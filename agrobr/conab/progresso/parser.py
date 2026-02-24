@@ -147,6 +147,24 @@ def parse_progresso_xlsx(data: bytes) -> pd.DataFrame:
         if estado_raw.startswith("*") or estado_raw.startswith("("):
             continue
         if "estados" in estado_raw.lower() or "brasil" in estado_raw.lower():
+            uf = "BR"
+            pct_ano_ant = _safe_float(vals[2])
+            pct_sem_ant = _safe_float(vals[3])
+            pct_sem_atual = _safe_float(vals[4])
+            pct_media_5 = _safe_float(vals[5])
+            records.append(
+                {
+                    "cultura": cultura_atual,
+                    "safra": safra_atual,
+                    "operacao": operacao_atual,
+                    "estado": uf,
+                    "semana_atual": semana_atual,
+                    "pct_ano_anterior": pct_ano_ant,
+                    "pct_semana_anterior": pct_sem_ant,
+                    "pct_semana_atual": pct_sem_atual,
+                    "pct_media_5_anos": pct_media_5,
+                }
+            )
             continue
         if estado_raw.lower().startswith("valores") or estado_raw.lower().startswith("percentual"):
             in_data_rows = False
