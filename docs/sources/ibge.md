@@ -322,7 +322,7 @@ asyncio.run(main())
 
 | Coluna | Tipo | Descricao |
 |--------|------|-----------|
-| `ano` | int | Ano de referencia (2017) |
+| `ano` | int | Ano de referencia (2006 ou 2017) |
 | `localidade` | str | Nome da localidade |
 | `localidade_cod` | int | Codigo IBGE da localidade |
 | `tema` | str | Tema do censo |
@@ -334,16 +334,23 @@ asyncio.run(main())
 
 ## Temas Censo Agropecuario
 
-| Codigo | Tema | Tabela SIDRA |
-|--------|------|--------------|
-| `efetivo_rebanho` | Efetivo de rebanho | 6907 |
-| `uso_terra` | Uso da terra | 6881 |
-| `lavoura_temporaria` | Lavoura temporaria | 6957 |
-| `lavoura_permanente` | Lavoura permanente | 6956 |
+| Codigo | Tema | Tabela SIDRA 2017 | Tabela SIDRA 2006 |
+|--------|------|-------------------|-------------------|
+| `efetivo_rebanho` | Efetivo de rebanho | 6907 | — |
+| `uso_terra` | Uso da terra | 6881 | — |
+| `lavoura_temporaria` | Lavoura temporaria | 6957 | — |
+| `lavoura_permanente` | Lavoura permanente | 6956 | — |
+| `preparo_solo` | Preparo do solo | 6855 | 791 |
+| `adubacao` | Adubacao | 6848 | 1249 |
+| `calagem` | Calagem | 6849 | 1245 |
+| `agrotoxicos` | Uso de agrotoxicos | 6851 | 1459 |
+| `praticas_agricolas` | Praticas agricolas | 8561 | 837 |
+| `irrigacao` | Irrigacao | 6857 | 855 |
 
 ```python
 temas = await ibge.temas_censo_agro()
-# ['efetivo_rebanho', 'uso_terra', 'lavoura_temporaria', 'lavoura_permanente']
+# ['efetivo_rebanho', 'uso_terra', 'lavoura_temporaria', 'lavoura_permanente',
+#  'preparo_solo', 'adubacao', 'calagem', 'agrotoxicos', 'praticas_agricolas', 'irrigacao']
 ```
 
 ## Cache

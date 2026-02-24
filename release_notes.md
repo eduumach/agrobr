@@ -1,15 +1,15 @@
-# agrobr 0.11.2 — Test Coverage Boost
+# agrobr 0.11.3 — Censo Agro Expansion
 
 ## Highlights
 
-- **3658 testes** (era 3501), cobertura **84%** (era 80%)
-- **157 novos testes** cobrindo 15 módulos, 462 linhas adicionais
-- **12 módulos** com ganho significativo de cobertura
-- Nenhuma dependência nova — todos os testes usam `unittest.mock`
+- **Censo Agropecuario expandido: 4 → 10 temas** — 6 novos temas de manejo de solo e irrigacao
+- **Multi-ano: 2006 + 2017** — novo parametro `ano` em `censo_agro()` para filtrar por ano censal
+- **86 testes** (era 52) — cobertura completa dos novos temas e combinacoes multi-ano
+- **Retrocompativel** — temas existentes continuam funcionando sem `ano`
 
 ## Breaking Changes
 
-Nenhum. API pública mantida.
+Nenhum. API publica mantida.
 
 ## Upgrade
 
@@ -19,31 +19,42 @@ pip install --upgrade agrobr
 
 ## Added
 
-- **Cobertura de testes 80% → 84%** — 157 novos testes em 15 módulos:
-  - `telemetry/collector` 0% → 100% (async track, flush, conveniences)
-  - `utils/logging` 0% → 100% (structlog configure, get_logger)
-  - `validators/sanity` 59% → 100% (validate_safra, validate_batch)
-  - `mapbiomas/client` 39% → 100% (URL building, fetch mock)
-  - `desmatamento/client` 22% → 97% (WFS URL, UF mapping, fetch)
-  - `cache/policies` 56% → 96% (format_ttl, next_update, should_refresh)
-  - `cache/duckdb_store` 83% → 94% (chunks, _to_row, error paths)
-  - `validators/structural` 18% → 85% (Jaccard, fingerprint, baseline)
-  - `http/browser` 23% → 77% (Playwright mock, Cloudflare detect)
-  - `plugins/__init__` 58% → 87% (load from file/dir, lifecycle)
-  - `cepea/parsers/consensus` 72% → 100% (analyze, select_best, validator)
-  - `cepea/parsers/detector` 92% → 100% (fallback chain, confidence)
+- **6 novos temas do Censo Agropecuario** (#15):
+  - `preparo_solo` — Preparo do solo (tabelas SIDRA 6855/791)
+  - `adubacao` — Adubacao (tabelas SIDRA 6848/1249)
+  - `calagem` — Calagem (tabelas SIDRA 6849/1245)
+  - `agrotoxicos` — Uso de agrotoxicos (tabelas SIDRA 6851/1459)
+  - `praticas_agricolas` — Praticas agricolas (tabelas SIDRA 8561/837)
+  - `irrigacao` — Irrigacao (tabelas SIDRA 6857/855)
 
-## Fixed
+- **Suporte multi-ano (2006 + 2017)**:
+  - `censo_agro('preparo_solo', ano=2017)` — apenas 2017
+  - `censo_agro('irrigacao', ano=2006)` — apenas 2006
+  - `censo_agro('adubacao')` — ambos os anos concatenados
 
-- **CONAB serie_historica**: URL corrigida — `/conab/conab/pt-br/` duplicado removido
-- **MapBiomas**: URLs migradas de GCS (404) para Dataverse (`data.mapbiomas.org`)
-- **SICAR**: SSLContext customizado com `@SECLEVEL=1` para TLS handshake failure
-- **ANTT Pedagio**: slugs CKAN atualizados, parser V2 ajustado para novo layout CSV
-- **ANP Diesel**: `vendas_diesel` migrado de XLS pivot (quebrado) para CSV dados abertos
+- **Tratamento especial `preparo_solo` 2017** — variaveis SIDRA funcionam como categorias (`_VAR_AS_CATEGORIA`)
+
+- **Helper `_fetch_censo_single()`** extraido para loop multi-ano
+
+## Exemplo
+
+```python
+from agrobr import ibge
+
+# Novos temas de manejo de solo
+df = await ibge.censo_agro('preparo_solo', ano=2017, uf='SP')
+df = await ibge.censo_agro('irrigacao')  # ambos os anos
+df = await ibge.censo_agro('adubacao', ano=2006)
+
+# Listar todos os 10 temas
+temas = await ibge.temas_censo_agro()
+# ['efetivo_rebanho', 'uso_terra', 'lavoura_temporaria', 'lavoura_permanente',
+#  'preparo_solo', 'adubacao', 'calagem', 'agrotoxicos', 'praticas_agricolas', 'irrigacao']
+```
 
 ## Links
 
-- [Documentação](https://www.agrobr.dev/docs/)
+- [Documentacao](https://www.agrobr.dev/docs/)
 - [PyPI](https://pypi.org/project/agrobr/)
 - [Changelog completo](https://github.com/bruno-portfolio/agrobr/blob/main/CHANGELOG.md)
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/bruno-portfolio/agrobr/blob/main/examples/agrobr_demo.ipynb)

@@ -7,6 +7,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+## [0.11.3] - 2026-02-24
+
 ### Added
 - **Censo Agropecuario — 6 novos temas de manejo de solo e irrigacao** (#15) — `preparo_solo`,
   `adubacao`, `calagem`, `agrotoxicos`, `praticas_agricolas`, `irrigacao`. Cada tema com dados de
@@ -718,7 +720,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - Type hints completos
 - Logging estruturado com structlog
 
-[Unreleased]: https://github.com/bruno-portfolio/agrobr/compare/v0.11.2...HEAD
+[Unreleased]: https://github.com/bruno-portfolio/agrobr/compare/v0.11.3...HEAD
+[0.11.3]: https://github.com/bruno-portfolio/agrobr/compare/v0.11.2...v0.11.3
 [0.11.2]: https://github.com/bruno-portfolio/agrobr/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/bruno-portfolio/agrobr/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/bruno-portfolio/agrobr/compare/v0.10.1...v0.11.0
