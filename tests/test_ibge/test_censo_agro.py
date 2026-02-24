@@ -14,56 +14,104 @@ GOLDEN_DIR = Path(__file__).parent.parent / "golden_data" / "ibge" / "censo_agro
 
 class TestTabelasCensoAgro:
     def test_efetivo_rebanho(self):
-        assert client.TABELAS_CENSO_AGRO["efetivo_rebanho"] == "6907"
+        assert client.TABELAS_CENSO_AGRO["efetivo_rebanho"]["2017"] == "6907"
 
     def test_uso_terra(self):
-        assert client.TABELAS_CENSO_AGRO["uso_terra"] == "6881"
+        assert client.TABELAS_CENSO_AGRO["uso_terra"]["2017"] == "6881"
 
     def test_lavoura_temporaria(self):
-        assert client.TABELAS_CENSO_AGRO["lavoura_temporaria"] == "6957"
+        assert client.TABELAS_CENSO_AGRO["lavoura_temporaria"]["2017"] == "6957"
 
     def test_lavoura_permanente(self):
-        assert client.TABELAS_CENSO_AGRO["lavoura_permanente"] == "6956"
+        assert client.TABELAS_CENSO_AGRO["lavoura_permanente"]["2017"] == "6956"
+
+    def test_preparo_solo(self):
+        assert client.TABELAS_CENSO_AGRO["preparo_solo"]["2006"] == "791"
+        assert client.TABELAS_CENSO_AGRO["preparo_solo"]["2017"] == "6855"
+
+    def test_adubacao(self):
+        assert client.TABELAS_CENSO_AGRO["adubacao"]["2006"] == "1249"
+        assert client.TABELAS_CENSO_AGRO["adubacao"]["2017"] == "6848"
+
+    def test_calagem(self):
+        assert client.TABELAS_CENSO_AGRO["calagem"]["2006"] == "1245"
+        assert client.TABELAS_CENSO_AGRO["calagem"]["2017"] == "6849"
+
+    def test_agrotoxicos(self):
+        assert client.TABELAS_CENSO_AGRO["agrotoxicos"]["2006"] == "1459"
+        assert client.TABELAS_CENSO_AGRO["agrotoxicos"]["2017"] == "6851"
+
+    def test_praticas_agricolas(self):
+        assert client.TABELAS_CENSO_AGRO["praticas_agricolas"]["2006"] == "837"
+        assert client.TABELAS_CENSO_AGRO["praticas_agricolas"]["2017"] == "8561"
+
+    def test_irrigacao(self):
+        assert client.TABELAS_CENSO_AGRO["irrigacao"]["2006"] == "855"
+        assert client.TABELAS_CENSO_AGRO["irrigacao"]["2017"] == "6857"
+
+    def test_has_10_themes(self):
+        assert len(client.TABELAS_CENSO_AGRO) == 10
+
+    def test_all_themes_have_at_least_one_year(self):
+        for tema, anos in client.TABELAS_CENSO_AGRO.items():
+            assert len(anos) >= 1, f"{tema} has no years"
 
     def test_all_codes_numeric(self):
-        for name, code in client.TABELAS_CENSO_AGRO.items():
-            assert code.isdigit(), f"{name} has non-numeric code: {code}"
+        for tema, anos in client.TABELAS_CENSO_AGRO.items():
+            for ano, code in anos.items():
+                assert code.isdigit(), f"{tema}/{ano} has non-numeric code: {code}"
 
 
 class TestVariaveisCensoAgro:
     def test_efetivo_has_cabecas(self):
-        assert "cabecas" in client.VARIAVEIS_CENSO_AGRO["efetivo_rebanho"]
-        assert client.VARIAVEIS_CENSO_AGRO["efetivo_rebanho"]["cabecas"] == "2209"
+        assert "cabecas" in client.VARIAVEIS_CENSO_AGRO["efetivo_rebanho"]["2017"]
+        assert client.VARIAVEIS_CENSO_AGRO["efetivo_rebanho"]["2017"]["cabecas"] == "2209"
 
     def test_uso_terra_has_area(self):
-        assert "area" in client.VARIAVEIS_CENSO_AGRO["uso_terra"]
-        assert client.VARIAVEIS_CENSO_AGRO["uso_terra"]["area"] == "184"
+        assert "area" in client.VARIAVEIS_CENSO_AGRO["uso_terra"]["2017"]
+        assert client.VARIAVEIS_CENSO_AGRO["uso_terra"]["2017"]["area"] == "184"
 
     def test_lavoura_temp_has_producao(self):
-        assert "producao" in client.VARIAVEIS_CENSO_AGRO["lavoura_temporaria"]
+        assert "producao" in client.VARIAVEIS_CENSO_AGRO["lavoura_temporaria"]["2017"]
 
     def test_lavoura_perm_has_producao(self):
-        assert "producao" in client.VARIAVEIS_CENSO_AGRO["lavoura_permanente"]
+        assert "producao" in client.VARIAVEIS_CENSO_AGRO["lavoura_permanente"]["2017"]
 
-    def test_all_themes_have_estabelecimentos(self):
-        for tema, vars_map in client.VARIAVEIS_CENSO_AGRO.items():
-            assert "estabelecimentos" in vars_map, f"{tema} missing estabelecimentos"
+    def test_preparo_solo_2017_has_plantio_direto(self):
+        assert "plantio_direto" in client.VARIAVEIS_CENSO_AGRO["preparo_solo"]["2017"]
+
+    def test_each_tema_ano_has_at_least_one_var(self):
+        for tema, anos in client.VARIAVEIS_CENSO_AGRO.items():
+            for ano, vars_map in anos.items():
+                assert len(vars_map) >= 1, f"{tema}/{ano} has no variables"
 
     def test_all_codes_numeric(self):
-        for tema, vars_map in client.VARIAVEIS_CENSO_AGRO.items():
-            for name, code in vars_map.items():
-                assert code.isdigit(), f"{tema}.{name} has non-numeric code: {code}"
+        for tema, anos in client.VARIAVEIS_CENSO_AGRO.items():
+            for ano, vars_map in anos.items():
+                for name, code in vars_map.items():
+                    assert code.isdigit(), f"{tema}/{ano}.{name} has non-numeric code: {code}"
 
 
 class TestTemasCensoAgro:
-    def test_has_4_themes(self):
-        assert len(client.TEMAS_CENSO_AGRO) == 4
+    def test_has_10_themes(self):
+        assert len(client.TEMAS_CENSO_AGRO) == 10
 
     def test_efetivo_in_temas(self):
         assert "efetivo_rebanho" in client.TEMAS_CENSO_AGRO
 
     def test_uso_terra_in_temas(self):
         assert "uso_terra" in client.TEMAS_CENSO_AGRO
+
+    def test_new_themes_in_temas(self):
+        for tema in [
+            "preparo_solo",
+            "adubacao",
+            "calagem",
+            "agrotoxicos",
+            "praticas_agricolas",
+            "irrigacao",
+        ]:
+            assert tema in client.TEMAS_CENSO_AGRO
 
     def test_temas_match_tabelas(self):
         assert set(client.TEMAS_CENSO_AGRO) == set(client.TABELAS_CENSO_AGRO.keys())
@@ -76,6 +124,13 @@ class TestCensoAgroValidation:
 
         with pytest.raises(ValueError, match="Tema não suportado"):
             await censo_agro("tema_inexistente")
+
+    @pytest.mark.asyncio
+    async def test_ano_invalido(self):
+        from agrobr.ibge.api import censo_agro
+
+        with pytest.raises(ValueError, match="Ano .* não disponível"):
+            await censo_agro("preparo_solo", ano=2020)
 
 
 def _build_mock_efetivo(n_ufs=3):
@@ -189,6 +244,214 @@ def _build_mock_uso_terra(n_ufs=2):
                 }
             )
     return pd.DataFrame(rows)
+
+
+def _build_mock_preparo_solo_2006(n_ufs=3):
+    rows = []
+    ufs = [("35", "São Paulo"), ("51", "Mato Grosso"), ("52", "Goiás")][:n_ufs]
+    categorias = [
+        ("113223", "Aração e/ou gradagem (cultivo convencional)"),
+        ("113224", "Cultivo mínimo"),
+        ("114631", "Plantio direto na palha"),
+    ]
+    for cod_uf, nome_uf in ufs:
+        for cod_cat, nome_cat in categorias:
+            rows.append(
+                {
+                    "NC": "3",
+                    "NN": "Unidade da Federação",
+                    "MC": "1020",
+                    "MN": "Unidades",
+                    "V": str(8000 + int(cod_uf)),
+                    "D1C": cod_uf,
+                    "D1N": nome_uf,
+                    "D2C": "183",
+                    "D2N": "Número de estabelecimentos agropecuários",
+                    "D3C": cod_cat,
+                    "D3N": nome_cat,
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _build_mock_preparo_solo_2017(n_ufs=3):
+    rows = []
+    ufs = [("35", "São Paulo"), ("51", "Mato Grosso"), ("52", "Goiás")][:n_ufs]
+    var_ids = [
+        ("9562", "Não utilizaram"),
+        ("9563", "Utilizaram preparo do solo"),
+        ("9564", "Cultivo convencional"),
+        ("9565", "Cultivo mínimo"),
+        ("2016", "Plantio direto na palha"),
+        ("2018", "Área com plantio direto na palha"),
+    ]
+    for cod_uf, nome_uf in ufs:
+        for var_id, var_nome in var_ids:
+            rows.append(
+                {
+                    "NC": "3",
+                    "NN": "Unidade da Federação",
+                    "MC": "1020",
+                    "MN": "Unidades",
+                    "V": str(5000 + int(cod_uf) + int(var_id) % 100),
+                    "D1C": cod_uf,
+                    "D1N": nome_uf,
+                    "D2C": var_id,
+                    "D2N": var_nome,
+                    "D3C": "46302",
+                    "D3N": "Total",
+                    "D4C": "41145",
+                    "D4N": "Total",
+                    "D5C": "45951",
+                    "D5N": "Total",
+                    "D6C": "46502",
+                    "D6N": "Total",
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _build_mock_classif_2006(categorias, n_ufs=2):
+    rows = []
+    ufs = [("35", "São Paulo"), ("51", "Mato Grosso")][:n_ufs]
+    for cod_uf, nome_uf in ufs:
+        for cod_cat, nome_cat in categorias:
+            rows.append(
+                {
+                    "NC": "3",
+                    "NN": "Unidade da Federação",
+                    "MC": "1020",
+                    "MN": "Unidades",
+                    "V": str(3000 + int(cod_uf)),
+                    "D1C": cod_uf,
+                    "D1N": nome_uf,
+                    "D2C": "183",
+                    "D2N": "Número de estabelecimentos agropecuários",
+                    "D3C": cod_cat,
+                    "D3N": nome_cat,
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _build_mock_classif_2017(categorias, n_ufs=2):
+    rows = []
+    ufs = [("35", "São Paulo"), ("51", "Mato Grosso")][:n_ufs]
+    var_ids = [("183", "Número de estabelecimentos"), ("184", "Área")]
+    for cod_uf, nome_uf in ufs:
+        for var_id, var_nome in var_ids:
+            for cod_cat, nome_cat in categorias:
+                rows.append(
+                    {
+                        "NC": "3",
+                        "NN": "Unidade da Federação",
+                        "MC": "1020",
+                        "MN": "Unidades",
+                        "V": str(4000 + int(cod_uf)),
+                        "D1C": cod_uf,
+                        "D1N": nome_uf,
+                        "D2C": var_id,
+                        "D2N": var_nome,
+                        "D3C": cod_cat,
+                        "D3N": nome_cat,
+                    }
+                )
+    return pd.DataFrame(rows)
+
+
+def _build_mock_adubacao_2006():
+    return _build_mock_classif_2006(
+        [
+            ("113227", "Usam adubação"),
+            ("113228", "Químico nitrogenado"),
+        ]
+    )
+
+
+def _build_mock_adubacao_2017():
+    return _build_mock_classif_2017(
+        [
+            ("46546", "Fez adubação"),
+            ("46547", "Química"),
+            ("46548", "Orgânica"),
+        ]
+    )
+
+
+def _build_mock_calagem_2006():
+    return _build_mock_classif_2006(
+        [
+            ("112013", "Fez no ano"),
+            ("120834", "Faz mas não precisou no período"),
+        ]
+    )
+
+
+def _build_mock_calagem_2017():
+    return _build_mock_classif_2017(
+        [
+            ("46554", "Fez aplicação de calcário e/ou de outro corretivo de acidez"),
+            ("46555", "Não fez aplicação"),
+        ]
+    )
+
+
+def _build_mock_agrotoxicos_2006():
+    return _build_mock_classif_2006(
+        [
+            ("111611", "Utilizou"),
+            ("111612", "Não utilizou"),
+        ]
+    )
+
+
+def _build_mock_agrotoxicos_2017():
+    return _build_mock_classif_2017(
+        [
+            ("111611", "Utilizou"),
+            ("111612", "Não utilizou"),
+        ]
+    )
+
+
+def _build_mock_praticas_agricolas_2006():
+    return _build_mock_classif_2006(
+        [
+            ("112654", "Plantio em nível"),
+            ("112677", "Rotação de culturas"),
+            ("112764", "Pousio ou descanso de solos"),
+        ]
+    )
+
+
+def _build_mock_praticas_agricolas_2017():
+    return _build_mock_classif_2017(
+        [
+            ("112654", "Plantio em nível"),
+            ("112677", "Rotação de culturas"),
+            ("112764", "Pousio ou descanso de solos"),
+        ]
+    )
+
+
+def _build_mock_irrigacao_2006():
+    return _build_mock_classif_2006(
+        [
+            ("113515", "Inundação"),
+            ("113517", "Pivô central"),
+            ("113519", "Localizado (gotejamento, microaspersão)"),
+        ]
+    )
+
+
+def _build_mock_irrigacao_2017():
+    return _build_mock_classif_2017(
+        [
+            ("45916", "Gotejamento"),
+            ("45923", "Pivô central"),
+            ("45919", "Inundação"),
+        ]
+    )
 
 
 class TestCensoAgroMocked:
@@ -384,6 +647,258 @@ class TestCensoAgroMocked:
             assert "Total" not in df["categoria"].values
 
 
+class TestCensoAgroNewThemesMocked:
+    @pytest.mark.asyncio
+    async def test_preparo_solo_2006(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_preparo_solo_2006()
+            df = await censo_agro("preparo_solo", ano=2006)
+            assert isinstance(df, pd.DataFrame)
+            assert len(df) > 0
+            assert (df["tema"] == "preparo_solo").all()
+            assert (df["ano"] == 2006).all()
+            categorias = df["categoria"].unique()
+            assert "Plantio direto na palha" in categorias
+
+    @pytest.mark.asyncio
+    async def test_preparo_solo_2017_var_as_category(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_preparo_solo_2017()
+            df = await censo_agro("preparo_solo", ano=2017)
+            assert isinstance(df, pd.DataFrame)
+            assert len(df) > 0
+            assert (df["tema"] == "preparo_solo").all()
+            assert (df["ano"] == 2017).all()
+            categorias = df["categoria"].unique()
+            assert "Plantio direto na palha" in categorias
+            assert "Cultivo convencional" in categorias
+
+    @pytest.mark.asyncio
+    async def test_preparo_solo_2017_columns(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_preparo_solo_2017()
+            df = await censo_agro("preparo_solo", ano=2017)
+            expected = [
+                "ano",
+                "localidade",
+                "localidade_cod",
+                "tema",
+                "categoria",
+                "variavel",
+                "valor",
+                "unidade",
+                "fonte",
+            ]
+            assert list(df.columns) == expected
+
+    @pytest.mark.asyncio
+    async def test_preparo_solo_multi_year(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.side_effect = [
+                _build_mock_preparo_solo_2006(),
+                _build_mock_preparo_solo_2017(),
+            ]
+            df = await censo_agro("preparo_solo")
+            assert set(df["ano"].unique()) == {2006, 2017}
+            assert len(df) > 0
+
+    @pytest.mark.asyncio
+    async def test_adubacao_2006(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_adubacao_2006()
+            df = await censo_agro("adubacao", ano=2006)
+            assert isinstance(df, pd.DataFrame)
+            assert len(df) > 0
+            assert (df["tema"] == "adubacao").all()
+            assert (df["ano"] == 2006).all()
+
+    @pytest.mark.asyncio
+    async def test_adubacao_2017(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_adubacao_2017()
+            df = await censo_agro("adubacao", ano=2017)
+            assert isinstance(df, pd.DataFrame)
+            assert len(df) > 0
+            assert (df["tema"] == "adubacao").all()
+
+    @pytest.mark.asyncio
+    async def test_calagem_2006(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_calagem_2006()
+            df = await censo_agro("calagem", ano=2006)
+            assert isinstance(df, pd.DataFrame)
+            assert len(df) > 0
+            assert (df["tema"] == "calagem").all()
+
+    @pytest.mark.asyncio
+    async def test_calagem_2017(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_calagem_2017()
+            df = await censo_agro("calagem", ano=2017)
+            assert isinstance(df, pd.DataFrame)
+            assert len(df) > 0
+            assert (df["tema"] == "calagem").all()
+
+    @pytest.mark.asyncio
+    async def test_agrotoxicos_2006(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_agrotoxicos_2006()
+            df = await censo_agro("agrotoxicos", ano=2006)
+            assert isinstance(df, pd.DataFrame)
+            assert len(df) > 0
+            assert (df["tema"] == "agrotoxicos").all()
+
+    @pytest.mark.asyncio
+    async def test_agrotoxicos_2017(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_agrotoxicos_2017()
+            df = await censo_agro("agrotoxicos", ano=2017)
+            assert isinstance(df, pd.DataFrame)
+            assert len(df) > 0
+            assert (df["tema"] == "agrotoxicos").all()
+
+    @pytest.mark.asyncio
+    async def test_praticas_agricolas_2006(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_praticas_agricolas_2006()
+            df = await censo_agro("praticas_agricolas", ano=2006)
+            assert isinstance(df, pd.DataFrame)
+            assert len(df) > 0
+            assert (df["tema"] == "praticas_agricolas").all()
+            categorias = df["categoria"].unique()
+            assert "Plantio em nível" in categorias
+
+    @pytest.mark.asyncio
+    async def test_praticas_agricolas_2017(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_praticas_agricolas_2017()
+            df = await censo_agro("praticas_agricolas", ano=2017)
+            assert isinstance(df, pd.DataFrame)
+            assert len(df) > 0
+            assert (df["tema"] == "praticas_agricolas").all()
+
+    @pytest.mark.asyncio
+    async def test_irrigacao_2006(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_irrigacao_2006()
+            df = await censo_agro("irrigacao", ano=2006)
+            assert isinstance(df, pd.DataFrame)
+            assert len(df) > 0
+            assert (df["tema"] == "irrigacao").all()
+            categorias = df["categoria"].unique()
+            assert "Pivô central" in categorias
+
+    @pytest.mark.asyncio
+    async def test_irrigacao_2017(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_irrigacao_2017()
+            df = await censo_agro("irrigacao", ano=2017)
+            assert isinstance(df, pd.DataFrame)
+            assert len(df) > 0
+            assert (df["tema"] == "irrigacao").all()
+            categorias = df["categoria"].unique()
+            assert "Gotejamento" in categorias
+
+    @pytest.mark.asyncio
+    async def test_ano_filter_single(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_adubacao_2017()
+            df = await censo_agro("adubacao", ano=2017)
+            mock.assert_called_once()
+            assert (df["ano"] == 2017).all()
+
+    @pytest.mark.asyncio
+    async def test_valor_numerico(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_irrigacao_2006()
+            df = await censo_agro("irrigacao", ano=2006)
+            assert pd.api.types.is_numeric_dtype(df["valor"])
+
+    @pytest.mark.asyncio
+    async def test_localidade_cod_inteiro(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_calagem_2017()
+            df = await censo_agro("calagem", ano=2017)
+            assert df["localidade_cod"].dtype == "Int64"
+
+
+class TestCensoAgroRetrocompat:
+    @pytest.mark.asyncio
+    async def test_efetivo_rebanho_still_works(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_efetivo()
+            df = await censo_agro("efetivo_rebanho")
+            assert isinstance(df, pd.DataFrame)
+            assert len(df) > 0
+            assert (df["tema"] == "efetivo_rebanho").all()
+
+    @pytest.mark.asyncio
+    async def test_uso_terra_still_works(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_uso_terra()
+            df = await censo_agro("uso_terra")
+            assert isinstance(df, pd.DataFrame)
+            assert len(df) > 0
+            assert (df["tema"] == "uso_terra").all()
+
+    @pytest.mark.asyncio
+    async def test_efetivo_with_uf_keyword(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_efetivo(n_ufs=1)
+            df = await censo_agro("efetivo_rebanho", uf="SP")
+            assert len(df) > 0
+
+    @pytest.mark.asyncio
+    async def test_efetivo_with_ano_none(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_efetivo()
+            df = await censo_agro("efetivo_rebanho", ano=None)
+            assert isinstance(df, pd.DataFrame)
+            assert len(df) > 0
+
+
 class TestTemasCensoAgroFunc:
     @pytest.mark.asyncio
     async def test_returns_list(self):
@@ -391,7 +906,7 @@ class TestTemasCensoAgroFunc:
 
         result = await temas_censo_agro()
         assert isinstance(result, list)
-        assert len(result) == 4
+        assert len(result) == 10
 
     @pytest.mark.asyncio
     async def test_contains_all_themes(self):
@@ -402,6 +917,12 @@ class TestTemasCensoAgroFunc:
         assert "uso_terra" in result
         assert "lavoura_temporaria" in result
         assert "lavoura_permanente" in result
+        assert "preparo_solo" in result
+        assert "adubacao" in result
+        assert "calagem" in result
+        assert "agrotoxicos" in result
+        assert "praticas_agricolas" in result
+        assert "irrigacao" in result
 
 
 class TestCensoAgroPolarsSupport:
@@ -527,6 +1048,9 @@ class TestCensoAgroDataset:
 
         assert "efetivo_rebanho" in CENSO_AGROPECUARIO_INFO.products
         assert "uso_terra" in CENSO_AGROPECUARIO_INFO.products
+        assert "preparo_solo" in CENSO_AGROPECUARIO_INFO.products
+        assert "irrigacao" in CENSO_AGROPECUARIO_INFO.products
+        assert len(CENSO_AGROPECUARIO_INFO.products) == 10
 
     def test_dataset_source(self):
         from agrobr.datasets.censo_agropecuario import CENSO_AGROPECUARIO_INFO

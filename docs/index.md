@@ -56,7 +56,7 @@ Peça o que quer, a fonte é detalhe interno:
 | `pecuaria_municipal` | Rebanhos e produção animal | IBGE PPM |
 | `abate_trimestral` | Abate de bovinos, suínos e frangos | IBGE Abate |
 | `cadastro_rural` | Cadastro Ambiental Rural (imóveis rurais) | SICAR/GeoServer WFS |
-| `censo_agropecuario` | Censo Agropecuário 2017 | IBGE Censo Agro |
+| `censo_agropecuario` | Censo Agropecuário 2006/2017 (10 temas) | IBGE Censo Agro |
 
 ```python
 from agrobr import datasets

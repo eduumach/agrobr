@@ -126,29 +126,66 @@ CATEGORIAS_ABATE = {
 
 ESPECIES_ABATE = ["bovino", "suino", "frango"]
 
-TABELAS_CENSO_AGRO = {
-    "efetivo_rebanho": "6907",
-    "uso_terra": "6881",
-    "lavoura_temporaria": "6957",
-    "lavoura_permanente": "6956",
+TABELAS_CENSO_AGRO: dict[str, dict[str, str]] = {
+    "efetivo_rebanho": {"2017": "6907"},
+    "uso_terra": {"2017": "6881"},
+    "lavoura_temporaria": {"2017": "6957"},
+    "lavoura_permanente": {"2017": "6956"},
+    "preparo_solo": {"2006": "791", "2017": "6855"},
+    "adubacao": {"2006": "1249", "2017": "6848"},
+    "calagem": {"2006": "1245", "2017": "6849"},
+    "agrotoxicos": {"2006": "1459", "2017": "6851"},
+    "praticas_agricolas": {"2006": "837", "2017": "8561"},
+    "irrigacao": {"2006": "855", "2017": "6857"},
 }
 
-VARIAVEIS_CENSO_AGRO: dict[str, dict[str, str]] = {
-    "efetivo_rebanho": {"estabelecimentos": "10010", "cabecas": "2209"},
-    "uso_terra": {"estabelecimentos": "9587", "area": "184"},
+VARIAVEIS_CENSO_AGRO: dict[str, dict[str, dict[str, str]]] = {
+    "efetivo_rebanho": {
+        "2017": {"estabelecimentos": "10010", "cabecas": "2209"},
+    },
+    "uso_terra": {
+        "2017": {"estabelecimentos": "9587", "area": "184"},
+    },
     "lavoura_temporaria": {
-        "estabelecimentos": "10084",
-        "producao": "10085",
-        "area_colhida": "10089",
+        "2017": {"estabelecimentos": "10084", "producao": "10085", "area_colhida": "10089"},
     },
     "lavoura_permanente": {
-        "estabelecimentos": "9504",
-        "producao": "9506",
-        "area_colhida": "10078",
+        "2017": {"estabelecimentos": "9504", "producao": "9506", "area_colhida": "10078"},
+    },
+    "preparo_solo": {
+        "2006": {"estabelecimentos": "183"},
+        "2017": {
+            "nao_utiliza": "9562",
+            "utiliza": "9563",
+            "convencional": "9564",
+            "cultivo_minimo": "9565",
+            "plantio_direto": "2016",
+            "area_plantio_direto": "2018",
+        },
+    },
+    "adubacao": {
+        "2006": {"estabelecimentos": "183"},
+        "2017": {"estabelecimentos": "183", "area": "184"},
+    },
+    "calagem": {
+        "2006": {"estabelecimentos": "183"},
+        "2017": {"estabelecimentos": "183", "area": "184"},
+    },
+    "agrotoxicos": {
+        "2006": {"estabelecimentos": "183"},
+        "2017": {"estabelecimentos": "183", "area": "184"},
+    },
+    "praticas_agricolas": {
+        "2006": {"estabelecimentos": "183"},
+        "2017": {"estabelecimentos": "183", "area": "184"},
+    },
+    "irrigacao": {
+        "2006": {"estabelecimentos": "183"},
+        "2017": {"estabelecimentos": "183", "area": "184"},
     },
 }
 
-TEMAS_CENSO_AGRO = list(TABELAS_CENSO_AGRO.keys())
+TEMAS_CENSO_AGRO: list[str] = list(TABELAS_CENSO_AGRO.keys())
 
 PRODUTOS_LSPA = {
     "soja": "39443",

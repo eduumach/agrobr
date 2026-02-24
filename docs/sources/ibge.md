@@ -47,13 +47,14 @@
 - **Especies**: bovino, suino, frango
 - **Variaveis**: animais abatidos (cabecas), peso das carcacas (kg)
 
-### Censo Agropecuario 2017
+### Censo Agropecuario 2006/2017
 
-- **Tabelas SIDRA**: 6907 (efetivo rebanho), 6881 (uso terra), 6957 (lavoura temporaria), 6956 (lavoura permanente)
+- **Tabelas SIDRA 2017**: 6907 (efetivo rebanho), 6881 (uso terra), 6957 (lavoura temporaria), 6956 (lavoura permanente), 6855 (preparo solo), 6848 (adubacao), 6849 (calagem), 6851 (agrotoxicos), 8561 (praticas agricolas), 6857 (irrigacao)
+- **Tabelas SIDRA 2006**: 791 (preparo solo), 1249 (adubacao), 1245 (calagem), 1459 (agrotoxicos), 837 (praticas agricolas), 855 (irrigacao)
 - **Cobertura**: Brasil + UF + municipio
 - **Frequencia**: Decenial
-- **Periodo**: 2017 (referencia out/2016 a set/2017)
-- **Temas**: efetivo_rebanho, uso_terra, lavoura_temporaria, lavoura_permanente
+- **Periodos**: 2006 e 2017 (conforme tema)
+- **Temas**: efetivo_rebanho, uso_terra, lavoura_temporaria, lavoura_permanente, preparo_solo, adubacao, calagem, agrotoxicos, praticas_agricolas, irrigacao
 - **Formato**: Long format (variavel/valor por linha)
 
 ## Variaveis

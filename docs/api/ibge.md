@@ -301,11 +301,12 @@ async def especies_abate() -> list[str]
 
 ### `censo_agro`
 
-Obtém dados do Censo Agropecuário 2017.
+Obtém dados do Censo Agropecuário (2006 e 2017).
 
 ```python
 async def censo_agro(
     tema: str,
+    ano: int | str | None = None,
     uf: str | None = None,
     nivel: str = 'uf',
     as_polars: bool = False,
@@ -316,21 +317,28 @@ async def censo_agro(
 
 | Parâmetro | Tipo | Descrição |
 |-----------|------|-----------|
-| `tema` | `str` | Tema: 'efetivo_rebanho', 'uso_terra', 'lavoura_temporaria', 'lavoura_permanente' |
+| `tema` | `str` | Tema do censo (ver tabela abaixo) |
+| `ano` | `int \| str \| None` | Ano censal (2006 ou 2017). Default: todos os anos disponíveis |
 | `uf` | `str \| None` | Filtrar por UF (ex: 'MT') |
 | `nivel` | `str` | Nível: 'brasil', 'uf', 'municipio' |
 | `as_polars` | `bool` | Retornar como polars.DataFrame |
 
 **Temas disponíveis:**
 
-| Código | Tema | Tabela SIDRA |
-|--------|------|--------------|
-| `efetivo_rebanho` | Efetivo de rebanho | 6907 |
-| `uso_terra` | Uso da terra | 6881 |
-| `lavoura_temporaria` | Lavoura temporária | 6957 |
-| `lavoura_permanente` | Lavoura permanente | 6956 |
+| Código | Tema | Tabela 2006 | Tabela 2017 |
+|--------|------|:-----------:|:-----------:|
+| `efetivo_rebanho` | Efetivo de rebanho | — | 6907 |
+| `uso_terra` | Uso da terra | — | 6881 |
+| `lavoura_temporaria` | Lavoura temporária | — | 6957 |
+| `lavoura_permanente` | Lavoura permanente | — | 6956 |
+| `preparo_solo` | Preparo do solo | 791 | 6855 |
+| `adubacao` | Adubação | 1249 | 6848 |
+| `calagem` | Calagem | 1245 | 6849 |
+| `agrotoxicos` | Uso de agrotóxicos | 1459 | 6851 |
+| `praticas_agricolas` | Práticas agrícolas | 837 | 8561 |
+| `irrigacao` | Irrigação | 855 | 6857 |
 
-**Variáveis retornadas por tema:**
+**Variáveis retornadas por tema (temas originais):**
 
 | Tema | Variável | Unidade |
 |------|----------|---------|
@@ -345,12 +353,23 @@ async def censo_agro(
 | `lavoura_permanente` | `producao` | varia |
 | `lavoura_permanente` | `area_colhida` | hectares |
 
+**Categorias dos novos temas (exemplos):**
+
+| Tema | Categorias (exemplos) |
+|------|----------------------|
+| `preparo_solo` | Cultivo convencional, Cultivo mínimo, Plantio direto na palha |
+| `adubacao` | Química, Orgânica, Adubação verde |
+| `calagem` | Fez aplicação, Não fez aplicação |
+| `agrotoxicos` | Utilizou, Não utilizou |
+| `praticas_agricolas` | Plantio em nível, Rotação de culturas, Pousio |
+| `irrigacao` | Gotejamento, Pivô central, Inundação, Aspersão |
+
 **Exemplo:**
 
 ```python
 from agrobr import ibge
 
-# Efetivo de rebanho por UF
+# Efetivo de rebanho por UF (2017)
 df = await ibge.censo_agro('efetivo_rebanho')
 
 # Uso da terra em Mato Grosso
@@ -359,8 +378,14 @@ df = await ibge.censo_agro('uso_terra', uf='MT')
 # Lavoura temporária por município
 df = await ibge.censo_agro('lavoura_temporaria', nivel='municipio', uf='PR')
 
-# Lavoura permanente — Brasil
-df = await ibge.censo_agro('lavoura_permanente', nivel='brasil')
+# Preparo do solo — ambos os anos (2006 + 2017)
+df = await ibge.censo_agro('preparo_solo')
+
+# Irrigação apenas 2017
+df = await ibge.censo_agro('irrigacao', ano=2017)
+
+# Adubação em 2006, filtrado por UF
+df = await ibge.censo_agro('adubacao', ano=2006, uf='SP')
 
 # Com metadados
 df, meta = await ibge.censo_agro('efetivo_rebanho', return_meta=True)
@@ -410,10 +435,16 @@ async def ufs() -> list[str]
 | 1092 | Abate - Bovinos |
 | 1093 | Abate - Suínos |
 | 1094 | Abate - Frangos |
-| 6907 | Censo Agro - Efetivo de rebanho |
-| 6881 | Censo Agro - Uso da terra |
-| 6957 | Censo Agro - Lavoura temporária |
-| 6956 | Censo Agro - Lavoura permanente |
+| 6907 | Censo Agro 2017 - Efetivo de rebanho |
+| 6881 | Censo Agro 2017 - Uso da terra |
+| 6957 | Censo Agro 2017 - Lavoura temporária |
+| 6956 | Censo Agro 2017 - Lavoura permanente |
+| 791 / 6855 | Censo Agro 2006/2017 - Preparo do solo |
+| 1249 / 6848 | Censo Agro 2006/2017 - Adubação |
+| 1245 / 6849 | Censo Agro 2006/2017 - Calagem |
+| 1459 / 6851 | Censo Agro 2006/2017 - Agrotóxicos |
+| 837 / 8561 | Censo Agro 2006/2017 - Práticas agrícolas |
+| 855 / 6857 | Censo Agro 2006/2017 - Irrigação |
 
 ## Versão Síncrona
 
@@ -425,6 +456,7 @@ df = ibge.lspa('milho_1', ano=2024, mes=6)
 df = ibge.ppm('bovino', ano=2023)
 df = ibge.abate('bovino', trimestre='202303')
 df = ibge.censo_agro('efetivo_rebanho')
+df = ibge.censo_agro('preparo_solo', ano=2017)
 ```
 
 ## Notas
@@ -435,4 +467,4 @@ df = ibge.censo_agro('efetivo_rebanho')
 - PAM é consolidada anualmente após colheita
 - PPM é consolidada anualmente (setembro), série desde 1974
 - Abate Trimestral disponível desde 1997, atualizado a cada trimestre (T+2 meses)
-- Censo Agropecuário 2017: dados deceniais, referência out/2016 a set/2017, cache 30 dias
+- Censo Agropecuário: 10 temas, dados de 2006 e/ou 2017 conforme disponibilidade. Referência 2017: out/2016 a set/2017. Cache 30 dias

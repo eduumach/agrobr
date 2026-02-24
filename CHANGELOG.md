@@ -5,6 +5,19 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR/).
 
+## [Unreleased]
+
+### Added
+- **Censo Agropecuario — 6 novos temas de manejo de solo e irrigacao** (#15) — `preparo_solo`,
+  `adubacao`, `calagem`, `agrotoxicos`, `praticas_agricolas`, `irrigacao`. Cada tema com dados de
+  2006 (tabelas SIDRA 791/1249/1245/1459/837/855) e 2017 (tabelas 6855/6848/6849/6851/8561/6857).
+  Total de temas sobe de 4 para 10. Novo parametro `ano` em `censo_agro()` para filtrar por ano
+  censal ou buscar ambos (`ano=None` concatena 2006+2017). Tratamento especial para `preparo_solo`
+  2017 onde variaveis SIDRA funcionam como categorias (`_VAR_AS_CATEGORIA`). Helper
+  `_fetch_censo_single()` extraido para loop multi-ano. Retrocompativel — temas existentes
+  continuam funcionando sem `ano`. 86 testes (era 52). Docs: `api/ibge.md`, `sources/ibge.md`,
+  `contracts/censo_agropecuario.md` atualizados
+
 ## [0.11.2] - 2026-02-22
 
 ### Added

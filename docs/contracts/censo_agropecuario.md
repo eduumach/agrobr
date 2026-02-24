@@ -1,22 +1,37 @@
 # censo_agropecuario v1.0
 
-Dados do Censo Agropecuario 2017 por tema, UF e nivel territorial.
+Dados do Censo Agropecuario 2006/2017 por tema, UF e nivel territorial.
 
 ## Fontes
 
 | Prioridade | Fonte | Descricao |
 |------------|-------|-----------|
-| 1 | IBGE Censo Agro | Censo Agropecuario 2017 |
+| 1 | IBGE Censo Agro | Censo Agropecuario 2006 e 2017 |
 
 ## Temas
 
-`efetivo_rebanho`, `uso_terra`, `lavoura_temporaria`, `lavoura_permanente`
+`efetivo_rebanho`, `uso_terra`, `lavoura_temporaria`, `lavoura_permanente`, `preparo_solo`, `adubacao`, `calagem`, `agrotoxicos`, `praticas_agricolas`, `irrigacao`
+
+### Cobertura temporal por tema
+
+| Tema | 2006 | 2017 |
+|------|:----:|:----:|
+| `efetivo_rebanho` | — | ✅ |
+| `uso_terra` | — | ✅ |
+| `lavoura_temporaria` | — | ✅ |
+| `lavoura_permanente` | — | ✅ |
+| `preparo_solo` | ✅ | ✅ |
+| `adubacao` | ✅ | ✅ |
+| `calagem` | ✅ | ✅ |
+| `agrotoxicos` | ✅ | ✅ |
+| `praticas_agricolas` | ✅ | ✅ |
+| `irrigacao` | ✅ | ✅ |
 
 ## Schema
 
 | Coluna | Tipo | Nullable | Descricao |
 |--------|------|----------|-----------|
-| `ano` | int | ❌ | Ano de referencia (2017) |
+| `ano` | int | ❌ | Ano de referencia (2006 ou 2017) |
 | `localidade` | str | ✅ | UF ou municipio |
 | `localidade_cod` | int | ✅ | Codigo IBGE |
 | `tema` | str | ❌ | Tema do censo |
@@ -34,7 +49,7 @@ Dados do Censo Agropecuario 2017 por tema, UF e nivel territorial.
 
 Long format: cada linha tem um par variavel/valor.
 
-### Variaveis por tema
+### Variaveis por tema (temas originais)
 
 | Tema | Variavel | Unidade |
 |------|----------|---------|
@@ -49,22 +64,40 @@ Long format: cada linha tem um par variavel/valor.
 | `lavoura_permanente` | `producao` | varia |
 | `lavoura_permanente` | `area_colhida` | hectares |
 
+### Novos temas — categorias
+
+| Tema | Categorias (exemplos) |
+|------|----------------------|
+| `preparo_solo` | Cultivo convencional, Cultivo minimo, Plantio direto na palha |
+| `adubacao` | Quimica, Organica, Adubacao verde (2006); Fez adubacao, Quimica, Organica (2017) |
+| `calagem` | Fez aplicacao, Nao fez aplicacao |
+| `agrotoxicos` | Utilizou, Nao utilizou |
+| `praticas_agricolas` | Plantio em nivel, Rotacao de culturas, Pousio |
+| `irrigacao` | Gotejamento, Pivo central, Inundacao, Aspersao |
+
 ## Garantias
 
-- Dados decenais consolidados (Censo Agropecuario 2017)
-- Periodo de referencia: outubro/2016 a setembro/2017
-- Cache com TTL de 30 dias (dados estáveis)
+- Dados decenais consolidados (Censo Agropecuario 2006 e 2017)
+- Periodo de referencia 2017: outubro/2016 a setembro/2017
+- Cache com TTL de 30 dias (dados estaveis)
+- Parametro `ano` filtra por ano censal; `ano=None` retorna todos os anos disponiveis
 
 ## Exemplo
 
 ```python
 from agrobr import ibge
 
-# Efetivo de rebanho por UF
+# Efetivo de rebanho por UF (2017)
 df = await ibge.censo_agro('efetivo_rebanho')
 
 # Uso da terra em Mato Grosso
 df = await ibge.censo_agro('uso_terra', uf='MT')
+
+# Preparo do solo — ambos os anos
+df = await ibge.censo_agro('preparo_solo')
+
+# Irrigacao apenas 2017
+df = await ibge.censo_agro('irrigacao', ano=2017)
 
 # Lavoura temporaria por municipio
 df = await ibge.censo_agro('lavoura_temporaria', nivel='municipio', uf='PR')
