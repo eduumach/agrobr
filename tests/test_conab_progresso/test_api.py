@@ -57,7 +57,7 @@ class TestProgressoSafra:
     async def test_filter_cultura(self, mock_fetch_latest: AsyncMock) -> None:  # noqa: ARG002
         df = await progresso_safra(cultura="Soja")
         assert all(df["cultura"] == "Soja")
-        assert len(df) == 6
+        assert len(df) == 8
 
     async def test_filter_cultura_normalized(self, mock_fetch_latest: AsyncMock) -> None:  # noqa: ARG002
         df = await progresso_safra(cultura="soja")

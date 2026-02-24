@@ -128,8 +128,8 @@ class TestParseEdgeCases:
         result = parse_progresso_xlsx(golden_xlsx)
         assert isinstance(result, pd.DataFrame)
 
-    def test_no_aggregate_rows(self, golden_xlsx: bytes) -> None:
+    def test_aggregate_rows_as_br(self, golden_xlsx: bytes) -> None:
         df = parse_progresso_xlsx(golden_xlsx)
+        assert "BR" in df["estado"].values
         for estado in df["estado"]:
             assert "estados" not in str(estado).lower()
-            assert "brasil" not in str(estado).lower()

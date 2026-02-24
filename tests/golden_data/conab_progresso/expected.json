@@ -19,14 +19,15 @@
     "Semeadura"
   ],
   "estados": [
+    "BR",
     "GO",
     "MT",
     "PR"
   ],
-  "total_records": 8,
-  "soja_semeadura_records": 3,
-  "soja_colheita_records": 3,
-  "milho2_semeadura_records": 2,
+  "total_records": 11,
+  "soja_semeadura_records": 4,
+  "soja_colheita_records": 4,
+  "milho2_semeadura_records": 3,
   "semana": "2026-02-07",
   "safra": "2025/26",
   "mt_soja_colheita_pct_atual": 0.468
