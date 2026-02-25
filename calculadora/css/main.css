@@ -627,6 +627,14 @@ body {
   font-family: var(--font-mono);
 }
 
+.result-banner-breakdown .breakdown-total {
+  width: 100%;
+  padding-top: 0.5rem;
+  margin-top: 0.25rem;
+  border-top: 1px solid rgba(255,255,255,0.3);
+  font-weight: 700;
+}
+
 /* ─── METHOD CARDS ─── */
 .method-grid {
   display: grid;

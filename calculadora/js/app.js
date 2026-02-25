@@ -405,15 +405,32 @@ function buildLayer(depth, suffix) {
 
 // ─── RENDERERS ───
 function renderBanner(report) {
+  const layers = report.moreira_result.nc_per_layer;
+  const hasSubsurface = "20-40" in layers;
+  const bannerLabel = $("result-banner-label");
+
+  if (hasSubsurface) {
+    bannerLabel.textContent = "Necessidade de Calagem — Moreira et al. (2025) — Perfil 0-40 cm";
+  } else {
+    bannerLabel.textContent = "Necessidade de Calagem — Moreira et al. (2025) — Camada 0-20 cm";
+  }
+
   $("banner-nc").textContent = report.moreira_result.nc_tha.toFixed(2);
   const breakdown = $("banner-breakdown");
   breakdown.innerHTML = "";
-  const layers = report.moreira_result.nc_per_layer;
+
   for (const [depth, nc] of Object.entries(layers)) {
     const span = document.createElement("span");
     span.className = "breakdown-item";
     span.textContent = `${depth} cm: ${nc.toFixed(2)} t/ha`;
     breakdown.appendChild(span);
+  }
+
+  if (hasSubsurface) {
+    const total = document.createElement("span");
+    total.className = "breakdown-item breakdown-total";
+    total.textContent = `Total perfil: ${report.moreira_result.nc_tha.toFixed(2)} t/ha`;
+    breakdown.appendChild(total);
   }
 }
 
