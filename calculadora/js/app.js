@@ -13,7 +13,7 @@ const state = {
 };
 
 const METHOD_DISPLAY = {
-  moreira_2025: { name: "Elevação da %Ca na CTC (Moreira et al., 2025)", desc: "Ca-saturação 60%, multicamada, calibrado em Latossolos de MG" },
+  moreira_2025: { name: "Moreira et al. (2025)", desc: "Elevação da %Ca na CTC, multicamada, calibrado em Latossolos de MG" },
   v_percent: { name: "Saturação por Bases (V%)", desc: "Raij (1979), calibração estadual" },
   al_ca_mg: { name: "Al+Ca+Mg (5ª Aprox.)", desc: "Alvarez V. & Ribeiro (1999), MG" },
   smp: { name: "Tabela SMP", desc: "CQFS (2016), RS/SC" },
