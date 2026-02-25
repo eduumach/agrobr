@@ -13,7 +13,7 @@ const state = {
 };
 
 const METHOD_DISPLAY = {
-  moreira_2025: { name: "Moreira et al. (2025)", desc: "Ca-saturação 60% CTC, multicamada" },
+  moreira_2025: { name: "Elevação da %Ca na CTC (Moreira et al., 2025)", desc: "Ca-saturação 60%, multicamada, calibrado em Latossolos de MG" },
   v_percent: { name: "Saturação por Bases (V%)", desc: "Raij (1979), calibração estadual" },
   al_ca_mg: { name: "Al+Ca+Mg (5ª Aprox.)", desc: "Alvarez V. & Ribeiro (1999), MG" },
   smp: { name: "Tabela SMP", desc: "CQFS (2016), RS/SC" },
@@ -104,10 +104,10 @@ $("state").addEventListener("change", e => {
   const hint = $("state-method-hint");
   const method = STATE_PRIMARY_METHOD[state.state];
   if (method) {
-    hint.textContent = `Método estadual: ${STATE_METHOD_NAMES[method]}`;
+    hint.textContent = `Moreira 2025 ✓ + comparação com ${STATE_METHOD_NAMES[method]}`;
     hint.classList.add("visible");
   } else if (state.state) {
-    hint.textContent = "Sem método estadual calibrado. Apenas Moreira 2025 disponível.";
+    hint.textContent = "Moreira 2025 ✓ (sem método estadual para comparação)";
     hint.classList.add("visible");
   } else {
     hint.classList.remove("visible");
