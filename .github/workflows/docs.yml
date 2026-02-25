@@ -38,6 +38,7 @@ jobs:
           mkdir site
           cp index.html site/
           cp -r site_mkdocs site/docs
+          cp -r calculadora site/calculadora
           echo "agrobr.dev" > site/CNAME
 
       - name: Setup Pages
