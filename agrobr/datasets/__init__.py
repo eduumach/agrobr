@@ -4,6 +4,7 @@ from agrobr.datasets.abate_trimestral import abate_trimestral
 from agrobr.datasets.balanco import balanco
 from agrobr.datasets.cadastro_rural import cadastro_rural
 from agrobr.datasets.censo_agropecuario import censo_agropecuario
+from agrobr.datasets.censo_agropecuario_legado import censo_agropecuario_legado
 from agrobr.datasets.credito_rural import credito_rural
 from agrobr.datasets.custo_producao import custo_producao
 from agrobr.datasets.deterministic import deterministic, get_snapshot, is_deterministic
@@ -27,6 +28,7 @@ __all__ = [
     "balanco",
     "cadastro_rural",
     "censo_agropecuario",
+    "censo_agropecuario_legado",
     "credito_rural",
     "custo_producao",
     "describe",

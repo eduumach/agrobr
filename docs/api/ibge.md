@@ -301,7 +301,7 @@ async def especies_abate() -> list[str]
 
 ### `censo_agro`
 
-Obtém dados do Censo Agropecuário (2006 e 2017).
+Obtém dados do Censo Agropecuário (1995, 2006 e 2017).
 
 ```python
 async def censo_agro(
@@ -318,25 +318,25 @@ async def censo_agro(
 | Parâmetro | Tipo | Descrição |
 |-----------|------|-----------|
 | `tema` | `str` | Tema do censo (ver tabela abaixo) |
-| `ano` | `int \| str \| None` | Ano censal (2006 ou 2017). Default: todos os anos disponíveis |
+| `ano` | `int \| str \| None` | Ano censal (1995, 2006 ou 2017). Default: todos os anos disponíveis |
 | `uf` | `str \| None` | Filtrar por UF (ex: 'MT') |
 | `nivel` | `str` | Nível: 'brasil', 'uf', 'municipio' |
 | `as_polars` | `bool` | Retornar como polars.DataFrame |
 
 **Temas disponíveis:**
 
-| Código | Tema | Tabela 2006 | Tabela 2017 |
-|--------|------|:-----------:|:-----------:|
-| `efetivo_rebanho` | Efetivo de rebanho | — | 6907 |
-| `uso_terra` | Uso da terra | — | 6881 |
-| `lavoura_temporaria` | Lavoura temporária | — | 6957 |
-| `lavoura_permanente` | Lavoura permanente | — | 6956 |
-| `preparo_solo` | Preparo do solo | 791 | 6855 |
-| `adubacao` | Adubação | 1249 | 6848 |
-| `calagem` | Calagem | 1245 | 6849 |
-| `agrotoxicos` | Uso de agrotóxicos | 1459 | 6851 |
-| `praticas_agricolas` | Práticas agrícolas | 837 | 8561 |
-| `irrigacao` | Irrigação | 855 | 6857 |
+| Código | Tema | Tabela 1995 | Tabela 2006 | Tabela 2017 |
+|--------|------|:-----------:|:-----------:|:-----------:|
+| `efetivo_rebanho` | Efetivo de rebanho | 323 | — | 6907 |
+| `uso_terra` | Uso da terra | 316/311 | — | 6881 |
+| `lavoura_temporaria` | Lavoura temporária | 497/492/503 | — | 6957 |
+| `lavoura_permanente` | Lavoura permanente | 509/504/510 | — | 6956 |
+| `preparo_solo` | Preparo do solo | — | 791 | 6855 |
+| `adubacao` | Adubação | — | 1249 | 6848 |
+| `calagem` | Calagem | — | 1245 | 6849 |
+| `agrotoxicos` | Uso de agrotóxicos | — | 1459 | 6851 |
+| `praticas_agricolas` | Práticas agrícolas | — | 837 | 8561 |
+| `irrigacao` | Irrigação | — | 855 | 6857 |
 
 **Variáveis retornadas por tema (temas originais):**
 
@@ -403,6 +403,69 @@ async def temas_censo_agro() -> list[str]
 
 ---
 
+### `censo_agro_legado`
+
+Obtém dados do Censo Agropecuário 1995/96 — 6 temas legados via FTP (XLS).
+
+```python
+async def censo_agro_legado(
+    tema: str,
+    uf: str | None = None,
+    nivel: str = 'uf',
+    as_polars: bool = False,
+) -> pd.DataFrame | pl.DataFrame
+```
+
+**Parâmetros:**
+
+| Parâmetro | Tipo | Descrição |
+|-----------|------|-----------|
+| `tema` | `str` | Tema legado (ver tabela abaixo) |
+| `uf` | `str \| None` | Filtrar por UF (ex: 'SP') |
+| `nivel` | `str` | Nível: 'brasil', 'uf', 'municipio' |
+| `as_polars` | `bool` | Retornar como polars.DataFrame |
+
+**Temas disponíveis:**
+
+| Código | Tema |
+|--------|------|
+| `tecnologia` | Tecnologia (assistência técnica, irrigação, adubos, etc.) |
+| `pessoal_ocupado` | Pessoal ocupado (total, familiar, permanentes, temporários) |
+| `maquinas` | Máquinas e equipamentos (tratores por faixa de CV) |
+| `producao_animal` | Produção animal (leite, lã, ovos) |
+| `valor_producao` | Valor da produção (vegetal, animal, subtipos) |
+| `financeiro` | Dados financeiros (investimentos, financiamentos, despesas, receitas) |
+
+**Exemplo:**
+
+```python
+from agrobr import ibge
+
+# Tecnologia por mesorregião
+df = await ibge.censo_agro_legado('tecnologia')
+
+# Pessoal ocupado em São Paulo
+df = await ibge.censo_agro_legado('pessoal_ocupado', uf='SP')
+
+# Máquinas — nível município
+df = await ibge.censo_agro_legado('maquinas', nivel='municipio')
+
+# Com metadados
+df, meta = await ibge.censo_agro_legado('tecnologia', return_meta=True)
+```
+
+---
+
+### `temas_censo_agro_legado`
+
+Lista temas disponíveis no Censo Agropecuário Legado (FTP).
+
+```python
+async def temas_censo_agro_legado() -> list[str]
+```
+
+---
+
 ### `ufs`
 
 Lista UFs disponíveis.
@@ -415,13 +478,13 @@ async def ufs() -> list[str]
 
 ## Diferenças PAM vs LSPA vs PPM vs Abate vs Censo Agro
 
-| Aspecto | PAM | LSPA | PPM | Abate | Censo Agro |
-|---------|-----|------|-----|-------|------------|
-| Frequência | Anual | Mensal | Anual | Trimestral | Decenial |
-| Granularidade | Até município | Até UF | Até município | Brasil + UF | Até município |
-| Tipo | Dados consolidados | Estimativas | Dados consolidados | Dados consolidados | Dados censitários |
-| Disponibilidade | T+1 ano | T+1 mês | T+1 ano | T+2 meses | Pós-censo |
-| Escopo | Lavouras | Lavouras | Pecuária | Abate de animais | Estrutura agropecuária |
+| Aspecto | PAM | LSPA | PPM | Abate | Censo Agro | Censo Agro Legado |
+|---------|-----|------|-----|-------|------------|-------------------|
+| Frequência | Anual | Mensal | Anual | Trimestral | Decenial | Única (1995/96) |
+| Granularidade | Até município | Até UF | Até município | Brasil + UF | Até município | Até município |
+| Tipo | Dados consolidados | Estimativas | Dados consolidados | Dados consolidados | Dados censitários | Dados censitários (FTP) |
+| Disponibilidade | T+1 ano | T+1 mês | T+1 ano | T+2 meses | Pós-censo | Estático |
+| Escopo | Lavouras | Lavouras | Pecuária | Abate de animais | Estrutura agropecuária | 6 temas legados |
 
 ## Tabelas SIDRA Utilizadas
 
@@ -435,6 +498,10 @@ async def ufs() -> list[str]
 | 1092 | Abate - Bovinos |
 | 1093 | Abate - Suínos |
 | 1094 | Abate - Frangos |
+| 323 | Censo Agro 1995 - Efetivo de rebanho |
+| 316 / 311 | Censo Agro 1995 - Uso da terra |
+| 497 / 492 / 503 | Censo Agro 1995 - Lavoura temporária |
+| 509 / 504 / 510 | Censo Agro 1995 - Lavoura permanente |
 | 6907 | Censo Agro 2017 - Efetivo de rebanho |
 | 6881 | Censo Agro 2017 - Uso da terra |
 | 6957 | Censo Agro 2017 - Lavoura temporária |
@@ -457,6 +524,8 @@ df = ibge.ppm('bovino', ano=2023)
 df = ibge.abate('bovino', trimestre='202303')
 df = ibge.censo_agro('efetivo_rebanho')
 df = ibge.censo_agro('preparo_solo', ano=2017)
+df = ibge.censo_agro_legado('tecnologia')
+df = ibge.censo_agro_legado('pessoal_ocupado', uf='SP')
 ```
 
 ## Notas
@@ -467,4 +536,5 @@ df = ibge.censo_agro('preparo_solo', ano=2017)
 - PAM é consolidada anualmente após colheita
 - PPM é consolidada anualmente (setembro), série desde 1974
 - Abate Trimestral disponível desde 1997, atualizado a cada trimestre (T+2 meses)
-- Censo Agropecuário: 10 temas, dados de 2006 e/ou 2017 conforme disponibilidade. Referência 2017: out/2016 a set/2017. Cache 30 dias
+- Censo Agropecuário: 10 temas, dados de 1995, 2006 e/ou 2017 conforme disponibilidade. Referência 2017: out/2016 a set/2017. Cache 30 dias
+- Censo Agropecuário Legado: 6 temas FTP (tecnologia, pessoal_ocupado, maquinas, producao_animal, valor_producao, financeiro). Ano fixo 1995. Cache 90 dias

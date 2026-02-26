@@ -84,6 +84,12 @@ POLICIES: dict[str, CachePolicy] = {
         description="IBGE Censo Agropecuário (atualiza a cada 10 anos)",
         smart_expiry=False,
     ),
+    "ibge_censo_agro_legado": CachePolicy(
+        ttl_seconds=TTL.DAYS_90.value,
+        stale_max_seconds=TTL.DAYS_90.value,
+        description="IBGE Censo Agropecuário 1995/96 legado FTP (dados estáticos)",
+        smart_expiry=False,
+    ),
     "noticias_agricolas": CachePolicy(
         ttl_seconds=TTL.HOURS_24.value,
         stale_max_seconds=TTL.HOURS_24.value * 2,

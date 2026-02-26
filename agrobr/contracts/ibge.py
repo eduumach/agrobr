@@ -277,7 +277,7 @@ IBGE_CENSO_AGRO_V1 = Contract(
             type=ColumnType.INTEGER,
             nullable=False,
             stable=True,
-            min_value=2006,
+            min_value=1995,
         ),
         Column(
             name="localidade",
@@ -331,9 +331,82 @@ IBGE_CENSO_AGRO_V1 = Contract(
     ],
     guarantees=[
         "Column names never change (additions only)",
-        "'ano' is always a valid census year (>= 2006)",
+        "'ano' is always a valid census year (>= 1995)",
         "Numeric values are always >= 0",
         "'fonte' is always 'ibge_censo_agro'",
+    ],
+    breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
+)
+
+IBGE_CENSO_AGRO_LEGADO_V1 = Contract(
+    name="ibge.censo_agro_legado",
+    version="1.0",
+    effective_from="0.12.0",
+    primary_key=["ano", "tema", "categoria", "variavel", "localidade"],
+    columns=[
+        Column(
+            name="ano",
+            type=ColumnType.INTEGER,
+            nullable=False,
+            stable=True,
+            min_value=1995,
+            max_value=1995,
+        ),
+        Column(
+            name="localidade",
+            type=ColumnType.STRING,
+            nullable=True,
+            stable=True,
+        ),
+        Column(
+            name="localidade_cod",
+            type=ColumnType.INTEGER,
+            nullable=True,
+            stable=True,
+        ),
+        Column(
+            name="tema",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="categoria",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="variavel",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="valor",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            stable=True,
+            min_value=0,
+        ),
+        Column(
+            name="unidade",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="fonte",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+    ],
+    guarantees=[
+        "Column names never change (additions only)",
+        "'ano' is always 1995 (Censo 1995/96)",
+        "Numeric values are always >= 0",
+        "'fonte' is always 'ibge_censo_agro_legado'",
     ],
     breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
 )
@@ -342,9 +415,11 @@ register_contract("producao_anual", IBGE_PAM_V1)
 register_contract("pecuaria_municipal", IBGE_PPM_V1)
 register_contract("abate_trimestral", IBGE_ABATE_V1)
 register_contract("censo_agropecuario", IBGE_CENSO_AGRO_V1)
+register_contract("censo_agropecuario_legado", IBGE_CENSO_AGRO_LEGADO_V1)
 
 __all__ = [
     "IBGE_ABATE_V1",
+    "IBGE_CENSO_AGRO_LEGADO_V1",
     "IBGE_CENSO_AGRO_V1",
     "IBGE_LSPA_V1",
     "IBGE_PAM_V1",

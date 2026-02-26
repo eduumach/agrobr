@@ -47,15 +47,25 @@
 - **Especies**: bovino, suino, frango
 - **Variaveis**: animais abatidos (cabecas), peso das carcacas (kg)
 
-### Censo Agropecuario 2006/2017
+### Censo Agropecuario 1995/2006/2017
 
 - **Tabelas SIDRA 2017**: 6907 (efetivo rebanho), 6881 (uso terra), 6957 (lavoura temporaria), 6956 (lavoura permanente), 6855 (preparo solo), 6848 (adubacao), 6849 (calagem), 6851 (agrotoxicos), 8561 (praticas agricolas), 6857 (irrigacao)
 - **Tabelas SIDRA 2006**: 791 (preparo solo), 1249 (adubacao), 1245 (calagem), 1459 (agrotoxicos), 837 (praticas agricolas), 855 (irrigacao)
+- **Tabelas SIDRA 1995**: 323 (efetivo rebanho), 316/311 (uso terra), 497/492/503 (lavoura temporaria), 509/504/510 (lavoura permanente)
 - **Cobertura**: Brasil + UF + municipio
 - **Frequencia**: Decenial
-- **Periodos**: 2006 e 2017 (conforme tema)
+- **Periodos**: 1995, 2006 e 2017 (conforme tema)
 - **Temas**: efetivo_rebanho, uso_terra, lavoura_temporaria, lavoura_permanente, preparo_solo, adubacao, calagem, agrotoxicos, praticas_agricolas, irrigacao
 - **Formato**: Long format (variavel/valor por linha)
+
+### Censo Agropecuario 1995/96 — Temas Legados (FTP)
+
+- **Fonte**: FTP IBGE (`ftp.ibge.gov.br`)
+- **Formato**: XLS legado (xlrd)
+- **Cobertura**: Brasil (mesorregioes, microrregioes, municipios)
+- **Frequencia**: Unica (Censo 1995/96)
+- **Temas**: tecnologia, pessoal_ocupado, maquinas, producao_animal, valor_producao, financeiro
+- **Acesso**: Publico, sem autenticacao
 
 ## Variaveis
 
@@ -322,7 +332,7 @@ asyncio.run(main())
 
 | Coluna | Tipo | Descricao |
 |--------|------|-----------|
-| `ano` | int | Ano de referencia (2006 ou 2017) |
+| `ano` | int | Ano de referencia (1995, 2006 ou 2017) |
 | `localidade` | str | Nome da localidade |
 | `localidade_cod` | int | Codigo IBGE da localidade |
 | `tema` | str | Tema do censo |
@@ -334,18 +344,18 @@ asyncio.run(main())
 
 ## Temas Censo Agropecuario
 
-| Codigo | Tema | Tabela SIDRA 2017 | Tabela SIDRA 2006 |
-|--------|------|-------------------|-------------------|
-| `efetivo_rebanho` | Efetivo de rebanho | 6907 | — |
-| `uso_terra` | Uso da terra | 6881 | — |
-| `lavoura_temporaria` | Lavoura temporaria | 6957 | — |
-| `lavoura_permanente` | Lavoura permanente | 6956 | — |
-| `preparo_solo` | Preparo do solo | 6855 | 791 |
-| `adubacao` | Adubacao | 6848 | 1249 |
-| `calagem` | Calagem | 6849 | 1245 |
-| `agrotoxicos` | Uso de agrotoxicos | 6851 | 1459 |
-| `praticas_agricolas` | Praticas agricolas | 8561 | 837 |
-| `irrigacao` | Irrigacao | 6857 | 855 |
+| Codigo | Tema | Tabela SIDRA 1995 | Tabela SIDRA 2006 | Tabela SIDRA 2017 |
+|--------|------|-------------------|-------------------|-------------------|
+| `efetivo_rebanho` | Efetivo de rebanho | 323 | — | 6907 |
+| `uso_terra` | Uso da terra | 316/311 | — | 6881 |
+| `lavoura_temporaria` | Lavoura temporaria | 497/492/503 | — | 6957 |
+| `lavoura_permanente` | Lavoura permanente | 509/504/510 | — | 6956 |
+| `preparo_solo` | Preparo do solo | — | 791 | 6855 |
+| `adubacao` | Adubacao | — | 1249 | 6848 |
+| `calagem` | Calagem | — | 1245 | 6849 |
+| `agrotoxicos` | Uso de agrotoxicos | — | 1459 | 6851 |
+| `praticas_agricolas` | Praticas agricolas | — | 837 | 8561 |
+| `irrigacao` | Irrigacao | — | 855 | 6857 |
 
 ```python
 temas = await ibge.temas_censo_agro()
@@ -362,6 +372,7 @@ temas = await ibge.temas_censo_agro()
 | PPM | 7 dias | 90 dias |
 | Abate | 7 dias | 90 dias |
 | Censo Agro | 30 dias | 365 dias |
+| Censo Agro Legado | 90 dias | 90 dias |
 
 ## Atualizacao
 

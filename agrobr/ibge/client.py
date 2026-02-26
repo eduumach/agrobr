@@ -127,10 +127,10 @@ CATEGORIAS_ABATE = {
 ESPECIES_ABATE = ["bovino", "suino", "frango"]
 
 TABELAS_CENSO_AGRO: dict[str, dict[str, str]] = {
-    "efetivo_rebanho": {"2017": "6907"},
-    "uso_terra": {"2017": "6881"},
-    "lavoura_temporaria": {"2017": "6957"},
-    "lavoura_permanente": {"2017": "6956"},
+    "efetivo_rebanho": {"1995": "323", "2017": "6907"},
+    "uso_terra": {"1995": "316", "2017": "6881"},
+    "lavoura_temporaria": {"1995": "497", "2017": "6957"},
+    "lavoura_permanente": {"1995": "509", "2017": "6956"},
     "preparo_solo": {"2006": "791", "2017": "6855"},
     "adubacao": {"2006": "1249", "2017": "6848"},
     "calagem": {"2006": "1245", "2017": "6849"},
@@ -141,15 +141,19 @@ TABELAS_CENSO_AGRO: dict[str, dict[str, str]] = {
 
 VARIAVEIS_CENSO_AGRO: dict[str, dict[str, dict[str, str]]] = {
     "efetivo_rebanho": {
+        "1995": {"cabecas": "105"},
         "2017": {"estabelecimentos": "10010", "cabecas": "2209"},
     },
     "uso_terra": {
+        "1995": {"area": "184", "estabelecimentos": "183"},
         "2017": {"estabelecimentos": "9587", "area": "184"},
     },
     "lavoura_temporaria": {
+        "1995": {"producao": "214", "estabelecimentos": "151", "area_colhida": "216"},
         "2017": {"estabelecimentos": "10084", "producao": "10085", "area_colhida": "10089"},
     },
     "lavoura_permanente": {
+        "1995": {"producao": "214", "estabelecimentos": "151", "area_colhida": "216"},
         "2017": {"estabelecimentos": "9504", "producao": "9506", "area_colhida": "10078"},
     },
     "preparo_solo": {

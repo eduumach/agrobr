@@ -49,6 +49,18 @@ class TestTabelasCensoAgro:
         assert client.TABELAS_CENSO_AGRO["irrigacao"]["2006"] == "855"
         assert client.TABELAS_CENSO_AGRO["irrigacao"]["2017"] == "6857"
 
+    def test_efetivo_rebanho_1995(self):
+        assert client.TABELAS_CENSO_AGRO["efetivo_rebanho"]["1995"] == "323"
+
+    def test_uso_terra_1995(self):
+        assert client.TABELAS_CENSO_AGRO["uso_terra"]["1995"] == "316"
+
+    def test_lavoura_temporaria_1995(self):
+        assert client.TABELAS_CENSO_AGRO["lavoura_temporaria"]["1995"] == "497"
+
+    def test_lavoura_permanente_1995(self):
+        assert client.TABELAS_CENSO_AGRO["lavoura_permanente"]["1995"] == "509"
+
     def test_has_10_themes(self):
         assert len(client.TABELAS_CENSO_AGRO) == 10
 
@@ -79,6 +91,21 @@ class TestVariaveisCensoAgro:
 
     def test_preparo_solo_2017_has_plantio_direto(self):
         assert "plantio_direto" in client.VARIAVEIS_CENSO_AGRO["preparo_solo"]["2017"]
+
+    def test_efetivo_1995_has_cabecas(self):
+        assert "cabecas" in client.VARIAVEIS_CENSO_AGRO["efetivo_rebanho"]["1995"]
+        assert client.VARIAVEIS_CENSO_AGRO["efetivo_rebanho"]["1995"]["cabecas"] == "105"
+
+    def test_uso_terra_1995_has_area(self):
+        assert "area" in client.VARIAVEIS_CENSO_AGRO["uso_terra"]["1995"]
+        assert client.VARIAVEIS_CENSO_AGRO["uso_terra"]["1995"]["area"] == "184"
+
+    def test_lavoura_temp_1995_has_producao(self):
+        assert "producao" in client.VARIAVEIS_CENSO_AGRO["lavoura_temporaria"]["1995"]
+        assert client.VARIAVEIS_CENSO_AGRO["lavoura_temporaria"]["1995"]["producao"] == "214"
+
+    def test_lavoura_perm_1995_has_producao(self):
+        assert "producao" in client.VARIAVEIS_CENSO_AGRO["lavoura_permanente"]["1995"]
 
     def test_each_tema_ano_has_at_least_one_var(self):
         for tema, anos in client.VARIAVEIS_CENSO_AGRO.items():
@@ -454,6 +481,296 @@ def _build_mock_irrigacao_2017():
     )
 
 
+def _build_mock_efetivo_1995(n_ufs=3):
+    rows = []
+    ufs = [("35", "São Paulo"), ("51", "Mato Grosso"), ("52", "Goiás")][:n_ufs]
+    species = [("31660", "Bovinos"), ("31666", "Ovinos")]
+    for cod_uf, nome_uf in ufs:
+        for cod_sp, nome_sp in species:
+            rows.append(
+                {
+                    "NC": "3",
+                    "NN": "Unidade da Federação",
+                    "MC": "24",
+                    "MN": "Cabeças",
+                    "V": str(800000 + int(cod_uf) * 100),
+                    "D1C": cod_uf,
+                    "D1N": nome_uf,
+                    "D2C": "105",
+                    "D2N": "Efetivo dos rebanhos",
+                    "D3C": cod_sp,
+                    "D3N": nome_sp,
+                    "D4C": "0",
+                    "D4N": "Total",
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _build_mock_uso_terra_1995_area(n_ufs=2):
+    rows = []
+    ufs = [("35", "São Paulo"), ("51", "Mato Grosso")][:n_ufs]
+    usos = [("31386", "Lavouras temporárias"), ("31387", "Pastagens naturais")]
+    for cod_uf, nome_uf in ufs:
+        for cod_uso, nome_uso in usos:
+            rows.append(
+                {
+                    "NC": "3",
+                    "NN": "Unidade da Federação",
+                    "MC": "1019",
+                    "MN": "Hectares",
+                    "V": str(400000 + int(cod_uf) * 100),
+                    "D1C": cod_uf,
+                    "D1N": nome_uf,
+                    "D2C": "184",
+                    "D2N": "Área dos estabelecimentos",
+                    "D3C": cod_uso,
+                    "D3N": nome_uso,
+                    "D4C": "0",
+                    "D4N": "Total",
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _build_mock_uso_terra_1995_estab(n_ufs=2):
+    rows = []
+    ufs = [("35", "São Paulo"), ("51", "Mato Grosso")][:n_ufs]
+    usos = [("31386", "Lavouras temporárias"), ("31387", "Pastagens naturais")]
+    for cod_uf, nome_uf in ufs:
+        for cod_uso, nome_uso in usos:
+            rows.append(
+                {
+                    "NC": "3",
+                    "NN": "Unidade da Federação",
+                    "MC": "1020",
+                    "MN": "Unidades",
+                    "V": str(8000 + int(cod_uf)),
+                    "D1C": cod_uf,
+                    "D1N": nome_uf,
+                    "D2C": "183",
+                    "D2N": "Número de estabelecimentos",
+                    "D3C": cod_uso,
+                    "D3N": nome_uso,
+                    "D4C": "0",
+                    "D4N": "Total",
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _build_mock_lavoura_temp_1995_prod(n_ufs=2):
+    rows = []
+    ufs = [("35", "São Paulo"), ("51", "Mato Grosso")][:n_ufs]
+    produtos = [("31627", "Arroz"), ("31631", "Milho")]
+    for cod_uf, nome_uf in ufs:
+        for cod_prod, nome_prod in produtos:
+            rows.append(
+                {
+                    "NC": "3",
+                    "NN": "Unidade da Federação",
+                    "MC": "1021",
+                    "MN": "Toneladas",
+                    "V": str(500000 + int(cod_uf) * 100),
+                    "D1C": cod_uf,
+                    "D1N": nome_uf,
+                    "D2C": "214",
+                    "D2N": "Quantidade produzida",
+                    "D3C": cod_prod,
+                    "D3N": nome_prod,
+                    "D4C": "0",
+                    "D4N": "Total",
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _build_mock_lavoura_temp_1995_estab(n_ufs=2):
+    rows = []
+    ufs = [("35", "São Paulo"), ("51", "Mato Grosso")][:n_ufs]
+    produtos = [("31627", "Arroz"), ("31631", "Milho")]
+    for cod_uf, nome_uf in ufs:
+        for cod_prod, nome_prod in produtos:
+            rows.append(
+                {
+                    "NC": "3",
+                    "NN": "Unidade da Federação",
+                    "MC": "1020",
+                    "MN": "Unidades",
+                    "V": str(5000 + int(cod_uf)),
+                    "D1C": cod_uf,
+                    "D1N": nome_uf,
+                    "D2C": "151",
+                    "D2N": "Número de estabelecimentos",
+                    "D3C": cod_prod,
+                    "D3N": nome_prod,
+                    "D4C": "0",
+                    "D4N": "Total",
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _build_mock_lavoura_temp_1995_area(n_ufs=2):
+    rows = []
+    ufs = [("35", "São Paulo"), ("51", "Mato Grosso")][:n_ufs]
+    produtos = [("31627", "Arroz"), ("31631", "Milho")]
+    for cod_uf, nome_uf in ufs:
+        for cod_prod, nome_prod in produtos:
+            rows.append(
+                {
+                    "NC": "3",
+                    "NN": "Unidade da Federação",
+                    "MC": "1019",
+                    "MN": "Hectares",
+                    "V": str(100000 + int(cod_uf) * 10),
+                    "D1C": cod_uf,
+                    "D1N": nome_uf,
+                    "D2C": "216",
+                    "D2N": "Área colhida",
+                    "D3C": cod_prod,
+                    "D3N": nome_prod,
+                    "D4C": "0",
+                    "D4N": "Total",
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+class TestCensoAgro1995Mocked:
+    @pytest.mark.asyncio
+    async def test_efetivo_1995_single_variable(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_efetivo_1995()
+            df = await censo_agro("efetivo_rebanho", ano=1995)
+            assert set(df["variavel"].unique()) == {"cabecas"}
+
+    @pytest.mark.asyncio
+    async def test_efetivo_1995_ano_value(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_efetivo_1995()
+            df = await censo_agro("efetivo_rebanho", ano=1995)
+            assert set(df["ano"].unique()) == {1995}
+
+    @pytest.mark.asyncio
+    async def test_efetivo_1995_categorias(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_efetivo_1995()
+            df = await censo_agro("efetivo_rebanho", ano=1995)
+            categorias = set(df["categoria"].unique())
+            assert "Bovinos" in categorias
+            assert "Ovinos" in categorias
+
+    @pytest.mark.asyncio
+    async def test_efetivo_1995_unidade(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_efetivo_1995()
+            df = await censo_agro("efetivo_rebanho", ano=1995)
+            assert (df["unidade"] == "cabeças").all()
+
+    @pytest.mark.asyncio
+    async def test_uso_terra_1995_multi_table(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.side_effect = [
+                _build_mock_uso_terra_1995_area(),
+                _build_mock_uso_terra_1995_estab(),
+            ]
+            df = await censo_agro("uso_terra", ano=1995)
+            assert mock.call_count == 2
+            variaveis = set(df["variavel"].unique())
+            assert "area" in variaveis
+            assert "estabelecimentos" in variaveis
+
+    @pytest.mark.asyncio
+    async def test_lavoura_temp_1995_multi_table(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.side_effect = [
+                _build_mock_lavoura_temp_1995_prod(),
+                _build_mock_lavoura_temp_1995_estab(),
+                _build_mock_lavoura_temp_1995_area(),
+            ]
+            df = await censo_agro("lavoura_temporaria", ano=1995)
+            assert mock.call_count == 3
+            variaveis = set(df["variavel"].unique())
+            assert len(variaveis) == 3
+            assert "producao" in variaveis
+            assert "estabelecimentos" in variaveis
+            assert "area_colhida" in variaveis
+
+    @pytest.mark.asyncio
+    async def test_1995_output_columns(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_efetivo_1995()
+            df = await censo_agro("efetivo_rebanho", ano=1995)
+            expected = [
+                "ano",
+                "localidade",
+                "localidade_cod",
+                "tema",
+                "categoria",
+                "variavel",
+                "valor",
+                "unidade",
+                "fonte",
+            ]
+            assert list(df.columns) == expected
+
+    @pytest.mark.asyncio
+    async def test_1995_multi_year_default(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.side_effect = [
+                _build_mock_efetivo_1995(),
+                _build_mock_efetivo(),
+            ]
+            df = await censo_agro("efetivo_rebanho")
+            assert {1995, 2017} == set(df["ano"].unique())
+
+    @pytest.mark.asyncio
+    async def test_1995_valor_numerico(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_efetivo_1995()
+            df = await censo_agro("efetivo_rebanho", ano=1995)
+            assert pd.api.types.is_numeric_dtype(df["valor"])
+            assert (df["valor"] > 0).all()
+
+    @pytest.mark.asyncio
+    async def test_1995_localidade_cod_inteiro(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_efetivo_1995()
+            df = await censo_agro("efetivo_rebanho", ano=1995)
+            assert df["localidade_cod"].dtype == "Int64"
+
+    @pytest.mark.asyncio
+    async def test_1995_tema_and_fonte(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_efetivo_1995()
+            df = await censo_agro("efetivo_rebanho", ano=1995)
+            assert (df["tema"] == "efetivo_rebanho").all()
+            assert (df["fonte"] == "ibge_censo_agro").all()
+
+
 class TestCensoAgroMocked:
     @pytest.mark.asyncio
     async def test_efetivo_returns_dataframe(self):
@@ -509,7 +826,7 @@ class TestCensoAgroMocked:
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo()
-            df = await censo_agro("efetivo_rebanho")
+            df = await censo_agro("efetivo_rebanho", ano=2017)
             assert (df["ano"] == 2017).all()
 
     @pytest.mark.asyncio
@@ -583,7 +900,7 @@ class TestCensoAgroMocked:
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo(n_ufs=1)
-            df = await censo_agro("efetivo_rebanho", uf="SP")
+            df = await censo_agro("efetivo_rebanho", ano=2017, uf="SP")
             assert len(df) > 0
             mock.assert_called_once()
             call_kwargs = mock.call_args
@@ -996,15 +1313,15 @@ class TestCensoAgroContract:
 
         df = pd.DataFrame(
             {
-                "ano": [2017, 2017],
-                "localidade": ["São Paulo", "São Paulo"],
-                "localidade_cod": [35, 35],
-                "tema": ["efetivo_rebanho", "efetivo_rebanho"],
-                "categoria": ["Bovinos", "Bovinos"],
-                "variavel": ["cabecas", "estabelecimentos"],
-                "valor": [10391878.0, 131234.0],
-                "unidade": ["cabeças", "unidades"],
-                "fonte": ["ibge_censo_agro", "ibge_censo_agro"],
+                "ano": [2017, 2017, 1995],
+                "localidade": ["São Paulo", "São Paulo", "São Paulo"],
+                "localidade_cod": [35, 35, 35],
+                "tema": ["efetivo_rebanho", "efetivo_rebanho", "efetivo_rebanho"],
+                "categoria": ["Bovinos", "Bovinos", "Bovinos"],
+                "variavel": ["cabecas", "estabelecimentos", "cabecas"],
+                "valor": [10391878.0, 131234.0, 5000000.0],
+                "unidade": ["cabeças", "unidades", "cabeças"],
+                "fonte": ["ibge_censo_agro", "ibge_censo_agro", "ibge_censo_agro"],
             }
         )
         validate_dataset(df, "censo_agropecuario")
@@ -1096,7 +1413,17 @@ class TestCensoAgroIntegration:
     async def test_uso_terra_real_api(self):
         from agrobr.ibge.api import censo_agro
 
-        df = await censo_agro("uso_terra", uf="MT", nivel="uf")
+        df = await censo_agro("uso_terra", ano=2017, uf="MT", nivel="uf")
         assert isinstance(df, pd.DataFrame)
         assert len(df) > 0
         assert (df["tema"] == "uso_terra").all()
+
+    @pytest.mark.asyncio
+    @pytest.mark.integration
+    async def test_efetivo_rebanho_1995_real_api(self):
+        from agrobr.ibge.api import censo_agro
+
+        df = await censo_agro("efetivo_rebanho", ano=1995, uf="SP", nivel="uf")
+        assert len(df) > 0
+        assert (df["ano"] == 1995).all()
+        assert "cabecas" in df["variavel"].values

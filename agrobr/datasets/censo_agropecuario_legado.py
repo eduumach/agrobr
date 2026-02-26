@@ -13,55 +13,53 @@ from agrobr.models import MetaInfo
 logger = structlog.get_logger()
 
 
-async def _fetch_ibge_censo_agro(tema: str, **kwargs: Any) -> tuple[pd.DataFrame, MetaInfo | None]:
-    from agrobr import ibge
+async def _fetch_ibge_censo_agro_legado(
+    tema: str, **kwargs: Any
+) -> tuple[pd.DataFrame, MetaInfo | None]:
+    from agrobr.ibge import legacy_api
 
     uf = kwargs.get("uf")
     nivel = kwargs.get("nivel", "uf")
 
-    result = await ibge.censo_agro(tema, uf=uf, nivel=nivel, return_meta=True)
+    result = await legacy_api.censo_agro_legado(tema, uf=uf, nivel=nivel, return_meta=True)
 
     if isinstance(result, tuple):
         return result[0], result[1]
     return result, None
 
 
-CENSO_AGROPECUARIO_INFO = DatasetInfo(
-    name="censo_agropecuario",
-    description="Dados do Censo Agropecuário por tema, categoria e UF",
+CENSO_AGROPECUARIO_LEGADO_INFO = DatasetInfo(
+    name="censo_agropecuario_legado",
+    description="Censo Agropecuário 1995/96 — temas legados via FTP (XLS)",
     sources=[
         DatasetSource(
-            name="ibge_censo_agro",
+            name="ibge_censo_agro_legado",
             priority=1,
-            fetch_fn=_fetch_ibge_censo_agro,
-            description="IBGE Censo Agropecuário via SIDRA",
+            fetch_fn=_fetch_ibge_censo_agro_legado,
+            description="IBGE Censo Agropecuário 1995/96 via FTP (XLS legado)",
         ),
     ],
     products=[
-        "efetivo_rebanho",
-        "uso_terra",
-        "lavoura_temporaria",
-        "lavoura_permanente",
-        "preparo_solo",
-        "adubacao",
-        "calagem",
-        "agrotoxicos",
-        "praticas_agricolas",
-        "irrigacao",
+        "tecnologia",
+        "pessoal_ocupado",
+        "maquinas",
+        "producao_animal",
+        "valor_producao",
+        "financeiro",
     ],
     contract_version="1.0",
-    update_frequency="decennial",
-    typical_latency="Y+2 anos",
-    source_url="https://sidra.ibge.gov.br",
+    update_frequency="never",
+    typical_latency="N/A",
+    source_url="https://ftp.ibge.gov.br/Censo_Agropecuario/Censo_Agropecuario_1995_96",
     source_institution="IBGE",
     min_date="1995-01-01",
-    unit="cabeças / hectares / toneladas",
+    unit="estabelecimentos / pessoas / unidades / R$",
     license="livre",
 )
 
 
-class CensoAgropecuarioDataset(BaseDataset):
-    info = CENSO_AGROPECUARIO_INFO
+class CensoAgropecuarioLegadoDataset(BaseDataset):
+    info = CENSO_AGROPECUARIO_LEGADO_INFO
 
     async def fetch(  # type: ignore[override]
         self,
@@ -73,7 +71,7 @@ class CensoAgropecuarioDataset(BaseDataset):
     ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
         logger.info(
             "dataset_fetch",
-            dataset="censo_agropecuario",
+            dataset="censo_agropecuario_legado",
             produto=produto,
             uf=uf,
         )
@@ -89,7 +87,7 @@ class CensoAgropecuarioDataset(BaseDataset):
         if return_meta:
             now = datetime.now(UTC)
             meta = MetaInfo(
-                source=f"datasets.censo_agropecuario/{source_name}",
+                source=f"datasets.censo_agropecuario_legado/{source_name}",
                 source_url=source_meta.source_url if source_meta else "",
                 source_method="dataset",
                 fetched_at=source_meta.fetched_at if source_meta else now,
@@ -97,7 +95,7 @@ class CensoAgropecuarioDataset(BaseDataset):
                 columns=df.columns.tolist(),
                 from_cache=False,
                 parser_version=source_meta.parser_version if source_meta else 1,
-                dataset="censo_agropecuario",
+                dataset="censo_agropecuario_legado",
                 contract_version=self.info.contract_version,
                 snapshot=snapshot,
                 attempted_sources=attempted,
@@ -109,20 +107,20 @@ class CensoAgropecuarioDataset(BaseDataset):
         return df
 
 
-_censo_agropecuario = CensoAgropecuarioDataset()
+_censo_agropecuario_legado = CensoAgropecuarioLegadoDataset()
 
 from agrobr.datasets.registry import register  # noqa: E402
 
-register(_censo_agropecuario)
+register(_censo_agropecuario_legado)
 
 
-async def censo_agropecuario(
+async def censo_agropecuario_legado(
     tema: str,
     uf: str | None = None,
     nivel: str = "uf",
     return_meta: bool = False,
     **kwargs: Any,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    return await _censo_agropecuario.fetch(
+    return await _censo_agropecuario_legado.fetch(
         tema, uf=uf, nivel=nivel, return_meta=return_meta, **kwargs
     )

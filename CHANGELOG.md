@@ -7,6 +7,38 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+### Added
+- **Censo Agropecuario 1995/96 — Bloco 1: config SIDRA** (#16) — tabelas, variaveis,
+  classificacoes e indices de coluna para 4 temas (efetivo_rebanho, uso_terra,
+  lavoura_temporaria, lavoura_permanente) do Censo 1995. Novo dict `_CENSO_MULTI_TABLE`
+  para dispatch multi-tabela (logica no Bloco 2). Contrato `min_value` e dataset `min_date`
+  atualizados de 2006 para 1995
+
+- **Censo Agropecuario 1995/96 — Bloco 6: API legado + contrato + dataset** (#16) — nova
+  funcao `censo_agro_legado()` para 6 temas FTP (tecnologia, pessoal_ocupado, maquinas,
+  producao_animal, valor_producao, financeiro). Contrato `IBGE_CENSO_AGRO_LEGADO_V1` com
+  ano fixo 1995, 9 colunas, fonte='ibge_censo_agro_legado'. Dataset
+  `censo_agropecuario_legado` com update_frequency='never'. Cache TTL 90 dias. Exports em
+  `ibge/__init__` e `datasets/__init__`. Testes completos (API, contrato, dataset, cache,
+  exports)
+
+### Changed
+- **Censo Agropecuario 1995/96 — Bloco 2: refatoracao + multi-tabela** (#16) — extraido
+  `_parse_censo_raw()` e `_empty_censo_df()` de `_fetch_censo_single()`. Novo
+  `_fetch_censo_multi_table()` busca N tabelas SIDRA e concatena. `_fetch_censo_single()`
+  simplificado para dispatch multi-table vs single-table. Zero regressao (84 testes)
+- **Censo Agropecuario 1995/96 — Bloco 3: testes SIDRA 1995** (#16) — 6 mock builders
+  para dados 1995, 12 testes novos em `TestCensoAgro1995Mocked` (single-variable, multi-table,
+  multi-year, columns, valor, categorias, unidade). Fix: `_parse_censo_raw` com fallback
+  `var_map` para SIDRA single-variable (sem dimensao de variavel na resposta). 104 testes
+- **Censo Agropecuario 1995/96 — Bloco 5: FTP client + parser** (#16) — novo
+  `ftp_client.py` para download de ZIPs legados do FTP IBGE (padrao ANTAQ: retry, timeout
+  180s, validacao tamanho, UserAgentRotator). Novo `legacy_parser.py` com parsing de XLS
+  (xlrd) para 6 temas FTP (tecnologia, pessoal_ocupado, maquinas, producao_animal,
+  valor_producao, financeiro). Deteccao de hierarquia geografica por indentacao
+  (totais/mesorregiao/microrregiao/municipio). Config por tema em `_TEMA_COLS`. URL FTP e
+  TTL 90 dias em constants.py. 60 testes novos, suite completa 3811 passed
+
 ## [0.11.3] - 2026-02-24
 
 ### Added

@@ -1,12 +1,12 @@
 # censo_agropecuario v1.0
 
-Dados do Censo Agropecuario 2006/2017 por tema, UF e nivel territorial.
+Dados do Censo Agropecuario 1995/2006/2017 por tema, UF e nivel territorial.
 
 ## Fontes
 
 | Prioridade | Fonte | Descricao |
 |------------|-------|-----------|
-| 1 | IBGE Censo Agro | Censo Agropecuario 2006 e 2017 |
+| 1 | IBGE Censo Agro | Censo Agropecuario 1995, 2006 e 2017 |
 
 ## Temas
 
@@ -14,24 +14,24 @@ Dados do Censo Agropecuario 2006/2017 por tema, UF e nivel territorial.
 
 ### Cobertura temporal por tema
 
-| Tema | 2006 | 2017 |
-|------|:----:|:----:|
-| `efetivo_rebanho` | — | ✅ |
-| `uso_terra` | — | ✅ |
-| `lavoura_temporaria` | — | ✅ |
-| `lavoura_permanente` | — | ✅ |
-| `preparo_solo` | ✅ | ✅ |
-| `adubacao` | ✅ | ✅ |
-| `calagem` | ✅ | ✅ |
-| `agrotoxicos` | ✅ | ✅ |
-| `praticas_agricolas` | ✅ | ✅ |
-| `irrigacao` | ✅ | ✅ |
+| Tema | 1995 | 2006 | 2017 |
+|------|:----:|:----:|:----:|
+| `efetivo_rebanho` | ✅ | — | ✅ |
+| `uso_terra` | ✅ | — | ✅ |
+| `lavoura_temporaria` | ✅ | — | ✅ |
+| `lavoura_permanente` | ✅ | — | ✅ |
+| `preparo_solo` | — | ✅ | ✅ |
+| `adubacao` | — | ✅ | ✅ |
+| `calagem` | — | ✅ | ✅ |
+| `agrotoxicos` | — | ✅ | ✅ |
+| `praticas_agricolas` | — | ✅ | ✅ |
+| `irrigacao` | — | ✅ | ✅ |
 
 ## Schema
 
 | Coluna | Tipo | Nullable | Descricao |
 |--------|------|----------|-----------|
-| `ano` | int | ❌ | Ano de referencia (2006 ou 2017) |
+| `ano` | int | ❌ | Ano de referencia (1995, 2006 ou 2017) |
 | `localidade` | str | ✅ | UF ou municipio |
 | `localidade_cod` | int | ✅ | Codigo IBGE |
 | `tema` | str | ❌ | Tema do censo |
@@ -77,7 +77,7 @@ Long format: cada linha tem um par variavel/valor.
 
 ## Garantias
 
-- Dados decenais consolidados (Censo Agropecuario 2006 e 2017)
+- Dados decenais consolidados (Censo Agropecuario 1995, 2006 e 2017)
 - Periodo de referencia 2017: outubro/2016 a setembro/2017
 - Cache com TTL de 30 dias (dados estaveis)
 - Parametro `ano` filtra por ano censal; `ano=None` retorna todos os anos disponiveis
@@ -123,3 +123,7 @@ print(contract.to_json())
 | `brasil` | Total nacional |
 | `uf` | Por Unidade Federativa (default) |
 | `municipio` | Por municipio |
+
+## Temas Legados (FTP)
+
+6 temas adicionais do Censo 1995/96 estão disponíveis via `censo_agro_legado()` com contrato separado. Ver [censo_agropecuario_legado](./censo_agropecuario_legado.md).

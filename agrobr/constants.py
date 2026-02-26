@@ -87,6 +87,7 @@ URLS = {
     Fonte.IBGE: {
         "base": "https://sidra.ibge.gov.br",
         "api": "https://apisidra.ibge.gov.br",
+        "ftp_censo_agro_1996": "https://ftp.ibge.gov.br/Censo_Agropecuario/Censo_Agropecuario_1995_96",
     },
     Fonte.IMEA: {
         "base": "https://api1.imea.com.br/api",
@@ -254,6 +255,7 @@ class CacheSettings(BaseSettings):
     ttl_ibge_ppm: int = 7 * 24 * 3600
     ttl_ibge_abate: int = 7 * 24 * 3600
     ttl_ibge_censo_agro: int = 30 * 24 * 3600
+    ttl_ibge_censo_agro_legado: int = 90 * 24 * 3600
     ttl_abiove: int = 7 * 24 * 3600
     ttl_anda: int = 7 * 24 * 3600
     ttl_deral: int = 24 * 3600
@@ -339,6 +341,11 @@ class AlertSettings(BaseSettings):
     alert_on_layout_change: bool = True
     alert_on_source_down: bool = True
     alert_on_anomaly: bool = True
+
+    consecutive_failures_warning: int = 2
+    consecutive_failures_critical: int = 3
+    alert_on_recovery: bool = True
+    discord_embed_char_limit: int = 3900
 
     model_config = SettingsConfigDict(env_prefix="AGROBR_ALERT_")
 

@@ -31,7 +31,8 @@ Validação é automática: todo `fetch()` de dataset valida o DataFrame contra 
 | [custo_producao](./custo_producao.md) | Custos de produção | CONAB |
 | [pecuaria_municipal](./pecuaria_municipal.md) | Rebanhos e produção animal | IBGE PPM |
 | [abate_trimestral](./abate_trimestral.md) | Abate de bovinos, suínos e frangos | IBGE Abate |
-| [censo_agropecuario](./censo_agropecuario.md) | Censo Agropecuário 2006/2017 (10 temas) | IBGE Censo Agro |
+| [censo_agropecuario](./censo_agropecuario.md) | Censo Agropecuário 1995/2006/2017 (10 temas) | IBGE Censo Agro |
+| [censo_agropecuario_legado](./censo_agropecuario_legado.md) | Censo Agropecuário 1995/96 — 6 temas legados (FTP) | IBGE FTP |
 | [cadastro_rural](./cadastro_rural.md) | Cadastro Ambiental Rural | SICAR |
 
 ## Schemas JSON

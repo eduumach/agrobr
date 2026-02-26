@@ -102,7 +102,7 @@ async def main():
     df = await ibge.abate('bovino', trimestre='202303')
     df = await ibge.abate('frango', trimestre='202303', uf='PR')
 
-    # Censo Agropecuário 2006/2017 — 10 temas
+    # Censo Agropecuário 1995/2006/2017 — 10 temas
     df = await ibge.censo_agro('efetivo_rebanho')
     df = await ibge.censo_agro('uso_terra', uf='MT')
     df = await ibge.censo_agro('lavoura_temporaria', nivel='municipio', uf='PR')
@@ -111,6 +111,10 @@ async def main():
     df = await ibge.censo_agro('preparo_solo', ano=2017, uf='SP')
     df = await ibge.censo_agro('irrigacao')  # ambos os anos
     df = await ibge.censo_agro('adubacao', ano=2006)
+
+    # Censo Agropecuário 1995/96 — temas legados (FTP)
+    df = await ibge.censo_agro_legado('tecnologia')
+    df = await ibge.censo_agro_legado('pessoal_ocupado', uf='SP')
 
     # Múltiplos anos
     df = await ibge.pam('milho', ano=[2020, 2021, 2022, 2023])
@@ -155,7 +159,7 @@ async def main():
     # Pecuária municipal (IBGE PPM)
     df = await datasets.pecuaria_municipal("bovino", ano=2023)
 
-    # Censo Agropecuário 2006/2017 (IBGE Censo Agro — 10 temas)
+    # Censo Agropecuário 1995/2006/2017 (IBGE Censo Agro — 10 temas)
     df = await datasets.censo_agropecuario("efetivo_rebanho")
     df = await datasets.censo_agropecuario("preparo_solo")
 
@@ -445,7 +449,8 @@ Use `agrobr health --all` para verificar localmente.
 | `abate_trimestral` | Abate de bovinos, suínos e frangos por UF | IBGE Abate |
 | `cadastro_rural` | Cadastro Ambiental Rural (imóveis rurais por UF) | SICAR/GeoServer WFS |
 | `pecuaria_municipal` | Pecuária municipal (rebanhos e produção animal) | IBGE PPM |
-| `censo_agropecuario` | Censo Agropecuário 2006/2017 (10 temas: rebanho, uso terra, lavouras, manejo solo, irrigação) | IBGE Censo Agro |
+| `censo_agropecuario` | Censo Agropecuário 1995/2006/2017 (10 temas: rebanho, uso terra, lavouras, manejo solo, irrigação) | IBGE Censo Agro |
+| `censo_agropecuario_legado` | Censo 1995/96 — 6 temas legados (FTP) | IBGE FTP |
 
 ## Fontes Suportadas
 

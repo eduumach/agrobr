@@ -703,6 +703,10 @@ async def especies_ppm() -> list[str]:
 
 
 _CLASSIFICACOES_CENSO_AGRO: dict[tuple[str, str], dict[str, str]] = {
+    ("efetivo_rebanho", "1995"): {"224": "all", "220": "0"},
+    ("uso_terra", "1995"): {"222": "all", "220": "0"},
+    ("lavoura_temporaria", "1995"): {"226": "all", "220": "0"},
+    ("lavoura_permanente", "1995"): {"227": "all", "220": "0"},
     ("efetivo_rebanho", "2017"): {
         "829": "46302",
         "12443": "all",
@@ -768,6 +772,10 @@ _CLASSIFICACOES_CENSO_AGRO: dict[tuple[str, str], dict[str, str]] = {
 }
 
 _CENSO_VAR_NOME: dict[str, str] = {
+    "105": "cabecas",
+    "151": "estabelecimentos",
+    "214": "producao",
+    "216": "area_colhida",
     "10010": "estabelecimentos",
     "2209": "cabecas",
     "9587": "estabelecimentos",
@@ -782,6 +790,10 @@ _CENSO_VAR_NOME: dict[str, str] = {
 }
 
 _CENSO_VAR_UNIDADE: dict[str, str] = {
+    "105": "cabeças",
+    "151": "unidades",
+    "214": "",
+    "216": "hectares",
     "10010": "unidades",
     "2209": "cabeças",
     "9587": "unidades",
@@ -798,6 +810,10 @@ _CENSO_VAR_UNIDADE: dict[str, str] = {
 _CENSO_ALL_VAR_IDS: set[str] = set(_CENSO_VAR_NOME.keys())
 
 _CENSO_CATEGORIA_COL_INDEX: dict[tuple[str, str], int] = {
+    ("efetivo_rebanho", "1995"): 3,
+    ("uso_terra", "1995"): 3,
+    ("lavoura_temporaria", "1995"): 3,
+    ("lavoura_permanente", "1995"): 3,
     ("efetivo_rebanho", "2017"): 5,
     ("uso_terra", "2017"): 5,
     ("lavoura_temporaria", "2017"): 5,
@@ -826,43 +842,47 @@ _VAR_AS_CATEGORIA: dict[tuple[str, str], dict[str, tuple[str, str, str]]] = {
     },
 }
 
+_CENSO_MULTI_TABLE: dict[tuple[str, str], list[tuple[str, dict[str, str]]]] = {
+    ("uso_terra", "1995"): [
+        ("316", {"area": "184"}),
+        ("311", {"estabelecimentos": "183"}),
+    ],
+    ("lavoura_temporaria", "1995"): [
+        ("497", {"producao": "214"}),
+        ("492", {"estabelecimentos": "151"}),
+        ("503", {"area_colhida": "216"}),
+    ],
+    ("lavoura_permanente", "1995"): [
+        ("509", {"producao": "214"}),
+        ("504", {"estabelecimentos": "151"}),
+        ("510", {"area_colhida": "216"}),
+    ],
+}
 
-async def _fetch_censo_single(
-    tema: str,
-    ano_key: str,
-    territorial_level: str,
-    ibge_code: str,
-) -> pd.DataFrame:
-    table_code = client.TABELAS_CENSO_AGRO[tema][ano_key]
-    var_map = client.VARIAVEIS_CENSO_AGRO[tema][ano_key]
-    var_codes = ",".join(var_map.values())
 
-    key = (tema, ano_key)
-    classifications: dict[str, str | list[str]] = dict(_CLASSIFICACOES_CENSO_AGRO.get(key, {}))
-
-    df = await client.fetch_sidra(
-        table_code=table_code,
-        territorial_level=territorial_level,
-        ibge_territorial_code=ibge_code,
-        variable=var_codes,
-        period="all",
-        classifications=classifications,
+def _empty_censo_df() -> pd.DataFrame:
+    return pd.DataFrame(
+        columns=[
+            "ano",
+            "localidade",
+            "localidade_cod",
+            "tema",
+            "categoria",
+            "variavel",
+            "valor",
+            "unidade",
+            "fonte",
+        ]
     )
 
-    if df.empty:
-        return pd.DataFrame(
-            columns=[
-                "ano",
-                "localidade",
-                "localidade_cod",
-                "tema",
-                "categoria",
-                "variavel",
-                "valor",
-                "unidade",
-                "fonte",
-            ]
-        )
+
+def _parse_censo_raw(
+    df: pd.DataFrame,
+    tema: str,
+    ano_key: str,
+    var_map: dict[str, str] | None = None,
+) -> pd.DataFrame:
+    key = (tema, ano_key)
 
     vac = _VAR_AS_CATEGORIA.get(key)
     if vac:
@@ -925,8 +945,15 @@ async def _fetch_censo_single(
         else:
             df["unidade"] = unidade_from_map.fillna("")
     else:
-        df["variavel"] = ""
-        df["unidade"] = ""
+        effective_var_map = var_map or client.VARIAVEIS_CENSO_AGRO.get(tema, {}).get(ano_key, {})
+        if len(effective_var_map) == 1:
+            var_name = next(iter(effective_var_map))
+            var_code = next(iter(effective_var_map.values()))
+            df["variavel"] = var_name
+            df["unidade"] = _CENSO_VAR_UNIDADE.get(var_code, "")
+        else:
+            df["variavel"] = ""
+            df["unidade"] = ""
 
     if "localidade_cod" in df.columns:
         df["localidade_cod"] = pd.to_numeric(df["localidade_cod"], errors="coerce").astype("Int64")
@@ -950,6 +977,72 @@ async def _fetch_censo_single(
         if c in df.columns
     ]
     return df[output_cols].reset_index(drop=True)
+
+
+async def _fetch_censo_multi_table(
+    tema: str,
+    ano_key: str,
+    table_specs: list[tuple[str, dict[str, str]]],
+    territorial_level: str,
+    ibge_code: str,
+) -> pd.DataFrame:
+    key = (tema, ano_key)
+    classifications: dict[str, str | list[str]] = dict(_CLASSIFICACOES_CENSO_AGRO.get(key, {}))
+    frames: list[pd.DataFrame] = []
+
+    for table_code, var_map in table_specs:
+        var_codes = ",".join(var_map.values())
+        df = await client.fetch_sidra(
+            table_code=table_code,
+            territorial_level=territorial_level,
+            ibge_territorial_code=ibge_code,
+            variable=var_codes,
+            period="all",
+            classifications=classifications,
+        )
+        if df.empty:
+            continue
+        parsed = _parse_censo_raw(df, tema, ano_key, var_map=var_map)
+        if not parsed.empty:
+            frames.append(parsed)
+
+    if not frames:
+        return _empty_censo_df()
+    return pd.concat(frames, ignore_index=True)
+
+
+async def _fetch_censo_single(
+    tema: str,
+    ano_key: str,
+    territorial_level: str,
+    ibge_code: str,
+) -> pd.DataFrame:
+    key = (tema, ano_key)
+
+    multi_spec = _CENSO_MULTI_TABLE.get(key)
+    if multi_spec:
+        return await _fetch_censo_multi_table(
+            tema, ano_key, multi_spec, territorial_level, ibge_code
+        )
+
+    table_code = client.TABELAS_CENSO_AGRO[tema][ano_key]
+    var_map = client.VARIAVEIS_CENSO_AGRO[tema][ano_key]
+    var_codes = ",".join(var_map.values())
+    classifications: dict[str, str | list[str]] = dict(_CLASSIFICACOES_CENSO_AGRO.get(key, {}))
+
+    df = await client.fetch_sidra(
+        table_code=table_code,
+        territorial_level=territorial_level,
+        ibge_territorial_code=ibge_code,
+        variable=var_codes,
+        period="all",
+        classifications=classifications,
+    )
+
+    if df.empty:
+        return _empty_censo_df()
+
+    return _parse_censo_raw(df, tema, ano_key)
 
 
 def _process_var_as_categoria(
@@ -1113,22 +1206,7 @@ async def censo_agro(
         if not sub_df.empty:
             frames.append(sub_df)
 
-    if frames:
-        df = pd.concat(frames, ignore_index=True)
-    else:
-        df = pd.DataFrame(
-            columns=[
-                "ano",
-                "localidade",
-                "localidade_cod",
-                "tema",
-                "categoria",
-                "variavel",
-                "valor",
-                "unidade",
-                "fonte",
-            ]
-        )
+    df = pd.concat(frames, ignore_index=True) if frames else _empty_censo_df()
 
     if not df.empty and "ano" in df.columns and "localidade" in df.columns:
         df = df.sort_values(["ano", "localidade"]).reset_index(drop=True)
