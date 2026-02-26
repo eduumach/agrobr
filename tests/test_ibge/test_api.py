@@ -354,6 +354,63 @@ class TestPolarsSupport:
             assert isinstance(df, pd.DataFrame)
 
 
+class TestPamMunicipal:
+    @pytest.fixture
+    def mock_sidra_response(self):
+        return pd.DataFrame(
+            {
+                "NC": ["6", "6"],
+                "NN": ["Município", "Município"],
+                "MC": ["1006", "1006"],
+                "MN": ["Hectares", "Hectares"],
+                "V": ["15000000", "12000000"],
+                "D1C": ["1500107", "1500206"],
+                "D1N": ["Belém", "Ananindeua"],
+                "D2C": ["2023", "2023"],
+                "D2N": ["2023", "2023"],
+                "D3C": ["214", "214"],
+                "D3N": ["Quantidade produzida", "Quantidade produzida"],
+                "D4C": ["40139", "40139"],
+                "D4N": ["Café (em grão)", "Café (em grão)"],
+            }
+        )
+
+    @pytest.mark.asyncio
+    async def test_pam_municipio_with_uf(self, mock_sidra_response):
+        with patch.object(client, "fetch_sidra", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = mock_sidra_response
+            await ibge.pam("cafe", ano=2023, nivel="municipio", uf="PA")
+            call_args = mock_fetch.call_args
+            assert call_args.kwargs["territorial_level"] == "6"
+            assert call_args.kwargs["ibge_territorial_code"] == "in N3 15"
+
+    @pytest.mark.asyncio
+    async def test_pam_municipio_without_uf(self, mock_sidra_response):
+        with patch.object(client, "fetch_sidra", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = mock_sidra_response
+            await ibge.pam("soja", ano=2023, nivel="municipio")
+            call_args = mock_fetch.call_args
+            assert call_args.kwargs["territorial_level"] == "6"
+            assert call_args.kwargs["ibge_territorial_code"] == "all"
+
+    @pytest.mark.asyncio
+    async def test_pam_municipio_uf_mt(self, mock_sidra_response):
+        with patch.object(client, "fetch_sidra", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = mock_sidra_response
+            await ibge.pam("soja", ano=2023, nivel="municipio", uf="MT")
+            call_args = mock_fetch.call_args
+            assert call_args.kwargs["ibge_territorial_code"] == "in N3 51"
+
+    @pytest.mark.asyncio
+    async def test_pam_uf_level_unchanged(self, mock_sidra_response):
+        with patch.object(client, "fetch_sidra", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = mock_sidra_response
+            await ibge.pam("soja", ano=2023, nivel="uf", uf="MT")
+            call_args = mock_fetch.call_args
+            assert call_args.kwargs["territorial_level"] == "3"
+            assert call_args.kwargs["ibge_territorial_code"] == "51"
+
+
 @pytest.mark.integration
 class TestPamIntegration:
     """Testes de integracao PAM (requer internet)."""

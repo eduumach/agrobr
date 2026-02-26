@@ -102,6 +102,9 @@ async def main():
     df = await ibge.abate('bovino', trimestre='202303')
     df = await ibge.abate('frango', trimestre='202303', uf='PR')
 
+    # PAM por município (filtrando UF para reduzir volume)
+    df = await ibge.pam('cafe', ano=2023, nivel='municipio', uf='PA')
+
     # Censo Agropecuário 1995/2006/2017 — 10 temas
     df = await ibge.censo_agro('efetivo_rebanho')
     df = await ibge.censo_agro('uso_terra', uf='MT')
@@ -387,6 +390,7 @@ df = desmatamento.prodes(bioma="Cerrado", ano=2022)
 df = b3.ajustes(data="13/02/2025")
 df = b3.posicoes_abertas(data="2025-12-19", contrato="boi")
 df = mapbiomas.cobertura(uf="MT", ano=2022)
+df = mapbiomas.cobertura(nivel="municipio", estado="PA", municipio="Belém", ano=2020)
 
 # SICAR — Cadastro Ambiental Rural
 df = alt.sicar.imoveis("DF")
@@ -471,7 +475,7 @@ Use `agrobr health --all` para verificar localmente.
 | Notícias Agrícolas | Cotações (fallback CEPEA) | ✅¹ | Funcional |
 | Queimadas/INPE | Focos de calor por satelite (6 biomas, 13 satelites) | ✅ | Funcional |
 | Desmatamento PRODES/DETER | Desmatamento consolidado + alertas (TerraBrasilis WFS) | ✅ | Funcional |
-| MapBiomas | Cobertura e uso da terra (1985-presente) | ✅ | Funcional |
+| MapBiomas | Cobertura e uso da terra (1985-presente), nivel estado e municipio | ✅ | Funcional |
 | CONAB Progresso | Progresso semanal de plantio/colheita por cultura e UF | ✅ | Funcional |
 | B3 Futuros Agro | Ajustes diarios + posicoes em aberto (7 contratos agro) | ✅ | Funcional |
 | CONAB CEASA/PROHORT | Precos atacado hortifruti (48 produtos, 43 CEASAs) | ✅ | Funcional |

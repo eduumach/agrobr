@@ -20,6 +20,8 @@ df = await agrobr.mapbiomas.cobertura(bioma="Cerrado", ano=2020, estado="GO")
 | `estado` | `str` | Nao | Filtrar por UF (ex: "MT", "SP") ou nome do estado |
 | `ano` | `int` | Nao | Ano (1985-2024). Se None, todos os anos |
 | `classe_id` | `int` | Nao | Codigo de classe MapBiomas (ex: 15 para Pastagem) |
+| `nivel` | `str` | Nao | `"estado"` (default) ou `"municipio"`. Municipal baixa ~660 MB |
+| `municipio` | `str` | Nao | Filtro parcial por nome de municipio (case-insensitive). Requer `nivel="municipio"` |
 | `colecao` | `int` | Nao | Colecao MapBiomas (default: 10) |
 | `return_meta` | `bool` | Nao | Se True, retorna `(DataFrame, MetaInfo)` |
 
@@ -29,6 +31,7 @@ df = await agrobr.mapbiomas.cobertura(bioma="Cerrado", ano=2020, estado="GO")
 |--------|------|-----------|
 | `bioma` | str | Nome do bioma |
 | `estado` | str | Codigo UF (ex: "MT") |
+| `municipio` | str | Nome do municipio (apenas quando `nivel="municipio"`) |
 | `classe_id` | int | Codigo da classe MapBiomas |
 | `classe` | str | Nome da classe (ex: "Pastagem", "Formacao Florestal") |
 | `nivel_0` | str | Categoria: "Natural", "Antropico", "Natural/Antropico", "Indefinido" |
@@ -122,6 +125,18 @@ df = await agrobr.mapbiomas.transicao(
     periodo="2019-2020",
 )
 print(f"Area convertida: {df['area_ha'].sum():,.0f} ha")
+```
+
+### Cobertura municipal (Belem, PA)
+
+```python
+import agrobr
+
+# Baixa ~660 MB na primeira chamada — filtre bioma/estado/municipio para reduzir
+df = await agrobr.mapbiomas.cobertura(
+    nivel="municipio", estado="PA", municipio="Belém", ano=2020
+)
+print(df[["municipio", "classe", "area_ha"]].head())
 ```
 
 ### Evolucao da soja no Brasil

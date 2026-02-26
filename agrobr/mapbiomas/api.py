@@ -22,6 +22,8 @@ async def cobertura(
     estado: str | None = None,
     ano: int | None = None,
     classe_id: int | None = None,
+    nivel: Literal["estado", "municipio"] = "estado",
+    municipio: str | None = None,
     colecao: int | None = None,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
@@ -34,6 +36,8 @@ async def cobertura(
     estado: str | None = None,
     ano: int | None = None,
     classe_id: int | None = None,
+    nivel: Literal["estado", "municipio"] = "estado",
+    municipio: str | None = None,
     colecao: int | None = None,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
@@ -45,14 +49,30 @@ async def cobertura(
     estado: str | None = None,
     ano: int | None = None,
     classe_id: int | None = None,
+    nivel: Literal["estado", "municipio"] = "estado",
+    municipio: str | None = None,
     colecao: int | None = None,  # noqa: ARG001
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    logger.info("mapbiomas_cobertura", bioma=bioma, estado=estado, ano=ano)
+    logger.info(
+        "mapbiomas_cobertura",
+        bioma=bioma,
+        estado=estado,
+        ano=ano,
+        nivel=nivel,
+        municipio=municipio,
+    )
 
     t0 = time.monotonic()
-    xlsx_bytes, source_url = await client.fetch_biome_state()
+    if nivel == "municipio":
+        logger.warning(
+            "mapbiomas_municipal_download",
+            hint="Arquivo municipal ~660 MB — download pode demorar",
+        )
+        xlsx_bytes, source_url = await client.fetch_biome_state_municipality()
+    else:
+        xlsx_bytes, source_url = await client.fetch_biome_state()
     fetch_ms = int((time.monotonic() - t0) * 1000)
 
     t1 = time.monotonic()
@@ -69,6 +89,10 @@ async def cobertura(
     if estado is not None:
         estado_upper = estado.strip().upper()
         df = df[df["estado"].str.upper() == estado_upper].reset_index(drop=True)
+
+    if municipio is not None and "municipio" in df.columns:
+        mun_lower = municipio.strip().lower()
+        df = df[df["municipio"].str.lower().str.contains(mun_lower)].reset_index(drop=True)
 
     if ano is not None:
         df = df[df["ano"] == ano].reset_index(drop=True)

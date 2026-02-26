@@ -9,6 +9,7 @@ from agrobr.exceptions import ParseError
 
 from .models import (
     COLUNAS_SAIDA_COBERTURA,
+    COLUNAS_SAIDA_COBERTURA_MUNICIPAL,
     COLUNAS_SAIDA_TRANSICAO,
     SHEET_COBERTURA,
     SHEET_TRANSICAO,
@@ -47,6 +48,8 @@ def parse_cobertura_xlsx(data: bytes) -> pd.DataFrame:
             reason=f"Colunas obrigatorias ausentes: {missing}",
         )
 
+    has_municipality = "municipality" in df.columns
+
     year_cols = [c for c in df.columns if isinstance(c, int)]
     if not year_cols:
         raise ParseError(
@@ -56,6 +59,9 @@ def parse_cobertura_xlsx(data: bytes) -> pd.DataFrame:
         )
 
     id_vars = ["biome", "state", "class", "class_level_0"]
+    if has_municipality:
+        id_vars = ["biome", "state", "municipality", "class", "class_level_0"]
+
     melted = df.melt(
         id_vars=id_vars,
         value_vars=year_cols,
@@ -65,6 +71,8 @@ def parse_cobertura_xlsx(data: bytes) -> pd.DataFrame:
 
     melted["bioma"] = melted["biome"]
     melted["estado"] = melted["state"].apply(estado_para_uf)
+    if has_municipality:
+        melted["municipio"] = melted["municipality"].fillna("").str.strip()
     melted["classe_id"] = pd.to_numeric(melted["class"], errors="coerce").astype("Int64")
     melted["classe"] = melted["classe_id"].apply(
         lambda x: classe_para_nome(int(x)) if pd.notna(x) else ""
@@ -73,11 +81,12 @@ def parse_cobertura_xlsx(data: bytes) -> pd.DataFrame:
     melted["ano"] = pd.to_numeric(melted["ano"], errors="coerce").astype("Int64")
     melted["area_ha"] = pd.to_numeric(melted["area_ha"], errors="coerce")
 
-    output_cols = [c for c in COLUNAS_SAIDA_COBERTURA if c in melted.columns]
+    schema = COLUNAS_SAIDA_COBERTURA_MUNICIPAL if has_municipality else COLUNAS_SAIDA_COBERTURA
+    output_cols = [c for c in schema if c in melted.columns]
     result = melted[output_cols].copy()
     result = result.dropna(subset=["area_ha"]).reset_index(drop=True)
 
-    logger.info("mapbiomas_cobertura_parse_ok", records=len(result))
+    logger.info("mapbiomas_cobertura_parse_ok", records=len(result), municipal=has_municipality)
     return result
 
 

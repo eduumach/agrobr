@@ -70,7 +70,7 @@ print(meta.records_count, meta.fetch_duration_ms)
 
 - Apenas dados tabulares (estatisticas). Dados geoespaciais (rasters/GEE) ficam para versao futura
 - O XLSX estadual (~23 MB) e baixado inteiro na primeira chamada (o parsing seleciona os filtros)
-- Nivel municipal (~660 MB) disponivel via `fetch_biome_state_municipality` mas nao exposto na API publica por questao de performance — sera adicionado em versao futura com cache local
+- Nivel municipal (~660 MB) disponivel via `cobertura(nivel="municipio")` — download pesado, recomendado filtrar por estado/municipio/bioma. Sem cache local integrado ainda
 - Nomes de classes seguem a legenda oficial do MapBiomas (em portugues)
 
 ## Cache e Atualizacao

@@ -1775,7 +1775,7 @@ SICAR_IMOVEIS_V1 = Contract(
         Column(
             name="data_criacao",
             type=ColumnType.DATETIME,
-            nullable=False,
+            nullable=True,
             stable=True,
         ),
         Column(

@@ -110,8 +110,12 @@ async def pam(
     territorial_level = nivel_map.get(nivel, "3")
 
     ibge_code = "all"
-    if uf and nivel in ("uf", "municipio"):
-        ibge_code = client.uf_to_ibge_code(uf)
+    if uf:
+        uf_ibge = client.uf_to_ibge_code(uf)
+        if nivel == "municipio":
+            ibge_code = f"in N3 {uf_ibge}"
+        elif nivel == "uf":
+            ibge_code = uf_ibge
 
     if ano is None:
         period = "last"
@@ -390,8 +394,12 @@ async def ppm(
     territorial_level = nivel_map.get(nivel, "3")
 
     ibge_code = "all"
-    if uf and nivel in ("uf", "municipio"):
-        ibge_code = client.uf_to_ibge_code(uf)
+    if uf:
+        uf_ibge = client.uf_to_ibge_code(uf)
+        if nivel == "municipio":
+            ibge_code = f"in N3 {uf_ibge}"
+        elif nivel == "uf":
+            ibge_code = uf_ibge
 
     if ano is None:
         period = "last"
@@ -1197,8 +1205,12 @@ async def censo_agro(
     territorial_level = nivel_map.get(nivel, "3")
 
     ibge_code = "all"
-    if uf and nivel in ("uf", "municipio"):
-        ibge_code = client.uf_to_ibge_code(uf)
+    if uf:
+        uf_ibge = client.uf_to_ibge_code(uf)
+        if nivel == "municipio":
+            ibge_code = f"in N3 {uf_ibge}"
+        elif nivel == "uf":
+            ibge_code = uf_ibge
 
     frames: list[pd.DataFrame] = []
     for ano_key in anos_fetch:

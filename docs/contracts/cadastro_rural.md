@@ -14,7 +14,7 @@ Registros de imoveis rurais do Cadastro Ambiental Rural (CAR) por UF.
 |--------|------|----------|-----------|
 | `cod_imovel` | str | ❌ | Codigo unico do imovel no CAR |
 | `status` | str | ❌ | Status do registro: AT, PE, SU, CA |
-| `data_criacao` | datetime | ❌ | Data de criacao do registro |
+| `data_criacao` | datetime | ✅ | Data de criacao do registro (pode ser nulo em registros antigos) |
 | `data_atualizacao` | datetime | ✅ | Data da ultima atualizacao |
 | `area_ha` | float64 | ❌ | Area do imovel em hectares (>= 0) |
 | `condicao` | str | ✅ | Condicao do imovel |

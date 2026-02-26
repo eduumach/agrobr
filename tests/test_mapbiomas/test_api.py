@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import io
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
+import pandas as pd
 import pytest
 
 from agrobr.mapbiomas import api
@@ -12,6 +14,23 @@ GOLDEN_DIR = Path(__file__).parent.parent / "golden_data" / "mapbiomas"
 
 def _golden_xlsx() -> bytes:
     return GOLDEN_DIR.joinpath("biome_state_sample.xlsx").read_bytes()
+
+
+def _make_municipal_xlsx() -> bytes:
+    data = {
+        "biome": ["Amazônia", "Amazônia", "Cerrado", "Cerrado"],
+        "state": ["Pará", "Pará", "Goiás", "Goiás"],
+        "municipality": ["Belém", "Marabá", "Goiânia", "Anápolis"],
+        "class": [3, 15, 3, 15],
+        "class_level_0": ["Natural", "Antropic", "Natural", "Antropic"],
+        2020: [100.0, 200.0, 150.0, 250.0],
+        2021: [110.0, 190.0, 160.0, 240.0],
+    }
+    df = pd.DataFrame(data)
+    buf = io.BytesIO()
+    with pd.ExcelWriter(buf, engine="openpyxl") as writer:
+        df.to_excel(writer, sheet_name="COVERAGE_10", index=False)
+    return buf.getvalue()
 
 
 class TestCobertura:
@@ -149,6 +168,95 @@ class TestCobertura:
         assert (df["bioma"] == "Cerrado").all()
         assert (df["estado"].str.upper() == "GO").all()
         assert (df["ano"] == 2020).all()
+
+
+class TestCoberturaMunicipal:
+    @pytest.mark.asyncio
+    async def test_nivel_municipio_calls_municipal_fetch(self):
+        xlsx_bytes = _make_municipal_xlsx()
+        with patch.object(
+            api.client,
+            "fetch_biome_state_municipality",
+            new_callable=AsyncMock,
+            return_value=(xlsx_bytes, "https://data.mapbiomas.org/test_mun.xlsx"),
+        ) as mock_fetch:
+            df = await api.cobertura(nivel="municipio")
+
+        mock_fetch.assert_called_once()
+        assert "municipio" in df.columns
+        assert len(df) == 8
+
+    @pytest.mark.asyncio
+    async def test_nivel_estado_calls_state_fetch(self):
+        xlsx_bytes = _golden_xlsx()
+        with patch.object(
+            api.client,
+            "fetch_biome_state",
+            new_callable=AsyncMock,
+            return_value=(xlsx_bytes, "https://data.mapbiomas.org/test.xlsx"),
+        ) as mock_fetch:
+            df = await api.cobertura(nivel="estado")
+
+        mock_fetch.assert_called_once()
+        assert "municipio" not in df.columns
+
+    @pytest.mark.asyncio
+    async def test_filter_municipio(self):
+        xlsx_bytes = _make_municipal_xlsx()
+        with patch.object(
+            api.client,
+            "fetch_biome_state_municipality",
+            new_callable=AsyncMock,
+            return_value=(xlsx_bytes, "https://data.mapbiomas.org/test_mun.xlsx"),
+        ):
+            df = await api.cobertura(nivel="municipio", municipio="Belém")
+
+        assert len(df) >= 1
+        assert (df["municipio"].str.contains("Belém")).all()
+
+    @pytest.mark.asyncio
+    async def test_filter_municipio_combined(self):
+        xlsx_bytes = _make_municipal_xlsx()
+        with patch.object(
+            api.client,
+            "fetch_biome_state_municipality",
+            new_callable=AsyncMock,
+            return_value=(xlsx_bytes, "https://data.mapbiomas.org/test_mun.xlsx"),
+        ):
+            df = await api.cobertura(nivel="municipio", estado="PA", municipio="Belém", ano=2020)
+
+        assert len(df) >= 1
+        assert (df["estado"].str.upper() == "PA").all()
+        assert (df["municipio"].str.contains("Belém")).all()
+        assert (df["ano"] == 2020).all()
+
+    @pytest.mark.asyncio
+    async def test_return_meta_municipal(self):
+        xlsx_bytes = _make_municipal_xlsx()
+        with patch.object(
+            api.client,
+            "fetch_biome_state_municipality",
+            new_callable=AsyncMock,
+            return_value=(xlsx_bytes, "https://data.mapbiomas.org/test_mun.xlsx"),
+        ):
+            df, meta = await api.cobertura(nivel="municipio", return_meta=True)
+
+        assert meta.source == "mapbiomas"
+        assert meta.records_count == len(df)
+        assert "municipio" in meta.columns
+
+    @pytest.mark.asyncio
+    async def test_municipio_filter_no_match(self):
+        xlsx_bytes = _make_municipal_xlsx()
+        with patch.object(
+            api.client,
+            "fetch_biome_state_municipality",
+            new_callable=AsyncMock,
+            return_value=(xlsx_bytes, "https://data.mapbiomas.org/test_mun.xlsx"),
+        ):
+            df = await api.cobertura(nivel="municipio", municipio="CidadeInexistente")
+
+        assert len(df) == 0
 
 
 class TestTransicao:

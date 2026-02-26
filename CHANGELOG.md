@@ -8,6 +8,21 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Unreleased]
 
 ### Added
+- **MapBiomas cobertura municipal** — novo parametro `nivel="municipio"` em `cobertura()`.
+  Chama `fetch_biome_state_municipality()` (~660 MB), parser detecta coluna `municipality`
+  automaticamente. Novo parametro `municipio` para filtro por nome (case-insensitive).
+  Warning de download pesado via structlog
+
+### Fixed
+- **PAM/PPM/Censo Agro municipal — fix SIDRA request** — corrige erro "Unidade territorial
+  inexistente" ao usar `nivel='municipio'` com filtro de UF. SIDRA espera notacao
+  `in N3 {uf_code}` para filtrar municipios por estado, nao o codigo da UF direto.
+  Afeta `pam()`, `ppm()` e `censo_agro()`
+- **SICAR ContractViolationError** — `data_criacao` nullable=True no contrato (dados reais
+  do GeoServer tem nulls legitimos). Dedup por `cod_imovel` mantendo registro com
+  `data_atualizacao` mais recente (resolve duplicatas de paginacao WFS)
+
+### Changed
 - **Censo Agropecuario 1995/96 — Bloco 1: config SIDRA** (#16) — tabelas, variaveis,
   classificacoes e indices de coluna para 4 temas (efetivo_rebanho, uso_terra,
   lavoura_temporaria, lavoura_permanente) do Censo 1995. Novo dict `_CENSO_MULTI_TABLE`

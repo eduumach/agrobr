@@ -88,6 +88,17 @@ COLUNAS_SAIDA_COBERTURA = [
     "area_ha",
 ]
 
+COLUNAS_SAIDA_COBERTURA_MUNICIPAL = [
+    "bioma",
+    "estado",
+    "municipio",
+    "classe_id",
+    "classe",
+    "nivel_0",
+    "ano",
+    "area_ha",
+]
+
 COLUNAS_SAIDA_TRANSICAO = [
     "bioma",
     "estado",

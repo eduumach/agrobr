@@ -119,6 +119,57 @@ class TestParseCoberturaXlsx:
             parse_cobertura_xlsx(buf.getvalue())
 
 
+class TestParseCoberturaMunicipal:
+    def _make_municipal_xlsx(self) -> bytes:
+        from io import BytesIO
+
+        import openpyxl
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "COVERAGE_10"
+        ws.append(["biome", "state", "municipality", "class", "class_level_0", 2020, 2021])
+        ws.append(["Amazônia", "Pará", "Belém", 3, "Natural", 100.0, 110.0])
+        ws.append(["Amazônia", "Pará", "Marabá", 15, "Antropic", 200.0, 190.0])
+        ws.append(["Cerrado", "Goiás", "Goiânia", 3, "Natural", 150.0, 160.0])
+        buf = BytesIO()
+        wb.save(buf)
+        return buf.getvalue()
+
+    def test_municipality_column_present(self):
+        df = parse_cobertura_xlsx(self._make_municipal_xlsx())
+        assert "municipio" in df.columns
+
+    def test_municipality_values(self):
+        df = parse_cobertura_xlsx(self._make_municipal_xlsx())
+        municipios = df["municipio"].unique().tolist()
+        assert "Belém" in municipios
+        assert "Marabá" in municipios
+        assert "Goiânia" in municipios
+
+    def test_municipality_output_columns(self):
+        df = parse_cobertura_xlsx(self._make_municipal_xlsx())
+        expected = [
+            "bioma",
+            "estado",
+            "municipio",
+            "classe_id",
+            "classe",
+            "nivel_0",
+            "ano",
+            "area_ha",
+        ]
+        assert list(df.columns) == expected
+
+    def test_municipality_records_count(self):
+        df = parse_cobertura_xlsx(self._make_municipal_xlsx())
+        assert len(df) == 6  # 3 rows x 2 years
+
+    def test_state_level_no_municipality(self):
+        df = parse_cobertura_xlsx(_golden_xlsx())
+        assert "municipio" not in df.columns
+
+
 class TestParseTransicaoXlsx:
     def test_valid_xlsx(self):
         df = parse_transicao_xlsx(_golden_xlsx())

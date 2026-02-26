@@ -268,3 +268,92 @@ class TestResumo:
         ):
             df = await resumo("df")  # lowercase
         assert isinstance(df, pd.DataFrame)
+
+
+DUPLICATE_CSV = (
+    b"FID,cod_imovel,status_imovel,dat_criacao,data_atualizacao,"
+    b"area,condicao,uf,municipio,cod_municipio_ibge,m_fiscal,tipo_imovel\n"
+    b"s.1,PA-001,AT,2014-06-15T10:30:00Z,2023-01-10T14:20:00Z,"
+    b"120.5,,PA,BELEM,1501402,5.0,IRU\n"
+    b"s.2,PA-001,AT,2014-06-15T10:30:00Z,2022-05-01T10:00:00Z,"
+    b"120.5,,PA,BELEM,1501402,5.0,IRU\n"
+    b"s.3,PA-002,PE,2018-03-22T08:15:00Z,,"
+    b"45.2,,PA,BELEM,1501402,1.8,IRU\n"
+)
+
+NULL_DATA_CRIACAO_CSV = (
+    b"FID,cod_imovel,status_imovel,dat_criacao,data_atualizacao,"
+    b"area,condicao,uf,municipio,cod_municipio_ibge,m_fiscal,tipo_imovel\n"
+    b"s.1,PA-001,AT,,2023-01-10T14:20:00Z,"
+    b"120.5,,PA,BELEM,1501402,5.0,IRU\n"
+    b"s.2,PA-002,PE,2018-03-22T08:15:00Z,,"
+    b"45.2,,PA,BELEM,1501402,1.8,IRU\n"
+)
+
+
+class TestImoveisDedup:
+    @pytest.mark.asyncio
+    async def test_dedup_removes_duplicates(self):
+        with (
+            patch.object(
+                api.client,
+                "fetch_hits",
+                new_callable=AsyncMock,
+                return_value=3,
+            ),
+            patch.object(
+                api.client,
+                "fetch_imoveis",
+                new_callable=AsyncMock,
+                return_value=([DUPLICATE_CSV], "https://test.url"),
+            ),
+        ):
+            df = await imoveis("PA")
+
+        assert len(df) == 2
+        assert df["cod_imovel"].is_unique
+
+    @pytest.mark.asyncio
+    async def test_dedup_keeps_most_recent(self):
+        with (
+            patch.object(
+                api.client,
+                "fetch_hits",
+                new_callable=AsyncMock,
+                return_value=3,
+            ),
+            patch.object(
+                api.client,
+                "fetch_imoveis",
+                new_callable=AsyncMock,
+                return_value=([DUPLICATE_CSV], "https://test.url"),
+            ),
+        ):
+            df = await imoveis("PA")
+
+        pa001 = df[df["cod_imovel"] == "PA-001"]
+        assert len(pa001) == 1
+        assert pa001["data_atualizacao"].iloc[0].year == 2023
+
+
+class TestImoveisNullDataCriacao:
+    @pytest.mark.asyncio
+    async def test_null_data_criacao_accepted(self):
+        with (
+            patch.object(
+                api.client,
+                "fetch_hits",
+                new_callable=AsyncMock,
+                return_value=2,
+            ),
+            patch.object(
+                api.client,
+                "fetch_imoveis",
+                new_callable=AsyncMock,
+                return_value=([NULL_DATA_CRIACAO_CSV], "https://test.url"),
+            ),
+        ):
+            df = await imoveis("PA")
+
+        assert len(df) == 2
+        assert pd.isna(df[df["cod_imovel"] == "PA-001"]["data_criacao"].iloc[0])
