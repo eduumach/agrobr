@@ -83,7 +83,6 @@ class TestHealthCommand:
             message="down",
             details={},
             timestamp=datetime(2024, 1, 1),
-            category="source_down",
         )
         with patch(
             "agrobr.health.checker.run_all_checks",
