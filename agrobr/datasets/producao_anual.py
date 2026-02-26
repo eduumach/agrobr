@@ -68,7 +68,7 @@ PRODUCAO_ANUAL_INFO = DatasetInfo(
             description="CONAB Safras",
         ),
     ],
-    products=["soja", "milho", "arroz", "feijao", "trigo", "algodao", "cafe"],
+    products=["soja", "milho", "arroz", "feijao", "trigo", "algodao", "cafe", "cacau"],
     contract_version="1.0",
     update_frequency="yearly",
     typical_latency="Y+1",

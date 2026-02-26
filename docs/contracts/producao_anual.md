@@ -11,7 +11,7 @@ Produção agrícola anual consolidada por UF ou município.
 
 ## Produtos
 
-`soja`, `milho`, `arroz`, `feijao`, `trigo`, `algodao`, `cafe`
+`soja`, `milho`, `arroz`, `feijao`, `trigo`, `algodao`, `cafe`, `cacau`
 
 ## Schema
 

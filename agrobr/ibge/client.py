@@ -57,6 +57,7 @@ PRODUTOS_PAM = {
     "cana": "40106",
     "mandioca": "40119",
     "laranja": "40151",
+    "cacau": "40138",
 }
 
 VARIAVEIS_PPM = {

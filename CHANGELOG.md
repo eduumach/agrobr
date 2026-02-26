@@ -8,6 +8,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Unreleased]
 
 ### Added
+- **PAM cacau** — novo produto `cacau` (código SIDRA 40138, "Cacau em amêndoa") em
+  `PRODUTOS_PAM` e na whitelist do dataset `producao_anual`
 - **MapBiomas cobertura municipal** — novo parametro `nivel="municipio"` em `cobertura()`.
   Chama `fetch_biome_state_municipality()` (~660 MB), parser detecta coluna `municipality`
   automaticamente. Novo parametro `municipio` para filtro por nome (case-insensitive).
