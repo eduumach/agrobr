@@ -33,6 +33,7 @@ Validação é automática: todo `fetch()` de dataset valida o DataFrame contra 
 | [abate_trimestral](./abate_trimestral.md) | Abate de bovinos, suínos e frangos | IBGE Abate |
 | [censo_agropecuario](./censo_agropecuario.md) | Censo Agropecuário 1995/2006/2017 (10 temas) | IBGE Censo Agro |
 | [censo_agropecuario_legado](./censo_agropecuario_legado.md) | Censo Agropecuário 1995/96 — 6 temas legados (FTP) | IBGE FTP |
+| [censo_agropecuario_historico](./censo_agropecuario_historico.md) | Série histórica Censo Agropecuário 1920-2006 (9 temas, até UF) | IBGE SIDRA |
 | [cadastro_rural](./cadastro_rural.md) | Cadastro Ambiental Rural | SICAR |
 
 ## Schemas JSON
@@ -66,8 +67,9 @@ from agrobr import datasets
 # Listar datasets
 datasets.list_datasets()
 # ['abate_trimestral', 'balanco', 'censo_agropecuario', 'credito_rural',
-#  'custo_producao', 'estimativa_safra', 'exportacao', 'fertilizante',
-#  'pecuaria_municipal', 'preco_diario', 'producao_anual', 'cadastro_rural']
+#  'censo_agropecuario_historico', 'custo_producao', 'estimativa_safra',
+#  'exportacao', 'fertilizante', 'pecuaria_municipal', 'preco_diario',
+#  'producao_anual', 'cadastro_rural']
 
 # Listar produtos de um dataset
 datasets.list_products("preco_diario")

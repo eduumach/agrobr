@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import time
 from datetime import datetime
 from typing import Literal, overload
@@ -1257,6 +1258,225 @@ async def censo_agro(
 
 async def temas_censo_agro() -> list[str]:
     return list(client.TEMAS_CENSO_AGRO)
+
+
+def _parse_censo_historico_raw(df: pd.DataFrame, tema: str) -> pd.DataFrame:
+    if df.empty:
+        return _empty_censo_df()
+
+    periodos_set = {str(p) for p in client.PERIODOS_CENSO_HISTORICO[tema]}
+    var_codes_set = set(client.VARIAVEIS_CENSO_HISTORICO[tema].values())
+    reverse_vars = {v: k for k, v in client.VARIAVEIS_CENSO_HISTORICO[tema].items()}
+    categorias = client.CATEGORIAS_CENSO_HISTORICO.get(tema, {})
+    has_classification = bool(client.CLASSIFICACOES_CENSO_HISTORICO[tema])
+
+    ano_dc = var_dc = cat_dc = None
+    for dc in ["D2C", "D3C", "D4C"]:
+        if dc not in df.columns:
+            continue
+        sample = str(df[dc].iloc[0])
+        if ano_dc is None and re.fullmatch(r"\d{4}", sample) and sample in periodos_set:
+            ano_dc = dc
+        elif var_dc is None and sample in var_codes_set:
+            var_dc = dc
+        elif cat_dc is None:
+            cat_dc = dc
+
+    result = pd.DataFrame()
+    result["localidade"] = df["D1N"].values
+    result["localidade_cod"] = pd.to_numeric(df["D1C"], errors="coerce").astype("Int64")
+
+    if ano_dc:
+        result["ano"] = pd.to_numeric(df[ano_dc], errors="coerce").astype("Int64")
+
+    if var_dc:
+        vc = df[var_dc].astype(str)
+        result["variavel"] = vc.map(reverse_vars).fillna(vc)
+    elif len(var_codes_set) == 1:
+        code = next(iter(var_codes_set))
+        result["variavel"] = reverse_vars.get(code, code)
+        vc = pd.Series(code, index=df.index)
+    else:
+        result["variavel"] = ""
+        vc = pd.Series("", index=df.index)
+
+    if cat_dc:
+        cc = df[cat_dc].astype(str)
+        cat_name_col = cat_dc[:-1] + "N"
+        mapped = cc.map(categorias)
+        if cat_name_col in df.columns:
+            result["categoria"] = mapped.fillna(df[cat_name_col])
+        else:
+            result["categoria"] = mapped.fillna("")
+    elif not has_classification:
+        result["categoria"] = "total"
+        cc = pd.Series("", index=df.index)
+    else:
+        result["categoria"] = ""
+        cc = pd.Series("", index=df.index)
+
+    fixed_unit = vc.map(client.UNIDADES_VARIAVEIS_CENSO_HISTORICO)
+    if cat_dc:
+        cat_unit = cc.map(client.UNIDADES_CATEGORIAS_CENSO_HISTORICO)
+    else:
+        cat_unit = pd.Series(pd.NA, index=df.index)
+    mn_unit = df["MN"] if "MN" in df.columns else pd.Series("", index=df.index)
+    result["unidade"] = fixed_unit.fillna(cat_unit).fillna(mn_unit).fillna("")
+
+    result["valor"] = pd.to_numeric(df["V"], errors="coerce")
+    result["tema"] = tema
+    result["fonte"] = "ibge_censo_agro_historico"
+
+    output_cols = [
+        "ano",
+        "localidade",
+        "localidade_cod",
+        "tema",
+        "categoria",
+        "variavel",
+        "valor",
+        "unidade",
+        "fonte",
+    ]
+    return result[output_cols].reset_index(drop=True)
+
+
+@overload
+async def censo_agro_historico(
+    tema: str,
+    ano: int | list[int] | None = None,
+    uf: str | None = None,
+    nivel: Literal["brasil", "regiao", "uf"] = "uf",
+    as_polars: bool = False,
+    *,
+    return_meta: Literal[False] = False,
+) -> pd.DataFrame: ...
+
+
+@overload
+async def censo_agro_historico(
+    tema: str,
+    ano: int | list[int] | None = None,
+    uf: str | None = None,
+    nivel: Literal["brasil", "regiao", "uf"] = "uf",
+    as_polars: bool = False,
+    *,
+    return_meta: Literal[True],
+) -> tuple[pd.DataFrame, MetaInfo]: ...
+
+
+async def censo_agro_historico(
+    tema: str,
+    ano: int | list[int] | None = None,
+    uf: str | None = None,
+    nivel: Literal["brasil", "regiao", "uf"] = "uf",
+    as_polars: bool = False,
+    return_meta: bool = False,
+) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
+    fetch_start = time.perf_counter()
+    meta = MetaInfo(
+        source="ibge_censo_agro_historico",
+        source_url="https://sidra.ibge.gov.br",
+        source_method="httpx",
+        fetched_at=datetime.now(),
+    )
+    logger.info(
+        "ibge_censo_agro_historico_request",
+        tema=tema,
+        ano=ano,
+        uf=uf,
+        nivel=nivel,
+    )
+
+    tema_lower = tema.lower()
+    if tema_lower not in client.TABELAS_CENSO_HISTORICO:
+        raise ValueError(f"Tema não suportado: {tema}. Disponíveis: {client.TEMAS_CENSO_HISTORICO}")
+
+    niveis_validos = client.NIVEIS_CENSO_HISTORICO[tema_lower]
+    if nivel not in niveis_validos:
+        raise ValueError(
+            f"Nível '{nivel}' não disponível para tema '{tema_lower}'. "
+            f"Disponíveis: {niveis_validos}"
+        )
+
+    periodos = client.PERIODOS_CENSO_HISTORICO[tema_lower]
+    if ano is None:
+        anos = periodos
+    elif isinstance(ano, int):
+        if ano not in periodos:
+            raise ValueError(
+                f"Ano {ano} não disponível para tema '{tema_lower}'. Disponíveis: {periodos}"
+            )
+        anos = [ano]
+    else:
+        for a in ano:
+            if a not in periodos:
+                raise ValueError(
+                    f"Ano {a} não disponível para tema '{tema_lower}'. Disponíveis: {periodos}"
+                )
+        anos = ano
+
+    nivel_map = {"brasil": "1", "regiao": "2", "uf": "3"}
+    territorial_level = nivel_map[nivel]
+
+    ibge_code = "all"
+    if uf and nivel == "uf":
+        ibge_code = client.uf_to_ibge_code(uf)
+
+    period = ",".join(str(a) for a in anos)
+    variable = ",".join(client.VARIAVEIS_CENSO_HISTORICO[tema_lower].values())
+    classifications: dict[str, str | list[str]] | None = (
+        dict(client.CLASSIFICACOES_CENSO_HISTORICO[tema_lower]) or None
+    )
+
+    df = await client.fetch_sidra(
+        table_code=client.TABELAS_CENSO_HISTORICO[tema_lower],
+        territorial_level=territorial_level,
+        ibge_territorial_code=ibge_code,
+        variable=variable,
+        period=period,
+        classifications=classifications,
+    )
+
+    df = _empty_censo_df() if df.empty else _parse_censo_historico_raw(df, tema_lower)
+
+    if not df.empty and "ano" in df.columns and "localidade" in df.columns:
+        df = df.sort_values(["ano", "localidade"]).reset_index(drop=True)
+
+    meta.fetch_duration_ms = int((time.perf_counter() - fetch_start) * 1000)
+    meta.records_count = len(df)
+    meta.columns = df.columns.tolist()
+    meta.cache_key = build_cache_key(
+        "ibge:censo_agro_historico",
+        {"tema": tema, "ano": ano, "uf": uf},
+        schema_version=meta.schema_version,
+    )
+    meta.cache_expires_at = calculate_expiry(constants.Fonte.IBGE, "censo_agro")
+
+    if as_polars:
+        try:
+            import polars as pl
+
+            result_df = pl.from_pandas(df)
+            if return_meta:
+                return result_df, meta  # type: ignore[return-value,no-any-return]
+            return result_df  # type: ignore[return-value,no-any-return]
+        except ImportError:
+            logger.warning("polars_not_installed", fallback="pandas")
+
+    logger.info(
+        "ibge_censo_agro_historico_success",
+        tema=tema,
+        records=len(df),
+    )
+
+    if return_meta:
+        return df, meta
+    return df
+
+
+async def temas_censo_agro_historico() -> list[str]:
+    return list(client.TEMAS_CENSO_HISTORICO)
 
 
 async def ufs() -> list[str]:

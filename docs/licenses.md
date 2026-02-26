@@ -34,6 +34,7 @@
 | **IBGE PPM** | Dados públicos governo federal | Sim (dados públicos) | `livre` | [SIDRA](https://sidra.ibge.gov.br) |
 | **IBGE Abate** | Dados públicos governo federal | Sim (dados públicos) | `livre` | [SIDRA](https://sidra.ibge.gov.br) |
 | **IBGE Censo Agro** | Dados públicos governo federal | Sim (dados públicos) | `livre` | [SIDRA](https://sidra.ibge.gov.br) |
+| **IBGE Censo Agro Histórico** | Dados públicos governo federal | Sim (dados públicos) | `livre` | [SIDRA](https://sidra.ibge.gov.br) |
 | **B3 Futuros Agro** | Sem termos públicos para acesso programático | Verificar com B3 | `zona_cinza` | [B3](https://www.b3.com.br) |
 | **CONAB CEASA/PROHORT** | Credenciais públicas embutidas no frontend, API não documentada oficialmente | Verificar com CONAB | `zona_cinza` | [Portal CONAB](https://portaldeinformacoes.conab.gov.br) |
 

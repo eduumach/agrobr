@@ -8,6 +8,26 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Unreleased]
 
 ### Added
+- **Censo Agropecuario Serie Historica — Bloco 4: CLI e integracao final** (#17) — comandos
+  `agrobr ibge censo-historico <tema>` (com `--ano`, `--uf`, `--nivel`, `--formato`) e
+  `agrobr ibge temas-historico`. Sync wrapper via `agrobr.sync.ibge` funciona automaticamente
+- **Censo Agropecuario Serie Historica — Bloco 3: contrato, dataset e docs** (#17) — contrato
+  `IBGE_CENSO_AGRO_HISTORICO_V1` (9 colunas, PK `[ano, tema, categoria, variavel, localidade]`,
+  effective_from 0.13.0, fonte='ibge_censo_agro_historico', anos censitarios 1920-2006, nivel max UF).
+  Dataset `censo_agropecuario_historico` com 9 temas, update_frequency='never', license='livre'.
+  Registrado no registry. 25 novos testes (14 contrato + 11 dataset). Docs: contrato, licenses,
+  index, README, CHANGELOG atualizados
+- **Censo Agropecuario Serie Historica — Bloco 2: API, parser e testes** (#17) — nova
+  funcao `censo_agro_historico()` para serie historica 1920-2006 (ate UF). Parser dedicado
+  `_parse_censo_historico_raw()` com deteccao robusta de dimensoes (ano/variavel/categoria),
+  unidade por categoria (UNIDADES_CATEGORIAS como fonte primaria, MN so como ultimo
+  fallback — corrige Aves=Mil cabecas vs Cabecas). Helper `temas_censo_agro_historico()`.
+  3 classes de teste: validacao (9), parsing (22 com mocks), integracao (1). 126 testes
+  no arquivo (era 95)
+- **Censo Agropecuario Serie Historica — Bloco 1: constantes SIDRA** (#17) — 9 tabelas
+  da serie historica (263-283, 1730, 1731) mapeadas com periodos, variaveis,
+  classificacoes, categorias, niveis territoriais e unidades. Cobertura: 1920-2006,
+  ate Brasil+Regiao+UF. 95 testes cobrindo todas as constantes
 - **PAM cacau** — novo produto `cacau` (código SIDRA 40138, "Cacau em amêndoa") em
   `PRODUTOS_PAM` e na whitelist do dataset `producao_anual`
 - **MapBiomas cobertura municipal** — novo parametro `nivel="municipio"` em `cobertura()`.

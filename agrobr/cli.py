@@ -52,15 +52,39 @@ def cepea_indicador(
 
 @app.command("health")  # type: ignore[misc, untyped-decorator]
 def health(
-    _all_sources: bool = typer.Option(False, "--all", "-a", help="Verifica todas as fontes"),
-    _source: str | None = typer.Option(None, "--source", "-s", help="Fonte especifica"),
+    source: str | None = typer.Option(None, "--source", "-s", help="Fonte especifica"),
+    deep: bool = typer.Option(False, "--deep", "-d", help="Deep checks (fingerprint+parse)"),
     output: str = typer.Option("text", "--output", "-o", help="Formato: text, json"),
 ) -> None:
-    typer.echo("Health check em desenvolvimento")
+    import asyncio
+
+    from agrobr.health.checker import format_results, run_all_checks
+    from agrobr.health.reporter import HealthReport
+
+    sources_list = None
+    if source:
+        try:
+            fonte = constants.Fonte(source.lower())
+        except ValueError:
+            typer.echo(f"Fonte desconhecida: {source}", err=True)
+            raise typer.Exit(1) from None
+        sources_list = [fonte]
+
+    try:
+        results = asyncio.run(run_all_checks(sources_list, deep=deep))  # type: ignore[call-arg]
+    except Exception as e:
+        typer.echo(f"Erro ao executar health check: {e}", err=True)
+        raise typer.Exit(1) from None
 
     if output == "json":
-        result = {"status": "ok", "checks": []}
-        typer.echo(json.dumps(result, indent=2))
+        report = HealthReport(results)
+        typer.echo(report.to_json(indent=2))
+    else:
+        typer.echo(format_results(results))
+
+    has_failed = any(r.status.value == "failed" for r in results)
+    if has_failed:
+        raise typer.Exit(1)
 
 
 @app.command("doctor")  # type: ignore[misc, untyped-decorator]
@@ -277,6 +301,60 @@ def ibge_lspa(
     except Exception as e:
         typer.echo(f"Erro: {e}", err=True)
         raise typer.Exit(1) from None
+
+
+@ibge_app.command("censo-historico")  # type: ignore[misc, untyped-decorator]
+def ibge_censo_historico(
+    tema: str = typer.Argument(..., help="Tema (estabelecimentos_area, uso_terra, etc)"),
+    ano: str | None = typer.Option(
+        None, "--ano", "-a", help="Ano censitario ou anos (ex: 1985 ou 1970,1985,2006)"
+    ),
+    uf: str | None = typer.Option(None, "--uf", "-u", help="Filtrar por UF"),
+    nivel: str = typer.Option("uf", "--nivel", "-n", help="Nivel: brasil, regiao, uf"),
+    formato: str = typer.Option("table", "--formato", "-o", help="Formato: table, csv, json"),
+) -> None:
+    import asyncio
+
+    from agrobr import ibge
+
+    typer.echo(f"Consultando censo historico: {tema}...")
+
+    try:
+        ano_param: int | list[int] | None = None
+        if ano:
+            ano_param = [int(a.strip()) for a in ano.split(",")] if "," in ano else int(ano)
+
+        nivel_typed: Any = nivel
+        df = asyncio.run(
+            ibge.censo_agro_historico(tema=tema, ano=ano_param, uf=uf, nivel=nivel_typed)
+        )
+
+        if df.empty:
+            typer.echo("Nenhum dado encontrado")
+            return
+
+        if formato == "json":
+            typer.echo(df.to_json(orient="records", indent=2))
+        elif formato == "csv":
+            typer.echo(df.to_csv(index=False))
+        else:
+            typer.echo(df.to_string(index=False))
+
+    except Exception as e:
+        typer.echo(f"Erro: {e}", err=True)
+        raise typer.Exit(1) from None
+
+
+@ibge_app.command("temas-historico")  # type: ignore[misc, untyped-decorator]
+def ibge_temas_historico() -> None:
+    import asyncio
+
+    from agrobr import ibge
+
+    temas = asyncio.run(ibge.temas_censo_agro_historico())
+    typer.echo("Temas disponiveis no Censo Agropecuario Historico:")
+    for tema in temas:
+        typer.echo(f"  - {tema}")
 
 
 @ibge_app.command("produtos")  # type: ignore[misc, untyped-decorator]

@@ -58,6 +58,7 @@ Peça o que quer, a fonte é detalhe interno:
 | `cadastro_rural` | Cadastro Ambiental Rural (imóveis rurais) | SICAR/GeoServer WFS |
 | `censo_agropecuario` | Censo Agropecuário 1995/2006/2017 (10 temas) | IBGE Censo Agro |
 | `censo_agropecuario_legado` | Censo Agropecuário 1995/96 — 6 temas legados | IBGE FTP |
+| `censo_agropecuario_historico` | Série histórica Censo Agropecuário 1920-2006 (9 temas) | IBGE SIDRA |
 
 ```python
 from agrobr import datasets

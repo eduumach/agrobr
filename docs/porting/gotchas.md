@@ -297,6 +297,29 @@ A API SIDRA é a fonte mais estável, mas tem particularidades:
 
 Níveis: `N1` (Brasil), `N2` (Região), `N3` (UF), `N6` (Município)
 
+### Série Histórica Censo Agropecuário (tabelas 263-283, 1730, 1731)
+
+**Nível territorial máximo:** UF (N3). Municipal **NÃO existe** no SIDRA para
+estas tabelas — retorna erro ou dados vazios.
+
+**Unidades mistas por categoria:**
+
+- Tabela 281 (efetivo animais): Aves = "Mil cabeças", demais = "Cabeças"
+- Tabela 282 (produção animal): Leite = "Mil litros", Ovos = "Mil dúzias", Lã = "Toneladas"
+- Tabelas 283, 1730, 1731: unidade depende do produto (Toneladas, Mil frutos, Mil cachos)
+
+**Classificações sem Total (`sumarizacao=false`):**
+Tabelas 281, 282, 283, 1730, 1731 não têm categoria "Total" na classificação.
+Não é possível pedir agregação via SIDRA — somar manualmente se necessário.
+
+**Missing values:** `".."` = indisponível, `"..."` = suprimido, `"-"` = não aplicável,
+`"X"` = dado sigiloso. Todos devem virar NaN.
+
+**Parâmetro `v/all` vs `v/allxp`:** usar `v/all` para incluir variáveis percentuais.
+`v/allxp` exclui percentuais silenciosamente.
+
+**Parâmetro `c/all` inválido:** usar `c{ID}/all` (ex: `c220/all`), não `c/all`.
+
 ---
 
 ## NASA POWER (Clima)

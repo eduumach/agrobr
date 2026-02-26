@@ -58,6 +58,15 @@
 - **Temas**: efetivo_rebanho, uso_terra, lavoura_temporaria, lavoura_permanente, preparo_solo, adubacao, calagem, agrotoxicos, praticas_agricolas, irrigacao
 - **Formato**: Long format (variavel/valor por linha)
 
+### Censo Agropecuario — Serie Historica (1920-2006)
+
+- **Tabelas SIDRA**: 263 (estabelecimentos/area), 264 (uso terra), 265 (pessoal/tratores), 280 (condicao produtor), 281 (efetivo animais), 282 (producao animal), 283 (producao vegetal), 1730 (lavoura permanente), 1731 (lavoura temporaria)
+- **Cobertura**: Brasil + Regiao + UF (municipal NAO disponivel no SIDRA)
+- **Frequencia**: Censos decenais (1920-2006, conforme tabela)
+- **Periodos**: ate 10 censos por tema (1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006)
+- **Temas**: 9 temas com serie historica longa
+- **Quirks**: Aves em mil cabecas (tab 281), unidades mistas por categoria (tabs 282/283/1730/1731), classificacoes sem Total (tabs 281/282/283/1730/1731)
+
 ### Censo Agropecuario 1995/96 — Temas Legados (FTP)
 
 - **Fonte**: FTP IBGE (`ftp.ibge.gov.br`)

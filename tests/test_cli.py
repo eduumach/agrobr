@@ -32,19 +32,66 @@ class TestMainApp:
 
 
 class TestHealthCommand:
+    def _mock_check_result(self, source="cepea"):
+        from agrobr.constants import Fonte
+        from agrobr.health.checker import CheckResult, CheckStatus
+
+        return CheckResult(
+            source=Fonte(source),
+            status=CheckStatus.OK,
+            latency_ms=100.0,
+            message="OK",
+            details={},
+            timestamp=datetime(2024, 1, 1),
+        )
+
     def test_health_default(self):
-        result = runner.invoke(app, ["health"])
+        with patch(
+            "agrobr.health.checker.run_all_checks",
+            new_callable=AsyncMock,
+            return_value=[self._mock_check_result()],
+        ):
+            result = runner.invoke(app, ["health"])
         assert result.exit_code == 0
-        assert "Health check" in result.output
+        assert "Health Check Results" in result.output
 
     def test_health_json_output(self):
-        result = runner.invoke(app, ["health", "--output", "json"])
+        with patch(
+            "agrobr.health.checker.run_all_checks",
+            new_callable=AsyncMock,
+            return_value=[self._mock_check_result()],
+        ):
+            result = runner.invoke(app, ["health", "--output", "json"])
         assert result.exit_code == 0
-        output = result.output
-        json_start = output.index("{")
-        data = json.loads(output[json_start:])
-        assert data["status"] == "ok"
+        data = json.loads(result.output)
+        assert "summary" in data
         assert "checks" in data
+
+    def test_health_unknown_source(self):
+        result = runner.invoke(app, ["health", "--source", "nonexistent"])
+        assert result.exit_code == 1
+        assert "Fonte desconhecida" in result.output
+
+    def test_health_exit_code_1_on_failure(self):
+        from agrobr.constants import Fonte
+        from agrobr.health.checker import CheckResult, CheckStatus
+
+        failed = CheckResult(
+            source=Fonte.CEPEA,
+            status=CheckStatus.FAILED,
+            latency_ms=0,
+            message="down",
+            details={},
+            timestamp=datetime(2024, 1, 1),
+            category="source_down",
+        )
+        with patch(
+            "agrobr.health.checker.run_all_checks",
+            new_callable=AsyncMock,
+            return_value=[failed],
+        ):
+            result = runner.invoke(app, ["health"])
+        assert result.exit_code == 1
 
 
 class TestDoctorCommand:
@@ -269,6 +316,144 @@ class TestIbgeCommands:
             result = runner.invoke(app, ["ibge", "produtos", "--pesquisa", "lspa"])
         assert result.exit_code == 0
         assert "LSPA" in result.output
+
+
+class TestIbgeCensoHistoricoCommands:
+    def test_censo_historico_success(self):
+        df = pd.DataFrame(
+            {
+                "ano": pd.array([1985], dtype="Int64"),
+                "localidade": ["São Paulo"],
+                "localidade_cod": pd.array([35], dtype="Int64"),
+                "tema": ["estabelecimentos_area"],
+                "categoria": ["total"],
+                "variavel": ["estabelecimentos"],
+                "valor": [5801809.0],
+                "unidade": ["Unidades"],
+                "fonte": ["ibge_censo_agro_historico"],
+            }
+        )
+        with patch("agrobr.ibge.censo_agro_historico", new_callable=AsyncMock, return_value=df):
+            result = runner.invoke(app, ["ibge", "censo-historico", "estabelecimentos_area"])
+        assert result.exit_code == 0
+        assert "estabelecimentos_area" in result.output
+
+    def test_censo_historico_with_ano(self):
+        df = pd.DataFrame(
+            {
+                "ano": pd.array([1985], dtype="Int64"),
+                "localidade": ["Brasil"],
+                "localidade_cod": pd.array([1], dtype="Int64"),
+                "tema": ["uso_terra"],
+                "categoria": ["total"],
+                "variavel": ["area"],
+                "valor": [100000.0],
+                "unidade": ["Hectares"],
+                "fonte": ["ibge_censo_agro_historico"],
+            }
+        )
+        with patch("agrobr.ibge.censo_agro_historico", new_callable=AsyncMock, return_value=df):
+            result = runner.invoke(app, ["ibge", "censo-historico", "uso_terra", "--ano", "1985"])
+        assert result.exit_code == 0
+
+    def test_censo_historico_with_multiple_anos(self):
+        df = pd.DataFrame(
+            {
+                "ano": pd.array([1985, 2006], dtype="Int64"),
+                "localidade": ["Brasil", "Brasil"],
+                "localidade_cod": pd.array([1, 1], dtype="Int64"),
+                "tema": ["uso_terra", "uso_terra"],
+                "categoria": ["total", "total"],
+                "variavel": ["area", "area"],
+                "valor": [100000.0, 200000.0],
+                "unidade": ["Hectares", "Hectares"],
+                "fonte": ["ibge_censo_agro_historico", "ibge_censo_agro_historico"],
+            }
+        )
+        with patch("agrobr.ibge.censo_agro_historico", new_callable=AsyncMock, return_value=df):
+            result = runner.invoke(
+                app, ["ibge", "censo-historico", "uso_terra", "--ano", "1985,2006"]
+            )
+        assert result.exit_code == 0
+
+    def test_censo_historico_empty(self):
+        with patch(
+            "agrobr.ibge.censo_agro_historico", new_callable=AsyncMock, return_value=pd.DataFrame()
+        ):
+            result = runner.invoke(app, ["ibge", "censo-historico", "uso_terra"])
+        assert result.exit_code == 0
+        assert "Nenhum dado" in result.output
+
+    def test_censo_historico_json(self):
+        df = pd.DataFrame(
+            {
+                "ano": pd.array([1985], dtype="Int64"),
+                "localidade": ["São Paulo"],
+                "localidade_cod": pd.array([35], dtype="Int64"),
+                "tema": ["pessoal_tratores"],
+                "categoria": ["total"],
+                "variavel": ["pessoal_ocupado"],
+                "valor": [100000.0],
+                "unidade": ["Pessoas"],
+                "fonte": ["ibge_censo_agro_historico"],
+            }
+        )
+        with patch("agrobr.ibge.censo_agro_historico", new_callable=AsyncMock, return_value=df):
+            result = runner.invoke(
+                app, ["ibge", "censo-historico", "pessoal_tratores", "--formato", "json"]
+            )
+        assert result.exit_code == 0
+
+    def test_censo_historico_csv(self):
+        df = pd.DataFrame(
+            {
+                "ano": pd.array([1985], dtype="Int64"),
+                "localidade": ["São Paulo"],
+                "localidade_cod": pd.array([35], dtype="Int64"),
+                "tema": ["pessoal_tratores"],
+                "categoria": ["total"],
+                "variavel": ["pessoal_ocupado"],
+                "valor": [100000.0],
+                "unidade": ["Pessoas"],
+                "fonte": ["ibge_censo_agro_historico"],
+            }
+        )
+        with patch("agrobr.ibge.censo_agro_historico", new_callable=AsyncMock, return_value=df):
+            result = runner.invoke(
+                app, ["ibge", "censo-historico", "pessoal_tratores", "--formato", "csv"]
+            )
+        assert result.exit_code == 0
+        assert "ano" in result.output
+
+    def test_censo_historico_error(self):
+        with patch(
+            "agrobr.ibge.censo_agro_historico",
+            new_callable=AsyncMock,
+            side_effect=ValueError("Tema não suportado"),
+        ):
+            result = runner.invoke(app, ["ibge", "censo-historico", "inexistente"])
+        assert result.exit_code == 1
+
+    def test_temas_historico(self):
+        temas = [
+            "estabelecimentos_area",
+            "uso_terra",
+            "pessoal_tratores",
+            "condicao_produtor",
+            "efetivo_animais",
+            "producao_animal",
+            "producao_vegetal",
+            "lavoura_permanente",
+            "lavoura_temporaria",
+        ]
+        with patch(
+            "agrobr.ibge.temas_censo_agro_historico", new_callable=AsyncMock, return_value=temas
+        ):
+            result = runner.invoke(app, ["ibge", "temas-historico"])
+        assert result.exit_code == 0
+        assert "Censo Agropecuario Historico" in result.output
+        assert "estabelecimentos_area" in result.output
+        assert "lavoura_temporaria" in result.output
 
 
 class TestConfigCommands:

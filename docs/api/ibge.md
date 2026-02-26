@@ -466,6 +466,96 @@ async def temas_censo_agro_legado() -> list[str]
 
 ---
 
+### `censo_agro_historico`
+
+Obtém dados da série histórica do Censo Agropecuário (1920-2006, nível UF máximo).
+
+```python
+async def censo_agro_historico(
+    tema: str,
+    ano: int | list[int] | None = None,
+    uf: str | None = None,
+    nivel: str = 'uf',
+    as_polars: bool = False,
+) -> pd.DataFrame | pl.DataFrame
+```
+
+**Parâmetros:**
+
+| Parâmetro | Tipo | Descrição |
+|-----------|------|-----------|
+| `tema` | `str` | Tema da série histórica (ver tabela abaixo) |
+| `ano` | `int \| list[int] \| None` | Ano(s) censal(ais). Default: todos os disponíveis |
+| `uf` | `str \| None` | Filtrar por UF (ex: 'SP'). Só aplicado em nivel='uf' |
+| `nivel` | `str` | Nível: 'brasil', 'regiao', 'uf' (municipal NÃO disponível) |
+| `as_polars` | `bool` | Retornar como polars.DataFrame |
+
+**Temas disponíveis:**
+
+| Código | Tema | Tabela SIDRA | Períodos |
+|--------|------|:------------:|----------|
+| `estabelecimentos_area` | Estabelecimentos e área por grupo de área | 263 | 1920-2006 (10 censos) |
+| `uso_terra` | Área por utilização das terras | 264 | 1970-2006 (6 censos) |
+| `pessoal_tratores` | Pessoal ocupado e tratores | 265 | 1970-2006 (6 censos) |
+| `condicao_produtor` | Estabelecimentos por condição do produtor | 280 | 1920-2006 (10 censos) |
+| `efetivo_animais` | Efetivo de animais por espécie | 281 | 1970-2006 (6 censos) |
+| `producao_animal` | Produção animal por tipo | 282 | 1920-2006 (10 censos) |
+| `producao_vegetal` | Produção vegetal e área colhida | 283 | 1920-2006 (10 censos) |
+| `lavoura_permanente` | Quantidade produzida — lavouras permanentes | 1730 | 1940-2006 (9 censos) |
+| `lavoura_temporaria` | Quantidade produzida — lavouras temporárias | 1731 | 1940-2006 (9 censos) |
+
+**Exemplo:**
+
+```python
+from agrobr import ibge
+
+# Estabelecimentos e área, Brasil, 1985
+df = await ibge.censo_agro_historico('estabelecimentos_area', ano=1985, nivel='brasil')
+
+# Efetivo de animais, todas as UFs, todos os censos
+df = await ibge.censo_agro_historico('efetivo_animais')
+
+# Pessoal e tratores em São Paulo, 1980 e 1985
+df = await ibge.censo_agro_historico('pessoal_tratores', ano=[1980, 1985], uf='SP')
+
+# Produção vegetal, nível região
+df = await ibge.censo_agro_historico('producao_vegetal', nivel='regiao')
+
+# Com metadados
+df, meta = await ibge.censo_agro_historico('uso_terra', ano=1985, return_meta=True)
+```
+
+---
+
+### `temas_censo_agro_historico`
+
+Lista temas disponíveis na série histórica do Censo Agropecuário.
+
+```python
+async def temas_censo_agro_historico() -> list[str]
+```
+
+#### CLI
+
+```bash
+# Todos os dados de estabelecimentos/área por UF
+agrobr ibge censo-historico estabelecimentos_area
+
+# Ano específico, formato CSV
+agrobr ibge censo-historico uso_terra --ano 1985 --formato csv
+
+# Múltiplos anos, nível Brasil
+agrobr ibge censo-historico efetivo_animais --ano 1970,1985,2006 --nivel brasil
+
+# Filtrar por UF
+agrobr ibge censo-historico pessoal_tratores --ano 1985 --uf SP
+
+# Listar temas disponíveis
+agrobr ibge temas-historico
+```
+
+---
+
 ### `ufs`
 
 Lista UFs disponíveis.
@@ -476,15 +566,15 @@ async def ufs() -> list[str]
 
 ---
 
-## Diferenças PAM vs LSPA vs PPM vs Abate vs Censo Agro
+## Diferenças PAM vs LSPA vs PPM vs Abate vs Censo Agro vs Série Histórica
 
-| Aspecto | PAM | LSPA | PPM | Abate | Censo Agro | Censo Agro Legado |
-|---------|-----|------|-----|-------|------------|-------------------|
-| Frequência | Anual | Mensal | Anual | Trimestral | Decenial | Única (1995/96) |
-| Granularidade | Até município | Até UF | Até município | Brasil + UF | Até município | Até município |
-| Tipo | Dados consolidados | Estimativas | Dados consolidados | Dados consolidados | Dados censitários | Dados censitários (FTP) |
-| Disponibilidade | T+1 ano | T+1 mês | T+1 ano | T+2 meses | Pós-censo | Estático |
-| Escopo | Lavouras | Lavouras | Pecuária | Abate de animais | Estrutura agropecuária | 6 temas legados |
+| Aspecto | PAM | LSPA | PPM | Abate | Censo Agro | Censo Agro Legado | Série Histórica |
+|---------|-----|------|-----|-------|------------|-------------------|-----------------|
+| Frequência | Anual | Mensal | Anual | Trimestral | Decenial | Única (1995/96) | Decenial |
+| Granularidade | Até município | Até UF | Até município | Brasil + UF | Até município | Até município | Brasil/Região/UF |
+| Tipo | Consolidados | Estimativas | Consolidados | Consolidados | Censitários | Censitários (FTP) | Censitários |
+| Disponibilidade | T+1 ano | T+1 mês | T+1 ano | T+2 meses | Pós-censo | Estático | Estático |
+| Escopo | Lavouras | Lavouras | Pecuária | Abate | Estrutura agro | 6 temas legados | 9 temas (1920-2006) |
 
 ## Tabelas SIDRA Utilizadas
 
@@ -512,6 +602,15 @@ async def ufs() -> list[str]
 | 1459 / 6851 | Censo Agro 2006/2017 - Agrotóxicos |
 | 837 / 8561 | Censo Agro 2006/2017 - Práticas agrícolas |
 | 855 / 6857 | Censo Agro 2006/2017 - Irrigação |
+| 263 | Série Histórica - Estabelecimentos e área |
+| 264 | Série Histórica - Uso da terra |
+| 265 | Série Histórica - Pessoal e tratores |
+| 280 | Série Histórica - Condição do produtor |
+| 281 | Série Histórica - Efetivo de animais |
+| 282 | Série Histórica - Produção animal |
+| 283 | Série Histórica - Produção vegetal |
+| 1730 | Série Histórica - Lavoura permanente |
+| 1731 | Série Histórica - Lavoura temporária |
 
 ## Versão Síncrona
 
@@ -538,3 +637,4 @@ df = ibge.censo_agro_legado('pessoal_ocupado', uf='SP')
 - Abate Trimestral disponível desde 1997, atualizado a cada trimestre (T+2 meses)
 - Censo Agropecuário: 10 temas, dados de 1995, 2006 e/ou 2017 conforme disponibilidade. Referência 2017: out/2016 a set/2017. Cache 30 dias
 - Censo Agropecuário Legado: 6 temas FTP (tecnologia, pessoal_ocupado, maquinas, producao_animal, valor_producao, financeiro). Ano fixo 1995. Cache 90 dias
+- Série Histórica: 9 temas, 1920-2006, até UF (municipal NÃO disponível). Unidades mistas por categoria (Aves=Mil cabeças, etc). Cache 30 dias

@@ -119,6 +119,11 @@ async def main():
     df = await ibge.censo_agro_legado('tecnologia')
     df = await ibge.censo_agro_legado('pessoal_ocupado', uf='SP')
 
+    # Censo Agropecuário — série histórica 1920-2006 (9 temas, até UF)
+    df = await ibge.censo_agro_historico('estabelecimentos_area')
+    df = await ibge.censo_agro_historico('efetivo_animais', uf='SP')
+    df = await ibge.censo_agro_historico('uso_terra', nivel='brasil')
+
     # Múltiplos anos
     df = await ibge.pam('milho', ano=[2020, 2021, 2022, 2023])
 ```
@@ -173,8 +178,9 @@ async def main():
     # Listar datasets disponíveis
     print(datasets.list_datasets())
     # ['abate_trimestral', 'balanco', 'cadastro_rural', 'censo_agropecuario',
-    #  'credito_rural', 'custo_producao', 'estimativa_safra', 'exportacao',
-    #  'fertilizante', 'pecuaria_municipal', 'preco_diario', 'producao_anual']
+    #  'censo_agropecuario_historico', 'credito_rural', 'custo_producao',
+    #  'estimativa_safra', 'exportacao', 'fertilizante', 'pecuaria_municipal',
+    #  'preco_diario', 'producao_anual']
 ```
 
 ### Modo Determinístico (Reprodutibilidade)
@@ -455,6 +461,7 @@ Use `agrobr health --all` para verificar localmente.
 | `pecuaria_municipal` | Pecuária municipal (rebanhos e produção animal) | IBGE PPM |
 | `censo_agropecuario` | Censo Agropecuário 1995/2006/2017 (10 temas: rebanho, uso terra, lavouras, manejo solo, irrigação) | IBGE Censo Agro |
 | `censo_agropecuario_legado` | Censo 1995/96 — 6 temas legados (FTP) | IBGE FTP |
+| `censo_agropecuario_historico` | Série histórica Censo Agropecuário 1920-2006 (9 temas, até UF) | IBGE SIDRA |
 
 ## Fontes Suportadas
 
@@ -503,7 +510,7 @@ list_contracts()
 #  'fertilizante', 'focos_queimadas', 'mapbiomas_cobertura', 'mapbiomas_transicao',
 #  'anp_diesel_precos', 'anp_diesel_vendas', 'antt_pedagio_fluxo',
 #  'antt_pedagio_pracas', 'mapa_psr_sinistros',
-#  'mapa_psr_apolices', 'movimentacao_portuaria',
+#  'censo_agropecuario_historico', 'mapa_psr_apolices', 'movimentacao_portuaria',
 #  'pecuaria_municipal', 'posicoes_abertas', 'preco_atacado', 'preco_diario',
 #  'producao_anual', 'sicar_imoveis', 'trade_mirror']
 

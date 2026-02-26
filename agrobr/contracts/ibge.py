@@ -411,14 +411,89 @@ IBGE_CENSO_AGRO_LEGADO_V1 = Contract(
     breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
 )
 
+IBGE_CENSO_AGRO_HISTORICO_V1 = Contract(
+    name="ibge.censo_agro_historico",
+    version="1.0",
+    effective_from="0.13.0",
+    primary_key=["ano", "tema", "categoria", "variavel", "localidade"],
+    columns=[
+        Column(
+            name="ano",
+            type=ColumnType.INTEGER,
+            nullable=False,
+            stable=True,
+            min_value=1920,
+        ),
+        Column(
+            name="localidade",
+            type=ColumnType.STRING,
+            nullable=True,
+            stable=True,
+        ),
+        Column(
+            name="localidade_cod",
+            type=ColumnType.INTEGER,
+            nullable=True,
+            stable=True,
+        ),
+        Column(
+            name="tema",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="categoria",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="variavel",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="valor",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            stable=True,
+            min_value=0,
+        ),
+        Column(
+            name="unidade",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="fonte",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+    ],
+    guarantees=[
+        "Column names never change (additions only)",
+        "'ano' is always a valid census year (1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006)",
+        "Numeric values are always >= 0",
+        "'fonte' is always 'ibge_censo_agro_historico'",
+        "Nível territorial máximo é UF (sem dados municipais)",
+    ],
+    breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
+)
+
 register_contract("producao_anual", IBGE_PAM_V1)
 register_contract("pecuaria_municipal", IBGE_PPM_V1)
 register_contract("abate_trimestral", IBGE_ABATE_V1)
 register_contract("censo_agropecuario", IBGE_CENSO_AGRO_V1)
 register_contract("censo_agropecuario_legado", IBGE_CENSO_AGRO_LEGADO_V1)
+register_contract("censo_agropecuario_historico", IBGE_CENSO_AGRO_HISTORICO_V1)
 
 __all__ = [
     "IBGE_ABATE_V1",
+    "IBGE_CENSO_AGRO_HISTORICO_V1",
     "IBGE_CENSO_AGRO_LEGADO_V1",
     "IBGE_CENSO_AGRO_V1",
     "IBGE_LSPA_V1",

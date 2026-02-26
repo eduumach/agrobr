@@ -1,0 +1,156 @@
+{
+  "name": "ibge.censo_agro_historico",
+  "schema_version": "1.0",
+  "effective_from": "0.13.0",
+  "breaking_policy": "major",
+  "primary_key": [
+    "ano",
+    "tema",
+    "categoria",
+    "variavel",
+    "localidade"
+  ],
+  "required_columns": [
+    "ano",
+    "tema",
+    "categoria",
+    "variavel",
+    "unidade",
+    "fonte"
+  ],
+  "dtypes": {
+    "ano": "int",
+    "localidade": "str",
+    "localidade_cod": "int",
+    "tema": "str",
+    "categoria": "str",
+    "variavel": "str",
+    "valor": "float",
+    "unidade": "str",
+    "fonte": "str"
+  },
+  "nullable": {
+    "ano": false,
+    "localidade": true,
+    "localidade_cod": true,
+    "tema": false,
+    "categoria": false,
+    "variavel": false,
+    "valor": true,
+    "unidade": false,
+    "fonte": false
+  },
+  "columns": [
+    {
+      "name": "ano",
+      "type": "int",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": 1920,
+      "max_value": null
+    },
+    {
+      "name": "localidade",
+      "type": "str",
+      "nullable": true,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    },
+    {
+      "name": "localidade_cod",
+      "type": "int",
+      "nullable": true,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    },
+    {
+      "name": "tema",
+      "type": "str",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    },
+    {
+      "name": "categoria",
+      "type": "str",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    },
+    {
+      "name": "variavel",
+      "type": "str",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    },
+    {
+      "name": "valor",
+      "type": "float",
+      "nullable": true,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": 0,
+      "max_value": null
+    },
+    {
+      "name": "unidade",
+      "type": "str",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    },
+    {
+      "name": "fonte",
+      "type": "str",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    }
+  ],
+  "constraints": {
+    "no_duplicates": true,
+    "ano_min": 1920,
+    "valor_min": 0
+  },
+  "guarantees": [
+    "Column names never change (additions only)",
+    "'ano' is always a valid census year (1920, 1940, 1950, 1960, 1970, 1975, 1980, 1985, 1995, 2006)",
+    "Numeric values are always >= 0",
+    "'fonte' is always 'ibge_censo_agro_historico'",
+    "Nível territorial máximo é UF (sem dados municipais)"
+  ]
+}
