@@ -182,9 +182,9 @@ async def main():
     # Listar datasets disponíveis
     print(datasets.list_datasets())
     # ['abate_trimestral', 'balanco', 'cadastro_rural', 'censo_agropecuario',
-    #  'censo_agropecuario_historico', 'credito_rural', 'custo_producao',
-    #  'estimativa_safra', 'exportacao', 'fertilizante', 'pecuaria_municipal',
-    #  'preco_diario', 'producao_anual']
+    #  'censo_agropecuario_historico', 'censo_agropecuario_municipal_1985',
+    #  'credito_rural', 'custo_producao', 'estimativa_safra', 'exportacao',
+    #  'fertilizante', 'pecuaria_municipal', 'preco_diario', 'producao_anual']
 ```
 
 ### Modo Determinístico (Reprodutibilidade)
@@ -515,7 +515,8 @@ list_contracts()
 #  'fertilizante', 'focos_queimadas', 'mapbiomas_cobertura', 'mapbiomas_transicao',
 #  'anp_diesel_precos', 'anp_diesel_vendas', 'antt_pedagio_fluxo',
 #  'antt_pedagio_pracas', 'mapa_psr_sinistros',
-#  'censo_agropecuario_historico', 'mapa_psr_apolices', 'movimentacao_portuaria',
+#  'censo_agropecuario_historico', 'censo_agropecuario_municipal_1985',
+#  'mapa_psr_apolices', 'movimentacao_portuaria',
 #  'pecuaria_municipal', 'posicoes_abertas', 'preco_atacado', 'preco_diario',
 #  'producao_anual', 'sicar_imoveis', 'trade_mirror']
 

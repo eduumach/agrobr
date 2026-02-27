@@ -67,10 +67,10 @@ from agrobr import datasets
 
 # Listar datasets
 datasets.list_datasets()
-# ['abate_trimestral', 'balanco', 'censo_agropecuario', 'credito_rural',
-#  'censo_agropecuario_historico', 'custo_producao', 'estimativa_safra',
-#  'exportacao', 'fertilizante', 'pecuaria_municipal', 'preco_diario',
-#  'producao_anual', 'cadastro_rural']
+# ['abate_trimestral', 'balanco', 'cadastro_rural', 'censo_agropecuario',
+#  'censo_agropecuario_historico', 'censo_agropecuario_municipal_1985',
+#  'credito_rural', 'custo_producao', 'estimativa_safra', 'exportacao',
+#  'fertilizante', 'pecuaria_municipal', 'preco_diario', 'producao_anual']
 
 # Listar produtos de um dataset
 datasets.list_products("preco_diario")

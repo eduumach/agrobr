@@ -691,6 +691,8 @@ df = ibge.censo_agro('efetivo_rebanho')
 df = ibge.censo_agro('preparo_solo', ano=2017)
 df = ibge.censo_agro_legado('tecnologia')
 df = ibge.censo_agro_legado('pessoal_ocupado', uf='SP')
+df = ibge.censo_agro_historico('estabelecimentos_area', ano=1985)
+df = ibge.censo_agro_municipal_1985('propriedade_terras', uf='SP')
 ```
 
 ## Notas
