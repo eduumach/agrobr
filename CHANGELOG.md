@@ -14,6 +14,11 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
   com warning de truncamento. Refator: `_normalize_columns` compartilhado entre
   `parse_imoveis_csv` e `parse_imoveis_geojson`. Schema `sicar_imoveis_geo.json`.
   28 novos testes
+- **SICAR filtro por codigo IBGE** — novo parametro `cod_municipio` (int) em
+  `imoveis()`, `imoveis_geo()` e `resumo()`. Alternativa ao filtro por nome
+  (`municipio`) que nao lida com acentos no GeoServer WFS ILIKE. Mutuamente
+  exclusivo com `municipio` (ValueError se ambos). `resumo()` refatorado para
+  usar `_build_cql_filter` em vez de CQL hardcoded. 9 novos testes
 - **Desmatamento DETER com geometria** — nova funcao `desmatamento.deter_geo()` retorna
   `GeoDataFrame` com poligonos MultiPolygon (EPSG:4326) dos alertas DETER. Requer
   `pip install agrobr[geo]`. Default `maxFeatures=10000` com warning de truncamento.

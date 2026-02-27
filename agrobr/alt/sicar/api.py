@@ -27,6 +27,7 @@ logger = structlog.get_logger()
 def _build_cql_filter(
     *,
     municipio: str | None = None,
+    cod_municipio: int | None = None,
     status: str | None = None,
     tipo: str | None = None,
     area_min: float | None = None,
@@ -35,7 +36,9 @@ def _build_cql_filter(
 ) -> str | None:
     parts: list[str] = []
 
-    if municipio:
+    if cod_municipio is not None:
+        parts.append(f"cod_municipio_ibge={cod_municipio}")
+    elif municipio:
         escaped = municipio.replace("'", "''")
         parts.append(f"municipio ILIKE '%{escaped}%'")
 
@@ -62,6 +65,7 @@ async def imoveis(
     uf: str,
     *,
     municipio: str | None = None,
+    cod_municipio: int | None = None,
     status: str | None = None,
     tipo: str | None = None,
     area_min: float | None = None,
@@ -76,6 +80,7 @@ async def imoveis(
     uf: str,
     *,
     municipio: str | None = None,
+    cod_municipio: int | None = None,
     status: str | None = None,
     tipo: str | None = None,
     area_min: float | None = None,
@@ -89,6 +94,7 @@ async def imoveis(
     uf: str,
     *,
     municipio: str | None = None,
+    cod_municipio: int | None = None,
     status: str | None = None,
     tipo: str | None = None,
     area_min: float | None = None,
@@ -101,6 +107,9 @@ async def imoveis(
     if uf_upper not in UFS_VALIDAS:
         raise ValueError(f"UF '{uf}' invalida. Opcoes: {sorted(UFS_VALIDAS)}")
 
+    if municipio is not None and cod_municipio is not None:
+        raise ValueError("Use 'municipio' ou 'cod_municipio', nao ambos")
+
     if status is not None and status.upper() not in STATUS_VALIDOS:
         raise ValueError(f"Status '{status}' invalido. Opcoes: {sorted(STATUS_VALIDOS)}")
 
@@ -111,6 +120,7 @@ async def imoveis(
         "sicar_imoveis",
         uf=uf_upper,
         municipio=municipio,
+        cod_municipio=cod_municipio,
         status=status,
         tipo=tipo,
         area_min=area_min,
@@ -119,6 +129,7 @@ async def imoveis(
 
     cql = _build_cql_filter(
         municipio=municipio,
+        cod_municipio=cod_municipio,
         status=status,
         tipo=tipo,
         area_min=area_min,
@@ -126,7 +137,7 @@ async def imoveis(
         criado_apos=criado_apos,
     )
 
-    if municipio is None:
+    if municipio is None and cod_municipio is None:
         try:
             total = await client.fetch_hits(uf_upper, cql)
             if total > MAX_FEATURES_WARNING:
@@ -186,6 +197,7 @@ async def imoveis_geo(
     uf: str,
     *,
     municipio: str | None = None,
+    cod_municipio: int | None = None,
     status: str | None = None,
     tipo: str | None = None,
     area_min: float | None = None,
@@ -200,6 +212,7 @@ async def imoveis_geo(
     uf: str,
     *,
     municipio: str | None = None,
+    cod_municipio: int | None = None,
     status: str | None = None,
     tipo: str | None = None,
     area_min: float | None = None,
@@ -213,6 +226,7 @@ async def imoveis_geo(
     uf: str,
     *,
     municipio: str | None = None,
+    cod_municipio: int | None = None,
     status: str | None = None,
     tipo: str | None = None,
     area_min: float | None = None,
@@ -225,6 +239,9 @@ async def imoveis_geo(
     if uf_upper not in UFS_VALIDAS:
         raise ValueError(f"UF '{uf}' invalida. Opcoes: {sorted(UFS_VALIDAS)}")
 
+    if municipio is not None and cod_municipio is not None:
+        raise ValueError("Use 'municipio' ou 'cod_municipio', nao ambos")
+
     if status is not None and status.upper() not in STATUS_VALIDOS:
         raise ValueError(f"Status '{status}' invalido. Opcoes: {sorted(STATUS_VALIDOS)}")
 
@@ -235,6 +252,7 @@ async def imoveis_geo(
         "sicar_imoveis_geo",
         uf=uf_upper,
         municipio=municipio,
+        cod_municipio=cod_municipio,
         status=status,
         tipo=tipo,
         area_min=area_min,
@@ -243,6 +261,7 @@ async def imoveis_geo(
 
     cql = _build_cql_filter(
         municipio=municipio,
+        cod_municipio=cod_municipio,
         status=status,
         tipo=tipo,
         area_min=area_min,
@@ -296,6 +315,7 @@ async def resumo(
     uf: str,
     *,
     municipio: str | None = None,
+    cod_municipio: int | None = None,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -305,6 +325,7 @@ async def resumo(
     uf: str,
     *,
     municipio: str | None = None,
+    cod_municipio: int | None = None,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -313,6 +334,7 @@ async def resumo(
     uf: str,
     *,
     municipio: str | None = None,
+    cod_municipio: int | None = None,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -320,11 +342,14 @@ async def resumo(
     if uf_upper not in UFS_VALIDAS:
         raise ValueError(f"UF '{uf}' invalida. Opcoes: {sorted(UFS_VALIDAS)}")
 
-    logger.info("sicar_resumo", uf=uf_upper, municipio=municipio)
+    if municipio is not None and cod_municipio is not None:
+        raise ValueError("Use 'municipio' ou 'cod_municipio', nao ambos")
+
+    logger.info("sicar_resumo", uf=uf_upper, municipio=municipio, cod_municipio=cod_municipio)
 
     t0 = time.monotonic()
 
-    if municipio is None:
+    if municipio is None and cod_municipio is None:
         total = await client.fetch_hits(uf_upper)
         ativos = await client.fetch_hits(uf_upper, "status_imovel='AT'")
         pendentes = await client.fetch_hits(uf_upper, "status_imovel='PE'")
@@ -348,8 +373,7 @@ async def resumo(
         source_url = WFS_BASE
         parse_ms = 0
     else:
-        escaped = municipio.replace("'", "''")
-        cql = f"municipio ILIKE '%{escaped}%'"
+        cql = _build_cql_filter(municipio=municipio, cod_municipio=cod_municipio)
 
         pages, source_url = await client.fetch_imoveis(uf_upper, cql)
         fetch_ms = int((time.monotonic() - t0) * 1000)

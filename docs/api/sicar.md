@@ -17,7 +17,8 @@ df = await agrobr.alt.sicar.imoveis("DF")
 | Parametro | Tipo | Obrigatorio | Descricao |
 |-----------|------|-------------|-----------|
 | uf | str | Sim | Sigla da UF (ex: "MT", "DF", "BA") |
-| municipio | str | Nao | Filtro parcial de municipio (case-insensitive) |
+| municipio | str | Nao | Filtro parcial de municipio (case-insensitive). Mutuamente exclusivo com `cod_municipio` |
+| cod_municipio | int | Nao | Codigo IBGE do municipio (ex: 5107925). Mutuamente exclusivo com `municipio` |
 | status | str | Nao | AT, PE, SU ou CA |
 | tipo | str | Nao | IRU, AST ou PCT |
 | area_min | float | Nao | Area minima em hectares |
@@ -49,6 +50,9 @@ df = await agrobr.alt.sicar.imoveis(
     "MT", municipio="Sorriso", status="AT"
 )
 
+# Filtro por codigo IBGE (evita problemas com acentos)
+df = await agrobr.alt.sicar.imoveis("PA", cod_municipio=1508159)  # Uruara
+
 # Imoveis grandes (>1000 ha) no DF
 df = await agrobr.alt.sicar.imoveis("DF", area_min=1000)
 
@@ -75,7 +79,8 @@ df = await agrobr.alt.sicar.resumo("MT")
 | Parametro | Tipo | Obrigatorio | Descricao |
 |-----------|------|-------------|-----------|
 | uf | str | Sim | Sigla da UF |
-| municipio | str | Nao | Filtro de municipio |
+| municipio | str | Nao | Filtro parcial de municipio (case-insensitive). Mutuamente exclusivo com `cod_municipio` |
+| cod_municipio | int | Nao | Codigo IBGE do municipio. Mutuamente exclusivo com `municipio` |
 | return_meta | bool | Nao | Se True, retorna (DataFrame, MetaInfo) |
 
 ### Retorno sem municipio (UF-level)
@@ -133,7 +138,8 @@ gdf = await agrobr.alt.sicar.imoveis_geo("DF")
 | Parametro | Tipo | Obrigatorio | Descricao |
 |-----------|------|-------------|-----------|
 | uf | str | Sim | Sigla da UF (ex: "MT", "DF", "BA") |
-| municipio | str | Nao | Filtro parcial de municipio (case-insensitive) |
+| municipio | str | Nao | Filtro parcial de municipio (case-insensitive). Mutuamente exclusivo com `cod_municipio` |
+| cod_municipio | int | Nao | Codigo IBGE do municipio (ex: 5107925). Mutuamente exclusivo com `municipio` |
 | status | str | Nao | AT, PE, SU ou CA |
 | tipo | str | Nao | IRU, AST ou PCT |
 | area_min | float | Nao | Area minima em hectares |
@@ -165,10 +171,13 @@ gdf = await agrobr.alt.sicar.imoveis_geo("DF")
 gdf = await agrobr.alt.sicar.imoveis_geo("DF")
 gdf.plot()
 
-# Filtrar por municipio
+# Filtrar por municipio (nome)
 gdf = await agrobr.alt.sicar.imoveis_geo(
     "MT", municipio="Sorriso", status="AT"
 )
+
+# Filtrar por codigo IBGE (evita problemas com acentos)
+gdf = await agrobr.alt.sicar.imoveis_geo("PA", cod_municipio=1508159)
 
 # Com metadados
 gdf, meta = await agrobr.alt.sicar.imoveis_geo("DF", return_meta=True)

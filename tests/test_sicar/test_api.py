@@ -15,6 +15,11 @@ from agrobr.alt.sicar.models import COLUNAS_IMOVEIS, COLUNAS_IMOVEIS_GEO
 GOLDEN_DIR = Path(__file__).parent.parent / "golden_data" / "sicar"
 
 
+def call_args_cql(mock: AsyncMock) -> str:
+    args = mock.call_args
+    return args[0][1] if len(args[0]) > 1 else args[1].get("cql_filter", "")
+
+
 def _load_golden_pages(name: str) -> list[bytes]:
     csv_path = GOLDEN_DIR / name / "response.csv"
     return [csv_path.read_bytes()]
@@ -59,6 +64,18 @@ class TestBuildCqlFilter:
         result = _build_cql_filter(municipio="It's a test")
         assert "It''s a test" in result
 
+    def test_cod_municipio_filter(self):
+        result = _build_cql_filter(cod_municipio=1508159)
+        assert "cod_municipio_ibge=1508159" in result
+
+    def test_cod_municipio_ignores_municipio(self):
+        result = _build_cql_filter(cod_municipio=1508159)
+        assert "ILIKE" not in result
+
+    def test_municipio_and_cod_municipio_prefers_cod(self):
+        result = _build_cql_filter(cod_municipio=1508159, municipio=None)
+        assert "cod_municipio_ibge=1508159" in result
+
 
 class TestImoveis:
     @pytest.mark.asyncio
@@ -75,6 +92,32 @@ class TestImoveis:
     async def test_invalid_tipo_raises(self):
         with pytest.raises(ValueError, match="Tipo"):
             await imoveis("DF", tipo="XYZ")
+
+    @pytest.mark.asyncio
+    async def test_municipio_and_cod_municipio_raises(self):
+        with pytest.raises(ValueError, match="municipio.*cod_municipio"):
+            await imoveis("DF", municipio="Brasilia", cod_municipio=5300108)
+
+    @pytest.mark.asyncio
+    async def test_cod_municipio_filter(self):
+        with (
+            patch.object(
+                api.client,
+                "fetch_hits",
+                new_callable=AsyncMock,
+                return_value=0,
+            ),
+            patch.object(
+                api.client,
+                "fetch_imoveis",
+                new_callable=AsyncMock,
+                return_value=([], "https://test.url"),
+            ) as mock_fetch,
+        ):
+            await imoveis("PA", cod_municipio=1508159)
+
+        cql = mock_fetch.call_args[0][1]
+        assert "cod_municipio_ibge=1508159" in cql
 
     @pytest.mark.asyncio
     @pytest.mark.skipif(
@@ -269,6 +312,31 @@ class TestResumo:
             df = await resumo("df")  # lowercase
         assert isinstance(df, pd.DataFrame)
 
+    @pytest.mark.asyncio
+    async def test_municipio_and_cod_municipio_raises(self):
+        with pytest.raises(ValueError, match="municipio.*cod_municipio"):
+            await resumo("MT", municipio="Sorriso", cod_municipio=5107925)
+
+    @pytest.mark.asyncio
+    @pytest.mark.skipif(
+        not (GOLDEN_DIR / "imoveis_mt_municipio" / "response.csv").exists(),
+        reason="No golden data",
+    )
+    async def test_cod_municipio_mode(self):
+        pages = _load_golden_pages("imoveis_mt_municipio")
+        with patch.object(
+            api.client,
+            "fetch_imoveis",
+            new_callable=AsyncMock,
+            return_value=(pages, "https://test.url"),
+        ) as mock_fetch:
+            df = await resumo("MT", cod_municipio=5107925)
+
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) == 1
+        cql = mock_fetch.call_args[0][1]
+        assert "cod_municipio_ibge=5107925" in cql
+
 
 DUPLICATE_CSV = (
     b"FID,cod_imovel,status_imovel,dat_criacao,data_atualizacao,"
@@ -394,6 +462,21 @@ class TestImoveisGeo:
     async def test_invalid_uf_raises(self):
         with pytest.raises(ValueError, match="UF"):
             await imoveis_geo("XX")
+
+    @pytest.mark.asyncio
+    async def test_municipio_and_cod_municipio_raises(self):
+        with pytest.raises(ValueError, match="municipio.*cod_municipio"):
+            await imoveis_geo("DF", municipio="Brasilia", cod_municipio=5300108)
+
+    @pytest.mark.asyncio
+    async def test_cod_municipio_filter(self):
+        geojson = _load_golden_geojson()
+        mock_fetch = AsyncMock(return_value=(geojson, "https://test.url"))
+        with patch.object(api.client, "fetch_imoveis_geo", mock_fetch):
+            await imoveis_geo("PA", cod_municipio=1508159)
+
+        cql = call_args_cql(mock_fetch)
+        assert "cod_municipio_ibge=1508159" in cql
 
     @pytest.mark.asyncio
     async def test_dedup_by_cod_imovel(self):
