@@ -140,6 +140,18 @@ COLUNAS_SAIDA_DETER = [
     "bioma",
 ]
 
+MAX_FEATURES_GEO = 10_000
+
+DETER_GEOM_COLUMN: dict[str, str] = {
+    "Amazônia": "geom",
+    "Cerrado": "st_multi",
+}
+
+DETER_COLUNAS_WFS_GEO_AMZ = ["geom"] + DETER_COLUNAS_WFS_AMZ
+DETER_COLUNAS_WFS_GEO_CERRADO = ["st_multi"] + DETER_COLUNAS_WFS_CERRADO
+
+COLUNAS_SAIDA_DETER_GEO = COLUNAS_SAIDA_DETER + ["geometry"]
+
 
 def normalizar_bioma(bioma: str) -> str:
     key = bioma.strip().lower()

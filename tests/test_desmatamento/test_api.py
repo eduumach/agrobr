@@ -9,6 +9,7 @@ from agrobr.desmatamento import api
 
 PRODES_DIR = Path(__file__).parent.parent / "golden_data" / "desmatamento" / "prodes_sample"
 DETER_DIR = Path(__file__).parent.parent / "golden_data" / "desmatamento" / "deter_sample"
+DETER_GEO_DIR = Path(__file__).parent.parent / "golden_data" / "desmatamento" / "deter_geo_sample"
 
 
 def _prodes_csv_bytes() -> bytes:
@@ -17,6 +18,10 @@ def _prodes_csv_bytes() -> bytes:
 
 def _deter_csv_bytes() -> bytes:
     return DETER_DIR.joinpath("response.csv").read_bytes()
+
+
+def _deter_geojson_bytes() -> bytes:
+    return DETER_GEO_DIR.joinpath("response.geojson").read_bytes()
 
 
 class TestProdes:
@@ -172,3 +177,98 @@ class TestDeter:
             df = await api.deter(bioma="Amazônia", classe="CLASSE_INEXISTENTE")
 
         assert len(df) == 0
+
+
+gpd = pytest.importorskip("geopandas")
+
+
+class TestDeterGeo:
+    @pytest.mark.asyncio
+    async def test_returns_geodataframe(self):
+        geojson_bytes = _deter_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_deter_geo",
+            new_callable=AsyncMock,
+            return_value=(
+                geojson_bytes,
+                "https://terrabrasilis.dpi.inpe.br/geoserver/deter.geojson",
+            ),
+        ):
+            gdf = await api.deter_geo(bioma="Amazônia")
+
+        assert isinstance(gdf, gpd.GeoDataFrame)
+        assert len(gdf) >= 5
+        assert "data" in gdf.columns
+        assert "area_km2" in gdf.columns
+        assert "geometry" in gdf.columns
+
+    @pytest.mark.asyncio
+    async def test_return_meta(self):
+        geojson_bytes = _deter_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_deter_geo",
+            new_callable=AsyncMock,
+            return_value=(
+                geojson_bytes,
+                "https://terrabrasilis.dpi.inpe.br/geoserver/deter.geojson",
+            ),
+        ):
+            gdf, meta = await api.deter_geo(bioma="Amazônia", return_meta=True)
+
+        assert meta.source == "desmatamento"
+        assert meta.source_method == "httpx+wfs+geojson"
+        assert meta.records_count == len(gdf)
+        assert "terrabrasilis_deter_geo" in meta.attempted_sources
+
+    @pytest.mark.asyncio
+    async def test_filter_classe(self):
+        geojson_bytes = _deter_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_deter_geo",
+            new_callable=AsyncMock,
+            return_value=(
+                geojson_bytes,
+                "https://terrabrasilis.dpi.inpe.br/geoserver/deter.geojson",
+            ),
+        ):
+            gdf = await api.deter_geo(bioma="Amazônia", classe="DESMATAMENTO_CR")
+
+        assert len(gdf) >= 1
+        assert (gdf["classe"] == "DESMATAMENTO_CR").all()
+
+    @pytest.mark.asyncio
+    async def test_filter_classe_empty(self):
+        geojson_bytes = _deter_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_deter_geo",
+            new_callable=AsyncMock,
+            return_value=(
+                geojson_bytes,
+                "https://terrabrasilis.dpi.inpe.br/geoserver/deter.geojson",
+            ),
+        ):
+            gdf = await api.deter_geo(bioma="Amazônia", classe="CLASSE_INEXISTENTE")
+
+        assert len(gdf) == 0
+        assert isinstance(gdf, gpd.GeoDataFrame)
+
+    @pytest.mark.asyncio
+    async def test_geometry_preserved_after_filter(self):
+        geojson_bytes = _deter_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_deter_geo",
+            new_callable=AsyncMock,
+            return_value=(
+                geojson_bytes,
+                "https://terrabrasilis.dpi.inpe.br/geoserver/deter.geojson",
+            ),
+        ):
+            gdf = await api.deter_geo(bioma="Amazônia", classe="DESMATAMENTO_CR")
+
+        assert "geometry" in gdf.columns
+        assert gdf.geometry.is_valid.all()

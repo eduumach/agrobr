@@ -99,6 +99,62 @@ df = await agrobr.desmatamento.deter(
 
 ---
 
+## `desmatamento.deter_geo()`
+
+Alertas DETER com geometria (poligonos). Retorna `GeoDataFrame` com coluna `geometry` (MultiPolygon EPSG:4326).
+
+Requer dependencia opcional: `pip install agrobr[geo]`
+
+```python
+import agrobr
+
+gdf = await agrobr.desmatamento.deter_geo(
+    bioma="Amazônia",
+    uf="PA",
+    data_inicio="2024-01-01",
+    data_fim="2024-06-30",
+)
+
+# Cruzamento geoespacial com CAR/SICAR
+import geopandas as gpd
+car = gpd.read_file("imoveis_car.geojson")
+alertas_em_reserva = gpd.sjoin(gdf, car[car["tipo"] == "RESERVA_LEGAL"])
+```
+
+### Parametros
+
+| Parametro | Tipo | Obrigatorio | Descricao |
+|-----------|------|-------------|-----------|
+| `bioma` | `str` | Nao | Bioma: "Amazonia", "Cerrado". Default: "Amazonia" |
+| `uf` | `str` | Nao | Filtrar por UF (ex: "PA") |
+| `data_inicio` | `str` | Nao | Data inicial YYYY-MM-DD |
+| `data_fim` | `str` | Nao | Data final YYYY-MM-DD |
+| `classe` | `str` | Nao | Filtrar por classe de alerta |
+| `return_meta` | `bool` | Nao | Se True, retorna `(GeoDataFrame, MetaInfo)` |
+
+### Colunas de Retorno
+
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| `data` | date | Data do alerta |
+| `classe` | str | Tipo de alerta (DESMATAMENTO_CR, DEGRADACAO, MINERACAO, etc.) |
+| `uf` | str | Codigo UF |
+| `municipio` | str | Nome do municipio |
+| `municipio_id` | int | Codigo IBGE do municipio |
+| `area_km2` | float | Area em km2 |
+| `satelite` | str | Satelite utilizado |
+| `sensor` | str | Sensor do satelite |
+| `bioma` | str | Bioma consultado |
+| `geometry` | geometry | MultiPolygon EPSG:4326 |
+
+### Notas
+
+- Default `maxFeatures=10000` — use filtros (uf, data_inicio/data_fim, classe) para reduzir volume
+- Warning logado automaticamente se a resposta atingir o limite de features (possivel truncamento)
+- Volume aproximado: ~1.1 KB por feature com geometria
+
+---
+
 ## Uso Sincrono
 
 ```python
@@ -106,6 +162,7 @@ from agrobr import sync
 
 df = sync.desmatamento.prodes(bioma="Cerrado", ano=2022, uf="MT")
 df_deter = sync.desmatamento.deter(bioma="Amazônia", uf="PA", data_inicio="2024-01-01")
+gdf = sync.desmatamento.deter_geo(bioma="Amazônia", uf="PA", data_inicio="2024-01-01")
 ```
 
 ## Fonte dos Dados

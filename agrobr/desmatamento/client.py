@@ -13,8 +13,11 @@ from agrobr.http.user_agents import UserAgentRotator
 from .models import (
     DETER_COLUNAS_WFS_AMZ,
     DETER_COLUNAS_WFS_CERRADO,
+    DETER_COLUNAS_WFS_GEO_AMZ,
+    DETER_COLUNAS_WFS_GEO_CERRADO,
     DETER_LAYERS,
     DETER_WORKSPACES,
+    MAX_FEATURES_GEO,
     PRODES_COLUNAS_WFS,
     PRODES_LAYER,
     PRODES_WORKSPACES,
@@ -42,13 +45,14 @@ def _build_wfs_url(
     property_names: list[str],
     cql_filter: str | None = None,
     max_features: int = MAX_FEATURES_PER_REQUEST,
+    output_format: str = "csv",
 ) -> str:
     props = ",".join(property_names)
     url = (
         f"{GEOSERVER_BASE}/{workspace}/ows"
         f"?service=WFS&version=1.0.0&request=GetFeature"
         f"&typeName={workspace}:{layer}"
-        f"&outputFormat=csv"
+        f"&outputFormat={quote(output_format)}"
         f"&propertyName={props}"
         f"&maxFeatures={max_features}"
     )
@@ -78,7 +82,7 @@ async def _fetch_url(url: str) -> bytes:
                 source="desmatamento",
                 url=url,
                 last_error=(
-                    f"CSV response too small ({len(content)} bytes), expected WFS feature data"
+                    f"WFS response too small ({len(content)} bytes), expected WFS feature data"
                 ),
             )
         return content
@@ -112,11 +116,14 @@ async def fetch_prodes(
     return content, url
 
 
-async def fetch_deter(
+async def _fetch_deter_raw(
     bioma: str,
     uf: str | None = None,
     data_inicio: str | None = None,
     data_fim: str | None = None,
+    *,
+    output_format: str = "csv",
+    include_geometry: bool = False,
 ) -> tuple[bytes, str]:
     workspace = DETER_WORKSPACES.get(bioma)
     layer = DETER_LAYERS.get(bioma)
@@ -127,7 +134,12 @@ async def fetch_deter(
             last_error=f"Bioma DETER nao suportado: {bioma}",
         )
 
-    cols = DETER_COLUNAS_WFS_AMZ if bioma == "Amazônia" else DETER_COLUNAS_WFS_CERRADO
+    if include_geometry:
+        cols = DETER_COLUNAS_WFS_GEO_AMZ if bioma == "Amazônia" else DETER_COLUNAS_WFS_GEO_CERRADO
+        max_features = MAX_FEATURES_GEO
+    else:
+        cols = DETER_COLUNAS_WFS_AMZ if bioma == "Amazônia" else DETER_COLUNAS_WFS_CERRADO
+        max_features = MAX_FEATURES_PER_REQUEST
 
     filters: list[str] = []
     if uf is not None:
@@ -138,9 +150,36 @@ async def fetch_deter(
         filters.append(f"view_date<='{data_fim}'")
 
     cql = " AND ".join(filters) if filters else None
-    url = _build_wfs_url(workspace, layer, cols, cql)
+    url = _build_wfs_url(
+        workspace, layer, cols, cql, max_features=max_features, output_format=output_format
+    )
     content = await _fetch_url(url)
+    return content, url
+
+
+async def fetch_deter(
+    bioma: str,
+    uf: str | None = None,
+    data_inicio: str | None = None,
+    data_fim: str | None = None,
+) -> tuple[bytes, str]:
+    content, url = await _fetch_deter_raw(
+        bioma, uf, data_inicio, data_fim, output_format="csv", include_geometry=False
+    )
     logger.info("desmatamento_deter_csv", url=url, size=len(content), bioma=bioma)
+    return content, url
+
+
+async def fetch_deter_geo(
+    bioma: str,
+    uf: str | None = None,
+    data_inicio: str | None = None,
+    data_fim: str | None = None,
+) -> tuple[bytes, str]:
+    content, url = await _fetch_deter_raw(
+        bioma, uf, data_inicio, data_fim, output_format="application/json", include_geometry=True
+    )
+    logger.info("desmatamento_deter_geojson", url=url, size=len(content), bioma=bioma)
     return content, url
 
 

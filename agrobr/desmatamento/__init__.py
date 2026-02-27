@@ -7,6 +7,6 @@ Fonte: https://terrabrasilis.dpi.inpe.br
 Licenca: Dados publicos governo federal — uso livre com citacao.
 """
 
-from agrobr.desmatamento.api import deter, prodes
+from agrobr.desmatamento.api import deter, deter_geo, prodes
 
-__all__ = ["deter", "prodes"]
+__all__ = ["deter", "deter_geo", "prodes"]

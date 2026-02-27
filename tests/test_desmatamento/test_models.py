@@ -4,9 +4,13 @@ from agrobr.desmatamento.models import (
     BIOMAS_VALIDOS,
     CLASSES_DETER,
     COLUNAS_SAIDA_DETER,
+    COLUNAS_SAIDA_DETER_GEO,
     COLUNAS_SAIDA_PRODES,
+    DETER_COLUNAS_WFS_GEO_AMZ,
+    DETER_COLUNAS_WFS_GEO_CERRADO,
     DETER_LAYERS,
     DETER_WORKSPACES,
+    MAX_FEATURES_GEO,
     PRODES_WORKSPACES,
     UF_ESTADO,
     estado_para_uf,
@@ -109,3 +113,15 @@ class TestConstants:
         assert "area_km2" in COLUNAS_SAIDA_DETER
         assert "municipio" in COLUNAS_SAIDA_DETER
         assert "bioma" in COLUNAS_SAIDA_DETER
+
+    def test_geo_columns_amz_includes_geom(self):
+        assert "geom" in DETER_COLUNAS_WFS_GEO_AMZ
+
+    def test_geo_columns_cerrado_includes_st_multi(self):
+        assert "st_multi" in DETER_COLUNAS_WFS_GEO_CERRADO
+
+    def test_geo_output_columns_has_geometry(self):
+        assert "geometry" in COLUNAS_SAIDA_DETER_GEO
+
+    def test_max_features_geo(self):
+        assert MAX_FEATURES_GEO == 10_000

@@ -2,15 +2,18 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from unittest.mock import patch
 
 import pandas as pd
 import pytest
 
+from agrobr.desmatamento.models import COLUNAS_SAIDA_DETER_GEO, MAX_FEATURES_GEO
 from agrobr.desmatamento.parser import PARSER_VERSION, parse_deter_csv, parse_prodes_csv
 from agrobr.exceptions import ParseError
 
 PRODES_DIR = Path(__file__).parent.parent / "golden_data" / "desmatamento" / "prodes_sample"
 DETER_DIR = Path(__file__).parent.parent / "golden_data" / "desmatamento" / "deter_sample"
+DETER_GEO_DIR = Path(__file__).parent.parent / "golden_data" / "desmatamento" / "deter_geo_sample"
 
 
 class TestParserVersion:
@@ -157,3 +160,123 @@ class TestParseDeterCsv:
         csv = b"id,nome,valor\n1,teste,100\n"
         with pytest.raises(ParseError, match="Colunas obrigatorias ausentes"):
             parse_deter_csv(csv, "Amazônia")
+
+
+gpd = pytest.importorskip("geopandas")
+
+
+class TestParseDeterGeojson:
+    def _parse(self, bioma: str = "Amazônia"):
+        from agrobr.desmatamento.parser import parse_deter_geojson
+
+        data = DETER_GEO_DIR.joinpath("response.geojson").read_bytes()
+        return parse_deter_geojson(data, bioma)
+
+    def test_valid_geojson(self):
+        gdf = self._parse()
+        assert len(gdf) >= 5
+        assert "data" in gdf.columns
+        assert "area_km2" in gdf.columns
+        assert "uf" in gdf.columns
+        assert "classe" in gdf.columns
+        assert "bioma" in gdf.columns
+
+    def test_output_columns_match_schema(self):
+        gdf = self._parse()
+        for col in COLUNAS_SAIDA_DETER_GEO:
+            assert col in gdf.columns, f"Missing column: {col}"
+
+    def test_geometry_column_exists(self):
+        gdf = self._parse()
+        assert "geometry" in gdf.columns
+
+    def test_geometry_is_valid(self):
+        gdf = self._parse()
+        assert gdf.geometry.is_valid.all()
+
+    def test_crs_is_4326(self):
+        gdf = self._parse()
+        assert gdf.crs.to_epsg() == 4326
+
+    def test_area_non_negative(self):
+        gdf = self._parse()
+        assert (gdf["area_km2"] >= 0).all()
+
+    def test_bioma_column(self):
+        gdf = self._parse()
+        assert (gdf["bioma"] == "Amazônia").all()
+
+    def test_data_column_is_date(self):
+        gdf = self._parse()
+        for val in gdf["data"].dropna():
+            assert hasattr(val, "year")
+
+    def test_municipio_id_is_ibge(self):
+        gdf = self._parse()
+        valid_ids = gdf["municipio_id"].dropna()
+        assert len(valid_ids) > 0
+        for mid in valid_ids:
+            assert mid > 1000000
+
+    def test_empty_geojson_raises(self):
+        from agrobr.desmatamento.parser import parse_deter_geojson
+
+        data = json.dumps({"type": "FeatureCollection", "features": []}).encode()
+        with pytest.raises(ParseError):
+            parse_deter_geojson(data, "Amazônia")
+
+    def test_invalid_json_raises(self):
+        from agrobr.desmatamento.parser import parse_deter_geojson
+
+        with pytest.raises(ParseError):
+            parse_deter_geojson(b"not json at all {{{", "Amazônia")
+
+    def test_missing_columns_raises(self):
+        from agrobr.desmatamento.parser import parse_deter_geojson
+
+        data = json.dumps(
+            {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "geometry": {"type": "Point", "coordinates": [-54.0, -3.0]},
+                        "properties": {"id": 1, "nome": "test"},
+                    }
+                ],
+            }
+        ).encode()
+        with pytest.raises(ParseError, match="Colunas obrigatorias ausentes"):
+            parse_deter_geojson(data, "Amazônia")
+
+    def test_geopandas_not_installed(self):
+        from agrobr.desmatamento.parser import parse_deter_geojson
+
+        with (
+            patch(
+                "agrobr.desmatamento.parser._check_geopandas",
+                side_effect=ImportError(
+                    "geopandas is required for deter_geo(). Install with: pip install agrobr[geo]"
+                ),
+            ),
+            pytest.raises(ImportError, match="agrobr\\[geo\\]"),
+        ):
+            parse_deter_geojson(b"{}", "Amazônia")
+
+    def test_truncation_warning(self):
+        from agrobr.desmatamento.parser import parse_deter_geojson
+
+        data = DETER_GEO_DIR.joinpath("response.geojson").read_bytes()
+        geojson = json.loads(data)
+        features = geojson["features"]
+        geojson["features"] = features * (MAX_FEATURES_GEO // len(features) + 1)
+        assert len(geojson["features"]) >= MAX_FEATURES_GEO
+        big_data = json.dumps(geojson).encode()
+
+        with patch("agrobr.desmatamento.parser.logger") as mock_logger:
+            gdf = parse_deter_geojson(big_data, "Amazônia")
+
+        assert len(gdf) >= MAX_FEATURES_GEO
+        mock_logger.warning.assert_called_once()
+        call_kwargs = mock_logger.warning.call_args
+        assert call_kwargs[0][0] == "desmatamento_deter_geo_truncated"

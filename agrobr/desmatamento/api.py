@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 from datetime import UTC, datetime
-from typing import Any, Literal, overload
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 import pandas as pd
 import structlog
@@ -10,6 +10,9 @@ import structlog
 from agrobr.models import MetaInfo
 
 from . import client, parser
+
+if TYPE_CHECKING:
+    import geopandas as gpd
 
 logger = structlog.get_logger()
 
@@ -152,3 +155,80 @@ async def deter(
         return df, meta
 
     return df
+
+
+@overload
+async def deter_geo(
+    *,
+    bioma: str = "Amazônia",
+    uf: str | None = None,
+    data_inicio: str | None = None,
+    data_fim: str | None = None,
+    classe: str | None = None,
+    return_meta: Literal[False] = False,
+) -> gpd.GeoDataFrame: ...
+
+
+@overload
+async def deter_geo(
+    *,
+    bioma: str = "Amazônia",
+    uf: str | None = None,
+    data_inicio: str | None = None,
+    data_fim: str | None = None,
+    classe: str | None = None,
+    return_meta: Literal[True],
+) -> tuple[gpd.GeoDataFrame, MetaInfo]: ...
+
+
+async def deter_geo(
+    *,
+    bioma: str = "Amazônia",
+    uf: str | None = None,
+    data_inicio: str | None = None,
+    data_fim: str | None = None,
+    classe: str | None = None,
+    return_meta: bool = False,
+    **kwargs: Any,  # noqa: ARG001
+) -> Any:
+    logger.info(
+        "desmatamento_deter_geo",
+        bioma=bioma,
+        uf=uf,
+        data_inicio=data_inicio,
+        data_fim=data_fim,
+        classe=classe,
+    )
+
+    t0 = time.monotonic()
+    geojson_bytes, source_url = await client.fetch_deter_geo(
+        bioma, uf=uf, data_inicio=data_inicio, data_fim=data_fim
+    )
+    fetch_ms = int((time.monotonic() - t0) * 1000)
+
+    t1 = time.monotonic()
+    gdf = parser.parse_deter_geojson(geojson_bytes, bioma)
+    parse_ms = int((time.monotonic() - t1) * 1000)
+
+    if classe is not None:
+        gdf = gdf[gdf["classe"] == classe].reset_index(drop=True)
+
+    if return_meta:
+        meta = MetaInfo(
+            source="desmatamento",
+            source_url=source_url,
+            source_method="httpx+wfs+geojson",
+            fetched_at=datetime.now(UTC),
+            fetch_duration_ms=fetch_ms,
+            parse_duration_ms=parse_ms,
+            records_count=len(gdf),
+            columns=gdf.columns.tolist(),
+            parser_version=parser.PARSER_VERSION,
+            schema_version="1.0",
+            attempted_sources=["terrabrasilis_deter_geo"],
+            selected_source="terrabrasilis_deter_geo",
+            fetch_timestamp=datetime.now(UTC),
+        )
+        return gdf, meta
+
+    return gdf

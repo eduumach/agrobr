@@ -8,6 +8,11 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Unreleased]
 
 ### Added
+- **Desmatamento DETER com geometria** — nova funcao `desmatamento.deter_geo()` retorna
+  `GeoDataFrame` com poligonos MultiPolygon (EPSG:4326) dos alertas DETER. Requer
+  `pip install agrobr[geo]`. Default `maxFeatures=10000` com warning de truncamento.
+  Mesmos parametros de `deter()` (bioma, uf, data_inicio, data_fim, classe, return_meta).
+  Sync wrapper automatico. 45 novos testes. Schema `desmatamento_deter_geo.json`
 - **Censo Agropecuario Municipal 1985 — Fase 7 completa: core + integracao** (#17) —
   dados municipais do Censo 1985 extraidos via OCR de PDFs do IBGE. 53 CSVs bundled no
   pacote (`agrobr/data/censo_1985/`), modulo `agrobr/ibge/censo_municipal_1985.py` com

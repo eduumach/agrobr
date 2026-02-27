@@ -27,7 +27,7 @@ Infraestrutura Python para dados agrícolas brasileiros com **camada semântica*
 - **INMET**: Dados meteorológicos por estação (requer token `AGROBR_INMET_TOKEN`)
 - **Notícias Agrícolas**: Cotações agrícolas (fallback CEPEA)
 - **Queimadas/INPE**: Focos de calor por satélite (6 biomas, 13 satélites)
-- **Desmatamento PRODES/DETER**: Desmatamento consolidado + alertas em tempo real
+- **Desmatamento PRODES/DETER**: Desmatamento consolidado + alertas em tempo real + geometria (GeoDataFrame)
 - **MapBiomas**: Cobertura e uso da terra por município (1985-presente)
 - **CONAB Progresso**: Progresso semanal de plantio/colheita por cultura e UF
 - **CONAB CEASA/PROHORT**: Precos diarios de atacado hortifruti em 43 CEASAs (48 produtos)

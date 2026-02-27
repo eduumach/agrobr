@@ -7,7 +7,7 @@
 | **Provedor** | INPE — Instituto Nacional de Pesquisas Espaciais |
 | **Programas** | PRODES (anual) e DETER (alertas diarios) |
 | **Acesso** | API WFS publica (TerraBrasilis GeoServer) |
-| **Formato** | CSV via WFS outputFormat |
+| **Formato** | CSV via WFS outputFormat + GeoJSON para geometria |
 | **Autenticacao** | Nenhuma |
 | **Licenca** | Dados publicos governo federal |
 | **Serie Historica** | PRODES: 2000+, DETER: 2016+ (Amazonia), 2020+ (Cerrado) |
@@ -41,6 +41,21 @@ Os dados sao acessados via GeoServer WFS do TerraBrasilis com `outputFormat=csv`
 | Amazonia | deter-amz | deter_amz |
 | Cerrado | deter-cerrado-nb | deter_cerrado |
 
+## Geometria (deter_geo)
+
+A funcao `deter_geo()` retorna alertas DETER com poligonos de geometria como GeoDataFrame.
+
+| Campo | Valor |
+|-------|-------|
+| **Coluna de geometria (AMZ)** | `geom` |
+| **Coluna de geometria (Cerrado)** | `st_multi` |
+| **Formato** | MultiPolygon EPSG:4326 |
+| **Volume por feature** | ~1.1 KB com geometria |
+| **maxFeatures default** | 10.000 (tabular: 50.000) |
+| **outputFormat** | `application/json` (GeoJSON) |
+
+A coluna de geometria e bioma-especifica no GeoServer. O parser normaliza ambas para `geometry` no GeoDataFrame de saida.
+
 ## Exemplo de Uso
 
 ```python
@@ -66,6 +81,14 @@ df, meta = await agrobr.desmatamento.prodes(
     bioma="Cerrado", ano=2022, return_meta=True
 )
 print(meta.records_count, meta.fetch_duration_ms)
+
+# DETER com geometria (requer pip install agrobr[geo])
+gdf = await agrobr.desmatamento.deter_geo(
+    bioma="Amazônia",
+    uf="PA",
+    data_inicio="2024-01-01",
+    data_fim="2024-06-30",
+)
 ```
 
 ## Limitacoes
@@ -75,6 +98,7 @@ print(meta.records_count, meta.fetch_duration_ms)
 - WFS limita 50.000 features por requisicao — filtrar por estado e/ou ano
 - Dados PRODES sao poligonos individuais (granularidade fina) — usar agregacao se necessario
 - DETER e sistema de alerta, nao de consolidacao — pode haver sobreposicao
+- `deter_geo()` retorna geometria (~10x mais volume que tabular) — usar filtros para reduzir dados
 
 ## Cache e Atualizacao
 
