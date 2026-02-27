@@ -19,7 +19,8 @@ from .models import (
     DETER_WORKSPACES,
     MAX_FEATURES_GEO,
     PRODES_COLUNAS_WFS,
-    PRODES_LAYER,
+    PRODES_COLUNAS_WFS_GEO,
+    PRODES_LAYERS,
     PRODES_WORKSPACES,
 )
 
@@ -88,31 +89,73 @@ async def _fetch_url(url: str) -> bytes:
         return content
 
 
-async def fetch_prodes(
+def _build_state_cql(uf: str) -> str:
+    uf_upper = uf.strip().upper()
+    estado = _uf_to_estado(uf_upper)
+    if estado:
+        return f"(state='{uf_upper}' OR state='{estado}')"
+    return f"state='{uf_upper}'"
+
+
+async def _fetch_prodes_raw(
     bioma: str,
     ano: int | None = None,
     uf: str | None = None,
+    *,
+    output_format: str = "csv",
+    include_geometry: bool = False,
 ) -> tuple[bytes, str]:
     workspace = PRODES_WORKSPACES.get(bioma)
-    if not workspace:
+    layer = PRODES_LAYERS.get(bioma)
+    if not workspace or not layer:
         raise SourceUnavailableError(
             source="desmatamento",
             url="",
             last_error=f"Bioma PRODES nao suportado: {bioma}",
         )
 
+    if include_geometry:
+        cols = PRODES_COLUNAS_WFS_GEO
+        max_features = MAX_FEATURES_GEO
+    else:
+        cols = PRODES_COLUNAS_WFS
+        max_features = MAX_FEATURES_PER_REQUEST
+
     filters: list[str] = []
     if ano is not None:
         filters.append(f"year={ano}")
     if uf is not None:
-        estado = _uf_to_estado(uf)
-        if estado:
-            filters.append(f"state='{estado}'")
+        filters.append(_build_state_cql(uf))
 
     cql = " AND ".join(filters) if filters else None
-    url = _build_wfs_url(workspace, PRODES_LAYER, PRODES_COLUNAS_WFS, cql)
+    url = _build_wfs_url(
+        workspace, layer, cols, cql, max_features=max_features, output_format=output_format
+    )
     content = await _fetch_url(url)
+    return content, url
+
+
+async def fetch_prodes(
+    bioma: str,
+    ano: int | None = None,
+    uf: str | None = None,
+) -> tuple[bytes, str]:
+    content, url = await _fetch_prodes_raw(
+        bioma, ano, uf, output_format="csv", include_geometry=False
+    )
     logger.info("desmatamento_prodes_csv", url=url, size=len(content), bioma=bioma)
+    return content, url
+
+
+async def fetch_prodes_geo(
+    bioma: str,
+    ano: int | None = None,
+    uf: str | None = None,
+) -> tuple[bytes, str]:
+    content, url = await _fetch_prodes_raw(
+        bioma, ano, uf, output_format="application/json", include_geometry=True
+    )
+    logger.info("desmatamento_prodes_geojson", url=url, size=len(content), bioma=bioma)
     return content, url
 
 

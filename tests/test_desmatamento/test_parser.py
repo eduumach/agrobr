@@ -7,11 +7,16 @@ from unittest.mock import patch
 import pandas as pd
 import pytest
 
-from agrobr.desmatamento.models import COLUNAS_SAIDA_DETER_GEO, MAX_FEATURES_GEO
+from agrobr.desmatamento.models import (
+    COLUNAS_SAIDA_DETER_GEO,
+    COLUNAS_SAIDA_PRODES_GEO,
+    MAX_FEATURES_GEO,
+)
 from agrobr.desmatamento.parser import PARSER_VERSION, parse_deter_csv, parse_prodes_csv
 from agrobr.exceptions import ParseError
 
 PRODES_DIR = Path(__file__).parent.parent / "golden_data" / "desmatamento" / "prodes_sample"
+PRODES_GEO_DIR = Path(__file__).parent.parent / "golden_data" / "desmatamento" / "prodes_geo_sample"
 DETER_DIR = Path(__file__).parent.parent / "golden_data" / "desmatamento" / "deter_sample"
 DETER_GEO_DIR = Path(__file__).parent.parent / "golden_data" / "desmatamento" / "deter_geo_sample"
 
@@ -280,3 +285,113 @@ class TestParseDeterGeojson:
         mock_logger.warning.assert_called_once()
         call_kwargs = mock_logger.warning.call_args
         assert call_kwargs[0][0] == "desmatamento_deter_geo_truncated"
+
+
+class TestParseProdesGeojson:
+    def _parse(self, bioma: str = "Cerrado"):
+        from agrobr.desmatamento.parser import parse_prodes_geojson
+
+        data = PRODES_GEO_DIR.joinpath("response.geojson").read_bytes()
+        return parse_prodes_geojson(data, bioma)
+
+    def test_valid_geojson(self):
+        gdf = self._parse()
+        assert len(gdf) >= 5
+        assert "ano" in gdf.columns
+        assert "area_km2" in gdf.columns
+        assert "uf" in gdf.columns
+        assert "bioma" in gdf.columns
+
+    def test_output_columns_match_schema(self):
+        gdf = self._parse()
+        for col in COLUNAS_SAIDA_PRODES_GEO:
+            assert col in gdf.columns, f"Missing column: {col}"
+
+    def test_geometry_column_exists(self):
+        gdf = self._parse()
+        assert "geometry" in gdf.columns
+
+    def test_geometry_is_valid(self):
+        gdf = self._parse()
+        assert gdf.geometry.is_valid.all()
+
+    def test_crs_is_4326(self):
+        gdf = self._parse()
+        assert gdf.crs.to_epsg() == 4326
+
+    def test_area_non_negative(self):
+        gdf = self._parse()
+        assert (gdf["area_km2"] >= 0).all()
+
+    def test_bioma_column(self):
+        gdf = self._parse()
+        assert (gdf["bioma"] == "Cerrado").all()
+
+    def test_ano_is_numeric(self):
+        gdf = self._parse()
+        import pandas as pd
+
+        assert pd.api.types.is_integer_dtype(gdf["ano"])
+
+    def test_empty_geojson_raises(self):
+        from agrobr.desmatamento.parser import parse_prodes_geojson
+
+        data = json.dumps({"type": "FeatureCollection", "features": []}).encode()
+        with pytest.raises(ParseError):
+            parse_prodes_geojson(data, "Cerrado")
+
+    def test_invalid_json_raises(self):
+        from agrobr.desmatamento.parser import parse_prodes_geojson
+
+        with pytest.raises(ParseError):
+            parse_prodes_geojson(b"not json at all {{{", "Cerrado")
+
+    def test_missing_columns_raises(self):
+        from agrobr.desmatamento.parser import parse_prodes_geojson
+
+        data = json.dumps(
+            {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "geometry": {"type": "Point", "coordinates": [-54.0, -3.0]},
+                        "properties": {"id": 1, "nome": "test"},
+                    }
+                ],
+            }
+        ).encode()
+        with pytest.raises(ParseError, match="Colunas obrigatorias ausentes"):
+            parse_prodes_geojson(data, "Cerrado")
+
+    def test_geopandas_not_installed(self):
+        from agrobr.desmatamento.parser import parse_prodes_geojson
+
+        with (
+            patch(
+                "agrobr.desmatamento.parser._check_geopandas",
+                side_effect=ImportError(
+                    "geopandas is required for geo functions. Install with: pip install agrobr[geo]"
+                ),
+            ),
+            pytest.raises(ImportError, match="agrobr\\[geo\\]"),
+        ):
+            parse_prodes_geojson(b"{}", "Cerrado")
+
+    def test_truncation_warning(self):
+        from agrobr.desmatamento.parser import parse_prodes_geojson
+
+        data = PRODES_GEO_DIR.joinpath("response.geojson").read_bytes()
+        geojson = json.loads(data)
+        features = geojson["features"]
+        geojson["features"] = features * (MAX_FEATURES_GEO // len(features) + 1)
+        assert len(geojson["features"]) >= MAX_FEATURES_GEO
+        big_data = json.dumps(geojson).encode()
+
+        with patch("agrobr.desmatamento.parser.logger") as mock_logger:
+            gdf = parse_prodes_geojson(big_data, "Cerrado")
+
+        assert len(gdf) >= MAX_FEATURES_GEO
+        mock_logger.warning.assert_called_once()
+        call_kwargs = mock_logger.warning.call_args
+        assert call_kwargs[0][0] == "desmatamento_prodes_geo_truncated"

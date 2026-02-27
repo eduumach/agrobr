@@ -6,11 +6,14 @@ from agrobr.desmatamento.models import (
     COLUNAS_SAIDA_DETER,
     COLUNAS_SAIDA_DETER_GEO,
     COLUNAS_SAIDA_PRODES,
+    COLUNAS_SAIDA_PRODES_GEO,
     DETER_COLUNAS_WFS_GEO_AMZ,
     DETER_COLUNAS_WFS_GEO_CERRADO,
     DETER_LAYERS,
     DETER_WORKSPACES,
     MAX_FEATURES_GEO,
+    PRODES_GEOM_COLUMN,
+    PRODES_LAYERS,
     PRODES_WORKSPACES,
     UF_ESTADO,
     estado_para_uf,
@@ -87,8 +90,26 @@ class TestConstants:
         assert "MINERACAO" in CLASSES_DETER
 
     def test_prodes_workspaces_non_empty(self):
-        assert len(PRODES_WORKSPACES) >= 5
+        assert len(PRODES_WORKSPACES) == 6
         assert "Cerrado" in PRODES_WORKSPACES
+        assert PRODES_WORKSPACES["Amazônia"] == "prodes-amazon-nb"
+
+    def test_prodes_layers_six_biomes(self):
+        assert len(PRODES_LAYERS) == 6
+        assert PRODES_LAYERS["Amazônia"] == "yearly_deforestation_biome"
+        assert PRODES_LAYERS["Cerrado"] == "yearly_deforestation"
+        assert PRODES_LAYERS["Caatinga"] == "yearly_deforestation"
+        assert PRODES_LAYERS["Mata Atlântica"] == "yearly_deforestation"
+        assert PRODES_LAYERS["Pantanal"] == "yearly_deforestation"
+        assert PRODES_LAYERS["Pampa"] == "yearly_deforestation"
+
+    def test_prodes_geom_column(self):
+        assert PRODES_GEOM_COLUMN == "geom"
+
+    def test_prodes_geo_output_columns_has_geometry(self):
+        assert "geometry" in COLUNAS_SAIDA_PRODES_GEO
+        for col in COLUNAS_SAIDA_PRODES:
+            assert col in COLUNAS_SAIDA_PRODES_GEO
 
     def test_deter_workspaces_two_biomes(self):
         assert len(DETER_WORKSPACES) == 2

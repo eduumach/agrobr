@@ -32,7 +32,7 @@ pip install agrobr[pdf]             # pdfplumber para ANDA (fertilizantes)
 pip install agrobr[polars]          # Suporte a Polars
 pip install agrobr[browser]         # Playwright (opcional, para fontes com JS)
 pip install agrobr[bigquery]        # Base dos Dados (fallback BCB/SICOR)
-pip install agrobr[geo]             # GeoPandas (geometria DETER + SICAR)
+pip install agrobr[geo]             # GeoPandas (geometria PRODES + DETER + SICAR)
 pip install agrobr[all]             # Tudo incluído
 ```
 
@@ -292,6 +292,9 @@ async def main():
     # PRODES — desmatamento anual consolidado (Cerrado)
     df = await desmatamento.prodes(bioma="Cerrado", ano=2022, uf="MT")
 
+    # PRODES com geometria (requer pip install agrobr[geo])
+    gdf = await desmatamento.prodes_geo(bioma="Cerrado", ano=2022, uf="MT")
+
     # DETER — alertas em tempo real (Amazônia)
     df = await desmatamento.deter(
         bioma="Amazônia", uf="PA",
@@ -407,6 +410,7 @@ df = conab.serie_historica('soja', inicio=2020)
 # v0.10.0
 df = queimadas.focos(ano=2024, mes=9)
 df = desmatamento.prodes(bioma="Cerrado", ano=2022)
+gdf = desmatamento.prodes_geo(bioma="Cerrado", ano=2022, uf="MT")
 gdf = desmatamento.deter_geo(bioma="Amazônia", uf="PA", data_inicio="2024-01-01")
 df = b3.ajustes(data="13/02/2025")
 df = b3.posicoes_abertas(data="2025-12-19", contrato="boi")

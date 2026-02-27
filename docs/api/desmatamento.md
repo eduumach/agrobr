@@ -16,7 +16,7 @@ df = await agrobr.desmatamento.prodes(bioma="Cerrado", ano=2022, uf="MT")
 
 | Parametro | Tipo | Obrigatorio | Descricao |
 |-----------|------|-------------|-----------|
-| `bioma` | `str` | Nao | Bioma: "Cerrado", "Caatinga", "Mata Atlantica", "Pantanal", "Pampa". Default: "Cerrado" |
+| `bioma` | `str` | Nao | Bioma: "Amazonia", "Cerrado", "Caatinga", "Mata Atlantica", "Pantanal", "Pampa". Default: "Cerrado" |
 | `ano` | `int` | Nao | Ano (ex: 2022). Se None, todos os anos |
 | `uf` | `str` | Nao | Filtrar por UF (ex: "MT") |
 | `return_meta` | `bool` | Nao | Se True, retorna `(DataFrame, MetaInfo)` |
@@ -35,13 +35,65 @@ df = await agrobr.desmatamento.prodes(bioma="Cerrado", ano=2022, uf="MT")
 
 ### Biomas Disponiveis (PRODES)
 
-| Bioma | Workspace GeoServer | Serie Historica |
-|-------|--------------------|----|
-| Cerrado | prodes-cerrado-nb | 2000+ |
-| Caatinga | prodes-caatinga-nb | 2000+ |
-| Mata Atlantica | prodes-mata-atlantica-nb | 2000+ |
-| Pantanal | prodes-pantanal-nb | 2000+ |
-| Pampa | prodes-pampa-nb | 2000+ |
+| Bioma | Workspace GeoServer | Layer | Serie Historica |
+|-------|--------------------|----|---|
+| Amazonia | prodes-amazon-nb | yearly_deforestation_biome | 2000+ |
+| Cerrado | prodes-cerrado-nb | yearly_deforestation | 2000+ |
+| Caatinga | prodes-caatinga-nb | yearly_deforestation | 2000+ |
+| Mata Atlantica | prodes-mata-atlantica-nb | yearly_deforestation | 2000+ |
+| Pantanal | prodes-pantanal-nb | yearly_deforestation | 2000+ |
+| Pampa | prodes-pampa-nb | yearly_deforestation | 2000+ |
+
+---
+
+## `desmatamento.prodes_geo()`
+
+Dados PRODES com geometria (poligonos). Retorna `GeoDataFrame` com coluna `geometry` (MultiPolygon EPSG:4326).
+
+Requer dependencia opcional: `pip install agrobr[geo]`
+
+```python
+import agrobr
+
+gdf = await agrobr.desmatamento.prodes_geo(
+    bioma="Cerrado",
+    ano=2022,
+    uf="MT",
+)
+
+# Cruzamento geoespacial com CAR/SICAR
+import geopandas as gpd
+car = gpd.read_file("imoveis_car.geojson")
+desmatamento_em_car = gpd.sjoin(gdf, car)
+```
+
+### Parametros
+
+| Parametro | Tipo | Obrigatorio | Descricao |
+|-----------|------|-------------|-----------|
+| `bioma` | `str` | Nao | Bioma: "Amazonia", "Cerrado", "Caatinga", "Mata Atlantica", "Pantanal", "Pampa". Default: "Cerrado" |
+| `ano` | `int` | Nao | Ano (ex: 2022). Se None, todos os anos |
+| `uf` | `str` | Nao | Filtrar por UF (ex: "MT") |
+| `return_meta` | `bool` | Nao | Se True, retorna `(GeoDataFrame, MetaInfo)` |
+
+### Colunas de Retorno
+
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| `ano` | int | Ano do desmatamento |
+| `uf` | str | Codigo UF (ex: "MT") |
+| `classe` | str | Classe de cobertura (ex: "desmatamento") |
+| `area_km2` | float | Area desmatada em km2 |
+| `satelite` | str | Satelite utilizado |
+| `sensor` | str | Sensor do satelite |
+| `bioma` | str | Bioma consultado |
+| `geometry` | geometry | MultiPolygon EPSG:4326 |
+
+### Notas
+
+- Default `maxFeatures=10000` — use filtros (uf, ano) para reduzir volume
+- Warning logado automaticamente se a resposta atingir o limite de features (possivel truncamento)
+- Coluna de geometria no GeoServer e `geom` para todos os 6 biomas (uniforme)
 
 ---
 
@@ -161,6 +213,7 @@ alertas_em_reserva = gpd.sjoin(gdf, car[car["tipo"] == "RESERVA_LEGAL"])
 from agrobr import sync
 
 df = sync.desmatamento.prodes(bioma="Cerrado", ano=2022, uf="MT")
+gdf_prodes = sync.desmatamento.prodes_geo(bioma="Cerrado", ano=2022, uf="MT")
 df_deter = sync.desmatamento.deter(bioma="Amazônia", uf="PA", data_inicio="2024-01-01")
 gdf = sync.desmatamento.deter_geo(bioma="Amazônia", uf="PA", data_inicio="2024-01-01")
 ```

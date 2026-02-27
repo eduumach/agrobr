@@ -1,0 +1,29 @@
+{
+  "count_min": 5,
+  "columns": [
+    "ano",
+    "uf",
+    "classe",
+    "area_km2",
+    "satelite",
+    "sensor",
+    "bioma",
+    "geometry"
+  ],
+  "non_null_columns": [
+    "ano",
+    "uf",
+    "classe",
+    "area_km2",
+    "bioma",
+    "geometry"
+  ],
+  "has_multiple_ufs": true,
+  "ufs_expected": [
+    "MT",
+    "PA"
+  ],
+  "bioma": "Cerrado",
+  "area_km2_min": 0,
+  "crs_epsg": 4326
+}

@@ -54,7 +54,7 @@ CLASSES_DETER = {
 }
 
 PRODES_WORKSPACES: dict[str, str] = {
-    "Amazônia": "prodes-cerrado-nb",
+    "Amazônia": "prodes-amazon-nb",
     "Cerrado": "prodes-cerrado-nb",
     "Caatinga": "prodes-caatinga-nb",
     "Mata Atlântica": "prodes-mata-atlantica-nb",
@@ -62,7 +62,16 @@ PRODES_WORKSPACES: dict[str, str] = {
     "Pampa": "prodes-pampa-nb",
 }
 
-PRODES_LAYER = "yearly_deforestation"
+PRODES_LAYERS: dict[str, str] = {
+    "Amazônia": "yearly_deforestation_biome",
+    "Cerrado": "yearly_deforestation",
+    "Caatinga": "yearly_deforestation",
+    "Mata Atlântica": "yearly_deforestation",
+    "Pantanal": "yearly_deforestation",
+    "Pampa": "yearly_deforestation",
+}
+
+PRODES_GEOM_COLUMN = "geom"
 
 DETER_WORKSPACES: dict[str, str] = {
     "Amazônia": "deter-amz",
@@ -118,6 +127,8 @@ DETER_COLUNAS_WFS_CERRADO = [
     "publish_month",
 ]
 
+PRODES_COLUNAS_WFS_GEO = [PRODES_GEOM_COLUMN] + PRODES_COLUNAS_WFS
+
 COLUNAS_SAIDA_PRODES = [
     "ano",
     "uf",
@@ -127,6 +138,8 @@ COLUNAS_SAIDA_PRODES = [
     "sensor",
     "bioma",
 ]
+
+COLUNAS_SAIDA_PRODES_GEO = COLUNAS_SAIDA_PRODES + ["geometry"]
 
 COLUNAS_SAIDA_DETER = [
     "data",

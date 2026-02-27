@@ -81,6 +81,69 @@ async def prodes(
 
 
 @overload
+async def prodes_geo(
+    *,
+    bioma: str = "Cerrado",
+    ano: int | None = None,
+    uf: str | None = None,
+    return_meta: Literal[False] = False,
+) -> gpd.GeoDataFrame: ...
+
+
+@overload
+async def prodes_geo(
+    *,
+    bioma: str = "Cerrado",
+    ano: int | None = None,
+    uf: str | None = None,
+    return_meta: Literal[True],
+) -> tuple[gpd.GeoDataFrame, MetaInfo]: ...
+
+
+async def prodes_geo(
+    *,
+    bioma: str = "Cerrado",
+    ano: int | None = None,
+    uf: str | None = None,
+    return_meta: bool = False,
+    **kwargs: Any,  # noqa: ARG001
+) -> Any:
+    logger.info("desmatamento_prodes_geo", bioma=bioma, ano=ano, uf=uf)
+
+    t0 = time.monotonic()
+    geojson_bytes, source_url = await client.fetch_prodes_geo(bioma, ano=ano, uf=uf)
+    fetch_ms = int((time.monotonic() - t0) * 1000)
+
+    t1 = time.monotonic()
+    gdf = parser.parse_prodes_geojson(geojson_bytes, bioma)
+    parse_ms = int((time.monotonic() - t1) * 1000)
+
+    if uf is not None:
+        uf_upper = uf.strip().upper()
+        gdf = gdf[gdf["uf"] == uf_upper].reset_index(drop=True)
+
+    if return_meta:
+        meta = MetaInfo(
+            source="desmatamento",
+            source_url=source_url,
+            source_method="httpx+wfs+geojson",
+            fetched_at=datetime.now(UTC),
+            fetch_duration_ms=fetch_ms,
+            parse_duration_ms=parse_ms,
+            records_count=len(gdf),
+            columns=gdf.columns.tolist(),
+            parser_version=parser.PARSER_VERSION,
+            schema_version="1.0",
+            attempted_sources=["terrabrasilis_prodes_geo"],
+            selected_source="terrabrasilis_prodes_geo",
+            fetch_timestamp=datetime.now(UTC),
+        )
+        return gdf, meta
+
+    return gdf
+
+
+@overload
 async def deter(
     *,
     bioma: str = "Amazônia",

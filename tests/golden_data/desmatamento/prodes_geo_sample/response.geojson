@@ -1,0 +1,195 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-49.50, -7.10], [-49.49, -7.10], [-49.49, -7.09], [-49.50, -7.09], [-49.50, -7.10]]]]
+      },
+      "properties": {
+        "uid": 100001,
+        "state": "PARÁ",
+        "main_class": "desmatamento",
+        "class_name": "d2022",
+        "year": 2022,
+        "area_km": 0.2345,
+        "publish_year": "2022-01-01",
+        "source": "cerrado",
+        "satellite": "Landsat8",
+        "sensor": "OLI"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-49.60, -7.20], [-49.59, -7.20], [-49.59, -7.19], [-49.60, -7.19], [-49.60, -7.20]]]]
+      },
+      "properties": {
+        "uid": 100002,
+        "state": "PARÁ",
+        "main_class": "desmatamento",
+        "class_name": "d2022",
+        "year": 2022,
+        "area_km": 1.5678,
+        "publish_year": "2022-01-01",
+        "source": "cerrado",
+        "satellite": "Landsat8",
+        "sensor": "OLI"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-49.70, -7.30], [-49.69, -7.30], [-49.69, -7.29], [-49.70, -7.29], [-49.70, -7.30]]]]
+      },
+      "properties": {
+        "uid": 100003,
+        "state": "PARÁ",
+        "main_class": "desmatamento",
+        "class_name": "d2023",
+        "year": 2023,
+        "area_km": 0.8912,
+        "publish_year": "2023-01-01",
+        "source": "cerrado",
+        "satellite": "Sentinel-2",
+        "sensor": "MSI"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-49.80, -7.40], [-49.79, -7.40], [-49.79, -7.39], [-49.80, -7.39], [-49.80, -7.40]]]]
+      },
+      "properties": {
+        "uid": 100004,
+        "state": "PARÁ",
+        "main_class": "desmatamento",
+        "class_name": "d2023",
+        "year": 2023,
+        "area_km": 3.4567,
+        "publish_year": "2023-01-01",
+        "source": "cerrado",
+        "satellite": "Sentinel-2",
+        "sensor": "MSI"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-49.90, -7.50], [-49.89, -7.50], [-49.89, -7.49], [-49.90, -7.49], [-49.90, -7.50]]]]
+      },
+      "properties": {
+        "uid": 100005,
+        "state": "PARÁ",
+        "main_class": "desmatamento",
+        "class_name": "d2024",
+        "year": 2024,
+        "area_km": 0.0567,
+        "publish_year": "2024-01-01",
+        "source": "cerrado",
+        "satellite": "Landsat8",
+        "sensor": "OLI"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-50.00, -7.60], [-49.99, -7.60], [-49.99, -7.59], [-50.00, -7.59], [-50.00, -7.60]]]]
+      },
+      "properties": {
+        "uid": 100006,
+        "state": "PARÁ",
+        "main_class": "desmatamento",
+        "class_name": "d2024",
+        "year": 2024,
+        "area_km": 12.3456,
+        "publish_year": "2024-01-01",
+        "source": "cerrado",
+        "satellite": "Sentinel-2",
+        "sensor": "MSI"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-50.10, -7.70], [-50.09, -7.70], [-50.09, -7.69], [-50.10, -7.69], [-50.10, -7.70]]]]
+      },
+      "properties": {
+        "uid": 100007,
+        "state": "PARÁ",
+        "main_class": "desmatamento",
+        "class_name": "d2025",
+        "year": 2025,
+        "area_km": 0.9876,
+        "publish_year": "2025-01-01",
+        "source": "cerrado",
+        "satellite": "Sentinel-2",
+        "sensor": "MSI"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-50.20, -7.80], [-50.19, -7.80], [-50.19, -7.79], [-50.20, -7.79], [-50.20, -7.80]]]]
+      },
+      "properties": {
+        "uid": 100008,
+        "state": "MATO GROSSO",
+        "main_class": "desmatamento",
+        "class_name": "d2022",
+        "year": 2022,
+        "area_km": 5.6789,
+        "publish_year": "2022-01-01",
+        "source": "cerrado",
+        "satellite": "Landsat8",
+        "sensor": "OLI"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-50.30, -7.90], [-50.29, -7.90], [-50.29, -7.89], [-50.30, -7.89], [-50.30, -7.90]]]]
+      },
+      "properties": {
+        "uid": 100009,
+        "state": "MATO GROSSO",
+        "main_class": "desmatamento",
+        "class_name": "d2023",
+        "year": 2023,
+        "area_km": 2.3456,
+        "publish_year": "2023-01-01",
+        "source": "cerrado",
+        "satellite": "Sentinel-2",
+        "sensor": "MSI"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-50.40, -8.00], [-50.39, -8.00], [-50.39, -7.99], [-50.40, -7.99], [-50.40, -8.00]]]]
+      },
+      "properties": {
+        "uid": 100010,
+        "state": "MATO GROSSO",
+        "main_class": "desmatamento",
+        "class_name": "d2024",
+        "year": 2024,
+        "area_km": 0.1234,
+        "publish_year": "2024-01-01",
+        "source": "cerrado",
+        "satellite": "Landsat8",
+        "sensor": "OLI"
+      }
+    }
+  ]
+}

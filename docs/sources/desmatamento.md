@@ -28,6 +28,7 @@ Os dados sao acessados via GeoServer WFS do TerraBrasilis com `outputFormat=csv`
 
 | Bioma | Workspace | Layer |
 |-------|-----------|-------|
+| Amazonia | prodes-amazon-nb | yearly_deforestation_biome |
 | Cerrado | prodes-cerrado-nb | yearly_deforestation |
 | Caatinga | prodes-caatinga-nb | yearly_deforestation |
 | Mata Atlantica | prodes-mata-atlantica-nb | yearly_deforestation |
@@ -40,6 +41,17 @@ Os dados sao acessados via GeoServer WFS do TerraBrasilis com `outputFormat=csv`
 |-------|-----------|-------|
 | Amazonia | deter-amz | deter_amz |
 | Cerrado | deter-cerrado-nb | deter_cerrado |
+
+## Geometria (prodes_geo)
+
+A funcao `prodes_geo()` retorna desmatamento PRODES consolidado com poligonos de geometria como GeoDataFrame.
+
+| Campo | Valor |
+|-------|-------|
+| **Coluna de geometria** | `geom` (uniforme em todos os 6 biomas) |
+| **Formato** | MultiPolygon EPSG:4326 |
+| **maxFeatures default** | 10.000 (tabular: 50.000) |
+| **outputFormat** | `application/json` (GeoJSON) |
 
 ## Geometria (deter_geo)
 
@@ -82,6 +94,13 @@ df, meta = await agrobr.desmatamento.prodes(
 )
 print(meta.records_count, meta.fetch_duration_ms)
 
+# PRODES com geometria (requer pip install agrobr[geo])
+gdf_prodes = await agrobr.desmatamento.prodes_geo(
+    bioma="Cerrado",
+    ano=2022,
+    uf="MT",
+)
+
 # DETER com geometria (requer pip install agrobr[geo])
 gdf = await agrobr.desmatamento.deter_geo(
     bioma="Amazônia",
@@ -93,12 +112,11 @@ gdf = await agrobr.desmatamento.deter_geo(
 
 ## Limitacoes
 
-- PRODES nao inclui bioma Amazonia neste modulo (dados PRODES Amazonia Legal tem workspace diferente com estrutura variavel)
 - DETER so disponivel para Amazonia e Cerrado
 - WFS limita 50.000 features por requisicao — filtrar por estado e/ou ano
 - Dados PRODES sao poligonos individuais (granularidade fina) — usar agregacao se necessario
 - DETER e sistema de alerta, nao de consolidacao — pode haver sobreposicao
-- `deter_geo()` retorna geometria (~10x mais volume que tabular) — usar filtros para reduzir dados
+- `prodes_geo()` e `deter_geo()` retornam geometria (~10x mais volume que tabular) — usar filtros para reduzir dados
 
 ## Cache e Atualizacao
 

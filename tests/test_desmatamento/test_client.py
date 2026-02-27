@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import httpx
 import pytest
 
-from agrobr.desmatamento.client import _build_wfs_url, _uf_to_estado
+from agrobr.desmatamento.client import _build_state_cql, _build_wfs_url, _uf_to_estado
 from agrobr.exceptions import SourceUnavailableError
 
 
@@ -53,6 +53,30 @@ class TestUfToEstado:
         assert result is not None
 
 
+class TestBuildStateCql:
+    def test_or_condition(self):
+        cql = _build_state_cql("MT")
+        assert "state='MT'" in cql
+        assert "state='MATO GROSSO'" in cql
+        assert cql.startswith("(")
+        assert " OR " in cql
+
+    def test_unknown_uf_no_or(self):
+        cql = _build_state_cql("XX")
+        assert cql == "state='XX'"
+        assert "OR" not in cql
+
+    def test_case_insensitive(self):
+        cql = _build_state_cql("mt")
+        assert "state='MT'" in cql
+        assert "state='MATO GROSSO'" in cql
+
+    def test_uf_without_name(self):
+        cql = _build_state_cql("DF")
+        assert "state='DF'" in cql
+        assert "state='DISTRITO FEDERAL'" in cql
+
+
 class TestFetchProdes:
     @pytest.mark.asyncio
     async def test_unsupported_bioma(self):
@@ -85,6 +109,8 @@ class TestFetchProdes:
         ):
             content, url = await fetch_prodes("Amazônia")
         assert len(content) >= 5000
+        assert "prodes-amazon-nb" in url
+        assert "yearly_deforestation_biome" in url
 
     @pytest.mark.asyncio
     async def test_with_ano_and_uf(self):
@@ -306,3 +332,142 @@ class TestFetchDeterGeo:
 
         with pytest.raises(SourceUnavailableError, match="nao suportado"):
             await fetch_deter_geo("bioma_invalido")
+
+
+class TestFetchProdesGeo:
+    @pytest.mark.asyncio
+    async def test_successful_fetch(self):
+        from agrobr.desmatamento.client import fetch_prodes_geo
+
+        mock_response = MagicMock(spec=httpx.Response)
+        mock_response.status_code = 200
+        mock_response.content = b"x" * 5000
+        mock_response.raise_for_status = MagicMock()
+
+        mock_client = AsyncMock()
+        mock_client.get = AsyncMock(return_value=mock_response)
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=False)
+
+        with (
+            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
+            patch(
+                "agrobr.desmatamento.client.retry_on_status",
+                new_callable=AsyncMock,
+                return_value=mock_response,
+            ),
+        ):
+            content, url = await fetch_prodes_geo("Cerrado")
+        assert len(content) >= 5000
+
+    @pytest.mark.asyncio
+    async def test_max_features_10000(self):
+        from agrobr.desmatamento.client import fetch_prodes_geo
+
+        mock_response = MagicMock(spec=httpx.Response)
+        mock_response.status_code = 200
+        mock_response.content = b"x" * 5000
+        mock_response.raise_for_status = MagicMock()
+
+        mock_client = AsyncMock()
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=False)
+        mock_client.get = AsyncMock(return_value=mock_response)
+
+        with (
+            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
+            patch(
+                "agrobr.desmatamento.client.retry_on_status",
+                new_callable=AsyncMock,
+                return_value=mock_response,
+            ),
+        ):
+            _, url = await fetch_prodes_geo("Cerrado")
+        assert "maxFeatures=10000" in url
+
+    @pytest.mark.asyncio
+    async def test_geom_column_in_url(self):
+        from agrobr.desmatamento.client import fetch_prodes_geo
+
+        mock_response = MagicMock(spec=httpx.Response)
+        mock_response.status_code = 200
+        mock_response.content = b"x" * 5000
+        mock_response.raise_for_status = MagicMock()
+
+        mock_client = AsyncMock()
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=False)
+        mock_client.get = AsyncMock(return_value=mock_response)
+
+        with (
+            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
+            patch(
+                "agrobr.desmatamento.client.retry_on_status",
+                new_callable=AsyncMock,
+                return_value=mock_response,
+            ),
+        ):
+            _, url = await fetch_prodes_geo("Cerrado")
+        assert "propertyName=geom," in url
+
+    @pytest.mark.asyncio
+    async def test_output_format_json(self):
+        from agrobr.desmatamento.client import fetch_prodes_geo
+
+        mock_response = MagicMock(spec=httpx.Response)
+        mock_response.status_code = 200
+        mock_response.content = b"x" * 5000
+        mock_response.raise_for_status = MagicMock()
+
+        mock_client = AsyncMock()
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=False)
+        mock_client.get = AsyncMock(return_value=mock_response)
+
+        with (
+            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
+            patch(
+                "agrobr.desmatamento.client.retry_on_status",
+                new_callable=AsyncMock,
+                return_value=mock_response,
+            ),
+        ):
+            _, url = await fetch_prodes_geo("Cerrado")
+        assert "outputFormat=application/json" in url
+
+    @pytest.mark.asyncio
+    async def test_unsupported_bioma(self):
+        from agrobr.desmatamento.client import fetch_prodes_geo
+
+        with pytest.raises(SourceUnavailableError, match="nao suportado"):
+            await fetch_prodes_geo("bioma_invalido")
+
+    @pytest.mark.asyncio
+    async def test_with_ano_and_uf(self):
+        from agrobr.desmatamento.client import fetch_prodes_geo
+
+        mock_response = MagicMock(spec=httpx.Response)
+        mock_response.status_code = 200
+        mock_response.content = b"x" * 5000
+        mock_response.raise_for_status = MagicMock()
+
+        mock_client = AsyncMock()
+        mock_client.get = AsyncMock(return_value=mock_response)
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=False)
+
+        with (
+            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
+            patch(
+                "agrobr.desmatamento.client.retry_on_status",
+                new_callable=AsyncMock,
+                return_value=mock_response,
+            ),
+        ):
+            _, url = await fetch_prodes_geo("Cerrado", ano=2023, uf="MT")
+        from urllib.parse import unquote
+
+        decoded = unquote(url)
+        assert "year=2023" in decoded
+        assert "state='MT'" in decoded
+        assert "state='MATO GROSSO'" in decoded

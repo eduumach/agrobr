@@ -13,6 +13,7 @@ from .models import (
     COLUNAS_SAIDA_DETER,
     COLUNAS_SAIDA_DETER_GEO,
     COLUNAS_SAIDA_PRODES,
+    COLUNAS_SAIDA_PRODES_GEO,
     MAX_FEATURES_GEO,
     estado_para_uf,
 )
@@ -121,7 +122,7 @@ def _check_geopandas() -> Any:
         return geopandas
     except ImportError:
         raise ImportError(
-            "geopandas is required for deter_geo(). Install with: pip install agrobr[geo]"
+            "geopandas is required for geo functions. Install with: pip install agrobr[geo]"
         ) from None
 
 
@@ -181,4 +182,59 @@ def parse_deter_geojson(data: bytes, bioma: str) -> Any:
     gdf = gdf.reset_index(drop=True)
 
     logger.info("desmatamento_deter_geojson_parse_ok", records=len(gdf), bioma=bioma)
+    return gdf
+
+
+def parse_prodes_geojson(data: bytes, bioma: str) -> Any:
+    gpd = _check_geopandas()
+
+    try:
+        geojson = json.loads(data)
+    except (json.JSONDecodeError, UnicodeDecodeError) as e:
+        raise ParseError(
+            source="desmatamento",
+            parser_version=PARSER_VERSION,
+            reason=f"Erro ao ler GeoJSON PRODES: {e}",
+        ) from e
+
+    features = geojson.get("features", [])
+    if not features:
+        raise ParseError(
+            source="desmatamento",
+            parser_version=PARSER_VERSION,
+            reason="GeoJSON PRODES vazio",
+        )
+
+    if len(features) >= MAX_FEATURES_GEO:
+        logger.warning(
+            "desmatamento_prodes_geo_truncated",
+            features=len(features),
+            max_features=MAX_FEATURES_GEO,
+            bioma=bioma,
+        )
+
+    gdf = gpd.GeoDataFrame.from_features(features, crs="EPSG:4326")
+
+    required = {"year", "area_km", "state"}
+    missing = required - set(gdf.columns)
+    if missing:
+        raise ParseError(
+            source="desmatamento",
+            parser_version=PARSER_VERSION,
+            reason=f"Colunas obrigatorias ausentes: {missing}",
+        )
+
+    gdf["ano"] = pd.to_numeric(gdf["year"], errors="coerce").astype("Int64")
+    gdf["area_km2"] = pd.to_numeric(gdf["area_km"], errors="coerce")
+    gdf["uf"] = gdf["state"].fillna("").apply(estado_para_uf)
+    gdf["classe"] = gdf.get("main_class", pd.Series(dtype=str)).fillna("desmatamento")
+    gdf["satelite"] = gdf.get("satellite", pd.Series(dtype=str)).fillna("")
+    gdf["sensor"] = gdf.get("sensor", pd.Series(dtype=str)).fillna("")
+    gdf["bioma"] = bioma
+
+    output_cols = [c for c in COLUNAS_SAIDA_PRODES_GEO if c in gdf.columns]
+    gdf = gdf[output_cols].copy()
+    gdf = gdf.reset_index(drop=True)
+
+    logger.info("desmatamento_prodes_geojson_parse_ok", records=len(gdf), bioma=bioma)
     return gdf

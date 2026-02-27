@@ -8,6 +8,24 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Unreleased]
 
 ### Added
+- **Desmatamento PRODES com geometria** — nova funcao `desmatamento.prodes_geo()` retorna
+  `GeoDataFrame` com poligonos MultiPolygon (EPSG:4326) do desmatamento consolidado PRODES.
+  Requer `pip install agrobr[geo]`. Todos os 6 biomas suportados (incluindo Amazonia).
+  Default `maxFeatures=10000` com warning de truncamento. Mesmos parametros de `prodes()`
+  (bioma, ano, uf, return_meta). Sync wrapper automatico. Schema `desmatamento_prodes_geo.json`.
+  28 novos testes
+
+### Fixed
+- **PRODES workspace Amazonia** — `PRODES_WORKSPACES["Amazônia"]` apontava para
+  `prodes-cerrado-nb` (workspace do Cerrado). Corrigido para `prodes-amazon-nb` com
+  layer `yearly_deforestation_biome`
+- **PRODES CQL state filter** — filtro por UF enviava apenas nome completo (ex:
+  `state='MATO GROSSO'`), mas WFS do TerraBrasilis tem ambos formatos (UF + nome)
+  misturados. Novo `_build_state_cql()` gera `(state='MT' OR state='MATO GROSSO')`
+- **`_check_geopandas()` mensagem generica** — mensagem de erro hardcoded para
+  `deter_geo()` corrigida para mensagem generica que cobre todas as funcoes geo
+
+### Added
 - **SICAR Cadastro Ambiental Rural com geometria** — nova funcao `sicar.imoveis_geo()`
   retorna `GeoDataFrame` com poligonos MultiPolygon (EPSG:4326) dos imoveis rurais.
   Requer `pip install agrobr[geo]`. Mesmos parametros de `imoveis()`. Max 5000 features
