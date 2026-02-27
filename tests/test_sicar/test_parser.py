@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from agrobr.alt.sicar.models import COLUNAS_IMOVEIS
+from agrobr.alt.sicar.models import COLUNAS_IMOVEIS, COLUNAS_IMOVEIS_GEO, MAX_FEATURES_GEO
 from agrobr.alt.sicar.parser import PARSER_VERSION, agregar_resumo, parse_imoveis_csv
 from agrobr.exceptions import ParseError
 
@@ -227,3 +227,94 @@ class TestAgregarResumo:
         resumo = agregar_resumo(df)
         assert resumo["ativos"].iloc[0] == 2
         assert resumo["pendentes"].iloc[0] == 0
+
+
+GOLDEN_GEO_DIR = GOLDEN_DIR / "imoveis_geo_sample"
+
+
+class TestParseImoveisGeojson:
+    gpd = pytest.importorskip("geopandas")
+
+    @pytest.fixture()
+    def golden_geojson(self) -> bytes:
+        return (GOLDEN_GEO_DIR / "response.geojson").read_bytes()
+
+    @pytest.fixture()
+    def parse(self):
+        from agrobr.alt.sicar.parser import parse_imoveis_geojson
+
+        return parse_imoveis_geojson
+
+    def test_valid_geojson(self, parse, golden_geojson):
+        gdf = parse(golden_geojson)
+        assert len(gdf) == 10
+        assert "cod_imovel" in gdf.columns
+        assert "status" in gdf.columns
+        assert "geometry" in gdf.columns
+
+    def test_output_columns_match_schema(self, parse, golden_geojson):
+        gdf = parse(golden_geojson)
+        assert list(gdf.columns) == COLUNAS_IMOVEIS_GEO
+
+    def test_geometry_column_exists(self, parse, golden_geojson):
+        gdf = parse(golden_geojson)
+        assert gdf.geometry.name == "geometry"
+
+    def test_geometry_is_valid(self, parse, golden_geojson):
+        gdf = parse(golden_geojson)
+        assert gdf.geometry.is_valid.all()
+
+    def test_crs_is_4326(self, parse, golden_geojson):
+        gdf = parse(golden_geojson)
+        assert gdf.crs.to_epsg() == 4326
+
+    def test_area_non_negative(self, parse, golden_geojson):
+        gdf = parse(golden_geojson)
+        assert (gdf["area_ha"] >= 0).all()
+
+    def test_data_types(self, parse, golden_geojson):
+        gdf = parse(golden_geojson)
+        assert gdf["area_ha"].dtype == "float64"
+        assert gdf["cod_municipio_ibge"].dtype == "Int64"
+
+    def test_status_uppercase(self, parse, golden_geojson):
+        gdf = parse(golden_geojson)
+        assert all(s == s.upper() for s in gdf["status"])
+
+    def test_empty_features_returns_empty_gdf(self, parse):
+        empty = b'{"type":"FeatureCollection","features":[]}'
+        gdf = parse(empty)
+        assert len(gdf) == 0
+        assert list(gdf.columns) == COLUNAS_IMOVEIS_GEO
+
+    def test_invalid_json_raises(self, parse):
+        with pytest.raises(ParseError, match="GeoJSON"):
+            parse(b"not json at all {{{")
+
+    def test_geopandas_not_installed(self):
+        from unittest.mock import patch
+
+        from agrobr.alt.sicar import parser as _parser
+
+        with (
+            patch.object(_parser, "_check_geopandas", side_effect=ImportError("no geopandas")),
+            pytest.raises(ImportError, match="geopandas"),
+        ):
+            _parser.parse_imoveis_geojson(b'{"type":"FeatureCollection","features":[]}')
+
+    def test_truncation_warning(self, parse, golden_geojson):
+        import json
+        from unittest.mock import patch
+
+        geojson = json.loads(golden_geojson)
+        while len(geojson["features"]) < MAX_FEATURES_GEO:
+            geojson["features"].extend(geojson["features"])
+        geojson["features"] = geojson["features"][:MAX_FEATURES_GEO]
+        data = json.dumps(geojson).encode()
+
+        from agrobr.alt.sicar import parser as _parser
+
+        with patch.object(_parser.logger, "warning") as mock_warn:
+            parse(data)
+            mock_warn.assert_called_once()
+            assert mock_warn.call_args[0][0] == "sicar_geo_truncated"

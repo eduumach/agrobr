@@ -93,3 +93,11 @@ UFS_VALIDAS = frozenset(
         "TO",
     }
 )
+
+MAX_FEATURES_GEO = 5_000
+
+SICAR_GEOM_COLUMN = "geo_area_imovel"
+
+PROPERTY_NAMES_GEO = [SICAR_GEOM_COLUMN] + PROPERTY_NAMES
+
+COLUNAS_IMOVEIS_GEO = COLUNAS_IMOVEIS + ["geometry"]

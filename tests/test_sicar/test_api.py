@@ -9,8 +9,8 @@ import pandas as pd
 import pytest
 
 from agrobr.alt.sicar import api
-from agrobr.alt.sicar.api import _build_cql_filter, imoveis, resumo
-from agrobr.alt.sicar.models import COLUNAS_IMOVEIS
+from agrobr.alt.sicar.api import _build_cql_filter, imoveis, imoveis_geo, resumo
+from agrobr.alt.sicar.models import COLUNAS_IMOVEIS, COLUNAS_IMOVEIS_GEO
 
 GOLDEN_DIR = Path(__file__).parent.parent / "golden_data" / "sicar"
 
@@ -334,6 +334,100 @@ class TestImoveisDedup:
         pa001 = df[df["cod_imovel"] == "PA-001"]
         assert len(pa001) == 1
         assert pa001["data_atualizacao"].iloc[0].year == 2023
+
+
+def _load_golden_geojson() -> bytes:
+    geo_path = GOLDEN_DIR / "imoveis_geo_sample" / "response.geojson"
+    return geo_path.read_bytes()
+
+
+class TestImoveisGeo:
+    gpd = pytest.importorskip("geopandas")
+
+    @pytest.mark.asyncio
+    async def test_returns_geodataframe(self):
+        import geopandas
+
+        geojson = _load_golden_geojson()
+        with patch.object(
+            api.client,
+            "fetch_imoveis_geo",
+            new_callable=AsyncMock,
+            return_value=(geojson, "https://test.url"),
+        ):
+            gdf = await imoveis_geo("DF")
+
+        assert isinstance(gdf, geopandas.GeoDataFrame)
+        assert len(gdf) == 10
+        for col in COLUNAS_IMOVEIS_GEO:
+            assert col in gdf.columns
+
+    @pytest.mark.asyncio
+    async def test_return_meta(self):
+        geojson = _load_golden_geojson()
+        with patch.object(
+            api.client,
+            "fetch_imoveis_geo",
+            new_callable=AsyncMock,
+            return_value=(geojson, "https://test.url"),
+        ):
+            gdf, meta = await imoveis_geo("DF", return_meta=True)
+
+        assert meta.source == "sicar"
+        assert meta.records_count == len(gdf)
+        assert meta.source_method == "httpx+wfs+geojson"
+        assert meta.selected_source == "sicar_wfs_geo"
+
+    @pytest.mark.asyncio
+    async def test_filter_municipio(self):
+        geojson = _load_golden_geojson()
+        mock_fetch = AsyncMock(return_value=(geojson, "https://test.url"))
+        with patch.object(api.client, "fetch_imoveis_geo", mock_fetch):
+            await imoveis_geo("DF", municipio="Brasilia")
+
+        call_args = mock_fetch.call_args
+        cql = call_args[0][1] if len(call_args[0]) > 1 else call_args[1].get("cql_filter")
+        assert cql is not None
+        assert "municipio ILIKE" in cql
+
+    @pytest.mark.asyncio
+    async def test_invalid_uf_raises(self):
+        with pytest.raises(ValueError, match="UF"):
+            await imoveis_geo("XX")
+
+    @pytest.mark.asyncio
+    async def test_dedup_by_cod_imovel(self):
+        import json
+
+        geojson_data = json.loads(_load_golden_geojson())
+        geojson_data["features"].append(geojson_data["features"][0])
+        data = json.dumps(geojson_data).encode()
+
+        with patch.object(
+            api.client,
+            "fetch_imoveis_geo",
+            new_callable=AsyncMock,
+            return_value=(data, "https://test.url"),
+        ):
+            gdf = await imoveis_geo("DF")
+
+        assert gdf["cod_imovel"].is_unique
+
+    @pytest.mark.asyncio
+    async def test_empty_result(self):
+        import geopandas
+
+        empty = b'{"type":"FeatureCollection","features":[]}'
+        with patch.object(
+            api.client,
+            "fetch_imoveis_geo",
+            new_callable=AsyncMock,
+            return_value=(empty, "https://test.url"),
+        ):
+            gdf = await imoveis_geo("DF")
+
+        assert isinstance(gdf, geopandas.GeoDataFrame)
+        assert len(gdf) == 0
 
 
 class TestImoveisNullDataCriacao:

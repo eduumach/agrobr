@@ -42,7 +42,8 @@ com filtros server-side (CQL_FILTER) e paginacao transparente.
 
 ## Notas
 
-- **Sem geometria:** o agrobr extrai apenas dados tabulares (sem poligonos/shapefiles)
+- **Geometria disponivel:** `imoveis_geo()` retorna `GeoDataFrame` com poligonos MultiPolygon
+  (EPSG:4326) via WFS GeoJSON. Requer `pip install agrobr[geo]`. Max 5.000 features por request
 - **Paginacao transparente:** queries grandes sao paginadas automaticamente (10.000 registros por pagina)
 - **Timeout estendido:** read timeout de 180s para UFs com muitos registros (BA, MG, MT)
 - **SSL:** o GeoServer do CAR usa cipher suite legado que rejeita handshake TLS padrao.

@@ -118,12 +118,75 @@ df = await agrobr.alt.sicar.resumo("DF")
 df = await agrobr.alt.sicar.resumo("MT", municipio="Sorriso")
 ```
 
+## imoveis_geo
+
+Registros individuais com geometria (poligonos MultiPolygon). Requer `pip install agrobr[geo]`.
+
+```python
+import agrobr
+
+gdf = await agrobr.alt.sicar.imoveis_geo("DF")
+```
+
+### Parametros
+
+| Parametro | Tipo | Obrigatorio | Descricao |
+|-----------|------|-------------|-----------|
+| uf | str | Sim | Sigla da UF (ex: "MT", "DF", "BA") |
+| municipio | str | Nao | Filtro parcial de municipio (case-insensitive) |
+| status | str | Nao | AT, PE, SU ou CA |
+| tipo | str | Nao | IRU, AST ou PCT |
+| area_min | float | Nao | Area minima em hectares |
+| area_max | float | Nao | Area maxima em hectares |
+| criado_apos | str | Nao | Data minima de criacao (ISO, ex: "2020-01-01") |
+| return_meta | bool | Nao | Se True, retorna (GeoDataFrame, MetaInfo) |
+
+### Colunas de retorno
+
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| cod_imovel | str | Codigo unico do imovel |
+| status | str | AT/PE/SU/CA |
+| data_criacao | datetime | Data de criacao |
+| data_atualizacao | datetime | Ultima atualizacao (nullable) |
+| area_ha | float | Area em hectares |
+| condicao | str | Condicao do cadastro (nullable) |
+| uf | str | Sigla UF |
+| municipio | str | Nome do municipio |
+| cod_municipio_ibge | int | Codigo IBGE |
+| modulos_fiscais | float | Modulos fiscais |
+| tipo | str | IRU/AST/PCT |
+| geometry | MultiPolygon | Poligono do imovel (EPSG:4326) |
+
+### Exemplos
+
+```python
+# Imoveis com geometria no DF
+gdf = await agrobr.alt.sicar.imoveis_geo("DF")
+gdf.plot()
+
+# Filtrar por municipio
+gdf = await agrobr.alt.sicar.imoveis_geo(
+    "MT", municipio="Sorriso", status="AT"
+)
+
+# Com metadados
+gdf, meta = await agrobr.alt.sicar.imoveis_geo("DF", return_meta=True)
+```
+
+### Notas
+
+- Maximo 5.000 features por request (warning se truncado)
+- Request unico sem paginacao (volume controlado)
+- CRS: EPSG:4326 (WGS84)
+
 ## Uso sincrono
 
 ```python
 from agrobr import sync
 
 df = sync.alt.sicar.imoveis("DF")
+gdf = sync.alt.sicar.imoveis_geo("DF")
 df = sync.alt.sicar.resumo("MT", municipio="Sorriso")
 ```
 

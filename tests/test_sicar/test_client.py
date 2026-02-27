@@ -7,8 +7,8 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from agrobr.alt.sicar import client
-from agrobr.alt.sicar.client import _build_wfs_url, fetch_hits, fetch_imoveis
-from agrobr.alt.sicar.models import PAGE_SIZE, WFS_BASE, WFS_VERSION
+from agrobr.alt.sicar.client import _build_wfs_url, fetch_hits, fetch_imoveis, fetch_imoveis_geo
+from agrobr.alt.sicar.models import MAX_FEATURES_GEO, PAGE_SIZE, WFS_BASE, WFS_VERSION
 from agrobr.exceptions import ParseError
 
 
@@ -184,6 +184,61 @@ class TestFetchImoveis:
         # Both hits and data request should have the filter
         for u in fetched_urls:
             assert "status_imovel" in u
+
+
+class TestFetchImoveisGeo:
+    @pytest.mark.asyncio
+    async def test_successful_fetch(self):
+        geojson = b'{"type":"FeatureCollection","features":[]}'
+        with patch.object(client, "_fetch_url", new_callable=AsyncMock, return_value=geojson):
+            content, url = await fetch_imoveis_geo("DF")
+        assert content == geojson
+        assert "sicar" in url
+
+    @pytest.mark.asyncio
+    async def test_url_output_format_json(self):
+        geojson = b'{"type":"FeatureCollection","features":[]}'
+        mock_fetch = AsyncMock(return_value=geojson)
+        with patch.object(client, "_fetch_url", mock_fetch):
+            await fetch_imoveis_geo("DF")
+        call_url = mock_fetch.call_args[0][0]
+        assert "outputFormat=application/json" in call_url
+
+    @pytest.mark.asyncio
+    async def test_url_contains_geom_column(self):
+        geojson = b'{"type":"FeatureCollection","features":[]}'
+        mock_fetch = AsyncMock(return_value=geojson)
+        with patch.object(client, "_fetch_url", mock_fetch):
+            await fetch_imoveis_geo("DF")
+        call_url = mock_fetch.call_args[0][0]
+        assert "geo_area_imovel" in call_url
+
+    @pytest.mark.asyncio
+    async def test_url_max_features(self):
+        geojson = b'{"type":"FeatureCollection","features":[]}'
+        mock_fetch = AsyncMock(return_value=geojson)
+        with patch.object(client, "_fetch_url", mock_fetch):
+            await fetch_imoveis_geo("MT")
+        call_url = mock_fetch.call_args[0][0]
+        assert f"count={MAX_FEATURES_GEO}" in call_url
+
+    @pytest.mark.asyncio
+    async def test_url_with_cql_filter(self):
+        geojson = b'{"type":"FeatureCollection","features":[]}'
+        mock_fetch = AsyncMock(return_value=geojson)
+        with patch.object(client, "_fetch_url", mock_fetch):
+            await fetch_imoveis_geo("BA", cql_filter="status_imovel='AT'")
+        call_url = mock_fetch.call_args[0][0]
+        assert "CQL_FILTER=" in call_url
+        assert "status_imovel" in call_url
+
+    @pytest.mark.asyncio
+    async def test_no_pagination(self):
+        geojson = b'{"type":"FeatureCollection","features":[]}'
+        mock_fetch = AsyncMock(return_value=geojson)
+        with patch.object(client, "_fetch_url", mock_fetch):
+            await fetch_imoveis_geo("SP")
+        assert mock_fetch.call_count == 1
 
 
 class TestTimeout:

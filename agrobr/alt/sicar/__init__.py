@@ -5,6 +5,6 @@ Dados abertos via GeoServer WFS (OGC), sem autenticacao.
 Licenca: CC-BY (dados abertos governo federal).
 """
 
-from agrobr.alt.sicar.api import imoveis, resumo
+from agrobr.alt.sicar.api import imoveis, imoveis_geo, resumo
 
-__all__ = ["imoveis", "resumo"]
+__all__ = ["imoveis", "imoveis_geo", "resumo"]

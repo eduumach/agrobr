@@ -6,10 +6,14 @@ import pytest
 
 from agrobr.alt.sicar.models import (
     COLUNAS_IMOVEIS,
+    COLUNAS_IMOVEIS_GEO,
+    MAX_FEATURES_GEO,
     MAX_FEATURES_WARNING,
     PAGE_SIZE,
     PROPERTY_NAMES,
+    PROPERTY_NAMES_GEO,
     RENAME_MAP,
+    SICAR_GEOM_COLUMN,
     STATUS_LABELS,
     STATUS_VALIDOS,
     TIPO_LABELS,
@@ -166,3 +170,19 @@ class TestUfsValidas:
     def test_no_invalid_uf(self):
         assert "XX" not in UFS_VALIDAS
         assert "BR" not in UFS_VALIDAS
+
+
+class TestGeoConstants:
+    def test_max_features_geo_value(self):
+        assert MAX_FEATURES_GEO == 5000
+
+    def test_sicar_geom_column(self):
+        assert SICAR_GEOM_COLUMN == "geo_area_imovel"
+
+    def test_property_names_geo_starts_with_geom(self):
+        assert PROPERTY_NAMES_GEO[0] == SICAR_GEOM_COLUMN
+        assert set(PROPERTY_NAMES_GEO[1:]) == set(PROPERTY_NAMES)
+
+    def test_colunas_imoveis_geo_ends_with_geometry(self):
+        assert COLUNAS_IMOVEIS_GEO[-1] == "geometry"
+        assert COLUNAS_IMOVEIS_GEO[:-1] == COLUNAS_IMOVEIS

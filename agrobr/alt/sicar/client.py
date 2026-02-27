@@ -13,7 +13,15 @@ from agrobr.exceptions import ParseError, SourceUnavailableError
 from agrobr.http.retry import retry_on_status
 from agrobr.http.user_agents import UserAgentRotator
 
-from .models import PAGE_SIZE, PROPERTY_NAMES, WFS_BASE, WFS_VERSION, layer_name
+from .models import (
+    MAX_FEATURES_GEO,
+    PAGE_SIZE,
+    PROPERTY_NAMES,
+    PROPERTY_NAMES_GEO,
+    WFS_BASE,
+    WFS_VERSION,
+    layer_name,
+)
 
 logger = structlog.get_logger()
 
@@ -39,15 +47,17 @@ def _build_wfs_url(
     count: int = PAGE_SIZE,
     start_index: int = 0,
     result_type: str | None = None,
+    output_format: str = "csv",
+    property_names: list[str] | None = None,
 ) -> str:
-    props = ",".join(PROPERTY_NAMES)
+    props = ",".join(property_names or PROPERTY_NAMES)
     layer = layer_name(uf)
 
     url = (
         f"{WFS_BASE}"
         f"?service=WFS&version={WFS_VERSION}&request=GetFeature"
         f"&typeNames=sicar:{layer}"
-        f"&outputFormat=csv"
+        f"&outputFormat={output_format}"
         f"&propertyName={props}"
         f"&count={count}"
         f"&startIndex={start_index}"
@@ -142,3 +152,19 @@ async def fetch_imoveis(uf: str, cql_filter: str | None = None) -> tuple[list[by
         )
 
     return pages, base_url
+
+
+async def fetch_imoveis_geo(
+    uf: str,
+    cql_filter: str | None = None,
+) -> tuple[bytes, str]:
+    url = _build_wfs_url(
+        uf,
+        cql_filter=cql_filter,
+        count=MAX_FEATURES_GEO,
+        output_format="application/json",
+        property_names=PROPERTY_NAMES_GEO,
+    )
+    content = await _fetch_url(url)
+    logger.info("sicar_imoveis_geojson", url=url, size=len(content), uf=uf)
+    return content, url

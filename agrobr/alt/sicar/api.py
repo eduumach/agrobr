@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 from datetime import UTC, datetime
-from typing import Any, Literal, overload
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 import pandas as pd
 import structlog
@@ -17,6 +17,9 @@ from .models import (
     UFS_VALIDAS,
     WFS_BASE,
 )
+
+if TYPE_CHECKING:
+    import geopandas as gpd
 
 logger = structlog.get_logger()
 
@@ -176,6 +179,116 @@ async def imoveis(
         return df, meta
 
     return df
+
+
+@overload
+async def imoveis_geo(
+    uf: str,
+    *,
+    municipio: str | None = None,
+    status: str | None = None,
+    tipo: str | None = None,
+    area_min: float | None = None,
+    area_max: float | None = None,
+    criado_apos: str | None = None,
+    return_meta: Literal[False] = False,
+) -> gpd.GeoDataFrame: ...
+
+
+@overload
+async def imoveis_geo(
+    uf: str,
+    *,
+    municipio: str | None = None,
+    status: str | None = None,
+    tipo: str | None = None,
+    area_min: float | None = None,
+    area_max: float | None = None,
+    criado_apos: str | None = None,
+    return_meta: Literal[True],
+) -> tuple[gpd.GeoDataFrame, MetaInfo]: ...
+
+
+async def imoveis_geo(
+    uf: str,
+    *,
+    municipio: str | None = None,
+    status: str | None = None,
+    tipo: str | None = None,
+    area_min: float | None = None,
+    area_max: float | None = None,
+    criado_apos: str | None = None,
+    return_meta: bool = False,
+    **kwargs: Any,  # noqa: ARG001
+) -> Any:
+    uf_upper = uf.strip().upper()
+    if uf_upper not in UFS_VALIDAS:
+        raise ValueError(f"UF '{uf}' invalida. Opcoes: {sorted(UFS_VALIDAS)}")
+
+    if status is not None and status.upper() not in STATUS_VALIDOS:
+        raise ValueError(f"Status '{status}' invalido. Opcoes: {sorted(STATUS_VALIDOS)}")
+
+    if tipo is not None and tipo.upper() not in TIPO_VALIDOS:
+        raise ValueError(f"Tipo '{tipo}' invalido. Opcoes: {sorted(TIPO_VALIDOS)}")
+
+    logger.info(
+        "sicar_imoveis_geo",
+        uf=uf_upper,
+        municipio=municipio,
+        status=status,
+        tipo=tipo,
+        area_min=area_min,
+        area_max=area_max,
+    )
+
+    cql = _build_cql_filter(
+        municipio=municipio,
+        status=status,
+        tipo=tipo,
+        area_min=area_min,
+        area_max=area_max,
+        criado_apos=criado_apos,
+    )
+
+    t0 = time.monotonic()
+    content, source_url = await client.fetch_imoveis_geo(uf_upper, cql)
+    fetch_ms = int((time.monotonic() - t0) * 1000)
+
+    t1 = time.monotonic()
+    gdf = parser.parse_imoveis_geojson(content)
+    parse_ms = int((time.monotonic() - t1) * 1000)
+
+    if not gdf.empty and "cod_imovel" in gdf.columns:
+        gdf = gdf.sort_values(
+            ["cod_imovel", "data_atualizacao"],
+            ascending=[True, False],
+            na_position="last",
+        )
+        before = len(gdf)
+        gdf = gdf.drop_duplicates(subset=["cod_imovel"], keep="first")
+        gdf = gdf.reset_index(drop=True)
+        if len(gdf) < before:
+            logger.info("sicar_geo_dedup", removed=before - len(gdf), remaining=len(gdf))
+
+    if return_meta:
+        meta = MetaInfo(
+            source="sicar",
+            source_url=source_url,
+            source_method="httpx+wfs+geojson",
+            fetched_at=datetime.now(UTC),
+            fetch_duration_ms=fetch_ms,
+            parse_duration_ms=parse_ms,
+            records_count=len(gdf),
+            columns=gdf.columns.tolist(),
+            parser_version=parser.PARSER_VERSION,
+            schema_version="1.0",
+            attempted_sources=["sicar_wfs_geo"],
+            selected_source="sicar_wfs_geo",
+            fetch_timestamp=datetime.now(UTC),
+        )
+        return gdf, meta
+
+    return gdf
 
 
 @overload

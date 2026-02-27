@@ -32,7 +32,7 @@ pip install agrobr[pdf]             # pdfplumber para ANDA (fertilizantes)
 pip install agrobr[polars]          # Suporte a Polars
 pip install agrobr[browser]         # Playwright (opcional, para fontes com JS)
 pip install agrobr[bigquery]        # Base dos Dados (fallback BCB/SICOR)
-pip install agrobr[geo]             # GeoPandas (geometria DETER)
+pip install agrobr[geo]             # GeoPandas (geometria DETER + SICAR)
 pip install agrobr[all]             # Tudo incluído
 ```
 
@@ -179,6 +179,9 @@ async def main():
     # Cadastro Ambiental Rural (SICAR)
     df = await datasets.cadastro_rural("DF")
     df = await datasets.cadastro_rural("MT", municipio="Sorriso", status="AT")
+
+    # SICAR com geometria (requer pip install agrobr[geo])
+    gdf = await agrobr.alt.sicar.imoveis_geo("DF")
 
     # Listar datasets disponíveis
     print(datasets.list_datasets())

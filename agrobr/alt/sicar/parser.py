@@ -1,17 +1,46 @@
 from __future__ import annotations
 
 import io
+import json
+from typing import Any
 
 import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
 
-from .models import COLUNAS_IMOVEIS, RENAME_MAP
+from .models import COLUNAS_IMOVEIS, COLUNAS_IMOVEIS_GEO, MAX_FEATURES_GEO, RENAME_MAP
 
 logger = structlog.get_logger()
 
 PARSER_VERSION = 1
+
+
+def _normalize_columns(df: pd.DataFrame, output_cols: list[str]) -> pd.DataFrame:
+    df = df.rename(columns=RENAME_MAP)
+
+    df["data_criacao"] = pd.to_datetime(df["data_criacao"], errors="coerce")
+    df["data_atualizacao"] = pd.to_datetime(
+        df.get("data_atualizacao", pd.Series(dtype=str)), errors="coerce"
+    )
+
+    df["area_ha"] = pd.to_numeric(df["area_ha"], errors="coerce")
+    df["cod_municipio_ibge"] = pd.to_numeric(
+        df.get("cod_municipio_ibge", pd.Series(dtype=str)), errors="coerce"
+    ).astype("Int64")
+    df["modulos_fiscais"] = pd.to_numeric(
+        df.get("modulos_fiscais", pd.Series(dtype=str)), errors="coerce"
+    )
+
+    df["uf"] = df["uf"].fillna("").str.strip().str.upper()
+    df["status"] = df["status"].fillna("").str.strip().str.upper()
+    df["tipo"] = df.get("tipo", pd.Series(dtype=str)).fillna("").str.strip().str.upper()
+    df["municipio"] = df.get("municipio", pd.Series(dtype=str)).fillna("").str.strip()
+    df["condicao"] = df.get("condicao", pd.Series(dtype=str)).fillna("").str.strip()
+    df["cod_imovel"] = df["cod_imovel"].fillna("").astype(str).str.strip()
+
+    cols = [c for c in output_cols if c in df.columns]
+    return df[cols].copy().reset_index(drop=True)
 
 
 def parse_imoveis_csv(pages: list[bytes]) -> pd.DataFrame:
@@ -48,34 +77,59 @@ def parse_imoveis_csv(pages: list[bytes]) -> pd.DataFrame:
             reason=f"Colunas obrigatorias ausentes: {missing}",
         )
 
-    df = df.rename(columns=RENAME_MAP)
-
-    df["data_criacao"] = pd.to_datetime(df["data_criacao"], errors="coerce")
-    df["data_atualizacao"] = pd.to_datetime(
-        df.get("data_atualizacao", pd.Series(dtype=str)), errors="coerce"
-    )
-
-    df["area_ha"] = pd.to_numeric(df["area_ha"], errors="coerce")
-    df["cod_municipio_ibge"] = pd.to_numeric(
-        df.get("cod_municipio_ibge", pd.Series(dtype=str)), errors="coerce"
-    ).astype("Int64")
-    df["modulos_fiscais"] = pd.to_numeric(
-        df.get("modulos_fiscais", pd.Series(dtype=str)), errors="coerce"
-    )
-
-    df["uf"] = df["uf"].fillna("").str.strip().str.upper()
-    df["status"] = df["status"].fillna("").str.strip().str.upper()
-    df["tipo"] = df.get("tipo", pd.Series(dtype=str)).fillna("").str.strip().str.upper()
-    df["municipio"] = df.get("municipio", pd.Series(dtype=str)).fillna("").str.strip()
-    df["condicao"] = df.get("condicao", pd.Series(dtype=str)).fillna("").str.strip()
-    df["cod_imovel"] = df["cod_imovel"].fillna("").astype(str).str.strip()
-
-    output_cols = [c for c in COLUNAS_IMOVEIS if c in df.columns]
-    df = df[output_cols].copy()
-    df = df.reset_index(drop=True)
-
+    df = _normalize_columns(df, COLUNAS_IMOVEIS)
     logger.info("sicar_parse_ok", records=len(df))
     return df
+
+
+def _check_geopandas() -> Any:
+    try:
+        import geopandas
+
+        return geopandas
+    except ImportError:
+        raise ImportError(
+            "geopandas is required for imoveis_geo(). Install with: pip install agrobr[geo]"
+        ) from None
+
+
+def parse_imoveis_geojson(data: bytes) -> Any:
+    gpd = _check_geopandas()
+
+    try:
+        geojson = json.loads(data)
+    except (json.JSONDecodeError, UnicodeDecodeError) as e:
+        raise ParseError(
+            source="sicar",
+            parser_version=PARSER_VERSION,
+            reason=f"Erro ao ler GeoJSON SICAR: {e}",
+        ) from e
+
+    features = geojson.get("features", [])
+    if not features:
+        return gpd.GeoDataFrame(columns=COLUNAS_IMOVEIS_GEO)
+
+    if len(features) >= MAX_FEATURES_GEO:
+        logger.warning(
+            "sicar_geo_truncated",
+            features=len(features),
+            max_features=MAX_FEATURES_GEO,
+        )
+
+    gdf = gpd.GeoDataFrame.from_features(features, crs="EPSG:4326")
+
+    required = {"cod_imovel", "status_imovel", "dat_criacao", "area", "uf"}
+    missing = required - set(gdf.columns)
+    if missing:
+        raise ParseError(
+            source="sicar",
+            parser_version=PARSER_VERSION,
+            reason=f"Colunas obrigatorias ausentes: {missing}",
+        )
+
+    gdf = _normalize_columns(gdf, COLUNAS_IMOVEIS_GEO)
+    logger.info("sicar_geojson_parse_ok", records=len(gdf))
+    return gdf
 
 
 def agregar_resumo(df: pd.DataFrame) -> pd.DataFrame:

@@ -8,6 +8,12 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Unreleased]
 
 ### Added
+- **SICAR Cadastro Ambiental Rural com geometria** — nova funcao `sicar.imoveis_geo()`
+  retorna `GeoDataFrame` com poligonos MultiPolygon (EPSG:4326) dos imoveis rurais.
+  Requer `pip install agrobr[geo]`. Mesmos parametros de `imoveis()`. Max 5000 features
+  com warning de truncamento. Refator: `_normalize_columns` compartilhado entre
+  `parse_imoveis_csv` e `parse_imoveis_geojson`. Schema `sicar_imoveis_geo.json`.
+  28 novos testes
 - **Desmatamento DETER com geometria** — nova funcao `desmatamento.deter_geo()` retorna
   `GeoDataFrame` com poligonos MultiPolygon (EPSG:4326) dos alertas DETER. Requer
   `pip install agrobr[geo]`. Default `maxFeatures=10000` com warning de truncamento.
