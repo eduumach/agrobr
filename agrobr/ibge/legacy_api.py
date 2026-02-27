@@ -43,6 +43,7 @@ async def censo_agro_legado(
             raise ValueError(f"UF '{uf}' inválida. Disponíveis: {sorted(ftp_client.UF_DIRS)}")
         uf_dir = ftp_client.UF_DIRS[uf_upper]
 
+    suffix = "Mn" if uf_dir != "Brasil" else ""
     zip_bytes = await ftp_client.download_legacy_zip(tab_name, uf_dir=uf_dir)
     xls_files = ftp_client.extract_xls_from_zip(zip_bytes)
 
@@ -94,7 +95,7 @@ async def censo_agro_legado(
         now = datetime.now(UTC)
         meta = MetaInfo(
             source="ibge_censo_agro_legado",
-            source_url=f"{ftp_client.FTP_BASE}/{uf_dir}/{tab_name}.zip",
+            source_url=f"{ftp_client.FTP_BASE}/{uf_dir}/{tab_name}{suffix}.zip",
             source_method="ftp_download",
             fetched_at=now,
             records_count=len(df) if not isinstance(df, tuple) else len(df),

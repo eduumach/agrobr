@@ -96,13 +96,13 @@ class TestFtpClientConstants:
         }
         assert set(ftp_client.LEGACY_TEMAS.keys()) == expected
 
-    def test_legacy_temas_tab_names(self):
-        assert ftp_client.LEGACY_TEMAS["tecnologia"] == "Tab_3Mn"
-        assert ftp_client.LEGACY_TEMAS["pessoal_ocupado"] == "Tab_6Mn"
-        assert ftp_client.LEGACY_TEMAS["maquinas"] == "Tab_7Mn"
-        assert ftp_client.LEGACY_TEMAS["producao_animal"] == "Tab_9Mn"
-        assert ftp_client.LEGACY_TEMAS["valor_producao"] == "Tab_10Mn"
-        assert ftp_client.LEGACY_TEMAS["financeiro"] == "Tab_11Mn"
+    def test_legacy_temas_tab_base_names(self):
+        assert ftp_client.LEGACY_TEMAS["tecnologia"] == "Tab_3"
+        assert ftp_client.LEGACY_TEMAS["pessoal_ocupado"] == "Tab_6"
+        assert ftp_client.LEGACY_TEMAS["maquinas"] == "Tab_7"
+        assert ftp_client.LEGACY_TEMAS["producao_animal"] == "Tab_9"
+        assert ftp_client.LEGACY_TEMAS["valor_producao"] == "Tab_10"
+        assert ftp_client.LEGACY_TEMAS["financeiro"] == "Tab_11"
 
     def test_uf_dirs_has_27_entries(self):
         assert len(ftp_client.UF_DIRS) == 27
@@ -140,7 +140,7 @@ class TestFtpClientDownload:
             mock_cls.return_value.__aenter__ = AsyncMock(return_value=AsyncMock())
             mock_cls.return_value.__aexit__ = AsyncMock(return_value=False)
 
-            result = await ftp_client.download_legacy_zip("Tab_3Mn", uf_dir="Sao_Paulo")
+            result = await ftp_client.download_legacy_zip("Tab_3", uf_dir="Sao_Paulo")
 
         assert len(result) == len(fake_zip)
         assert result == fake_zip
@@ -165,7 +165,7 @@ class TestFtpClientDownload:
             from agrobr.exceptions import SourceUnavailableError
 
             with pytest.raises(SourceUnavailableError, match="ZIP too small"):
-                await ftp_client.download_legacy_zip("Tab_3Mn")
+                await ftp_client.download_legacy_zip("Tab_3")
 
     @pytest.mark.asyncio
     async def test_download_url_format(self):
@@ -189,11 +189,37 @@ class TestFtpClientDownload:
             mock_cls.return_value.__aenter__ = AsyncMock(return_value=mock_http)
             mock_cls.return_value.__aexit__ = AsyncMock(return_value=False)
 
-            await ftp_client.download_legacy_zip("Tab_6Mn", uf_dir="Minas_Gerais")
+            await ftp_client.download_legacy_zip("Tab_6", uf_dir="Minas_Gerais")
 
             mock_http.get.assert_called_once()
             captured_url = mock_http.get.call_args[0][0]
             assert "Minas_Gerais/Tab_6Mn.zip" in captured_url
+
+    @pytest.mark.asyncio
+    async def test_download_brasil_url_no_mn_suffix(self):
+        fake_zip = _build_fake_zip(b"x" * 600)
+        mock_response = MagicMock()
+        mock_response.content = fake_zip
+        mock_response.raise_for_status = MagicMock()
+
+        async def fake_retry(func, **_kwargs):
+            await func()
+            return mock_response
+
+        with (
+            patch("agrobr.ibge.ftp_client.retry_on_status", side_effect=fake_retry),
+            patch("agrobr.ibge.ftp_client.httpx.AsyncClient") as mock_cls,
+        ):
+            mock_http = AsyncMock()
+            mock_cls.return_value.__aenter__ = AsyncMock(return_value=mock_http)
+            mock_cls.return_value.__aexit__ = AsyncMock(return_value=False)
+
+            await ftp_client.download_legacy_zip("Tab_3", uf_dir="Brasil")
+
+            mock_http.get.assert_called_once()
+            captured_url = mock_http.get.call_args[0][0]
+            assert "Brasil/Tab_3.zip" in captured_url
+            assert "Mn" not in captured_url
 
 
 class TestExtractXlsFromZip:

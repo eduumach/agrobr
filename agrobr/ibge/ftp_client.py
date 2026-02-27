@@ -15,12 +15,12 @@ logger = structlog.get_logger()
 FTP_BASE = "https://ftp.ibge.gov.br/Censo_Agropecuario/Censo_Agropecuario_1995_96"
 
 LEGACY_TEMAS: dict[str, str] = {
-    "tecnologia": "Tab_3Mn",
-    "pessoal_ocupado": "Tab_6Mn",
-    "maquinas": "Tab_7Mn",
-    "producao_animal": "Tab_9Mn",
-    "valor_producao": "Tab_10Mn",
-    "financeiro": "Tab_11Mn",
+    "tecnologia": "Tab_3",
+    "pessoal_ocupado": "Tab_6",
+    "maquinas": "Tab_7",
+    "producao_animal": "Tab_9",
+    "valor_producao": "Tab_10",
+    "financeiro": "Tab_11",
 }
 
 UF_DIRS: dict[str, str] = {
@@ -64,7 +64,8 @@ TIMEOUT = httpx.Timeout(
 
 
 async def download_legacy_zip(filename: str, uf_dir: str = "Brasil") -> bytes:
-    url = f"{FTP_BASE}/{uf_dir}/{filename}.zip"
+    suffix = "Mn" if uf_dir != "Brasil" else ""
+    url = f"{FTP_BASE}/{uf_dir}/{filename}{suffix}.zip"
     logger.info("ibge_legacy_download", url=url)
 
     async with httpx.AsyncClient(

@@ -36,6 +36,16 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
   Warning de download pesado via structlog
 
 ### Fixed
+- **Censo Agro Legado FTP 404 no nivel Brasil** (#16) — `LEGACY_TEMAS` guardava nomes
+  com sufixo `Mn` (ex: `Tab_3Mn`), mas o diretorio `Brasil/` no FTP do IBGE so tem
+  arquivos sem sufixo (`Tab_3.zip`). Fix: guardar nome base e adicionar `Mn`
+  condicionalmente apenas para diretorios de UF
+- **Censo Agro 2006 subcategorias perdidas** (#16) — `_parse_censo_raw()` colidia
+  quando SIDRA retorna classificacao em D2 e variavel em D3: o `cat_idx=3` sobrescrevia
+  a coluna ja reivindicada como `variavel_cod`, mapeando o nome da variavel como
+  categoria e ignorando as subcategorias reais. Fix: deteccao de conflito no `cat_idx`
+  com fallback para primeira coluna Dx nao reivindicada. Afeta todos os 6 temas 2006
+  (preparo_solo, adubacao, calagem, agrotoxicos, praticas_agricolas, irrigacao)
 - **PAM/PPM/Censo Agro municipal — fix SIDRA request** — corrige erro "Unidade territorial
   inexistente" ao usar `nivel='municipio'` com filtro de UF. SIDRA espera notacao
   `in N3 {uf_code}` para filtrar municipios por estado, nao o codigo da UF direto.

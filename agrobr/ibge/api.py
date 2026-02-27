@@ -921,9 +921,16 @@ def _parse_censo_raw(
     if cat_idx:
         cat_col_c = f"D{cat_idx}C"
         cat_col_n = f"D{cat_idx}N"
-        if cat_col_c in df.columns:
+        if cat_col_c in col_map:
+            for i in range(2, 7):
+                alt_c = f"D{i}C"
+                if alt_c in df.columns and alt_c not in col_map:
+                    cat_col_c = alt_c
+                    cat_col_n = f"D{i}N"
+                    break
+        if cat_col_c in df.columns and cat_col_c not in col_map:
             col_map[cat_col_c] = "categoria_cod"
-        if cat_col_n in df.columns:
+        if cat_col_n in df.columns and cat_col_n not in col_map:
             col_map[cat_col_n] = "categoria"
 
     rename_map = {k: v for k, v in col_map.items() if k in df.columns}

@@ -301,6 +301,57 @@ def _build_mock_preparo_solo_2006(n_ufs=3):
     return pd.DataFrame(rows)
 
 
+def _build_mock_preparo_solo_2006_reversed(n_ufs=3):
+    rows = []
+    ufs = [("35", "São Paulo"), ("51", "Mato Grosso"), ("52", "Goiás")][:n_ufs]
+    categorias = [
+        ("113223", "Aração e/ou gradagem (cultivo convencional)"),
+        ("113224", "Cultivo mínimo"),
+        ("114631", "Plantio direto na palha"),
+    ]
+    for cod_uf, nome_uf in ufs:
+        for cod_cat, nome_cat in categorias:
+            rows.append(
+                {
+                    "NC": "3",
+                    "NN": "Unidade da Federação",
+                    "MC": "1020",
+                    "MN": "Unidades",
+                    "V": str(8000 + int(cod_uf)),
+                    "D1C": cod_uf,
+                    "D1N": nome_uf,
+                    "D2C": cod_cat,
+                    "D2N": nome_cat,
+                    "D3C": "183",
+                    "D3N": "Número de estabelecimentos agropecuários",
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _build_mock_classif_2006_reversed(categorias, n_ufs=2):
+    rows = []
+    ufs = [("35", "São Paulo"), ("51", "Mato Grosso")][:n_ufs]
+    for cod_uf, nome_uf in ufs:
+        for cod_cat, nome_cat in categorias:
+            rows.append(
+                {
+                    "NC": "3",
+                    "NN": "Unidade da Federação",
+                    "MC": "1020",
+                    "MN": "Unidades",
+                    "V": str(3000 + int(cod_uf)),
+                    "D1C": cod_uf,
+                    "D1N": nome_uf,
+                    "D2C": cod_cat,
+                    "D2N": nome_cat,
+                    "D3C": "183",
+                    "D3N": "Número de estabelecimentos agropecuários",
+                }
+            )
+    return pd.DataFrame(rows)
+
+
 def _build_mock_preparo_solo_2017(n_ufs=3):
     rows = []
     ufs = [("35", "São Paulo"), ("51", "Mato Grosso"), ("52", "Goiás")][:n_ufs]
@@ -1038,6 +1089,8 @@ class TestCensoAgroNewThemesMocked:
             assert len(df) > 0
             assert (df["tema"] == "adubacao").all()
             assert (df["ano"] == 2006).all()
+            categorias = set(df["categoria"].unique())
+            assert "Usam adubação" in categorias
 
     @pytest.mark.asyncio
     async def test_adubacao_2017(self):
@@ -1060,6 +1113,8 @@ class TestCensoAgroNewThemesMocked:
             assert isinstance(df, pd.DataFrame)
             assert len(df) > 0
             assert (df["tema"] == "calagem").all()
+            categorias = set(df["categoria"].unique())
+            assert "Fez no ano" in categorias
 
     @pytest.mark.asyncio
     async def test_calagem_2017(self):
@@ -1082,6 +1137,8 @@ class TestCensoAgroNewThemesMocked:
             assert isinstance(df, pd.DataFrame)
             assert len(df) > 0
             assert (df["tema"] == "agrotoxicos").all()
+            categorias = set(df["categoria"].unique())
+            assert "Utilizou" in categorias
 
     @pytest.mark.asyncio
     async def test_agrotoxicos_2017(self):
@@ -1171,6 +1228,80 @@ class TestCensoAgroNewThemesMocked:
             mock.return_value = _build_mock_calagem_2017()
             df = await censo_agro("calagem", ano=2017)
             assert df["localidade_cod"].dtype == "Int64"
+
+
+class TestCensoAgro2006ReversedColumns:
+    @pytest.mark.asyncio
+    async def test_preparo_solo_2006_reversed_has_subcategorias(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_preparo_solo_2006_reversed()
+            df = await censo_agro("preparo_solo", ano=2006)
+            assert len(df) > 0
+            categorias = set(df["categoria"].unique())
+            assert "Plantio direto na palha" in categorias
+            assert "Cultivo mínimo" in categorias
+            assert "Número de estabelecimentos agropecuários" not in categorias
+
+    @pytest.mark.asyncio
+    async def test_preparo_solo_2006_reversed_variavel_ok(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_preparo_solo_2006_reversed()
+            df = await censo_agro("preparo_solo", ano=2006)
+            assert (df["variavel"] == "estabelecimentos").all()
+
+    @pytest.mark.asyncio
+    async def test_preparo_solo_2006_reversed_no_duplicate_pk(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_preparo_solo_2006_reversed()
+            df = await censo_agro("preparo_solo", ano=2006)
+            pk = ["ano", "tema", "categoria", "variavel", "localidade"]
+            dupes = df.duplicated(subset=pk, keep=False)
+            assert not dupes.any(), f"Duplicate PKs found:\n{df[dupes]}"
+
+    @pytest.mark.asyncio
+    async def test_adubacao_2006_reversed_has_subcategorias(self):
+        from agrobr.ibge.api import censo_agro
+
+        reversed_data = _build_mock_classif_2006_reversed(
+            [("113227", "Usam adubação"), ("113228", "Químico nitrogenado")]
+        )
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = reversed_data
+            df = await censo_agro("adubacao", ano=2006)
+            categorias = set(df["categoria"].unique())
+            assert "Usam adubação" in categorias
+            assert "Número de estabelecimentos agropecuários" not in categorias
+
+    @pytest.mark.asyncio
+    async def test_irrigacao_2006_reversed_has_subcategorias(self):
+        from agrobr.ibge.api import censo_agro
+
+        reversed_data = _build_mock_classif_2006_reversed(
+            [("113515", "Inundação"), ("113517", "Pivô central")]
+        )
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = reversed_data
+            df = await censo_agro("irrigacao", ano=2006)
+            categorias = set(df["categoria"].unique())
+            assert "Pivô central" in categorias
+            assert "Número de estabelecimentos agropecuários" not in categorias
+
+    @pytest.mark.asyncio
+    async def test_original_order_still_works(self):
+        from agrobr.ibge.api import censo_agro
+
+        with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
+            mock.return_value = _build_mock_preparo_solo_2006()
+            df = await censo_agro("preparo_solo", ano=2006)
+            categorias = set(df["categoria"].unique())
+            assert "Plantio direto na palha" in categorias
+            assert "Cultivo mínimo" in categorias
 
 
 class TestCensoAgroRetrocompat:
