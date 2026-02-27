@@ -67,6 +67,18 @@
 - **Temas**: 9 temas com serie historica longa
 - **Quirks**: Aves em mil cabecas (tab 281), unidades mistas por categoria (tabs 282/283/1730/1731), classificacoes sem Total (tabs 281/282/283/1730/1731)
 
+### Censo Agropecuario 1985 — Dados Municipais (PDFs OCR)
+
+- **Fonte**: PDFs estaduais da Biblioteca IBGE
+- **Formato**: CSVs extraidos via OCR hibrida (PyMuPDF coords + correcao OCR)
+- **Cobertura**: 22 UFs, ate municipio (mesorregiao, microrregiao, municipio)
+- **Frequencia**: Unica (Censo 1985)
+- **Temas**: 53 temas (propriedade, uso da terra, pessoal, mecanizacao, pecuaria, lavouras, producao)
+- **UFs excluidas**: MA, PI, CE, RN (PDFs sem camada OCR)
+- **Acesso**: Dados bundled no pacote (agrobr/data/censo_1985/)
+- **Qualidade**: campo `confianca` (alta/media/baixa), 77.9% cross-validation estadual↔nacional
+- **URL catalogo**: https://biblioteca.ibge.gov.br/index.php/biblioteca-catalogo?view=detalhes&id=768
+
 ### Censo Agropecuario 1995/96 — Temas Legados (FTP)
 
 - **Fonte**: FTP IBGE (`ftp.ibge.gov.br`)

@@ -357,6 +357,52 @@ def ibge_temas_historico() -> None:
         typer.echo(f"  - {tema}")
 
 
+@ibge_app.command("censo-municipal-1985")  # type: ignore[misc, untyped-decorator]
+def ibge_censo_municipal_1985(
+    tema: str = typer.Argument(..., help="Tema (propriedade_terras, condicao_produtor, etc)"),
+    uf: str | None = typer.Option(None, "--uf", "-u", help="Filtrar por UF"),
+    nivel: str | None = typer.Option(
+        None, "--nivel", "-n", help="Nivel: total, mesorregiao, microrregiao, municipio"
+    ),
+    formato: str = typer.Option("table", "--formato", "-o", help="Formato: table, csv, json"),
+) -> None:
+    import asyncio
+
+    from agrobr import ibge
+
+    typer.echo(f"Consultando censo municipal 1985: {tema}...")
+
+    try:
+        df = asyncio.run(ibge.censo_agro_municipal_1985(tema, uf=uf, nivel=nivel))
+
+        if df.empty:
+            typer.echo("Nenhum dado encontrado")
+            return
+
+        if formato == "json":
+            typer.echo(df.to_json(orient="records", indent=2))
+        elif formato == "csv":
+            typer.echo(df.to_csv(index=False))
+        else:
+            typer.echo(df.to_string(index=False))
+
+    except Exception as e:
+        typer.echo(f"Erro: {e}", err=True)
+        raise typer.Exit(1) from None
+
+
+@ibge_app.command("temas-municipal-1985")  # type: ignore[misc, untyped-decorator]
+def ibge_temas_municipal_1985() -> None:
+    import asyncio
+
+    from agrobr import ibge
+
+    temas = asyncio.run(ibge.temas_censo_agro_municipal_1985())
+    typer.echo("Temas disponiveis no Censo Agropecuario Municipal 1985:")
+    for tema in temas:
+        typer.echo(f"  - {tema}")
+
+
 @ibge_app.command("produtos")  # type: ignore[misc, untyped-decorator]
 def ibge_produtos(
     pesquisa: str = typer.Option("pam", "--pesquisa", "-p", help="Pesquisa: pam ou lspa"),

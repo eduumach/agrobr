@@ -1,0 +1,212 @@
+{
+  "name": "ibge.censo_agro_municipal_1985",
+  "schema_version": "1.0",
+  "effective_from": "0.12.0",
+  "breaking_policy": "major",
+  "primary_key": [],
+  "required_columns": [
+    "ano",
+    "uf",
+    "uf_cod",
+    "localidade",
+    "nivel",
+    "tema",
+    "categoria",
+    "variavel",
+    "unidade",
+    "confianca",
+    "fonte"
+  ],
+  "dtypes": {
+    "ano": "int",
+    "uf": "str",
+    "uf_cod": "int",
+    "localidade": "str",
+    "localidade_cod": "int",
+    "nivel": "str",
+    "tema": "str",
+    "categoria": "str",
+    "variavel": "str",
+    "valor": "float",
+    "unidade": "str",
+    "confianca": "str",
+    "fonte": "str"
+  },
+  "nullable": {
+    "ano": false,
+    "uf": false,
+    "uf_cod": false,
+    "localidade": false,
+    "localidade_cod": true,
+    "nivel": false,
+    "tema": false,
+    "categoria": false,
+    "variavel": false,
+    "valor": true,
+    "unidade": false,
+    "confianca": false,
+    "fonte": false
+  },
+  "columns": [
+    {
+      "name": "ano",
+      "type": "int",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": 1985,
+      "max_value": 1985
+    },
+    {
+      "name": "uf",
+      "type": "str",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    },
+    {
+      "name": "uf_cod",
+      "type": "int",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": 11,
+      "max_value": 53
+    },
+    {
+      "name": "localidade",
+      "type": "str",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    },
+    {
+      "name": "localidade_cod",
+      "type": "int",
+      "nullable": true,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    },
+    {
+      "name": "nivel",
+      "type": "str",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    },
+    {
+      "name": "tema",
+      "type": "str",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    },
+    {
+      "name": "categoria",
+      "type": "str",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    },
+    {
+      "name": "variavel",
+      "type": "str",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    },
+    {
+      "name": "valor",
+      "type": "float",
+      "nullable": true,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": 0,
+      "max_value": null
+    },
+    {
+      "name": "unidade",
+      "type": "str",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    },
+    {
+      "name": "confianca",
+      "type": "str",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    },
+    {
+      "name": "fonte",
+      "type": "str",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    }
+  ],
+  "constraints": {
+    "ano_min": 1985,
+    "ano_max": 1985,
+    "uf_cod_min": 11,
+    "uf_cod_max": 53,
+    "valor_min": 0
+  },
+  "guarantees": [
+    "Column names never change (additions only)",
+    "'ano' is always 1985",
+    "Numeric values are always >= 0",
+    "'fonte' is always 'ibge_censo_agro_municipal_1985'",
+    "Dados extraídos via OCR de PDFs do IBGE — 22 UFs (excluídos MA/PI/CE/RN)",
+    "'confianca' indica qualidade OCR: alta, media ou baixa",
+    "'localidade_cod' pode ser None quando OCR não permite match exato",
+    "PK vazio: OCR pode gerar labels homônimos (ex: 3 'Santo Antônio' em MG)"
+  ]
+}

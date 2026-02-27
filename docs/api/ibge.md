@@ -556,6 +556,72 @@ agrobr ibge temas-historico
 
 ---
 
+### `censo_agro_municipal_1985`
+
+Obtém dados do Censo Agropecuário 1985 a nível municipal (extraídos via OCR de PDFs IBGE).
+
+```python
+async def censo_agro_municipal_1985(
+    tema: str,
+    *,
+    uf: str | None = None,
+    nivel: str | None = None,
+    return_meta: bool = False,
+) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]
+```
+
+**Parâmetros:**
+
+| Parâmetro | Tipo | Descrição |
+|-----------|------|-----------|
+| `tema` | `str` | Tema (53 disponíveis — use `temas_censo_agro_municipal_1985()`) |
+| `uf` | `str \| None` | Filtrar por UF (22 UFs disponíveis) |
+| `nivel` | `str \| None` | Filtrar: total, mesorregiao, microrregiao, municipio |
+| `return_meta` | `bool` | Retornar MetaInfo |
+
+**Exemplo:**
+
+```python
+from agrobr import ibge
+
+# Propriedade de terras em São Paulo
+df = await ibge.censo_agro_municipal_1985('propriedade_terras', uf='SP')
+
+# Apenas municípios
+df = await ibge.censo_agro_municipal_1985('bovinos', nivel='municipio')
+
+# Com metadados
+df, meta = await ibge.censo_agro_municipal_1985('propriedade_terras', return_meta=True)
+```
+
+---
+
+### `temas_censo_agro_municipal_1985`
+
+Lista temas disponíveis no Censo Agropecuário Municipal 1985.
+
+```python
+async def temas_censo_agro_municipal_1985() -> list[str]
+```
+
+#### CLI
+
+```bash
+# Dados de propriedade de terras em SP
+agrobr ibge censo-municipal-1985 propriedade_terras --uf SP
+
+# Formato CSV
+agrobr ibge censo-municipal-1985 bovinos --formato csv
+
+# Filtrar por nível
+agrobr ibge censo-municipal-1985 uso_terra_lavoura --nivel municipio --uf MG
+
+# Listar temas disponíveis
+agrobr ibge temas-municipal-1985
+```
+
+---
+
 ### `ufs`
 
 Lista UFs disponíveis.
@@ -566,15 +632,15 @@ async def ufs() -> list[str]
 
 ---
 
-## Diferenças PAM vs LSPA vs PPM vs Abate vs Censo Agro vs Série Histórica
+## Diferenças PAM vs LSPA vs PPM vs Abate vs Censo Agro vs Série Histórica vs Municipal 1985
 
-| Aspecto | PAM | LSPA | PPM | Abate | Censo Agro | Censo Agro Legado | Série Histórica |
-|---------|-----|------|-----|-------|------------|-------------------|-----------------|
-| Frequência | Anual | Mensal | Anual | Trimestral | Decenial | Única (1995/96) | Decenial |
-| Granularidade | Até município | Até UF | Até município | Brasil + UF | Até município | Até município | Brasil/Região/UF |
-| Tipo | Consolidados | Estimativas | Consolidados | Consolidados | Censitários | Censitários (FTP) | Censitários |
-| Disponibilidade | T+1 ano | T+1 mês | T+1 ano | T+2 meses | Pós-censo | Estático | Estático |
-| Escopo | Lavouras | Lavouras | Pecuária | Abate | Estrutura agro | 6 temas legados | 9 temas (1920-2006) |
+| Aspecto | PAM | LSPA | PPM | Abate | Censo Agro | Censo Legado | Série Histórica | Municipal 1985 |
+|---------|-----|------|-----|-------|------------|--------------|-----------------|----------------|
+| Frequência | Anual | Mensal | Anual | Trimestral | Decenial | Única (1995/96) | Decenial | Única (1985) |
+| Granularidade | Até município | Até UF | Até município | Brasil + UF | Até município | Até município | Brasil/Região/UF | Até município |
+| Tipo | Consolidados | Estimativas | Consolidados | Consolidados | Censitários | Censitários (FTP) | Censitários | Censitários (OCR) |
+| Disponibilidade | T+1 ano | T+1 mês | T+1 ano | T+2 meses | Pós-censo | Estático | Estático | Estático |
+| Escopo | Lavouras | Lavouras | Pecuária | Abate | Estrutura agro | 6 temas legados | 9 temas (1920-2006) | 53 temas (1985) |
 
 ## Tabelas SIDRA Utilizadas
 
@@ -638,3 +704,4 @@ df = ibge.censo_agro_legado('pessoal_ocupado', uf='SP')
 - Censo Agropecuário: 10 temas, dados de 1995, 2006 e/ou 2017 conforme disponibilidade. Referência 2017: out/2016 a set/2017. Cache 30 dias
 - Censo Agropecuário Legado: 6 temas FTP (tecnologia, pessoal_ocupado, maquinas, producao_animal, valor_producao, financeiro). Ano fixo 1995. Cache 90 dias
 - Série Histórica: 9 temas, 1920-2006, até UF (municipal NÃO disponível). Unidades mistas por categoria (Aves=Mil cabeças, etc). Cache 30 dias
+- Censo Municipal 1985: 53 temas, dados municipais de 22 UFs, extraídos via OCR de PDFs estaduais do IBGE. Dados estáticos (bundled). Campo `confianca` indica qualidade OCR

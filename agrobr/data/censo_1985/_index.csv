@@ -1,0 +1,54 @@
+﻿table_num;tema;ufs;rows;municipios;data_cols;colunas;alta;media;baixa
+67;propriedade_terras;18;2877;1519;6;estab_total, area_ha_total, estab_individual, area_ha_individual, estab_soc_condominio, area_ha_soc_condominio;235;938;1704
+68;condicao_legal_terras;20;2028;1441;6;val_1, val_2, val_3, val_4, val_5, val_6;205;1447;376
+69;classe_atividade_economica;21;2734;1638;6;val_1, val_2, val_3, val_4, val_5, val_6;237;1634;863
+70;condicao_produtor;21;3281;2520;8;estab_proprietario, area_ha_proprietario, estab_arrendatario, area_ha_arrendatario, estab_parceiro, area_ha_parceiro, estab_ocupante, area_ha_ocupante;256;2673;352
+71;residencia_produtor;21;3460;2548;8;val_1, val_2, val_3, val_4, val_5, val_6, val_7, val_8;196;3104;160
+72;forma_administracao;21;3498;2374;6;val_1, val_2, val_3, val_4, val_5, val_6;362;2830;306
+73;cooperativas;21;3215;2732;6;val_1, val_2, val_3, val_4, val_5, val_6;99;2359;757
+74;servicos_empreitada;20;3160;2480;8;val_1, val_2, val_3, val_4, val_5, val_6, val_7, val_8;394;2278;488
+75;uso_forca_trabalho;19;2681;2129;7;estab_total, inform_forca_total, inform_animal, inform_mecanica, inform_propria, inform_alugada, inform_outra_sem_decl;494;2121;66
+76;assistencia_tecnica;21;3441;2664;7;val_1, val_2, val_3, val_4, val_5, val_6, val_7;198;2629;614
+77;fertilizantes_defensivos;20;3081;2023;8;val_1, val_2, val_3, val_4, val_5, val_6, val_7, val_8;284;2513;284
+78;conservacao_solo;20;3267;2582;5;val_1, val_2, val_3, val_4, val_5;147;2529;591
+79;irrigacao;20;3243;2533;8;val_1, val_2, val_3, val_4, val_5, val_6, val_7, val_8;34;633;2576
+80;inseminacao_ordenha;12;2631;2168;3;val_1, val_2, val_3;5;257;2369
+81;terras_fora_area;18;3026;2528;5;val_1, val_2, val_3, val_4, val_5;55;1159;1812
+82;parcelas;18;2332;1287;8;val_1, val_2, val_3, val_4, val_5, val_6, val_7, val_8;125;1854;353
+83;terras_proprias_terceiros;17;2290;1315;7;val_1, val_2, val_3, val_4, val_5, val_6, val_7;274;1832;184
+84;grupos_area_total;21;5549;4092;6;estab_total, area_ha_total, estab_menos_1ha, area_ha_menos_1ha, estab_1_a_2ha, area_ha_1_a_2ha;100;2054;3395
+85;grupos_area_complemento;13;2023;1704;5;val_1, val_2, val_3, val_4, val_5;145;1124;754
+86;utilizacao_terras;20;2726;1708;7;estab_total, area_ha_total, inform_lav_permanente, area_ha_lav_permanente, inform_lav_temporaria, area_ha_lav_temporaria, inform_lav_temp_descanso;114;1145;1467
+87;pessoal_ocupado;17;4411;3381;5;val_1, val_2, val_3, val_4, val_5;102;3716;593
+88;grupos_pessoal_ocupado;20;2630;2148;6;estab_total, num_pessoas_total, estab_menos_5, num_pessoas_menos_5, estab_5_a_10, num_pessoas_5_a_10;247;1482;901
+89;silos_armazenamento;20;2189;1763;6;val_1, val_2, val_3, val_4, val_5, val_6;431;1503;255
+90;maquinas_instrumentos;19;2715;2183;7;val_1, val_2, val_3, val_4, val_5, val_6, val_7;34;335;2346
+91;meios_transporte;20;3320;2371;9;val_1, val_2, val_3, val_4, val_5, val_6, val_7, val_8, val_9;263;3057;0
+92;energia_eletrica;21;6481;4649;7;val_1, val_2, val_3, val_4, val_5, val_6, val_7;144;2741;3596
+93;bens_despesas;20;3330;2447;11;val_1, val_2, val_3, val_4, val_5, val_6, val_7, val_8, val_9, val_10, val_11;189;1378;1763
+94;investimentos;21;7103;4756;8;val_1, val_2, val_3, val_4, val_5, val_6, val_7, val_8;58;1930;5115
+95;valor_bens_invest_financ;20;3314;2482;6;inform_bens, valor_bens_mil_cr, inform_investimentos, valor_investimentos_mil_cr, inform_financiamentos, valor_financiamentos_mil_cr;494;2487;333
+96;despesas;20;3277;2220;6;val_1, val_2, val_3, val_4, val_5, val_6;709;2568;0
+97;efetivo_bubalinos_machos;21;3318;2481;6;val_1, val_2, val_3, val_4, val_5, val_6;279;2973;66
+98;efetivo_bubalinos_femeas;14;2073;1764;6;val_1, val_2, val_3, val_4, val_5, val_6;192;1431;450
+99;efetivo_equinos;21;3177;2708;5;efetivo_total, nascidos, vitimados, comprados, vendidos;498;2274;405
+100;efetivo_asininos;10;1503;1262;5;efetivo_total, nascidos, vitimados, comprados, vendidos;0;579;924
+101;efetivo_muares;17;2865;2389;5;efetivo_total, nascidos, vitimados, comprados, vendidos;100;475;2290
+102;efetivo_bovinos;21;3277;2348;6;val_1, val_2, val_3, val_4, val_5, val_6;537;2740;0
+103;efetivo_suinos;18;3209;2739;6;val_1, val_2, val_3, val_4, val_5, val_6;290;2192;727
+104;efetivo_caprinos;20;2977;2318;6;val_1, val_2, val_3, val_4, val_5, val_6;126;1172;1679
+105;efetivo_coelhos;5;1603;1421;6;val_1, val_2, val_3, val_4, val_5, val_6;0;1603;0
+106;efetivo_ovinos;17;2471;1596;6;val_1, val_2, val_3, val_4, val_5, val_6;516;1955;0
+107;efetivo_aves;21;3545;2403;5;efetivo_total, nascidos, vitimados, comprados, vendidos;542;2827;176
+108;producao_leite_ovos;19;3403;1977;7;val_1, val_2, val_3, val_4, val_5, val_6, val_7;46;2109;1248
+109;producao_la_mel;20;3650;1589;5;val_1, val_2, val_3, val_4, val_5;9;2139;1502
+110;producao_animal_cont;9;2065;1200;3;val_1, val_2, val_3;0;774;1291
+111;colheita_lav_temporaria;20;21422;14507;6;inform_1safra, qtde_1safra, area_ha_1safra, inform_2safra, qtde_2safra, area_ha_2safra;221;19523;1678
+112;lavoura_permanente;20;16839;10625;8;val_1, val_2, val_3, val_4, val_5, val_6, val_7, val_8;345;9742;6752
+113;horticultura;20;6189;3589;6;val_1, val_2, val_3, val_4, val_5, val_6;67;1948;4174
+114;produtos_extrativos;20;4897;3294;6;val_1, val_2, val_3, val_4, val_5, val_6;140;2420;2337
+115;silvicultura;8;745;373;6;val_1, val_2, val_3, val_4, val_5, val_6;0;439;306
+116;silvicultura_cont;7;1184;888;4;val_1, val_2, val_3, val_4;29;1155;0
+117;transformacao_beneficiamento;15;3617;2547;6;val_1, val_2, val_3, val_4, val_5, val_6;67;2548;1002
+118;transformacao_cont;14;1097;586;8;val_1, val_2, val_3, val_4, val_5, val_6, val_7, val_8;11;365;721
+119;producao_particular;21;3497;1375;6;val_1, val_2, val_3, val_4, val_5, val_6;137;989;2371

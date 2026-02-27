@@ -34,6 +34,7 @@ Validação é automática: todo `fetch()` de dataset valida o DataFrame contra 
 | [censo_agropecuario](./censo_agropecuario.md) | Censo Agropecuário 1995/2006/2017 (10 temas) | IBGE Censo Agro |
 | [censo_agropecuario_legado](./censo_agropecuario_legado.md) | Censo Agropecuário 1995/96 — 6 temas legados (FTP) | IBGE FTP |
 | [censo_agropecuario_historico](./censo_agropecuario_historico.md) | Série histórica Censo Agropecuário 1920-2006 (9 temas, até UF) | IBGE SIDRA |
+| [censo_agropecuario_municipal_1985](./censo_agropecuario_municipal_1985.md) | Censo 1985 municipal — 53 temas via OCR de PDFs (22 UFs) | IBGE PDFs |
 | [cadastro_rural](./cadastro_rural.md) | Cadastro Ambiental Rural | SICAR |
 
 ## Schemas JSON

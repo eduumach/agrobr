@@ -8,6 +8,18 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Unreleased]
 
 ### Added
+- **Censo Agropecuario Municipal 1985 — Fase 7 completa: core + integracao** (#17) —
+  dados municipais do Censo 1985 extraidos via OCR de PDFs do IBGE. 53 CSVs bundled no
+  pacote (`agrobr/data/censo_1985/`), modulo `agrobr/ibge/censo_municipal_1985.py` com
+  API async (`censo_agro_municipal_1985()`, `temas_censo_agro_municipal_1985()`),
+  constantes (53 temas, tab 67-119), loader CSV com melt wide→long, resolucao de
+  `localidade_cod` via `municipio_para_ibge()`, unidade por prefixo semantico. Contrato
+  `IBGE_CENSO_AGRO_MUNICIPAL_V1` (13 colunas, PK vazio — labels OCR homonimos,
+  effective_from 0.12.0). Dataset `censo_agropecuario_municipal_1985` no registry com
+  fallback automatico. CLI: `agrobr ibge censo-municipal-1985 <tema>` (--uf, --nivel,
+  --formato) e `agrobr ibge temas-municipal-1985`. Schema JSON gerado. 63 testes
+  (constantes, index, CSV, unidade, data dir, contrato, validacao, parsing, dataset, CLI).
+  22 UFs cobertas (MA/PI/CE/RN excluidas — sem OCR). Docs completos
 - **Censo Agropecuario Serie Historica — Bloco 4: CLI e integracao final** (#17) — comandos
   `agrobr ibge censo-historico <tema>` (com `--ano`, `--uf`, `--nivel`, `--formato`) e
   `agrobr ibge temas-historico`. Sync wrapper via `agrobr.sync.ibge` funciona automaticamente

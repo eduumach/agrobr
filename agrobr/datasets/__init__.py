@@ -6,6 +6,7 @@ from agrobr.datasets.cadastro_rural import cadastro_rural
 from agrobr.datasets.censo_agropecuario import censo_agropecuario
 from agrobr.datasets.censo_agropecuario_historico import censo_agropecuario_historico
 from agrobr.datasets.censo_agropecuario_legado import censo_agropecuario_legado
+from agrobr.datasets.censo_agropecuario_municipal_1985 import censo_agropecuario_municipal_1985
 from agrobr.datasets.credito_rural import credito_rural
 from agrobr.datasets.custo_producao import custo_producao
 from agrobr.datasets.deterministic import deterministic, get_snapshot, is_deterministic
@@ -31,6 +32,7 @@ __all__ = [
     "censo_agropecuario",
     "censo_agropecuario_historico",
     "censo_agropecuario_legado",
+    "censo_agropecuario_municipal_1985",
     "credito_rural",
     "custo_producao",
     "describe",

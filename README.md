@@ -124,6 +124,10 @@ async def main():
     df = await ibge.censo_agro_historico('efetivo_animais', uf='SP')
     df = await ibge.censo_agro_historico('uso_terra', nivel='brasil')
 
+    # Censo Agropecuário 1985 — dados municipais (53 temas, 22 UFs, OCR de PDFs)
+    df = await ibge.censo_agro_municipal_1985('propriedade_terras', uf='SP')
+    df = await ibge.censo_agro_municipal_1985('bovinos', nivel='municipio')
+
     # Múltiplos anos
     df = await ibge.pam('milho', ano=[2020, 2021, 2022, 2023])
 ```
@@ -462,6 +466,7 @@ Use `agrobr health --all` para verificar localmente.
 | `censo_agropecuario` | Censo Agropecuário 1995/2006/2017 (10 temas: rebanho, uso terra, lavouras, manejo solo, irrigação) | IBGE Censo Agro |
 | `censo_agropecuario_legado` | Censo 1995/96 — 6 temas legados (FTP) | IBGE FTP |
 | `censo_agropecuario_historico` | Série histórica Censo Agropecuário 1920-2006 (9 temas, até UF) | IBGE SIDRA |
+| `censo_agropecuario_municipal_1985` | Censo 1985 municipal — 53 temas via OCR (22 UFs) | IBGE PDFs |
 
 ## Fontes Suportadas
 
