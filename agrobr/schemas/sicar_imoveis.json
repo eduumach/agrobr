@@ -9,7 +9,6 @@
   "required_columns": [
     "cod_imovel",
     "status",
-    "data_criacao",
     "area_ha",
     "uf",
     "municipio",
@@ -33,7 +32,7 @@
   "nullable": {
     "cod_imovel": false,
     "status": false,
-    "data_criacao": false,
+    "data_criacao": true,
     "data_atualizacao": true,
     "area_ha": false,
     "condicao": true,
@@ -69,7 +68,7 @@
     {
       "name": "data_criacao",
       "type": "datetime",
-      "nullable": false,
+      "nullable": true,
       "unit": null,
       "stable": true,
       "deprecated": false,

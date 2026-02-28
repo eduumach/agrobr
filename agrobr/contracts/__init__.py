@@ -52,6 +52,13 @@ class Column:
                 except Exception:
                     errors.append(f"Column '{self.name}' cannot be converted to date")
 
+        elif self.type == ColumnType.DATETIME:
+            if not pd.api.types.is_datetime64_any_dtype(series):
+                try:
+                    pd.to_datetime(series.dropna())
+                except Exception:
+                    errors.append(f"Column '{self.name}' cannot be converted to datetime")
+
         elif self.type == ColumnType.INTEGER:
             if not pd.api.types.is_integer_dtype(series):
                 non_null = series.dropna()
@@ -246,6 +253,20 @@ class Contract:
 
 
 _CONTRACT_REGISTRY: dict[str, Contract] = {}
+_CONTRACTS_DISCOVERED = False
+
+
+def _auto_discover_contracts() -> None:
+    global _CONTRACTS_DISCOVERED
+    if _CONTRACTS_DISCOVERED:
+        return
+    _CONTRACTS_DISCOVERED = True
+
+    import importlib
+    import pkgutil
+
+    for info in pkgutil.iter_modules(__path__, __name__ + "."):
+        importlib.import_module(info.name)
 
 
 def register_contract(dataset_name: str, contract: Contract) -> None:
@@ -294,7 +315,7 @@ def generate_json_schemas(output_dir: str) -> list[str]:
     for dataset_name in sorted(_CONTRACT_REGISTRY):
         contract = _CONTRACT_REGISTRY[dataset_name]
         filepath = path / f"{dataset_name}.json"
-        filepath.write_text(contract.to_json(), encoding="utf-8")
+        filepath.write_text(contract.to_json() + "\n", encoding="utf-8")
         generated.append(str(filepath))
 
     return generated
@@ -305,6 +326,7 @@ __all__ = [
     "Column",
     "ColumnType",
     "Contract",
+    "_auto_discover_contracts",
     "generate_json_schemas",
     "get_contract",
     "has_contract",

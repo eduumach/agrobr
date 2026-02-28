@@ -39,6 +39,15 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
   RateLimiter, HistoryManager e todas as flags `_WARNED` (6 módulos) entre testes.
   Elimina poluição de estado entre testes e garante isolamento correto
 - **HistoryManager** — adicionada `reset_history_manager()` para permitir reset do singleton
+- **Contracts DATETIME** — `Column.validate()` agora valida colunas DATETIME (antes caiam
+  no fallthrough sem type-check). Afeta 2 colunas SICAR (`data_criacao`, `data_atualizacao`)
+- **Contracts auto-discovery** — side-effect imports em `datasets/base.py` substituídos por
+  `_auto_discover_contracts()` via `pkgutil`. Descobre automaticamente novos módulos de
+  contratos sem precisar editar lista manual
+- **IBGE LSPA** — contrato `IBGE_LSPA_V1` agora registrado como `lspa` (antes era definido
+  mas nunca registrado)
+- **Schema orphan** — removido `antaq_movimentacao.json` duplicado (auto-gerado correto é
+  `movimentacao_portuaria.json`)
 
 ### Added
 - **IBGE PEVS Silvicultura** — nova funcao `ibge.silvicultura()` para producao silvicultural

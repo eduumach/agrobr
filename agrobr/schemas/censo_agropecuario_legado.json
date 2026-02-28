@@ -1,7 +1,7 @@
 {
-  "name": "ibge.censo_agro",
+  "name": "ibge.censo_agro_legado",
   "schema_version": "1.0",
-  "effective_from": "0.10.0",
+  "effective_from": "0.12.0",
   "breaking_policy": "major",
   "primary_key": [
     "ano",
@@ -50,7 +50,7 @@
       "deprecated": false,
       "description": "",
       "min_value": 1995,
-      "max_value": null
+      "max_value": 1995
     },
     {
       "name": "localidade",
@@ -144,12 +144,13 @@
   "constraints": {
     "no_duplicates": true,
     "ano_min": 1995,
+    "ano_max": 1995,
     "valor_min": 0
   },
   "guarantees": [
     "Column names never change (additions only)",
-    "'ano' is always a valid census year (>= 1995)",
+    "'ano' is always 1995 (Censo 1995/96)",
     "Numeric values are always >= 0",
-    "'fonte' is always 'ibge_censo_agro'"
+    "'fonte' is always 'ibge_censo_agro_legado'"
   ]
 }

@@ -21,10 +21,9 @@ from agrobr.exceptions import (
 
 logger = structlog.get_logger()
 
-import agrobr.contracts.cepea  # noqa: F401, E402
-import agrobr.contracts.conab  # noqa: F401, E402
-import agrobr.contracts.datasets  # noqa: F401, E402
-import agrobr.contracts.ibge  # noqa: F401, E402
+from agrobr.contracts import _auto_discover_contracts  # noqa: E402
+
+_auto_discover_contracts()
 
 
 @dataclass

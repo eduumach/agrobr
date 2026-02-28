@@ -39,6 +39,7 @@ Validação é automática: todo `fetch()` de dataset valida o DataFrame contra 
 | [silvicultura](./silvicultura.md) | Producao silvicultural (IBGE PEVS) | IBGE PEVS |
 | [extrativismo_vegetal](./extrativismo_vegetal.md) | Producao extrativista vegetal (IBGE PEVS) | IBGE PEVS |
 | [leite_industrial](./leite_industrial.md) | Leite trimestral (aquisicao/industrializacao) | IBGE Leite |
+| [lspa](./lspa.md) | Estimativas mensais de produção agrícola | IBGE LSPA |
 
 ## Schemas JSON
 

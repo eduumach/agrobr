@@ -113,6 +113,25 @@ class TestColumn:
         errors = col.validate(series)
         assert len(errors) == 0
 
+    def test_column_validate_datetime(self):
+        col = Column(name="ts", type=ColumnType.DATETIME, nullable=True)
+        series = pd.Series(pd.to_datetime(["2024-01-01 10:00:00", "2024-06-15 14:30:00"]))
+        errors = col.validate(series)
+        assert len(errors) == 0
+
+    def test_column_validate_datetime_string_coercible(self):
+        col = Column(name="ts", type=ColumnType.DATETIME, nullable=True)
+        series = pd.Series(["2024-01-01 10:00:00", "2024-06-15 14:30:00"])
+        errors = col.validate(series)
+        assert len(errors) == 0
+
+    def test_column_validate_datetime_invalid(self):
+        col = Column(name="ts", type=ColumnType.DATETIME, nullable=True)
+        series = pd.Series(["not-a-date", "also-invalid"])
+        errors = col.validate(series)
+        assert len(errors) == 1
+        assert "cannot be converted to datetime" in errors[0]
+
 
 class TestContract:
     def test_contract_creation(self):
@@ -384,6 +403,7 @@ class TestContractRegistry:
             "balanco",
             "credito_rural",
             "custo_producao",
+            "lspa",
             "mapa_psr_apolices",
             "mapa_psr_sinistros",
             "estimativa_safra",
@@ -493,7 +513,7 @@ class TestGenerateJsonSchemas:
     def test_generate_all_schemas(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             files = generate_json_schemas(tmpdir)
-            assert len(files) == 37
+            assert len(files) == 38
 
             for filepath in files:
                 path = Path(filepath)

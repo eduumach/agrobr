@@ -1,43 +1,32 @@
 {
-  "name": "ibge.censo_agro",
+  "name": "ibge.lspa",
   "schema_version": "1.0",
-  "effective_from": "0.10.0",
+  "effective_from": "0.3.0",
   "breaking_policy": "major",
   "primary_key": [
     "ano",
-    "tema",
-    "categoria",
-    "variavel",
-    "localidade"
+    "mes",
+    "produto"
   ],
   "required_columns": [
     "ano",
-    "tema",
-    "categoria",
-    "variavel",
-    "unidade",
+    "produto",
     "fonte"
   ],
   "dtypes": {
     "ano": "int",
-    "localidade": "str",
-    "localidade_cod": "int",
-    "tema": "str",
-    "categoria": "str",
+    "mes": "int",
+    "produto": "str",
     "variavel": "str",
     "valor": "float",
-    "unidade": "str",
     "fonte": "str"
   },
   "nullable": {
     "ano": false,
-    "localidade": true,
-    "localidade_cod": true,
-    "tema": false,
-    "categoria": false,
-    "variavel": false,
+    "mes": true,
+    "produto": false,
+    "variavel": true,
     "valor": true,
-    "unidade": false,
     "fonte": false
   },
   "columns": [
@@ -49,44 +38,22 @@
       "stable": true,
       "deprecated": false,
       "description": "",
-      "min_value": 1995,
+      "min_value": 1974,
       "max_value": null
     },
     {
-      "name": "localidade",
-      "type": "str",
-      "nullable": true,
-      "unit": null,
-      "stable": true,
-      "deprecated": false,
-      "description": "",
-      "min_value": null,
-      "max_value": null
-    },
-    {
-      "name": "localidade_cod",
+      "name": "mes",
       "type": "int",
       "nullable": true,
       "unit": null,
       "stable": true,
       "deprecated": false,
       "description": "",
-      "min_value": null,
-      "max_value": null
+      "min_value": 1,
+      "max_value": 12
     },
     {
-      "name": "tema",
-      "type": "str",
-      "nullable": false,
-      "unit": null,
-      "stable": true,
-      "deprecated": false,
-      "description": "",
-      "min_value": null,
-      "max_value": null
-    },
-    {
-      "name": "categoria",
+      "name": "produto",
       "type": "str",
       "nullable": false,
       "unit": null,
@@ -99,9 +66,9 @@
     {
       "name": "variavel",
       "type": "str",
-      "nullable": false,
+      "nullable": true,
       "unit": null,
-      "stable": true,
+      "stable": false,
       "deprecated": false,
       "description": "",
       "min_value": null,
@@ -112,18 +79,7 @@
       "type": "float",
       "nullable": true,
       "unit": null,
-      "stable": true,
-      "deprecated": false,
-      "description": "",
-      "min_value": 0,
-      "max_value": null
-    },
-    {
-      "name": "unidade",
-      "type": "str",
-      "nullable": false,
-      "unit": null,
-      "stable": true,
+      "stable": false,
       "deprecated": false,
       "description": "",
       "min_value": null,
@@ -143,13 +99,14 @@
   ],
   "constraints": {
     "no_duplicates": true,
-    "ano_min": 1995,
-    "valor_min": 0
+    "ano_min": 1974,
+    "mes_min": 1,
+    "mes_max": 12
   },
   "guarantees": [
     "Column names never change (additions only)",
-    "'ano' is always a valid census year (>= 1995)",
-    "Numeric values are always >= 0",
-    "'fonte' is always 'ibge_censo_agro'"
+    "'ano' is always a valid year",
+    "'mes' is between 1 and 12 when present",
+    "'fonte' is always 'ibge_lspa'"
   ]
 }

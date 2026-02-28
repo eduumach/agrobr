@@ -771,6 +771,7 @@ IBGE_LEITE_TRIMESTRAL_V1 = Contract(
     breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
 )
 
+register_contract("lspa", IBGE_LSPA_V1)
 register_contract("silvicultura", IBGE_SILVICULTURA_V1)
 register_contract("extrativismo_vegetal", IBGE_EXTRACAO_VEGETAL_V1)
 register_contract("leite_industrial", IBGE_LEITE_TRIMESTRAL_V1)
