@@ -84,6 +84,30 @@ POLICIES: dict[str, CachePolicy] = {
         description="IBGE Censo Agropecuário (atualiza a cada 10 anos)",
         smart_expiry=False,
     ),
+    "ibge_silvicultura": CachePolicy(
+        ttl_seconds=TTL.DAYS_7.value,
+        stale_max_seconds=TTL.DAYS_90.value,
+        description="IBGE PEVS Silvicultura (atualiza anualmente)",
+        smart_expiry=False,
+    ),
+    "ibge_extracao_vegetal": CachePolicy(
+        ttl_seconds=TTL.DAYS_7.value,
+        stale_max_seconds=TTL.DAYS_90.value,
+        description="IBGE PEVS Extração Vegetal (atualiza anualmente)",
+        smart_expiry=False,
+    ),
+    "ibge_leite_trimestral": CachePolicy(
+        ttl_seconds=TTL.DAYS_7.value,
+        stale_max_seconds=TTL.DAYS_90.value,
+        description="IBGE Pesquisa Trimestral do Leite (atualiza trimestralmente)",
+        smart_expiry=False,
+    ),
+    "ibge_pib": CachePolicy(
+        ttl_seconds=TTL.DAYS_7.value,
+        stale_max_seconds=TTL.DAYS_90.value,
+        description="IBGE Contas Nacionais Trimestrais (atualiza trimestralmente)",
+        smart_expiry=False,
+    ),
     "ibge_censo_agro_legado": CachePolicy(
         ttl_seconds=TTL.DAYS_90.value,
         stale_max_seconds=TTL.DAYS_90.value,

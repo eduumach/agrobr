@@ -1,0 +1,28 @@
+{
+  "count": 9,
+  "columns": [
+    "nivel_territorial_cod",
+    "nivel_territorial",
+    "localidade_cod",
+    "localidade",
+    "valor",
+    "ano_cod",
+    "ano",
+    "variavel_cod",
+    "variavel",
+    "produto_cod",
+    "produto"
+  ],
+  "first_row": {
+    "localidade": "Mil litros",
+    "valor": 1850000.0,
+    "ano": "Minas Gerais",
+    "produto": "Leite cru adquirido"
+  },
+  "last_row": {
+    "localidade": "Reais por litro",
+    "valor": 2.42,
+    "ano": "Paraná",
+    "produto": "Preço médio pago ao produtor"
+  }
+}

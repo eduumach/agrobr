@@ -256,6 +256,10 @@ class CacheSettings(BaseSettings):
     ttl_ibge_abate: int = 7 * 24 * 3600
     ttl_ibge_censo_agro: int = 30 * 24 * 3600
     ttl_ibge_censo_agro_legado: int = 90 * 24 * 3600
+    ttl_ibge_silvicultura: int = 7 * 24 * 3600
+    ttl_ibge_extracao_vegetal: int = 7 * 24 * 3600
+    ttl_ibge_leite_trimestral: int = 7 * 24 * 3600
+    ttl_ibge_pib: int = 7 * 24 * 3600
     ttl_abiove: int = 7 * 24 * 3600
     ttl_anda: int = 7 * 24 * 3600
     ttl_deral: int = 24 * 3600

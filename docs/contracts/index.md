@@ -36,6 +36,9 @@ Validação é automática: todo `fetch()` de dataset valida o DataFrame contra 
 | [censo_agropecuario_historico](./censo_agropecuario_historico.md) | Série histórica Censo Agropecuário 1920-2006 (9 temas, até UF) | IBGE SIDRA |
 | [censo_agropecuario_municipal_1985](./censo_agropecuario_municipal_1985.md) | Censo 1985 municipal — 53 temas via OCR de PDFs (22 UFs) | IBGE PDFs |
 | [cadastro_rural](./cadastro_rural.md) | Cadastro Ambiental Rural | SICAR |
+| [silvicultura](./silvicultura.md) | Producao silvicultural (IBGE PEVS) | IBGE PEVS |
+| [extrativismo_vegetal](./extrativismo_vegetal.md) | Producao extrativista vegetal (IBGE PEVS) | IBGE PEVS |
+| [leite_industrial](./leite_industrial.md) | Leite trimestral (aquisicao/industrializacao) | IBGE Leite |
 
 ## Schemas JSON
 
@@ -70,7 +73,8 @@ datasets.list_datasets()
 # ['abate_trimestral', 'balanco', 'cadastro_rural', 'censo_agropecuario',
 #  'censo_agropecuario_historico', 'censo_agropecuario_municipal_1985',
 #  'credito_rural', 'custo_producao', 'estimativa_safra', 'exportacao',
-#  'fertilizante', 'pecuaria_municipal', 'preco_diario', 'producao_anual']
+#  'extrativismo_vegetal', 'fertilizante', 'leite_industrial',
+#  'pecuaria_municipal', 'preco_diario', 'producao_anual', 'silvicultura']
 
 # Listar produtos de um dataset
 datasets.list_products("preco_diario")

@@ -9,7 +9,7 @@ Todas as fontes suportam `return_meta=True` para rastreabilidade completa.
 |-------|------|-------------|-----------|
 | [CEPEA/ESALQ](cepea.md) | Precos | Diaria | Commodities agricolas |
 | [CONAB](conab.md) | Safras, custos, serie historica | Mensal | Producao nacional |
-| [IBGE/SIDRA](ibge.md) | Estatisticas | Anual/Mensal | Dados oficiais |
+| [IBGE/SIDRA](ibge.md) | Estatisticas | Anual/Mensal/Trimestral | Dados oficiais (PAM, LSPA, PPM, Abate, PEVS, Leite, PIB, Censo) |
 | [NASA POWER](nasa_power.md) | Climatologia | Diaria | Global, grid 0.5 grau |
 | [BCB/SICOR](bcb.md) | Credito rural | Mensal | Cultura/UF (+ BigQuery) |
 | [ComexStat](comexstat.md) | Exportacoes | Semanal | NCM/UF |

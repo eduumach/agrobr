@@ -15,7 +15,7 @@ Infraestrutura Python para dados agrícolas brasileiros com **camada semântica*
 
 - **CEPEA/ESALQ**: 20 indicadores de preços (soja, milho, boi, café, algodão, trigo, arroz, açúcar, etanol, frango, suíno, leite, laranja)
 - **CONAB**: Safras, balanço oferta/demanda, custos de produção e série histórica
-- **IBGE/SIDRA**: PAM (anual) e LSPA (mensal)
+- **IBGE/SIDRA**: PAM (anual), LSPA (mensal), PPM, Abate, PEVS (silvicultura + extracao vegetal), Leite Trimestral, PIB Agro, Censo Agro
 - **NASA POWER**: Climatologia gridded diária (temperatura, precipitação, radiação, umidade, vento)
 - **BCB/SICOR**: Crédito rural por cultura e UF com dimensões SICOR (programa, fonte, seguro, modalidade, atividade) + fallback BigQuery
 - **ComexStat**: Exportações agrícolas por NCM
@@ -60,6 +60,9 @@ Peça o que quer, a fonte é detalhe interno:
 | `censo_agropecuario_legado` | Censo Agropecuário 1995/96 — 6 temas legados | IBGE FTP |
 | `censo_agropecuario_historico` | Série histórica Censo Agropecuário 1920-2006 (9 temas) | IBGE SIDRA |
 | `censo_agropecuario_municipal_1985` | Censo 1985 municipal — 53 temas via OCR (22 UFs) | IBGE PDFs |
+| `silvicultura` | Producao silvicultural (eucalipto, pinus, carvao, madeira) | IBGE PEVS |
+| `extrativismo_vegetal` | Producao extrativista vegetal (acai, castanha, erva-mate) | IBGE PEVS |
+| `leite_industrial` | Aquisicao/industrializacao trimestral de leite por UF | IBGE Leite |
 
 ```python
 from agrobr import datasets

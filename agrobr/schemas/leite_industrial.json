@@ -1,0 +1,123 @@
+{
+  "name": "ibge.leite_trimestral",
+  "schema_version": "1.0",
+  "effective_from": "0.15.0",
+  "breaking_policy": "major",
+  "primary_key": [
+    "trimestre",
+    "localidade"
+  ],
+  "required_columns": [
+    "trimestre",
+    "fonte"
+  ],
+  "dtypes": {
+    "trimestre": "str",
+    "localidade": "str",
+    "localidade_cod": "int",
+    "leite_adquirido": "float",
+    "leite_industrializado": "float",
+    "preco_medio": "float",
+    "fonte": "str"
+  },
+  "nullable": {
+    "trimestre": false,
+    "localidade": true,
+    "localidade_cod": true,
+    "leite_adquirido": true,
+    "leite_industrializado": true,
+    "preco_medio": true,
+    "fonte": false
+  },
+  "columns": [
+    {
+      "name": "trimestre",
+      "type": "str",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    },
+    {
+      "name": "localidade",
+      "type": "str",
+      "nullable": true,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    },
+    {
+      "name": "localidade_cod",
+      "type": "int",
+      "nullable": true,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    },
+    {
+      "name": "leite_adquirido",
+      "type": "float",
+      "nullable": true,
+      "unit": "mil_litros",
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": 0,
+      "max_value": null
+    },
+    {
+      "name": "leite_industrializado",
+      "type": "float",
+      "nullable": true,
+      "unit": "mil_litros",
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": 0,
+      "max_value": null
+    },
+    {
+      "name": "preco_medio",
+      "type": "float",
+      "nullable": true,
+      "unit": "reais_por_litro",
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": 0,
+      "max_value": null
+    },
+    {
+      "name": "fonte",
+      "type": "str",
+      "nullable": false,
+      "unit": null,
+      "stable": true,
+      "deprecated": false,
+      "description": "",
+      "min_value": null,
+      "max_value": null
+    }
+  ],
+  "constraints": {
+    "no_duplicates": true,
+    "leite_adquirido_min": 0,
+    "leite_industrializado_min": 0,
+    "preco_medio_min": 0
+  },
+  "guarantees": [
+    "Column names never change (additions only)",
+    "'trimestre' format is YYYYQQ (e.g. 202303)",
+    "Numeric values are always >= 0",
+    "'fonte' is always 'ibge_leite_trimestral'"
+  ]
+}

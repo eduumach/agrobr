@@ -12,7 +12,9 @@ from agrobr.datasets.custo_producao import custo_producao
 from agrobr.datasets.deterministic import deterministic, get_snapshot, is_deterministic
 from agrobr.datasets.estimativa_safra import estimativa_safra
 from agrobr.datasets.exportacao import exportacao
+from agrobr.datasets.extrativismo_vegetal import extrativismo_vegetal
 from agrobr.datasets.fertilizante import fertilizante
+from agrobr.datasets.leite_industrial import leite_industrial
 from agrobr.datasets.pecuaria_municipal import pecuaria_municipal
 from agrobr.datasets.preco_diario import preco_diario
 from agrobr.datasets.producao_anual import producao_anual
@@ -24,6 +26,7 @@ from agrobr.datasets.registry import (
     list_datasets,
     list_products,
 )
+from agrobr.datasets.silvicultura import silvicultura as silvicultura_dataset
 
 __all__ = [
     "abate_trimestral",
@@ -40,14 +43,17 @@ __all__ = [
     "deterministic",
     "estimativa_safra",
     "exportacao",
+    "extrativismo_vegetal",
     "fertilizante",
     "get_dataset",
     "get_snapshot",
     "info",
     "is_deterministic",
+    "leite_industrial",
     "list_datasets",
     "list_products",
     "pecuaria_municipal",
     "preco_diario",
     "producao_anual",
+    "silvicultura_dataset",
 ]

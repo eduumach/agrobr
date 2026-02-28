@@ -78,7 +78,7 @@ async def main():
     print(brasil)
 ```
 
-### IBGE - PAM, LSPA, PPM, Abate e Censo Agro
+### IBGE - PAM, LSPA, PPM, Abate, PEVS, Leite, PIB e Censo Agro
 
 ```python
 from agrobr import ibge
@@ -131,6 +131,19 @@ async def main():
 
     # Múltiplos anos
     df = await ibge.pam('milho', ano=[2020, 2021, 2022, 2023])
+
+    # PEVS — Silvicultura (eucalipto, pinus, carvão)
+    df = await ibge.silvicultura('madeira_tora', ano=2023)
+    df = await ibge.silvicultura('eucalipto', variavel='area')  # área plantada
+
+    # PEVS — Extração vegetal (açaí, castanha, erva-mate)
+    df = await ibge.extracao_vegetal('acai', ano=2023, nivel='uf')
+
+    # Leite trimestral (aquisição + industrialização + preço)
+    df = await ibge.leite_trimestral(trimestre='202303', uf='MG')
+
+    # PIB Agropecuário trimestral
+    df = await ibge.pib_agro(trimestre='202501', setor='agropecuaria')
 ```
 
 ### Datasets - Camada Semântica
@@ -183,12 +196,22 @@ async def main():
     # SICAR com geometria (requer pip install agrobr[geo])
     gdf = await agrobr.alt.sicar.imoveis_geo("DF")
 
+    # Silvicultura (IBGE PEVS)
+    df = await datasets.silvicultura("madeira_tora", ano=2023)
+
+    # Extrativismo vegetal (IBGE PEVS)
+    df = await datasets.extrativismo_vegetal("acai", ano=2023)
+
+    # Leite industrial (IBGE Leite Trimestral)
+    df = await datasets.leite_industrial(trimestre="202303")
+
     # Listar datasets disponíveis
     print(datasets.list_datasets())
     # ['abate_trimestral', 'balanco', 'cadastro_rural', 'censo_agropecuario',
     #  'censo_agropecuario_historico', 'censo_agropecuario_municipal_1985',
     #  'credito_rural', 'custo_producao', 'estimativa_safra', 'exportacao',
-    #  'fertilizante', 'pecuaria_municipal', 'preco_diario', 'producao_anual']
+    #  'extrativismo_vegetal', 'fertilizante', 'leite_industrial',
+    #  'pecuaria_municipal', 'preco_diario', 'producao_anual', 'silvicultura']
 ```
 
 ### Modo Determinístico (Reprodutibilidade)
@@ -417,6 +440,12 @@ df = b3.posicoes_abertas(data="2025-12-19", contrato="boi")
 df = mapbiomas.cobertura(uf="MT", ano=2022)
 df = mapbiomas.cobertura(nivel="municipio", estado="PA", municipio="Belém", ano=2020)
 
+# IBGE PEVS, Leite, PIB
+df = ibge.silvicultura('madeira_tora', ano=2023)
+df = ibge.extracao_vegetal('acai', ano=2023)
+df = ibge.leite_trimestral(trimestre='202303')
+df = ibge.pib_agro(trimestre='202501')
+
 # SICAR — Cadastro Ambiental Rural
 df = alt.sicar.imoveis("DF")
 df = alt.sicar.resumo("MT", municipio="Sorriso")
@@ -482,6 +511,9 @@ Use `agrobr health --all` para verificar localmente.
 | `censo_agropecuario_legado` | Censo 1995/96 — 6 temas legados (FTP) | IBGE FTP |
 | `censo_agropecuario_historico` | Série histórica Censo Agropecuário 1920-2006 (9 temas, até UF) | IBGE SIDRA |
 | `censo_agropecuario_municipal_1985` | Censo 1985 municipal — 53 temas via OCR (22 UFs) | IBGE PDFs |
+| `silvicultura` | Producao silvicultural (eucalipto, pinus, carvao vegetal, madeira) | IBGE PEVS |
+| `extrativismo_vegetal` | Producao extrativista vegetal (acai, castanha, erva-mate) | IBGE PEVS |
+| `leite_industrial` | Aquisicao e industrializacao trimestral de leite por UF | IBGE Leite |
 
 ## Fontes Suportadas
 
@@ -489,7 +521,7 @@ Use `agrobr health --all` para verificar localmente.
 |-------|-------|:-----------:|--------|
 | CEPEA | Indicadores de preços (20 produtos) | ✅ | Funcional |
 | CONAB | Safras, balanço, custos, série histórica | ✅ | Funcional |
-| IBGE | PAM (anual), LSPA (mensal) | ✅ | Funcional |
+| IBGE | PAM, LSPA, PPM, Abate, PEVS, Leite, PIB, Censo Agro | ✅ | Funcional |
 | NASA POWER | Climatologia diária/mensal (grid 0.5°) | ✅ | Funcional |
 | BCB/SICOR | Crédito rural por cultura + dimensões SICOR (+ fallback BigQuery) | ✅¹ | Funcional |
 | ComexStat | Exportações por NCM/UF | ✅¹ | Funcional |
@@ -527,13 +559,14 @@ list_contracts()
 # ['abate_trimestral', 'ajuste_diario', 'balanco', 'censo_agropecuario',
 #  'comercio_bilateral', 'conab_progresso', 'credito_rural', 'custo_producao',
 #  'desmatamento_deter', 'desmatamento_prodes', 'estimativa_safra', 'exportacao',
-#  'fertilizante', 'focos_queimadas', 'mapbiomas_cobertura', 'mapbiomas_transicao',
+#  'extrativismo_vegetal', 'fertilizante', 'focos_queimadas', 'leite_industrial',
+#  'mapbiomas_cobertura', 'mapbiomas_transicao',
 #  'anp_diesel_precos', 'anp_diesel_vendas', 'antt_pedagio_fluxo',
 #  'antt_pedagio_pracas', 'mapa_psr_sinistros',
 #  'censo_agropecuario_historico', 'censo_agropecuario_municipal_1985',
 #  'mapa_psr_apolices', 'movimentacao_portuaria',
 #  'pecuaria_municipal', 'posicoes_abertas', 'preco_atacado', 'preco_diario',
-#  'producao_anual', 'sicar_imoveis', 'trade_mirror']
+#  'producao_anual', 'sicar_imoveis', 'silvicultura', 'trade_mirror']
 
 # Inspecionar contrato
 contract = get_contract("preco_diario")

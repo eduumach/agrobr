@@ -1,0 +1,14 @@
+{
+  "source": "ibge",
+  "format": "dataframe",
+  "parser": "agrobr.ibge.client::parse_sidra_response()",
+  "parser_version": 1,
+  "captured_at": "2026-02-28T12:00:00.000000+00:00",
+  "query": {
+    "table": "1086",
+    "variable": "282,283,2522",
+    "territorial_level": "3",
+    "period": "last"
+  },
+  "notes": "Simulated SIDRA response — Leite trimestral por UF, 3 vars x 3 UFs = 9 rows"
+}

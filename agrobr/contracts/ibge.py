@@ -587,6 +587,193 @@ IBGE_CENSO_AGRO_MUNICIPAL_V1 = Contract(
     breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
 )
 
+IBGE_SILVICULTURA_V1 = Contract(
+    name="ibge.silvicultura",
+    version="1.0",
+    effective_from="0.15.0",
+    primary_key=["ano", "produto", "localidade"],
+    columns=[
+        Column(
+            name="ano",
+            type=ColumnType.INTEGER,
+            nullable=False,
+            stable=True,
+            min_value=1986,
+        ),
+        Column(
+            name="localidade",
+            type=ColumnType.STRING,
+            nullable=True,
+            stable=True,
+        ),
+        Column(
+            name="localidade_cod",
+            type=ColumnType.INTEGER,
+            nullable=True,
+            stable=True,
+        ),
+        Column(
+            name="produto",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="valor",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            stable=True,
+            min_value=0,
+        ),
+        Column(
+            name="unidade",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="fonte",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+    ],
+    guarantees=[
+        "Column names never change (additions only)",
+        "'ano' is always a valid year (>= 1986)",
+        "Numeric values are always >= 0",
+        "'fonte' is always 'ibge_silvicultura'",
+    ],
+    breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
+)
+
+IBGE_EXTRACAO_VEGETAL_V1 = Contract(
+    name="ibge.extracao_vegetal",
+    version="1.0",
+    effective_from="0.15.0",
+    primary_key=["ano", "produto", "localidade"],
+    columns=[
+        Column(
+            name="ano",
+            type=ColumnType.INTEGER,
+            nullable=False,
+            stable=True,
+            min_value=1986,
+        ),
+        Column(
+            name="localidade",
+            type=ColumnType.STRING,
+            nullable=True,
+            stable=True,
+        ),
+        Column(
+            name="localidade_cod",
+            type=ColumnType.INTEGER,
+            nullable=True,
+            stable=True,
+        ),
+        Column(
+            name="produto",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="valor",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            stable=True,
+            min_value=0,
+        ),
+        Column(
+            name="unidade",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="fonte",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+    ],
+    guarantees=[
+        "Column names never change (additions only)",
+        "'ano' is always a valid year (>= 1986)",
+        "Numeric values are always >= 0",
+        "'fonte' is always 'ibge_extracao_vegetal'",
+    ],
+    breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
+)
+
+IBGE_LEITE_TRIMESTRAL_V1 = Contract(
+    name="ibge.leite_trimestral",
+    version="1.0",
+    effective_from="0.15.0",
+    primary_key=["trimestre", "localidade"],
+    columns=[
+        Column(
+            name="trimestre",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="localidade",
+            type=ColumnType.STRING,
+            nullable=True,
+            stable=True,
+        ),
+        Column(
+            name="localidade_cod",
+            type=ColumnType.INTEGER,
+            nullable=True,
+            stable=True,
+        ),
+        Column(
+            name="leite_adquirido",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            unit="mil_litros",
+            stable=True,
+            min_value=0,
+        ),
+        Column(
+            name="leite_industrializado",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            unit="mil_litros",
+            stable=True,
+            min_value=0,
+        ),
+        Column(
+            name="preco_medio",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            unit="reais_por_litro",
+            stable=True,
+            min_value=0,
+        ),
+        Column(
+            name="fonte",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+    ],
+    guarantees=[
+        "Column names never change (additions only)",
+        "'trimestre' format is YYYYQQ (e.g. 202303)",
+        "Numeric values are always >= 0",
+        "'fonte' is always 'ibge_leite_trimestral'",
+    ],
+    breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
+)
+
+register_contract("silvicultura", IBGE_SILVICULTURA_V1)
+register_contract("extrativismo_vegetal", IBGE_EXTRACAO_VEGETAL_V1)
+register_contract("leite_industrial", IBGE_LEITE_TRIMESTRAL_V1)
 register_contract("producao_anual", IBGE_PAM_V1)
 register_contract("pecuaria_municipal", IBGE_PPM_V1)
 register_contract("abate_trimestral", IBGE_ABATE_V1)
@@ -601,7 +788,10 @@ __all__ = [
     "IBGE_CENSO_AGRO_LEGADO_V1",
     "IBGE_CENSO_AGRO_MUNICIPAL_V1",
     "IBGE_CENSO_AGRO_V1",
+    "IBGE_EXTRACAO_VEGETAL_V1",
+    "IBGE_LEITE_TRIMESTRAL_V1",
     "IBGE_LSPA_V1",
     "IBGE_PAM_V1",
     "IBGE_PPM_V1",
+    "IBGE_SILVICULTURA_V1",
 ]

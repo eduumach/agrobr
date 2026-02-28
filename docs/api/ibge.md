@@ -632,15 +632,251 @@ async def ufs() -> list[str]
 
 ---
 
-## Diferenças PAM vs LSPA vs PPM vs Abate vs Censo Agro vs Série Histórica vs Municipal 1985
+### `silvicultura`
 
-| Aspecto | PAM | LSPA | PPM | Abate | Censo Agro | Censo Legado | Série Histórica | Municipal 1985 |
-|---------|-----|------|-----|-------|------------|--------------|-----------------|----------------|
-| Frequência | Anual | Mensal | Anual | Trimestral | Decenial | Única (1995/96) | Decenial | Única (1985) |
-| Granularidade | Até município | Até UF | Até município | Brasil + UF | Até município | Até município | Brasil/Região/UF | Até município |
-| Tipo | Consolidados | Estimativas | Consolidados | Consolidados | Censitários | Censitários (FTP) | Censitários | Censitários (OCR) |
-| Disponibilidade | T+1 ano | T+1 mês | T+1 ano | T+2 meses | Pós-censo | Estático | Estático | Estático |
-| Escopo | Lavouras | Lavouras | Pecuária | Abate | Estrutura agro | 6 temas legados | 9 temas (1920-2006) | 53 temas (1985) |
+Obtém dados da Produção da Extração Vegetal e da Silvicultura (PEVS) — silvicultura.
+
+```python
+async def silvicultura(
+    produto: str,
+    ano: int | list[int] | None = None,
+    uf: str | None = None,
+    nivel: str = 'uf',
+    variavel: str = 'quantidade_produzida',
+    as_polars: bool = False,
+    return_meta: bool = False,
+) -> pd.DataFrame | pl.DataFrame
+```
+
+**Parâmetros:**
+
+| Parâmetro | Tipo | Descrição |
+|-----------|------|-----------|
+| `produto` | `str` | Código do produto (ex: 'madeira_tora', 'carvao') ou espécie de área (ex: 'eucalipto') |
+| `ano` | `int \| list[int] \| None` | Ano(s). Default: último disponível |
+| `uf` | `str \| None` | Filtrar por UF (ex: 'MG') |
+| `nivel` | `str` | Nível: 'brasil', 'uf', 'municipio' |
+| `variavel` | `str` | 'quantidade_produzida', 'valor_producao' (tab 291) ou 'area' (tab 5930) |
+| `as_polars` | `bool` | Retornar como polars.DataFrame |
+| `return_meta` | `bool` | Retornar MetaInfo |
+
+**Produtos (tab 291, classificação c194):**
+
+`carvao`, `carvao_eucalipto`, `carvao_pinus`, `carvao_outras`, `lenha`, `lenha_eucalipto`, `lenha_pinus`, `lenha_outras`, `madeira_tora`, `madeira_celulose`, `madeira_outras_finalidades`, `acacia_negra`, `eucalipto_folha`, `resina`
+
+**Espécies de área (tab 5930, classificação c734) — variavel='area':**
+
+`eucalipto`, `pinus`, `outras`
+
+**Exemplo:**
+
+```python
+from agrobr import ibge
+
+# Produção de madeira em tora por UF
+df = await ibge.silvicultura('madeira_tora', ano=2023)
+
+# Área plantada de eucalipto
+df = await ibge.silvicultura('eucalipto', variavel='area')
+
+# Carvão vegetal em MG
+df = await ibge.silvicultura('carvao', ano=2023, uf='MG')
+
+# Com metadados
+df, meta = await ibge.silvicultura('madeira_tora', ano=2023, return_meta=True)
+```
+
+---
+
+### `produtos_silvicultura`
+
+Lista produtos disponíveis na silvicultura (tab 291).
+
+```python
+async def produtos_silvicultura() -> list[str]
+```
+
+---
+
+### `especies_silvicultura_area`
+
+Lista espécies disponíveis para área plantada (tab 5930).
+
+```python
+async def especies_silvicultura_area() -> list[str]
+```
+
+---
+
+### `extracao_vegetal`
+
+Obtém dados da Produção da Extração Vegetal e da Silvicultura (PEVS) — extração vegetal.
+
+```python
+async def extracao_vegetal(
+    produto: str,
+    ano: int | list[int] | None = None,
+    uf: str | None = None,
+    nivel: str = 'uf',
+    variavel: str = 'quantidade_produzida',
+    as_polars: bool = False,
+    return_meta: bool = False,
+) -> pd.DataFrame | pl.DataFrame
+```
+
+**Parâmetros:**
+
+| Parâmetro | Tipo | Descrição |
+|-----------|------|-----------|
+| `produto` | `str` | Código do produto (ex: 'acai', 'castanha_para') |
+| `ano` | `int \| list[int] \| None` | Ano(s). Default: último disponível |
+| `uf` | `str \| None` | Filtrar por UF |
+| `nivel` | `str` | Nível: 'brasil', 'uf', 'municipio' |
+| `variavel` | `str` | 'quantidade_produzida' ou 'valor_producao' |
+| `as_polars` | `bool` | Retornar como polars.DataFrame |
+| `return_meta` | `bool` | Retornar MetaInfo |
+
+**Produtos (tab 289, classificação c193):**
+
+`acai`, `castanha_caju`, `castanha_para`, `erva_mate`, `mangaba`, `palmito`, `pequi_fruto`, `pinhao`, `umbu`, `hevea_coagulado`, `hevea_liquido`, `carnauba_cera`, `carnauba_po`, `piacava`, `carvao`, `lenha`, `madeira_tora`, `babacu`, `copaiba`, `cumaru`, `pequi_amendoa`
+
+**Exemplo:**
+
+```python
+from agrobr import ibge
+
+# Produção de açaí por UF
+df = await ibge.extracao_vegetal('acai', ano=2023)
+
+# Castanha-do-Pará no Amazonas
+df = await ibge.extracao_vegetal('castanha_para', ano=2023, uf='AM')
+
+# Valor da produção
+df = await ibge.extracao_vegetal('acai', ano=2023, variavel='valor_producao')
+
+# Com metadados
+df, meta = await ibge.extracao_vegetal('acai', ano=2023, return_meta=True)
+```
+
+---
+
+### `produtos_extracao_vegetal`
+
+Lista produtos disponíveis na extração vegetal (tab 289).
+
+```python
+async def produtos_extracao_vegetal() -> list[str]
+```
+
+---
+
+### `leite_trimestral`
+
+Obtém dados da Pesquisa Trimestral do Leite — aquisição, industrialização e preço médio.
+
+```python
+async def leite_trimestral(
+    trimestre: str | list[str] | None = None,
+    uf: str | None = None,
+    as_polars: bool = False,
+    return_meta: bool = False,
+) -> pd.DataFrame | pl.DataFrame
+```
+
+**Parâmetros:**
+
+| Parâmetro | Tipo | Descrição |
+|-----------|------|-----------|
+| `trimestre` | `str \| list[str] \| None` | Trimestre YYYYQQ (ex: '202303'). Default: último |
+| `uf` | `str \| None` | Filtrar por UF |
+| `as_polars` | `bool` | Retornar como polars.DataFrame |
+| `return_meta` | `bool` | Retornar MetaInfo |
+
+**Colunas retornadas (pivot wide):**
+
+| Coluna | Tipo | Descrição |
+|--------|------|-----------|
+| `trimestre` | str | Trimestre YYYYQQ |
+| `localidade` | str | UF |
+| `localidade_cod` | int | Código IBGE |
+| `leite_adquirido` | float | Leite cru adquirido (mil litros) |
+| `leite_industrializado` | float | Leite cru industrializado (mil litros) |
+| `preco_medio` | float | Preço médio pago ao produtor (R$/litro) |
+| `fonte` | str | "ibge_leite_trimestral" |
+
+**Exemplo:**
+
+```python
+from agrobr import ibge
+
+# Leite trimestral por UF
+df = await ibge.leite_trimestral(trimestre='202303')
+
+# Filtrar por UF
+df = await ibge.leite_trimestral(trimestre='202303', uf='MG')
+
+# Múltiplos trimestres
+df = await ibge.leite_trimestral(trimestre=['202301', '202302', '202303'])
+
+# Com metadados
+df, meta = await ibge.leite_trimestral(trimestre='202303', return_meta=True)
+```
+
+---
+
+### `pib_agro`
+
+Obtém o PIB agropecuário trimestral (Contas Nacionais Trimestrais).
+
+```python
+async def pib_agro(
+    trimestre: str | list[str] | None = None,
+    precos: str = 'corrente',
+    setor: str = 'agropecuaria',
+    as_polars: bool = False,
+    return_meta: bool = False,
+) -> pd.DataFrame | pl.DataFrame
+```
+
+**Parâmetros:**
+
+| Parâmetro | Tipo | Descrição |
+|-----------|------|-----------|
+| `trimestre` | `str \| list[str] \| None` | Trimestre YYYYQQ. Default: último |
+| `precos` | `str` | 'corrente' (tab 1846) ou 'real_1995' (tab 6612) |
+| `setor` | `str` | 'agropecuaria', 'industria', 'servicos' ou 'pib_total' |
+| `as_polars` | `bool` | Retornar como polars.DataFrame |
+| `return_meta` | `bool` | Retornar MetaInfo |
+
+**Exemplo:**
+
+```python
+from agrobr import ibge
+
+# PIB agropecuário a preços correntes
+df = await ibge.pib_agro(trimestre='202501')
+
+# PIB a preços reais (base 1995)
+df = await ibge.pib_agro(trimestre='202501', precos='real_1995')
+
+# PIB total (todos os setores)
+df = await ibge.pib_agro(trimestre='202501', setor='pib_total')
+
+# Com metadados
+df, meta = await ibge.pib_agro(return_meta=True)
+```
+
+---
+
+## Diferenças PAM vs LSPA vs PPM vs Abate vs PEVS vs Leite vs PIB vs Censo Agro vs Série Histórica vs Municipal 1985
+
+| Aspecto | PAM | LSPA | PPM | Abate | PEVS | Leite | PIB | Censo Agro | Censo Legado | Série Histórica | Municipal 1985 |
+|---------|-----|------|-----|-------|------|-------|-----|------------|--------------|-----------------|----------------|
+| Frequência | Anual | Mensal | Anual | Trimestral | Anual | Trimestral | Trimestral | Decenial | Única (1995/96) | Decenial | Única (1985) |
+| Granularidade | Até município | Até UF | Até município | Brasil + UF | Até município | UF | Brasil | Até município | Até município | Brasil/Região/UF | Até município |
+| Tipo | Consolidados | Estimativas | Consolidados | Consolidados | Consolidados | Consolidados | Estimativas | Censitários | Censitários (FTP) | Censitários | Censitários (OCR) |
+| Disponibilidade | T+1 ano | T+1 mês | T+1 ano | T+2 meses | T+1 ano | T+2 meses | T+2 meses | Pós-censo | Estático | Estático | Estático |
+| Escopo | Lavouras | Lavouras | Pecuária | Abate | Silvicultura + Extr. vegetal | Leite (aquisição, industrialização) | PIB setorial | Estrutura agro | 6 temas legados | 9 temas (1920-2006) | 53 temas (1985) |
 
 ## Tabelas SIDRA Utilizadas
 
@@ -677,6 +913,12 @@ async def ufs() -> list[str]
 | 283 | Série Histórica - Produção vegetal |
 | 1730 | Série Histórica - Lavoura permanente |
 | 1731 | Série Histórica - Lavoura temporária |
+| 289 | PEVS - Extração vegetal (c193) |
+| 291 | PEVS - Silvicultura produção (c194) |
+| 5930 | PEVS - Silvicultura área (c734) |
+| 1086 | Leite - Pesquisa Trimestral do Leite |
+| 1846 | PIB - Contas Nacionais a preços correntes |
+| 6612 | PIB - Contas Nacionais a preços reais (1995) |
 
 ## Versão Síncrona
 
@@ -693,6 +935,10 @@ df = ibge.censo_agro_legado('tecnologia')
 df = ibge.censo_agro_legado('pessoal_ocupado', uf='SP')
 df = ibge.censo_agro_historico('estabelecimentos_area', ano=1985)
 df = ibge.censo_agro_municipal_1985('propriedade_terras', uf='SP')
+df = ibge.silvicultura('madeira_tora', ano=2023)
+df = ibge.extracao_vegetal('acai', ano=2023)
+df = ibge.leite_trimestral(trimestre='202303')
+df = ibge.pib_agro(trimestre='202501')
 ```
 
 ## Notas

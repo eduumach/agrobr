@@ -1,0 +1,30 @@
+{
+  "count": 4,
+  "columns": [
+    "nivel_territorial_cod",
+    "nivel_territorial",
+    "localidade_cod",
+    "localidade",
+    "valor",
+    "ano_cod",
+    "ano",
+    "variavel_cod",
+    "variavel",
+    "produto_cod",
+    "produto",
+    "classificacao_cod",
+    "classificacao"
+  ],
+  "first_row": {
+    "localidade": "Milhões de Reais",
+    "valor": 125000.0,
+    "ano": "Brasil",
+    "classificacao": "Agropecuária - total"
+  },
+  "last_row": {
+    "localidade": "Milhões de Reais",
+    "valor": 145000.0,
+    "ano": "Brasil",
+    "classificacao": "Agropecuária - total"
+  }
+}

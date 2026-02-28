@@ -8,6 +8,27 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Unreleased]
 
 ### Added
+- **IBGE PEVS Silvicultura** — nova funcao `ibge.silvicultura()` para producao silvicultural
+  (eucalipto, pinus, carvao vegetal, madeira). Tabela SIDRA 291 (producao, classificacao c194)
+  + tabela 5930 (area plantada, classificacao c734). 14 produtos, 3 especies de area,
+  variaveis quantidade_produzida/valor_producao/area. Helpers `produtos_silvicultura()` e
+  `especies_silvicultura_area()`. Contrato `ibge.silvicultura` v1.0. Dataset `silvicultura`
+  com 8 produtos. Schema JSON. Cache 7d/90d stale. ~57 testes + golden data
+- **IBGE PEVS Extracao Vegetal** — nova funcao `ibge.extracao_vegetal()` para producao
+  extrativista vegetal (acai, castanha-do-para, erva-mate, palmito, etc). Tabela SIDRA 289
+  (classificacao c193). 21 produtos, variaveis quantidade_produzida/valor_producao.
+  Helper `produtos_extracao_vegetal()`. Contrato `ibge.extracao_vegetal` v1.0. Dataset
+  `extrativismo_vegetal` com 12 produtos. Schema JSON. Cache 7d/90d stale. ~35 testes + golden data
+- **IBGE Leite Trimestral** — nova funcao `ibge.leite_trimestral()` para aquisicao e
+  industrializacao de leite por UF. Tabela SIDRA 1086. 3 variaveis (leite adquirido,
+  industrializado, preco medio) pivotadas em colunas wide. Contrato `ibge.leite_trimestral` v1.0.
+  Dataset `leite_industrial`. Schema JSON. Cache 7d/90d stale. ~30 testes + golden data
+- **IBGE PIB Agro** — nova funcao `ibge.pib_agro()` para PIB agropecuario trimestral
+  (Contas Nacionais Trimestrais). Tabelas SIDRA 1846 (precos correntes) e 6612 (precos reais
+  1995). 4 setores (agropecuaria, industria, servicos, pib_total). Sem dataset (macro view).
+  Cache 7d/90d stale. ~25 testes + golden data
+
+### Added
 - **Desmatamento PRODES com geometria** — nova funcao `desmatamento.prodes_geo()` retorna
   `GeoDataFrame` com poligonos MultiPolygon (EPSG:4326) do desmatamento consolidado PRODES.
   Requer `pip install agrobr[geo]`. Todos os 6 biomas suportados (incluindo Amazonia).

@@ -294,6 +294,12 @@ A API SIDRA é a fonte mais estável, mas tem particularidades:
 | PPM | 3939 | N1, N2, N3, N6 |
 | Abate | 1093 | N1, N3 |
 | Censo Agro | 6780 | N1, N2, N3, N6 |
+| PEVS Silvicultura | 291 | N1, N2, N3, N6 |
+| PEVS Silvicultura Area | 5930 | N1, N2, N3, N6 |
+| PEVS Extracao Vegetal | 289 | N1, N2, N3, N6 |
+| Leite Trimestral | 1086 | N1, N3 |
+| PIB Agro (corrente) | 1846 | N1 |
+| PIB Agro (real) | 6612 | N1 |
 
 Níveis: `N1` (Brasil), `N2` (Região), `N3` (UF), `N6` (Município)
 

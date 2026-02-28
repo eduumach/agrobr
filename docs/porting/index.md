@@ -245,7 +245,7 @@ para validar parsers em qualquer linguagem:
 2. Compare o output com o `expected.json`
 3. Se bater, seu parser está correto
 
-### Conjuntos de teste disponíveis (20 fontes, 26 casos)
+### Conjuntos de teste disponíveis (20 fontes, 30 casos)
 
 | Fonte | Caso de teste | Arquivos |
 |-------|--------------|----------|
@@ -268,6 +268,10 @@ para validar parsers em qualquer linguagem:
 | IBGE | `censo_agro_efetivo_sample` | response.csv, expected.json |
 | IBGE | `pam_soja_sample` | response.csv, expected.json |
 | IBGE | `ppm_bovino_sample` | response.csv, expected.json |
+| IBGE | `silvicultura_sample` | response.csv, expected.json |
+| IBGE | `extracao_vegetal_sample` | response.csv, expected.json |
+| IBGE | `leite_trimestral_sample` | response.csv, expected.json |
+| IBGE | `pib_agro_sample` | response.csv, expected.json |
 | IMEA | `cotacoes_soja_sample` | response.json, expected.json |
 | INMET | `observacoes_sample` | response.json, expected.json |
 | MapBiomas | `biome_state_sample` | biome_state_sample.xlsx, expected.json |

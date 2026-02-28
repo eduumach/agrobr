@@ -88,6 +88,46 @@
 - **Temas**: tecnologia, pessoal_ocupado, maquinas, producao_animal, valor_producao, financeiro
 - **Acesso**: Publico, sem autenticacao
 
+### PEVS — Silvicultura
+
+- **Tabelas SIDRA**: 291 (producao, classificacao c194) + 5930 (area plantada, classificacao c734)
+- **Cobertura**: Todos os municipios
+- **Frequencia**: Anual
+- **Serie**: 1986-presente
+- **Produtos**: carvao, lenha, madeira_tora, madeira_celulose, acacia_negra, eucalipto_folha, resina (14 total)
+- **Especies area**: eucalipto, pinus, outras
+- **Variaveis**: quantidade_produzida (var 142), valor_producao (var 143), area (var 6549)
+- **Unidades**: Toneladas ou Metros cubicos (conforme produto)
+
+### PEVS — Extracao Vegetal
+
+- **Tabela SIDRA**: 289 (classificacao c193)
+- **Cobertura**: Todos os municipios
+- **Frequencia**: Anual
+- **Serie**: 1986-presente
+- **Produtos**: acai, castanha_caju, castanha_para, erva_mate, mangaba, palmito, pequi_fruto, pinhao, umbu, hevea_coagulado, hevea_liquido, carnauba_cera, carnauba_po, piacava, carvao, lenha, madeira_tora, babacu, copaiba, cumaru, pequi_amendoa (21 total)
+- **Variaveis**: quantidade_produzida (var 144), valor_producao (var 145)
+- **Unidades**: Toneladas (maioria) ou Metros cubicos (lenha, madeira_tora)
+
+### Leite Trimestral — Pesquisa Trimestral do Leite
+
+- **Tabela SIDRA**: 1086
+- **Cobertura**: Brasil + UF (27 UFs)
+- **Frequencia**: Trimestral
+- **Serie**: 1997-presente
+- **Variaveis**: leite adquirido (var 282, mil litros), leite industrializado (var 283, mil litros), preco medio (var 2522, R$/litro)
+- **Output**: Formato wide (3 variaveis como colunas)
+
+### PIB Agropecuario — Contas Nacionais Trimestrais
+
+- **Tabelas SIDRA**: 1846 (precos correntes, var 585) + 6612 (precos reais base 1995, var 9318)
+- **Cobertura**: Brasil (nivel nacional)
+- **Frequencia**: Trimestral
+- **Serie**: 1996-presente
+- **Setores**: agropecuaria (90687), industria (90691), servicos (90696), pib_total (90707)
+- **Classificacao**: c11255
+- **Unidade**: Milhoes de Reais
+
 ## Variaveis
 
 | Codigo | Nome | Unidade |
@@ -394,6 +434,10 @@ temas = await ibge.temas_censo_agro()
 | Abate | 7 dias | 90 dias |
 | Censo Agro | 30 dias | 365 dias |
 | Censo Agro Legado | 90 dias | 90 dias |
+| Silvicultura (PEVS) | 7 dias | 90 dias |
+| Extracao Vegetal (PEVS) | 7 dias | 90 dias |
+| Leite Trimestral | 7 dias | 90 dias |
+| PIB Agro | 7 dias | 90 dias |
 
 ## Atualizacao
 
@@ -404,3 +448,156 @@ temas = await ibge.temas_censo_agro()
 | PPM | Anual (setembro) |
 | Abate | Trimestral (T+2 meses) |
 | Censo Agro | Decenial (ultimo: 2017) |
+| Silvicultura (PEVS) | Anual (agosto-setembro) |
+| Extracao Vegetal (PEVS) | Anual (agosto-setembro) |
+| Leite Trimestral | Trimestral (T+2 meses) |
+| PIB Agro | Trimestral (T+2 meses) |
+
+## Uso - Silvicultura (PEVS)
+
+### Basico
+
+```python
+import asyncio
+from agrobr import ibge
+
+async def main():
+    # Producao de madeira em tora por UF
+    df = await ibge.silvicultura('madeira_tora', ano=2023)
+
+    # Area plantada de eucalipto
+    df = await ibge.silvicultura('eucalipto', variavel='area')
+
+    # Carvao vegetal em MG
+    df = await ibge.silvicultura('carvao', ano=2023, uf='MG')
+
+    # Com metadados
+    df, meta = await ibge.silvicultura('madeira_tora', return_meta=True)
+
+asyncio.run(main())
+```
+
+## Schema - Silvicultura
+
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| `ano` | int | Ano de referencia |
+| `localidade` | str | Nome da localidade |
+| `localidade_cod` | int | Codigo IBGE da localidade |
+| `produto` | str | Nome do produto |
+| `valor` | float | Valor (Toneladas, Metros cubicos ou Hectares) |
+| `unidade` | str | Unidade de medida |
+| `fonte` | str | "ibge_silvicultura" |
+
+## Uso - Extracao Vegetal (PEVS)
+
+### Basico
+
+```python
+import asyncio
+from agrobr import ibge
+
+async def main():
+    # Producao de acai por UF
+    df = await ibge.extracao_vegetal('acai', ano=2023)
+
+    # Castanha-do-Para no Amazonas
+    df = await ibge.extracao_vegetal('castanha_para', ano=2023, uf='AM')
+
+    # Valor da producao
+    df = await ibge.extracao_vegetal('acai', variavel='valor_producao')
+
+    # Com metadados
+    df, meta = await ibge.extracao_vegetal('acai', return_meta=True)
+
+asyncio.run(main())
+```
+
+## Schema - Extracao Vegetal
+
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| `ano` | int | Ano de referencia |
+| `localidade` | str | Nome da localidade |
+| `localidade_cod` | int | Codigo IBGE da localidade |
+| `produto` | str | Nome do produto |
+| `valor` | float | Valor (Toneladas ou Metros cubicos) |
+| `unidade` | str | Unidade de medida |
+| `fonte` | str | "ibge_extracao_vegetal" |
+
+## Uso - Leite Trimestral
+
+### Basico
+
+```python
+import asyncio
+from agrobr import ibge
+
+async def main():
+    # Leite trimestral por UF
+    df = await ibge.leite_trimestral(trimestre='202303')
+
+    # Filtrar por UF
+    df = await ibge.leite_trimestral(trimestre='202303', uf='MG')
+
+    # Multiplos trimestres
+    df = await ibge.leite_trimestral(trimestre=['202301', '202302', '202303'])
+
+    # Com metadados
+    df, meta = await ibge.leite_trimestral(return_meta=True)
+
+asyncio.run(main())
+```
+
+## Schema - Leite Trimestral
+
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| `trimestre` | str | Trimestre YYYYQQ |
+| `localidade` | str | UF |
+| `localidade_cod` | int | Codigo IBGE da localidade |
+| `leite_adquirido` | float | Leite cru adquirido (mil litros) |
+| `leite_industrializado` | float | Leite cru industrializado (mil litros) |
+| `preco_medio` | float | Preco medio pago ao produtor (R$/litro) |
+| `fonte` | str | "ibge_leite_trimestral" |
+
+## Uso - PIB Agropecuario
+
+### Basico
+
+```python
+import asyncio
+from agrobr import ibge
+
+async def main():
+    # PIB agropecuario a precos correntes
+    df = await ibge.pib_agro(trimestre='202501')
+
+    # PIB a precos reais (base 1995)
+    df = await ibge.pib_agro(trimestre='202501', precos='real_1995')
+
+    # PIB total
+    df = await ibge.pib_agro(trimestre='202501', setor='pib_total')
+
+    # Com metadados
+    df, meta = await ibge.pib_agro(return_meta=True)
+
+asyncio.run(main())
+```
+
+## Schema - PIB Agropecuario
+
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| `trimestre` | str | Trimestre YYYYQQ |
+| `valor` | float | Valor (Milhoes de Reais) |
+| `unidade` | str | Unidade de medida |
+| `setor` | str | Setor economico |
+| `fonte` | str | "ibge_pib" |
+
+## Notas
+
+- PEVS Silvicultura: 14 produtos, dados anuais desde 1986. Area plantada (tab 5930) com 3 especies. Cache 7 dias
+- PEVS Extracao Vegetal: 21 produtos, dados anuais desde 1986. Unidades mistas (Toneladas vs Metros cubicos). Cache 7 dias
+- Leite Trimestral: tabela 1086, 3 variaveis pivotadas em colunas wide. Serie desde 1997. Cache 7 dias
+- PIB Agropecuario: tabs 1846/6612, 4 setores, nivel Brasil. Serie desde 1996. Sem contrato (macro view). Cache 7 dias

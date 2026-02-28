@@ -451,6 +451,139 @@ UNIDADES_CATEGORIAS_CENSO_HISTORICO: dict[str, str] = {
 
 TEMAS_CENSO_HISTORICO: list[str] = list(TABELAS_CENSO_HISTORICO.keys())
 
+TABELAS_PEVS = {
+    "silvicultura_producao": "291",
+    "silvicultura_area": "5930",
+    "extracao_vegetal": "289",
+}
+
+VARIAVEIS_SILVICULTURA = {
+    "quantidade_produzida": "142",
+    "valor_producao": "143",
+}
+
+VARIAVEIS_SILVICULTURA_AREA = {
+    "area_total": "6549",
+}
+
+PRODUTOS_SILVICULTURA: dict[str, str] = {
+    "carvao": "3455",
+    "carvao_eucalipto": "33247",
+    "carvao_pinus": "33248",
+    "carvao_outras": "33249",
+    "lenha": "3456",
+    "lenha_eucalipto": "33250",
+    "lenha_pinus": "33251",
+    "lenha_outras": "33252",
+    "madeira_tora": "3457",
+    "madeira_celulose": "3458",
+    "madeira_outras_finalidades": "3459",
+    "acacia_negra": "3461",
+    "eucalipto_folha": "3462",
+    "resina": "3463",
+}
+
+ESPECIES_SILVICULTURA_AREA: dict[str, str] = {
+    "eucalipto": "39326",
+    "pinus": "39327",
+    "outras": "39328",
+}
+
+UNIDADES_SILVICULTURA: dict[str, str] = {
+    "carvao": "Toneladas",
+    "carvao_eucalipto": "Toneladas",
+    "carvao_pinus": "Toneladas",
+    "carvao_outras": "Toneladas",
+    "lenha": "Metros cúbicos",
+    "lenha_eucalipto": "Metros cúbicos",
+    "lenha_pinus": "Metros cúbicos",
+    "lenha_outras": "Metros cúbicos",
+    "madeira_tora": "Metros cúbicos",
+    "madeira_celulose": "Metros cúbicos",
+    "madeira_outras_finalidades": "Metros cúbicos",
+    "acacia_negra": "Toneladas",
+    "eucalipto_folha": "Toneladas",
+    "resina": "Toneladas",
+}
+
+VARIAVEIS_EXTRACAO_VEGETAL = {
+    "quantidade_produzida": "144",
+    "valor_producao": "145",
+}
+
+PRODUTOS_EXTRACAO_VEGETAL: dict[str, str] = {
+    "acai": "3403",
+    "castanha_caju": "3404",
+    "castanha_para": "3405",
+    "erva_mate": "3406",
+    "mangaba": "3407",
+    "palmito": "3408",
+    "pequi_fruto": "39409",
+    "pinhao": "3409",
+    "umbu": "3410",
+    "hevea_coagulado": "3418",
+    "hevea_liquido": "3419",
+    "carnauba_cera": "3421",
+    "carnauba_po": "3422",
+    "piacava": "3426",
+    "carvao": "3433",
+    "lenha": "3434",
+    "madeira_tora": "3435",
+    "babacu": "3439",
+    "copaiba": "3440",
+    "cumaru": "3441",
+    "pequi_amendoa": "3444",
+}
+
+UNIDADES_EXTRACAO_VEGETAL: dict[str, str] = {
+    "acai": "Toneladas",
+    "castanha_caju": "Toneladas",
+    "castanha_para": "Toneladas",
+    "erva_mate": "Toneladas",
+    "mangaba": "Toneladas",
+    "palmito": "Toneladas",
+    "pequi_fruto": "Toneladas",
+    "pinhao": "Toneladas",
+    "umbu": "Toneladas",
+    "hevea_coagulado": "Toneladas",
+    "hevea_liquido": "Toneladas",
+    "carnauba_cera": "Toneladas",
+    "carnauba_po": "Toneladas",
+    "piacava": "Toneladas",
+    "carvao": "Toneladas",
+    "lenha": "Metros cúbicos",
+    "madeira_tora": "Metros cúbicos",
+    "babacu": "Toneladas",
+    "copaiba": "Toneladas",
+    "cumaru": "Toneladas",
+    "pequi_amendoa": "Toneladas",
+}
+
+TABELAS_LEITE = {"leite_trimestral": "1086"}
+
+VARIAVEIS_LEITE = {
+    "leite_adquirido": "282",
+    "leite_industrializado": "283",
+    "preco_medio": "2522",
+}
+
+TABELAS_PIB = {
+    "pib_corrente": "1846",
+    "pib_real": "6612",
+}
+
+VARIAVEIS_PIB = {
+    "corrente": "585",
+    "real_1995": "9318",
+}
+
+SETORES_PIB: dict[str, str] = {
+    "agropecuaria": "90687",
+    "industria": "90691",
+    "servicos": "90696",
+    "pib_total": "90707",
+}
+
 PRODUTOS_LSPA = {
     "soja": "39443",
     "milho_1": "39441",

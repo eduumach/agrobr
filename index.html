@@ -677,6 +677,21 @@
       <div class="dataset-desc">Censo 1985 municipal: 53 temas, 22 UFs (OCR de PDFs)</div>
       <div class="dataset-sources">IBGE PDFs</div>
     </div>
+    <div class="dataset-card">
+      <div class="dataset-name">silvicultura</div>
+      <div class="dataset-desc">Producao silvicultural: eucalipto, pinus, carvao vegetal, madeira</div>
+      <div class="dataset-sources">IBGE PEVS</div>
+    </div>
+    <div class="dataset-card">
+      <div class="dataset-name">extrativismo_vegetal</div>
+      <div class="dataset-desc">Producao extrativista vegetal: acai, castanha, erva-mate, palmito</div>
+      <div class="dataset-sources">IBGE PEVS</div>
+    </div>
+    <div class="dataset-card">
+      <div class="dataset-name">leite_industrial</div>
+      <div class="dataset-desc">Aquisicao e industrializacao trimestral de leite por UF</div>
+      <div class="dataset-sources">IBGE Leite</div>
+    </div>
   </div>
 
   <div class="code-block reveal" data-lang="python">
@@ -771,8 +786,8 @@
     </div>
     <div class="source-card">
       <div class="source-name">IBGE/SIDRA</div>
-      <div class="source-count">PAM + LSPA + PPM + Abate + Censo Agro</div>
-      <div class="source-detail">Produção agrícola, estimativas, pecuária, abate trimestral e censo agropecuário</div>
+      <div class="source-count">PAM + LSPA + PPM + Abate + PEVS + Leite + PIB + Censo</div>
+      <div class="source-detail">Produção agrícola, estimativas, pecuária, abate, silvicultura, extrativismo vegetal, leite, PIB agro e censo</div>
     </div>
     <div class="source-card">
       <div class="source-name">NASA POWER</div>
@@ -896,7 +911,7 @@
   <div class="reveal">
     <p class="section-label">Começar</p>
     <h2 class="section-title">pip install agrobr</h2>
-    <p class="section-desc" style="margin: 0 auto 0;">MIT License (código). 4089+ testes. 25 fontes. 15 datasets. <a href="https://www.agrobr.dev/docs/licenses/" style="color: var(--accent-gold-dim);">Licenças dos dados →</a></p>
+    <p class="section-desc" style="margin: 0 auto 0;">MIT License (código). 4089+ testes. 25 fontes. 18 datasets. <a href="https://www.agrobr.dev/docs/licenses/" style="color: var(--accent-gold-dim);">Licenças dos dados →</a></p>
     <div class="cta-links">
       <a href="https://www.agrobr.dev/docs/" class="cta-btn primary">Documentação →</a>
       <a href="https://colab.research.google.com/github/bruno-portfolio/agrobr/blob/main/examples/agrobr_demo.ipynb" class="cta-btn secondary">Abrir no Colab ↗</a>

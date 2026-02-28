@@ -195,6 +195,41 @@ async def main():
 asyncio.run(main())
 ```
 
+### PEVS — Silvicultura e Extracao Vegetal
+
+Dados anuais de producao silvicultural e extrativista vegetal.
+
+```python
+from agrobr import ibge
+
+async def main():
+    # Silvicultura — producao de madeira
+    df = await ibge.silvicultura('madeira_tora', ano=2023)
+
+    # Extracao vegetal — producao de acai
+    df = await ibge.extracao_vegetal('acai', ano=2023)
+
+    # Area plantada de eucalipto
+    df = await ibge.silvicultura('eucalipto', variavel='area')
+
+asyncio.run(main())
+```
+
+### Leite Trimestral e PIB Agro
+
+```python
+from agrobr import ibge
+
+async def main():
+    # Leite — aquisicao + industrializacao + preco
+    df = await ibge.leite_trimestral(trimestre='202303')
+
+    # PIB agropecuario trimestral
+    df = await ibge.pib_agro(trimestre='202501')
+
+asyncio.run(main())
+```
+
 ## ComexStat - Exportacoes
 
 Dados de comercio exterior do MDIC/SECEX por NCM, UF e pais.

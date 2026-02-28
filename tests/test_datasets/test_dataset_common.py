@@ -10,9 +10,12 @@ ALL_DATASETS = [
     "custo_producao",
     "estimativa_safra",
     "exportacao",
+    "extrativismo_vegetal",
     "fertilizante",
+    "leite_industrial",
     "preco_diario",
     "producao_anual",
+    "silvicultura",
 ]
 
 
@@ -42,7 +45,7 @@ class TestDatasetInfo:
 
     def test_info_update_frequency(self, dataset_name):
         ds = registry.get_dataset(dataset_name)
-        assert ds.info.update_frequency in {"daily", "monthly", "yearly"}
+        assert ds.info.update_frequency in {"daily", "monthly", "yearly", "quarterly"}
 
     def test_info_to_dict(self, dataset_name):
         ds = registry.get_dataset(dataset_name)
