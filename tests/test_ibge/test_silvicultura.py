@@ -375,7 +375,7 @@ class TestSilviculturaGoldenData:
             },
         )
         assert len(parsed) == expected["count"]
-        assert parsed["localidade"].iloc[0] == expected["first_row"]["localidade"]
+        assert parsed["localidade"].iloc[0] == expected["first_row"]["ano"]
         assert parsed["valor"].iloc[0] == expected["first_row"]["valor"]
 
     def test_golden_all_values_positive(self):

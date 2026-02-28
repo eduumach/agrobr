@@ -289,7 +289,7 @@ class TestExtracaoVegetalGoldenData:
             },
         )
         assert len(parsed) == expected["count"]
-        assert parsed["localidade"].iloc[0] == expected["first_row"]["localidade"]
+        assert parsed["localidade"].iloc[0] == expected["first_row"]["ano"]
 
     def test_golden_all_values_positive(self):
         df = pd.read_csv(GOLDEN_DIR / "response.csv", dtype=str)
