@@ -12,6 +12,17 @@ GOLDEN_DATA_DIR = FIXTURES_DIR / "golden_data"
 
 
 @pytest.fixture(autouse=True)
+def _fast_retry(monkeypatch):
+    monkeypatch.setenv("AGROBR_HTTP_RETRY_BASE_DELAY", "0.001")
+    monkeypatch.setenv("AGROBR_HTTP_RETRY_MAX_DELAY", "0.01")
+    from agrobr import constants
+
+    for field in constants.HTTPSettings.model_fields:
+        if field.startswith("rate_limit_"):
+            monkeypatch.setenv(f"AGROBR_HTTP_{field.upper()}", "0.001")
+
+
+@pytest.fixture(autouse=True)
 def _reset_global_state():
     yield
     from agrobr.cache.history import reset_history_manager

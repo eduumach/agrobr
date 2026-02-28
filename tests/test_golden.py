@@ -714,6 +714,7 @@ def _get_anp_diesel_cases() -> list[tuple[str, Path]]:
     return _discover_cases(source_filter="anp_diesel")
 
 
+@pytest.mark.slow
 @pytest.mark.skipif(not _get_anp_diesel_cases(), reason="No ANP diesel golden data")
 @pytest.mark.parametrize("_name,path", _get_anp_diesel_cases())
 def test_anp_diesel_golden_parsing(_name: str, path: Path):

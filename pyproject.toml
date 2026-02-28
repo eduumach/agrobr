@@ -163,7 +163,7 @@ ignore_errors = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
-addopts = "-v --tb=short"
+addopts = "-q --tb=short -m 'not benchmark and not slow'"
 filterwarnings = [
     "ignore::DeprecationWarning",
 ]

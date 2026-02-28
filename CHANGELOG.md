@@ -34,6 +34,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
   Conversão de indicadores restrita a `(KeyError, ValueError, TypeError)`
 - **SICAR** — validação regex de `criado_apos` (`^\d{4}-\d{2}-\d{2}$`) no filtro CQL
 
+### Changed
+- **Test performance** — test suite reduzido de ~102s para ~43s (58% mais rápido).
+  Fixture autouse `_fast_retry` com env vars para retry delays (0.001s) e rate limits (0.001s).
+  Benchmark tests excluídos por default (`-m 'not benchmark and not slow'`).
+  ANP diesel golden test marcado como `@pytest.mark.slow` (12s de parse xlsx).
+  Testes de settings ajustados para verificar consistência em vez de defaults hardcoded
+
 ### Fixed
 - **Test isolation** — fixture autouse `_reset_global_state` em conftest.py reseta config,
   RateLimiter, HistoryManager e todas as flags `_WARNED` (6 módulos) entre testes.

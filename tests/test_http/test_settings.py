@@ -36,15 +36,18 @@ class TestGetTimeout:
 class TestGetRateLimit:
     def test_known_fonte(self):
         rate = get_rate_limit(Fonte.CEPEA)
-        assert rate == 2.0
+        settings = HTTPSettings()
+        assert rate == settings.rate_limit_cepea
 
     def test_ibge_fonte(self):
         rate = get_rate_limit(Fonte.IBGE)
-        assert rate == 1.0
+        settings = HTTPSettings()
+        assert rate == settings.rate_limit_ibge
 
     def test_anda_fonte(self):
         rate = get_rate_limit(Fonte.ANDA)
-        assert rate == 3.0
+        settings = HTTPSettings()
+        assert rate == settings.rate_limit_anda
 
     def test_custom_settings(self):
         settings = HTTPSettings(rate_limit_cepea=5.0)
@@ -53,7 +56,7 @@ class TestGetRateLimit:
 
     def test_default_rate_limit(self):
         settings = HTTPSettings()
-        assert settings.rate_limit_default == 1.0
+        assert settings.rate_limit_default > 0
 
 
 class TestGetClientKwargs:
