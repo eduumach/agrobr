@@ -9,80 +9,6 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [0.12.0] - 2026-02-28
 
-### Improved
-- **Censo Agro Municipal 1985** — melhoria de qualidade dos dados OCR municipais (53 tabelas, 22 UFs).
-  Column bleed fix: 525 valores corrigidos (remoção de dígitos vazados de colunas adjacentes).
-  Label D→O fix: `\bOE\b→DE`, `\bOO\b→DO` no OCR (e.g. "PLÁCIDO OE CASTRO" → "DE CASTRO").
-  Tolerância adaptativa no validador: `absolute_tolerance=5.0` para valores pequenos (<100),
-  `sparse_factor=2.0` para tabelas com >60% de células vazias/zero.
-  Thresholds de confiança recalibrados: `_load_stats` 70/40→60/30, `generate_confidence_report`
-  suspect_rate 0/0.3→0.10/0.40. Revalidação per-parent-group (upgrade-only).
-  Distribuição de confiança: alta 5.4%→25.4%, média 62.0%→65.3%, baixa 32.6%→9.3%
-
-### Security
-- **Snapshots** — proteção contra path traversal em `create_snapshot()`, `load_from_snapshot()`
-  e `delete_snapshot()`. Nomes de snapshot validados por regex whitelist + `Path.resolve().is_relative_to()`.
-  Previne `shutil.rmtree` em diretórios arbitrários via nomes como `../../..`
-- **RateLimiter** — lock `asyncio.Lock()` agora é lazy (criado no primeiro uso, não no import).
-  Evita compartilhamento de primitivas asyncio entre event loops diferentes em testes
-- **SICAR** — removido `check_hostname=False` e `verify_mode=CERT_NONE` do SSLContext.
-  Certificado Sectigo validado (chain completa). `@SECLEVEL=1` mantido para compatibilidade
-  de ciphers do GeoServer
-- **B3** — removido `verify=False` do client de ajustes. Certificado GTS validado (ECDSA 256)
-- **CONAB** — sanitizado URL interpolada em `page.evaluate()` via `json.dumps()` para
-  prevenir JS injection no download headless de XLSX
-- **B3** — split de flag `_WARNED` em `_WARNED_AJUSTES` e `_WARNED_POSICOES` para que
-  cada funcao emita seu proprio warning de licenca independentemente
-- **IBGE** — `retriable_exceptions` restrito a exceções de rede (httpx.TimeoutException,
-  NetworkError, ConnectionError, TimeoutError). Evita retry infinito em TypeError/KeyError
-- **BCB BigQuery** — sanitização de inputs em `_build_query()` via regex whitelist.
-  Previne SQL injection em parâmetros `produto`, `safra_ano`, `uf`
-- **BCB OData** — escape de aspas simples em `produto_sicor` no filtro OData `contains()`
-- **Desmatamento** — validação regex de UF (`^[A-Z]{2}$`) e datas (`^\d{4}-\d{2}-\d{2}$`)
-  nos filtros CQL do DETER e PRODES
-- **B3** — `except Exception` restrito a `(httpx.HTTPError, SourceUnavailableError, ParseError)`
-  em `historico()` e `oi_historico()`. Bugs de programação não são mais engolidos
-- **CEPEA** — `except Exception` restrito a exceções de rede/parse em `indicador()` e `ultimo()`.
-  Conversão de indicadores restrita a `(KeyError, ValueError, TypeError)`
-- **SICAR** — validação regex de `criado_apos` (`^\d{4}-\d{2}-\d{2}$`) no filtro CQL
-
-### Changed
-- **Rate limiter** — `retry_on_status()` agora aplica rate limiting automático em todas as
-  fontes. `RateLimiter._get_delay()` busca settings dinamicamente via `getattr(HTTPSettings)`,
-  eliminando dict hardcoded. `RateLimiter.acquire()` aceita `str | Fonte`. 32 call sites
-  em 21 clients ganham rate limiting sem alteração de código
-- **CONAB Custo Produção** — `fetch_custos_page()` agora usa `retry_on_status()` em cada tab
-  e fallback, consistente com `download_xlsx()`. Antes era `client.get()` direto sem retry
-- **INMET/NASA POWER** — adicionado `follow_redirects=True` ao `httpx.AsyncClient`
-- **ComexStat** — docstring documentando SERPRO TLS (cert intermediário Sectigo ausente,
-  `verify=False` justificado)
-- **CONAB CEASA** — credenciais Pentaho movidas para env vars (`AGROBR_CONAB_CEASA_USER`,
-  `AGROBR_CONAB_CEASA_PASS`) com defaults públicos
-- **Structlog** — processador `_scrub_sensitive` filtra campos sensíveis (api_key, token,
-  password, authorization) e query params sensíveis em URLs nos logs
-- **Golden tests** — checksum exclui `parsed_at` (não-determinístico) para estabilidade
-- **ANP Diesel** — `format="mixed"` em `pd.to_datetime()` elimina warning `dayfirst` vs ISO
-- **Test performance** — test suite reduzido de ~102s para ~43s (58% mais rápido).
-  Fixture autouse `_fast_retry` com env vars para retry delays (0.001s) e rate limits (0.001s).
-  Benchmark tests excluídos por default (`-m 'not benchmark and not slow'`).
-  ANP diesel golden test marcado como `@pytest.mark.slow` (12s de parse xlsx).
-  Testes de settings ajustados para verificar consistência em vez de defaults hardcoded
-
-### Fixed
-- **Test isolation** — fixture autouse `_reset_global_state` em conftest.py reseta config,
-  RateLimiter, HistoryManager e todas as flags `_WARNED` (6 módulos) entre testes.
-  Elimina poluição de estado entre testes e garante isolamento correto
-- **HistoryManager** — adicionada `reset_history_manager()` para permitir reset do singleton
-- **Contracts DATETIME** — `Column.validate()` agora valida colunas DATETIME (antes caiam
-  no fallthrough sem type-check). Afeta 2 colunas SICAR (`data_criacao`, `data_atualizacao`)
-- **Contracts auto-discovery** — side-effect imports em `datasets/base.py` substituídos por
-  `_auto_discover_contracts()` via `pkgutil`. Descobre automaticamente novos módulos de
-  contratos sem precisar editar lista manual
-- **IBGE LSPA** — contrato `IBGE_LSPA_V1` agora registrado como `lspa` (antes era definido
-  mas nunca registrado)
-- **Schema orphan** — removido `antaq_movimentacao.json` duplicado (auto-gerado correto é
-  `movimentacao_portuaria.json`)
-
 ### Added
 - **IBGE PEVS Silvicultura** — nova funcao `ibge.silvicultura()` para producao silvicultural
   (eucalipto, pinus, carvao vegetal, madeira). Tabela SIDRA 291 (producao, classificacao c194)
@@ -103,26 +29,17 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
   (Contas Nacionais Trimestrais). Tabelas SIDRA 1846 (precos correntes) e 6612 (precos reais
   1995). 4 setores (agropecuaria, industria, servicos, pib_total). Sem dataset (macro view).
   Cache 7d/90d stale. ~25 testes + golden data
-
-### Added
 - **Desmatamento PRODES com geometria** — nova funcao `desmatamento.prodes_geo()` retorna
   `GeoDataFrame` com poligonos MultiPolygon (EPSG:4326) do desmatamento consolidado PRODES.
   Requer `pip install agrobr[geo]`. Todos os 6 biomas suportados (incluindo Amazonia).
   Default `maxFeatures=10000` com warning de truncamento. Mesmos parametros de `prodes()`
   (bioma, ano, uf, return_meta). Sync wrapper automatico. Schema `desmatamento_prodes_geo.json`.
   28 novos testes
-
-### Fixed
-- **PRODES workspace Amazonia** — `PRODES_WORKSPACES["Amazônia"]` apontava para
-  `prodes-cerrado-nb` (workspace do Cerrado). Corrigido para `prodes-amazon-nb` com
-  layer `yearly_deforestation_biome`
-- **PRODES CQL state filter** — filtro por UF enviava apenas nome completo (ex:
-  `state='MATO GROSSO'`), mas WFS do TerraBrasilis tem ambos formatos (UF + nome)
-  misturados. Novo `_build_state_cql()` gera `(state='MT' OR state='MATO GROSSO')`
-- **`_check_geopandas()` mensagem generica** — mensagem de erro hardcoded para
-  `deter_geo()` corrigida para mensagem generica que cobre todas as funcoes geo
-
-### Added
+- **Desmatamento DETER com geometria** — nova funcao `desmatamento.deter_geo()` retorna
+  `GeoDataFrame` com poligonos MultiPolygon (EPSG:4326) dos alertas DETER. Requer
+  `pip install agrobr[geo]`. Default `maxFeatures=10000` com warning de truncamento.
+  Mesmos parametros de `deter()` (bioma, uf, data_inicio, data_fim, classe, return_meta).
+  Sync wrapper automatico. 45 novos testes. Schema `desmatamento_deter_geo.json`
 - **SICAR Cadastro Ambiental Rural com geometria** — nova funcao `sicar.imoveis_geo()`
   retorna `GeoDataFrame` com poligonos MultiPolygon (EPSG:4326) dos imoveis rurais.
   Requer `pip install agrobr[geo]`. Mesmos parametros de `imoveis()`. Max 5000 features
@@ -134,11 +51,6 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
   (`municipio`) que nao lida com acentos no GeoServer WFS ILIKE. Mutuamente
   exclusivo com `municipio` (ValueError se ambos). `resumo()` refatorado para
   usar `_build_cql_filter` em vez de CQL hardcoded. 9 novos testes
-- **Desmatamento DETER com geometria** — nova funcao `desmatamento.deter_geo()` retorna
-  `GeoDataFrame` com poligonos MultiPolygon (EPSG:4326) dos alertas DETER. Requer
-  `pip install agrobr[geo]`. Default `maxFeatures=10000` com warning de truncamento.
-  Mesmos parametros de `deter()` (bioma, uf, data_inicio, data_fim, classe, return_meta).
-  Sync wrapper automatico. 45 novos testes. Schema `desmatamento_deter_geo.json`
 - **Censo Agropecuario Municipal 1985 — Fase 7 completa: core + integracao** (#17) —
   dados municipais do Censo 1985 extraidos via OCR de PDFs do IBGE. 53 CSVs bundled no
   pacote (`agrobr/data/censo_1985/`), modulo `agrobr/ibge/censo_municipal_1985.py` com
@@ -178,7 +90,87 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
   automaticamente. Novo parametro `municipio` para filtro por nome (case-insensitive).
   Warning de download pesado via structlog
 
+### Improved
+- **Censo Agro Municipal 1985** — melhoria de qualidade dos dados OCR municipais (53 tabelas, 22 UFs).
+  Column bleed fix: 525 valores corrigidos (remoção de dígitos vazados de colunas adjacentes).
+  Label D→O fix: `\bOE\b→DE`, `\bOO\b→DO` no OCR (e.g. "PLÁCIDO OE CASTRO" → "DE CASTRO").
+  Tolerância adaptativa no validador: `absolute_tolerance=5.0` para valores pequenos (<100),
+  `sparse_factor=2.0` para tabelas com >60% de células vazias/zero.
+  Thresholds de confiança recalibrados: `_load_stats` 70/40→60/30, `generate_confidence_report`
+  suspect_rate 0/0.3→0.10/0.40. Revalidação per-parent-group (upgrade-only).
+  Distribuição de confiança: alta 5.4%→25.4%, média 62.0%→65.3%, baixa 32.6%→9.3%
+
+### Changed
+- **Rate limiter** — `retry_on_status()` agora aplica rate limiting automático em todas as
+  fontes. `RateLimiter._get_delay()` busca settings dinamicamente via `getattr(HTTPSettings)`,
+  eliminando dict hardcoded. `RateLimiter.acquire()` aceita `str | Fonte`. 32 call sites
+  em 21 clients ganham rate limiting sem alteração de código
+- **CONAB Custo Produção** — `fetch_custos_page()` agora usa `retry_on_status()` em cada tab
+  e fallback, consistente com `download_xlsx()`. Antes era `client.get()` direto sem retry
+- **INMET/NASA POWER** — adicionado `follow_redirects=True` ao `httpx.AsyncClient`
+- **ComexStat** — docstring documentando SERPRO TLS (cert intermediário Sectigo ausente,
+  `verify=False` justificado)
+- **CONAB CEASA** — credenciais Pentaho movidas para env vars (`AGROBR_CONAB_CEASA_USER`,
+  `AGROBR_CONAB_CEASA_PASS`) com defaults públicos
+- **Structlog** — processador `_scrub_sensitive` filtra campos sensíveis (api_key, token,
+  password, authorization) e query params sensíveis em URLs nos logs
+- **Golden tests** — checksum exclui `parsed_at` (não-determinístico) para estabilidade
+- **ANP Diesel** — `format="mixed"` em `pd.to_datetime()` elimina warning `dayfirst` vs ISO
+- **Test performance** — test suite reduzido de ~102s para ~43s (58% mais rápido).
+  Fixture autouse `_fast_retry` com env vars para retry delays (0.001s) e rate limits (0.001s).
+  Benchmark tests excluídos por default (`-m 'not benchmark and not slow'`).
+  ANP diesel golden test marcado como `@pytest.mark.slow` (12s de parse xlsx).
+  Testes de settings ajustados para verificar consistência em vez de defaults hardcoded
+- **Censo Agropecuario 1995/96 — Bloco 1: config SIDRA** (#16) — tabelas, variaveis,
+  classificacoes e indices de coluna para 4 temas (efetivo_rebanho, uso_terra,
+  lavoura_temporaria, lavoura_permanente) do Censo 1995. Novo dict `_CENSO_MULTI_TABLE`
+  para dispatch multi-tabela (logica no Bloco 2). Contrato `min_value` e dataset `min_date`
+  atualizados de 2006 para 1995
+- **Censo Agropecuario 1995/96 — Bloco 6: API legado + contrato + dataset** (#16) — nova
+  funcao `censo_agro_legado()` para 6 temas FTP (tecnologia, pessoal_ocupado, maquinas,
+  producao_animal, valor_producao, financeiro). Contrato `IBGE_CENSO_AGRO_LEGADO_V1` com
+  ano fixo 1995, 9 colunas, fonte='ibge_censo_agro_legado'. Dataset
+  `censo_agropecuario_legado` com update_frequency='never'. Cache TTL 90 dias. Exports em
+  `ibge/__init__` e `datasets/__init__`. Testes completos (API, contrato, dataset, cache,
+  exports)
+- **Censo Agropecuario 1995/96 — Bloco 2: refatoracao + multi-tabela** (#16) — extraido
+  `_parse_censo_raw()` e `_empty_censo_df()` de `_fetch_censo_single()`. Novo
+  `_fetch_censo_multi_table()` busca N tabelas SIDRA e concatena. `_fetch_censo_single()`
+  simplificado para dispatch multi-table vs single-table. Zero regressao (84 testes)
+- **Censo Agropecuario 1995/96 — Bloco 3: testes SIDRA 1995** (#16) — 6 mock builders
+  para dados 1995, 12 testes novos em `TestCensoAgro1995Mocked` (single-variable, multi-table,
+  multi-year, columns, valor, categorias, unidade). Fix: `_parse_censo_raw` com fallback
+  `var_map` para SIDRA single-variable (sem dimensao de variavel na resposta). 104 testes
+- **Censo Agropecuario 1995/96 — Bloco 5: FTP client + parser** (#16) — novo
+  `ftp_client.py` para download de ZIPs legados do FTP IBGE (padrao ANTAQ: retry, timeout
+  180s, validacao tamanho, UserAgentRotator). Novo `legacy_parser.py` com parsing de XLS
+  (xlrd) para 6 temas FTP (tecnologia, pessoal_ocupado, maquinas, producao_animal,
+  valor_producao, financeiro). Deteccao de hierarquia geografica por indentacao
+  (totais/mesorregiao/microrregiao/municipio). Config por tema em `_TEMA_COLS`. URL FTP e
+  TTL 90 dias em constants.py. 60 testes novos, suite completa 3811 passed
+
 ### Fixed
+- **Test isolation** — fixture autouse `_reset_global_state` em conftest.py reseta config,
+  RateLimiter, HistoryManager e todas as flags `_WARNED` (6 módulos) entre testes.
+  Elimina poluição de estado entre testes e garante isolamento correto
+- **HistoryManager** — adicionada `reset_history_manager()` para permitir reset do singleton
+- **Contracts DATETIME** — `Column.validate()` agora valida colunas DATETIME (antes caiam
+  no fallthrough sem type-check). Afeta 2 colunas SICAR (`data_criacao`, `data_atualizacao`)
+- **Contracts auto-discovery** — side-effect imports em `datasets/base.py` substituídos por
+  `_auto_discover_contracts()` via `pkgutil`. Descobre automaticamente novos módulos de
+  contratos sem precisar editar lista manual
+- **IBGE LSPA** — contrato `IBGE_LSPA_V1` agora registrado como `lspa` (antes era definido
+  mas nunca registrado)
+- **Schema orphan** — removido `antaq_movimentacao.json` duplicado (auto-gerado correto é
+  `movimentacao_portuaria.json`)
+- **PRODES workspace Amazonia** — `PRODES_WORKSPACES["Amazônia"]` apontava para
+  `prodes-cerrado-nb` (workspace do Cerrado). Corrigido para `prodes-amazon-nb` com
+  layer `yearly_deforestation_biome`
+- **PRODES CQL state filter** — filtro por UF enviava apenas nome completo (ex:
+  `state='MATO GROSSO'`), mas WFS do TerraBrasilis tem ambos formatos (UF + nome)
+  misturados. Novo `_build_state_cql()` gera `(state='MT' OR state='MATO GROSSO')`
+- **`_check_geopandas()` mensagem generica** — mensagem de erro hardcoded para
+  `deter_geo()` corrigida para mensagem generica que cobre todas as funcoes geo
 - **Censo Agro Legado FTP 404 no nivel Brasil** (#16) — `LEGACY_TEMAS` guardava nomes
   com sufixo `Mn` (ex: `Tab_3Mn`), mas o diretorio `Brasil/` no FTP do IBGE so tem
   arquivos sem sufixo (`Tab_3.zip`). Fix: guardar nome base e adicionar `Mn`
@@ -197,37 +189,32 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
   do GeoServer tem nulls legitimos). Dedup por `cod_imovel` mantendo registro com
   `data_atualizacao` mais recente (resolve duplicatas de paginacao WFS)
 
-### Changed
-- **Censo Agropecuario 1995/96 — Bloco 1: config SIDRA** (#16) — tabelas, variaveis,
-  classificacoes e indices de coluna para 4 temas (efetivo_rebanho, uso_terra,
-  lavoura_temporaria, lavoura_permanente) do Censo 1995. Novo dict `_CENSO_MULTI_TABLE`
-  para dispatch multi-tabela (logica no Bloco 2). Contrato `min_value` e dataset `min_date`
-  atualizados de 2006 para 1995
-
-- **Censo Agropecuario 1995/96 — Bloco 6: API legado + contrato + dataset** (#16) — nova
-  funcao `censo_agro_legado()` para 6 temas FTP (tecnologia, pessoal_ocupado, maquinas,
-  producao_animal, valor_producao, financeiro). Contrato `IBGE_CENSO_AGRO_LEGADO_V1` com
-  ano fixo 1995, 9 colunas, fonte='ibge_censo_agro_legado'. Dataset
-  `censo_agropecuario_legado` com update_frequency='never'. Cache TTL 90 dias. Exports em
-  `ibge/__init__` e `datasets/__init__`. Testes completos (API, contrato, dataset, cache,
-  exports)
-
-### Changed
-- **Censo Agropecuario 1995/96 — Bloco 2: refatoracao + multi-tabela** (#16) — extraido
-  `_parse_censo_raw()` e `_empty_censo_df()` de `_fetch_censo_single()`. Novo
-  `_fetch_censo_multi_table()` busca N tabelas SIDRA e concatena. `_fetch_censo_single()`
-  simplificado para dispatch multi-table vs single-table. Zero regressao (84 testes)
-- **Censo Agropecuario 1995/96 — Bloco 3: testes SIDRA 1995** (#16) — 6 mock builders
-  para dados 1995, 12 testes novos em `TestCensoAgro1995Mocked` (single-variable, multi-table,
-  multi-year, columns, valor, categorias, unidade). Fix: `_parse_censo_raw` com fallback
-  `var_map` para SIDRA single-variable (sem dimensao de variavel na resposta). 104 testes
-- **Censo Agropecuario 1995/96 — Bloco 5: FTP client + parser** (#16) — novo
-  `ftp_client.py` para download de ZIPs legados do FTP IBGE (padrao ANTAQ: retry, timeout
-  180s, validacao tamanho, UserAgentRotator). Novo `legacy_parser.py` com parsing de XLS
-  (xlrd) para 6 temas FTP (tecnologia, pessoal_ocupado, maquinas, producao_animal,
-  valor_producao, financeiro). Deteccao de hierarquia geografica por indentacao
-  (totais/mesorregiao/microrregiao/municipio). Config por tema em `_TEMA_COLS`. URL FTP e
-  TTL 90 dias em constants.py. 60 testes novos, suite completa 3811 passed
+### Security
+- **Snapshots** — proteção contra path traversal em `create_snapshot()`, `load_from_snapshot()`
+  e `delete_snapshot()`. Nomes de snapshot validados por regex whitelist + `Path.resolve().is_relative_to()`.
+  Previne `shutil.rmtree` em diretórios arbitrários via nomes como `../../..`
+- **RateLimiter** — lock `asyncio.Lock()` agora é lazy (criado no primeiro uso, não no import).
+  Evita compartilhamento de primitivas asyncio entre event loops diferentes em testes
+- **SICAR** — removido `check_hostname=False` e `verify_mode=CERT_NONE` do SSLContext.
+  Certificado Sectigo validado (chain completa). `@SECLEVEL=1` mantido para compatibilidade
+  de ciphers do GeoServer
+- **B3** — removido `verify=False` do client de ajustes. Certificado GTS validado (ECDSA 256)
+- **CONAB** — sanitizado URL interpolada em `page.evaluate()` via `json.dumps()` para
+  prevenir JS injection no download headless de XLSX
+- **B3** — split de flag `_WARNED` em `_WARNED_AJUSTES` e `_WARNED_POSICOES` para que
+  cada funcao emita seu proprio warning de licenca independentemente
+- **IBGE** — `retriable_exceptions` restrito a exceções de rede (httpx.TimeoutException,
+  NetworkError, ConnectionError, TimeoutError). Evita retry infinito em TypeError/KeyError
+- **BCB BigQuery** — sanitização de inputs em `_build_query()` via regex whitelist.
+  Previne SQL injection em parâmetros `produto`, `safra_ano`, `uf`
+- **BCB OData** — escape de aspas simples em `produto_sicor` no filtro OData `contains()`
+- **Desmatamento** — validação regex de UF (`^[A-Z]{2}$`) e datas (`^\d{4}-\d{2}-\d{2}$`)
+  nos filtros CQL do DETER e PRODES
+- **B3** — `except Exception` restrito a `(httpx.HTTPError, SourceUnavailableError, ParseError)`
+  em `historico()` e `oi_historico()`. Bugs de programação não são mais engolidos
+- **CEPEA** — `except Exception` restrito a exceções de rede/parse em `indicador()` e `ultimo()`.
+  Conversão de indicadores restrita a `(KeyError, ValueError, TypeError)`
+- **SICAR** — validação regex de `criado_apos` (`^\d{4}-\d{2}-\d{2}$`) no filtro CQL
 
 ## [0.11.3] - 2026-02-24
 
