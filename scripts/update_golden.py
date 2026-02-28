@@ -520,7 +520,7 @@ async def capture_cepea(produto: str) -> None:
     (case_dir / "response.html").write_text(html, encoding="utf-8")
 
     data_str = json.dumps(
-        [r.model_dump(mode="json") for r in results],
+        [r.model_dump(mode="json", exclude={"parsed_at"}) for r in results],
         sort_keys=True,
         default=str,
     )

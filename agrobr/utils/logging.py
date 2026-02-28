@@ -1,11 +1,44 @@
 from __future__ import annotations
 
 import logging
+import re
 import sys
 from pathlib import Path
+from typing import Any
 
 import structlog
 from structlog.types import Processor
+
+_SENSITIVE_KEYS = frozenset(
+    {
+        "authorization",
+        "api_key",
+        "apikey",
+        "token",
+        "password",
+        "secret",
+        "credential",
+        "ocp-apim-subscription-key",
+    }
+)
+
+_SENSITIVE_QUERY_RE = re.compile(
+    r"([?&])(api_key|apikey|token|key|password|secret)=[^&]*",
+    re.IGNORECASE,
+)
+
+
+def _scrub_sensitive(
+    _logger: Any,
+    _method: str,
+    event_dict: dict[str, Any],
+) -> dict[str, Any]:
+    for key in event_dict:
+        if key.lower().replace("-", "_") in _SENSITIVE_KEYS:
+            event_dict[key] = "***"
+        elif isinstance(event_dict[key], str):
+            event_dict[key] = _SENSITIVE_QUERY_RE.sub(r"\1\2=***", event_dict[key])
+    return event_dict
 
 
 def configure_logging(
@@ -20,6 +53,7 @@ def configure_logging(
         structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.processors.StackInfoRenderer(),
         structlog.processors.UnicodeDecoder(),
+        _scrub_sensitive,
     ]
 
     if json_format:

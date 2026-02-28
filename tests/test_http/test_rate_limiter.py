@@ -40,7 +40,7 @@ class TestRateLimiter:
             pass
         elapsed = time.monotonic() - start
 
-        delay = RateLimiter._get_delay(constants.Fonte.IBGE)
+        delay = RateLimiter._get_delay(constants.Fonte.IBGE.value)
         assert elapsed >= delay * 0.8
 
     @pytest.mark.asyncio
@@ -79,16 +79,17 @@ class TestRateLimiter:
         assert len(order) == 3
 
     def test_get_delay_returns_configured_value(self):
-        delay = RateLimiter._get_delay(constants.Fonte.CEPEA)
+        delay = RateLimiter._get_delay("cepea")
         settings = constants.HTTPSettings()
         assert delay == settings.rate_limit_cepea
 
     def test_get_delay_unknown_source_returns_default(self):
         delay = RateLimiter._get_delay("unknown_source")
-        assert delay == 1.0
+        settings = constants.HTTPSettings()
+        assert delay == settings.rate_limit_default
 
     @pytest.mark.asyncio
     async def test_all_sources_have_delay(self):
         for fonte in constants.Fonte:
-            delay = RateLimiter._get_delay(fonte)
+            delay = RateLimiter._get_delay(fonte.value)
             assert delay > 0, f"{fonte} has no delay configured"

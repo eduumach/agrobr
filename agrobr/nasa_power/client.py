@@ -31,7 +31,7 @@ MAX_DAYS_PER_REQUEST = 365
 
 async def _get_json(params: dict[str, Any]) -> dict[str, Any]:
     async with httpx.AsyncClient(
-        timeout=TIMEOUT, headers=UserAgentRotator.get_bot_headers()
+        timeout=TIMEOUT, headers=UserAgentRotator.get_bot_headers(), follow_redirects=True
     ) as client:
         response = await retry_on_status(
             lambda: client.get(BASE_URL, params=params),

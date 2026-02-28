@@ -152,9 +152,13 @@ def parse_precos(
     result: dict[str, Any] = {}
 
     if col_data_ini:
-        result["data"] = pd.to_datetime(df[col_data_ini], errors="coerce", dayfirst=True)
+        result["data"] = pd.to_datetime(
+            df[col_data_ini], errors="coerce", format="mixed", dayfirst=True
+        )
     elif col_data_fim:
-        result["data"] = pd.to_datetime(df[col_data_fim], errors="coerce", dayfirst=True)
+        result["data"] = pd.to_datetime(
+            df[col_data_fim], errors="coerce", format="mixed", dayfirst=True
+        )
     else:
         raise ParseError(
             source="anp_diesel",

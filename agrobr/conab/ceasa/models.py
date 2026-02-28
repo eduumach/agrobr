@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import os
 import re
 
 PENTAHO_BASE = "https://pentahoportaldeinformacoes.conab.gov.br/pentaho/plugin/cda/api/doQuery"
 
-PENTAHO_AUTH = {"userid": "pentaho", "password": "password"}
+PENTAHO_AUTH = {
+    "userid": os.environ.get("AGROBR_CONAB_CEASA_USER", "pentaho"),
+    "password": os.environ.get("AGROBR_CONAB_CEASA_PASS", "password"),
+}
 
 CDA_PROHORT = "/home/PROHORT/precoDia.cda"
 

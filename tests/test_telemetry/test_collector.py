@@ -74,6 +74,8 @@ class TestTrack:
             await TelemetryCollector.track("e1")
             await TelemetryCollector.track("e2")
             mock_create_task.assert_called()
+            coro = mock_create_task.call_args[0][0]
+            await coro
 
 
 class TestFlush:

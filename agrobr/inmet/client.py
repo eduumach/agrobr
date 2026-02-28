@@ -51,7 +51,7 @@ async def _get_json(path: str) -> list[dict[str, Any]]:
             hint="Defina AGROBR_INMET_TOKEN para acessar dados observacionais",
         )
 
-    async with httpx.AsyncClient(timeout=TIMEOUT, headers=headers) as client:
+    async with httpx.AsyncClient(timeout=TIMEOUT, headers=headers, follow_redirects=True) as client:
         response = await retry_on_status(
             lambda: client.get(url),
             source="inmet",

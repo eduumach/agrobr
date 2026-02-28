@@ -9,6 +9,7 @@ import structlog
 
 from agrobr.constants import URLS, Fonte, HTTPSettings
 from agrobr.exceptions import SourceUnavailableError
+from agrobr.http.retry import retry_on_status
 from agrobr.http.user_agents import UserAgentRotator
 
 logger = structlog.get_logger()
@@ -51,20 +52,26 @@ async def fetch_custos_page() -> str:
         for slug in _TAB_SLUGS:
             url = f"{CUSTOS_PAGE}/{slug}"
             try:
-                response = await client.get(url)
+                response = await retry_on_status(
+                    lambda _u=url: client.get(_u),  # type: ignore[misc]
+                    source="conab_custo",
+                )
                 response.raise_for_status()
                 combined_html += response.text
                 logger.info("conab_custo_tab_ok", slug=slug, content_length=len(response.text))
-            except httpx.HTTPError as e:
+            except (httpx.HTTPError, SourceUnavailableError) as e:
                 logger.warning("conab_custo_tab_error", slug=slug, error=str(e))
 
         if not combined_html:
             try:
-                response = await client.get(CUSTOS_PAGE)
+                response = await retry_on_status(
+                    lambda: client.get(CUSTOS_PAGE),
+                    source="conab_custo",
+                )
                 response.raise_for_status()
                 combined_html = response.text
                 logger.info("conab_custo_page_ok", content_length=len(response.text))
-            except httpx.HTTPError as e:
+            except (httpx.HTTPError, SourceUnavailableError) as e:
                 raise SourceUnavailableError(
                     source="conab_custo",
                     url=CUSTOS_PAGE,

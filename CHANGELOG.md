@@ -35,6 +35,21 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **SICAR** — validação regex de `criado_apos` (`^\d{4}-\d{2}-\d{2}$`) no filtro CQL
 
 ### Changed
+- **Rate limiter** — `retry_on_status()` agora aplica rate limiting automático em todas as
+  fontes. `RateLimiter._get_delay()` busca settings dinamicamente via `getattr(HTTPSettings)`,
+  eliminando dict hardcoded. `RateLimiter.acquire()` aceita `str | Fonte`. 32 call sites
+  em 21 clients ganham rate limiting sem alteração de código
+- **CONAB Custo Produção** — `fetch_custos_page()` agora usa `retry_on_status()` em cada tab
+  e fallback, consistente com `download_xlsx()`. Antes era `client.get()` direto sem retry
+- **INMET/NASA POWER** — adicionado `follow_redirects=True` ao `httpx.AsyncClient`
+- **ComexStat** — docstring documentando SERPRO TLS (cert intermediário Sectigo ausente,
+  `verify=False` justificado)
+- **CONAB CEASA** — credenciais Pentaho movidas para env vars (`AGROBR_CONAB_CEASA_USER`,
+  `AGROBR_CONAB_CEASA_PASS`) com defaults públicos
+- **Structlog** — processador `_scrub_sensitive` filtra campos sensíveis (api_key, token,
+  password, authorization) e query params sensíveis em URLs nos logs
+- **Golden tests** — checksum exclui `parsed_at` (não-determinístico) para estabilidade
+- **ANP Diesel** — `format="mixed"` em `pd.to_datetime()` elimina warning `dayfirst` vs ISO
 - **Test performance** — test suite reduzido de ~102s para ~43s (58% mais rápido).
   Fixture autouse `_fast_retry` com env vars para retry delays (0.001s) e rate limits (0.001s).
   Benchmark tests excluídos por default (`-m 'not benchmark and not slow'`).

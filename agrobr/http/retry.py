@@ -87,6 +87,7 @@ async def retry_on_status(
     max_delay: float | None = None,
 ) -> httpx.Response:
     from agrobr.exceptions import SourceUnavailableError
+    from agrobr.http.rate_limiter import RateLimiter
 
     settings = constants.HTTPSettings()
     _max = max_attempts or settings.max_retries
@@ -96,7 +97,8 @@ async def retry_on_status(
     last_response: httpx.Response | None = None
 
     for attempt in range(_max):
-        response = await func()
+        async with RateLimiter.acquire(source):
+            response = await func()
 
         if not should_retry_status(response.status_code):
             return response

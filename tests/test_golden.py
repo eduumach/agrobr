@@ -190,7 +190,8 @@ def test_golden_parsing(_name: str, path: Path):
     assert last.valor == Decimal(expected["last"]["valor"])
 
     if "checksum" in expected:
-        data_str = json.dumps([r.model_dump(mode="json") for r in results], sort_keys=True)
+        dumps = [r.model_dump(mode="json", exclude={"parsed_at"}) for r in results]
+        data_str = json.dumps(dumps, sort_keys=True)
         checksum = f"sha256:{hashlib.sha256(data_str.encode()).hexdigest()[:16]}"
         if checksum != expected["checksum"]:
             import warnings

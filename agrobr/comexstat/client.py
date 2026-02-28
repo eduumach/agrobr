@@ -1,3 +1,10 @@
+"""ComexStat bulk CSV client.
+
+TLS: verify=False is required — SERPRO (balanca.economia.gov.br) does not
+send the Sectigo intermediate certificate, breaking chain validation.
+Confirmed via ``openssl s_client``.  Tracked upstream, no fix available.
+"""
+
 from __future__ import annotations
 
 import httpx
