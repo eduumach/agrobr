@@ -7,6 +7,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-02-28
+
 ### Improved
 - **Censo Agro Municipal 1985** — melhoria de qualidade dos dados OCR municipais (53 tabelas, 22 UFs).
   Column bleed fix: 525 valores corrigidos (remoção de dígitos vazados de colunas adjacentes).
@@ -940,7 +942,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - Type hints completos
 - Logging estruturado com structlog
 
-[Unreleased]: https://github.com/bruno-portfolio/agrobr/compare/v0.11.3...HEAD
+[Unreleased]: https://github.com/bruno-portfolio/agrobr/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/bruno-portfolio/agrobr/compare/v0.11.3...v0.12.0
 [0.11.3]: https://github.com/bruno-portfolio/agrobr/compare/v0.11.2...v0.11.3
 [0.11.2]: https://github.com/bruno-portfolio/agrobr/compare/v0.11.1...v0.11.2
 [0.11.1]: https://github.com/bruno-portfolio/agrobr/compare/v0.11.0...v0.11.1
