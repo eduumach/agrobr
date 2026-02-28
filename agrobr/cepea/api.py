@@ -6,6 +6,7 @@ from datetime import date, datetime, timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Literal, overload
 
+import httpx
 import pandas as pd
 import structlog
 
@@ -15,6 +16,7 @@ from agrobr.cache.keys import build_cache_key
 from agrobr.cache.policies import calculate_expiry
 from agrobr.cepea import client
 from agrobr.cepea.parsers.detector import get_parser_with_fallback
+from agrobr.exceptions import ParseError, SourceUnavailableError
 from agrobr.models import Indicador, MetaInfo
 from agrobr.validators.sanity import validate_batch
 
@@ -197,7 +199,7 @@ async def indicador(
                 )
                 meta.validation_warnings.append("stale_data: using cache after empty fetch")
 
-        except Exception as e:
+        except (httpx.HTTPError, SourceUnavailableError, ParseError, OSError) as e:
             logger.warning(
                 "source_fetch_failed",
                 produto=produto,
@@ -278,7 +280,7 @@ def _dicts_to_indicadores(dicts: list[dict[str, Any]]) -> list[Indicador]:
                 parser_version=d.get("parser_version", 1),
             )
             indicadores.append(ind)
-        except Exception as e:
+        except (KeyError, ValueError, TypeError) as e:
             logger.warning("indicador_conversion_failed", error=str(e), data=d)
     return indicadores
 
@@ -365,7 +367,7 @@ async def ultimo(produto: str, praca: str | None = None, offline: bool = False) 
                         if ind.data not in existing_dates:
                             indicadores.append(ind)
 
-            except Exception as e:
+            except (httpx.HTTPError, SourceUnavailableError, ParseError, OSError) as e:
                 logger.warning("source_fetch_failed", produto=produto, error=str(e))
 
     if praca:
@@ -374,8 +376,6 @@ async def ultimo(produto: str, praca: str | None = None, offline: bool = False) 
         ]
 
     if not indicadores:
-        from agrobr.exceptions import ParseError
-
         raise ParseError(
             source="cepea",
             parser_version=1,

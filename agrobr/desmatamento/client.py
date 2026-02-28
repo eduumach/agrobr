@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from urllib.parse import quote
 
 import httpx
@@ -25,6 +26,9 @@ from .models import (
 )
 
 logger = structlog.get_logger()
+
+_UF_RE = re.compile(r"^[A-Z]{2}$")
+_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 GEOSERVER_BASE = URLS[Fonte.DESMATAMENTO]["geoserver"]
 
@@ -91,6 +95,8 @@ async def _fetch_url(url: str) -> bytes:
 
 def _build_state_cql(uf: str) -> str:
     uf_upper = uf.strip().upper()
+    if not _UF_RE.match(uf_upper):
+        raise ValueError(f"UF invalida: {uf!r}")
     estado = _uf_to_estado(uf_upper)
     if estado:
         return f"(state='{uf_upper}' OR state='{estado}')"
@@ -186,10 +192,17 @@ async def _fetch_deter_raw(
 
     filters: list[str] = []
     if uf is not None:
-        filters.append(f"uf='{uf.upper()}'")
+        uf_upper = uf.strip().upper()
+        if not _UF_RE.match(uf_upper):
+            raise ValueError(f"UF invalida: {uf!r}")
+        filters.append(f"uf='{uf_upper}'")
     if data_inicio is not None:
+        if not _DATE_RE.match(data_inicio):
+            raise ValueError(f"data_inicio invalida (esperado YYYY-MM-DD): {data_inicio!r}")
         filters.append(f"view_date>='{data_inicio}'")
     if data_fim is not None:
+        if not _DATE_RE.match(data_fim):
+            raise ValueError(f"data_fim invalida (esperado YYYY-MM-DD): {data_fim!r}")
         filters.append(f"view_date<='{data_fim}'")
 
     cql = " AND ".join(filters) if filters else None

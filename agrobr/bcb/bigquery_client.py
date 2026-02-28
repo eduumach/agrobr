@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import re
 from typing import Any
 
 import structlog
@@ -24,6 +25,8 @@ BQ_COLUMNS_MAP: dict[str, str] = {
     "area_financiada": "area_financiada",
 }
 
+_SAFE_IDENTIFIER = re.compile(r"^[A-Za-zÀ-ÿ0-9 _\-/]+$")
+
 
 def _check_basedosdados() -> None:
     try:
@@ -34,6 +37,12 @@ def _check_basedosdados() -> None:
             url="https://basedosdados.org/dataset/br-bcb-sicor",
             last_error=("basedosdados não instalado. Instale com: pip install agrobr[bigquery]"),
         ) from exc
+
+
+def _sanitize_bq_str(value: str, field: str) -> str:
+    if not _SAFE_IDENTIFIER.match(value):
+        raise ValueError(f"Caractere invalido em {field}: {value!r}")
+    return value.replace("'", "\\'")
 
 
 def _build_query(
@@ -65,16 +74,20 @@ FROM `basedosdados.br_bcb_sicor.microdados_operacao`
         "comercializacão": "COMERCIALIZAÇÃO",
     }
     nome_finalidade = finalidade_map.get(finalidade.lower(), finalidade.upper())
-    conditions.append(f"nome_finalidade = '{nome_finalidade}'")
+    conditions.append(f"nome_finalidade = '{_sanitize_bq_str(nome_finalidade, 'finalidade')}'")
 
     if produto:
-        conditions.append(f"UPPER(nome_produto) LIKE '%{produto.upper()}%'")
+        safe_produto = _sanitize_bq_str(produto.upper(), "produto")
+        conditions.append(f"UPPER(nome_produto) LIKE '%{safe_produto}%'")
 
     if safra_ano:
-        conditions.append(f"ano = {safra_ano}")
+        conditions.append(f"ano = {int(safra_ano)}")
 
     if uf:
-        conditions.append(f"sigla_uf = '{uf.upper()}'")
+        safe_uf = _sanitize_bq_str(uf.upper(), "uf")
+        if len(safe_uf) != 2:
+            raise ValueError(f"UF deve ter 2 caracteres: {uf!r}")
+        conditions.append(f"sigla_uf = '{safe_uf}'")
 
     where = " AND ".join(conditions)
 

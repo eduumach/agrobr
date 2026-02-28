@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import time
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, Literal, overload
@@ -17,6 +18,8 @@ from .models import (
     UFS_VALIDAS,
     WFS_BASE,
 )
+
+_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 if TYPE_CHECKING:
     import geopandas as gpd
@@ -55,6 +58,8 @@ def _build_cql_filter(
         parts.append(f"area<={area_max}")
 
     if criado_apos:
+        if not _DATE_RE.match(criado_apos):
+            raise ValueError(f"criado_apos invalido (esperado YYYY-MM-DD): {criado_apos!r}")
         parts.append(f"dat_criacao>='{criado_apos}'")
 
     return " AND ".join(parts) if parts else None

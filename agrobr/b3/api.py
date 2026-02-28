@@ -6,9 +6,11 @@ import warnings
 from datetime import UTC, date, datetime, timedelta
 from typing import Any, Literal, overload
 
+import httpx
 import pandas as pd
 import structlog
 
+from agrobr.exceptions import ParseError, SourceUnavailableError
 from agrobr.models import MetaInfo
 
 from . import client, parser
@@ -150,7 +152,7 @@ async def historico(
                     frames.append(df_dia)
                 else:
                     logger.debug("b3_historico_empty", data=str(current), contrato=contrato)
-            except Exception as exc:
+            except (httpx.HTTPError, SourceUnavailableError, ParseError) as exc:
                 logger.warning(
                     "b3_historico_skip",
                     data=str(current),
@@ -326,7 +328,7 @@ async def oi_historico(
                     frames.append(df_dia)
                 else:
                     logger.debug("b3_oi_historico_empty", data=str(current), contrato=contrato)
-            except Exception as exc:
+            except (httpx.HTTPError, SourceUnavailableError, ParseError) as exc:
                 logger.warning(
                     "b3_oi_historico_skip",
                     data=str(current),

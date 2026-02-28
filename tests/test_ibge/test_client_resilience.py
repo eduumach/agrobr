@@ -22,7 +22,7 @@ class TestIbgeSidraTimeout:
     async def test_sidrapy_timeout_retried(self):
         with patch("agrobr.ibge.client.sidrapy.get_table") as mock_sidra:
             mock_sidra.side_effect = [
-                Exception("timeout"),
+                ConnectionError("timeout"),
                 pd.DataFrame({"V": ["100"]}),
             ]
             result = await client.fetch_sidra(table_code="5457")

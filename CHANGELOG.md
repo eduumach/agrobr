@@ -16,6 +16,18 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
   prevenir JS injection no download headless de XLSX
 - **B3** — split de flag `_WARNED` em `_WARNED_AJUSTES` e `_WARNED_POSICOES` para que
   cada funcao emita seu proprio warning de licenca independentemente
+- **IBGE** — `retriable_exceptions` restrito a exceções de rede (httpx.TimeoutException,
+  NetworkError, ConnectionError, TimeoutError). Evita retry infinito em TypeError/KeyError
+- **BCB BigQuery** — sanitização de inputs em `_build_query()` via regex whitelist.
+  Previne SQL injection em parâmetros `produto`, `safra_ano`, `uf`
+- **BCB OData** — escape de aspas simples em `produto_sicor` no filtro OData `contains()`
+- **Desmatamento** — validação regex de UF (`^[A-Z]{2}$`) e datas (`^\d{4}-\d{2}-\d{2}$`)
+  nos filtros CQL do DETER e PRODES
+- **B3** — `except Exception` restrito a `(httpx.HTTPError, SourceUnavailableError, ParseError)`
+  em `historico()` e `oi_historico()`. Bugs de programação não são mais engolidos
+- **CEPEA** — `except Exception` restrito a exceções de rede/parse em `indicador()` e `ultimo()`.
+  Conversão de indicadores restrita a `(KeyError, ValueError, TypeError)`
+- **SICAR** — validação regex de `criado_apos` (`^\d{4}-\d{2}-\d{2}$`) no filtro CQL
 
 ### Added
 - **IBGE PEVS Silvicultura** — nova funcao `ibge.silvicultura()` para producao silvicultural

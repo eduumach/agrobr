@@ -88,7 +88,8 @@ async def fetch_credito_rural(
 
     server_filter: list[str] | None = None
     if produto_sicor:
-        server_filter = [f"contains(nomeProduto,'{produto_sicor}')"]
+        safe = produto_sicor.replace("'", "''")
+        server_filter = [f"contains(nomeProduto,'{safe}')"]
 
     logger.info(
         "bcb_fetch_credito",

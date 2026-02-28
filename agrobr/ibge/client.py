@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
+import httpx
 import pandas as pd
 import sidrapy
 import structlog
@@ -656,7 +657,13 @@ async def fetch_sidra(
 
         df = await retry_async(
             _do_fetch,
-            retriable_exceptions=(Exception,),
+            retriable_exceptions=(
+                httpx.TimeoutException,
+                httpx.NetworkError,
+                httpx.RemoteProtocolError,
+                ConnectionError,
+                TimeoutError,
+            ),
         )
 
         logger.info(
