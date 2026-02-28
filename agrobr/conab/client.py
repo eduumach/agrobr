@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 from io import BytesIO
 from typing import Any
@@ -140,7 +141,8 @@ async def download_xlsx(url: str) -> BytesIO:
 
         try:
             async with page.expect_download(timeout=60000) as download_info:
-                await page.evaluate(f'() => {{ window.location.href = "{url}" }}')
+                safe_url = json.dumps(url)
+                await page.evaluate(f"() => {{ window.location.href = {safe_url} }}")
 
             download = await download_info.value
 

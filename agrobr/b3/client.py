@@ -36,7 +36,6 @@ async def fetch_ajustes(data: str) -> tuple[str, str]:
         timeout=TIMEOUT,
         headers=UserAgentRotator.get_bot_headers(),
         follow_redirects=True,
-        verify=False,
     ) as http:
         logger.debug("b3_request", url=url)
         response = await retry_on_status(

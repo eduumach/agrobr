@@ -35,8 +35,6 @@ TIMEOUT = httpx.Timeout(
 )
 
 _ssl_ctx = ssl.create_default_context()
-_ssl_ctx.check_hostname = False
-_ssl_ctx.verify_mode = ssl.CERT_NONE
 _ssl_ctx.set_ciphers("DEFAULT:@SECLEVEL=1")
 
 

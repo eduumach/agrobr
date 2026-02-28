@@ -20,7 +20,8 @@ from .models import (
     TICKERS_AGRO_OI,
 )
 
-_WARNED = False
+_WARNED_AJUSTES = False
+_WARNED_POSICOES = False
 
 logger = structlog.get_logger()
 
@@ -50,8 +51,8 @@ async def ajustes(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    global _WARNED  # noqa: PLW0603
-    if not _WARNED:
+    global _WARNED_AJUSTES  # noqa: PLW0603
+    if not _WARNED_AJUSTES:
         warnings.warn(
             "agrobr.b3: dados da B3 (empresa privada). Ajustes diarios publicados "
             "sem autenticacao, mas termos de uso para acesso programatico nao sao "
@@ -59,7 +60,7 @@ async def ajustes(
             UserWarning,
             stacklevel=2,
         )
-        _WARNED = True
+        _WARNED_AJUSTES = True
 
     logger.info("b3_ajustes", data=str(data), contrato=contrato)
 
@@ -220,8 +221,8 @@ async def posicoes_abertas(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    global _WARNED  # noqa: PLW0603
-    if not _WARNED:
+    global _WARNED_POSICOES  # noqa: PLW0603
+    if not _WARNED_POSICOES:
         warnings.warn(
             "agrobr.b3: dados da B3 (empresa privada). Posicoes em aberto publicadas "
             "sem autenticacao, mas termos de uso para acesso programatico nao sao "
@@ -229,7 +230,7 @@ async def posicoes_abertas(
             UserWarning,
             stacklevel=2,
         )
-        _WARNED = True
+        _WARNED_POSICOES = True
 
     logger.info("b3_posicoes_abertas", data=str(data), contrato=contrato, tipo=tipo)
 

@@ -7,6 +7,16 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+### Security
+- **SICAR** — removido `check_hostname=False` e `verify_mode=CERT_NONE` do SSLContext.
+  Certificado Sectigo validado (chain completa). `@SECLEVEL=1` mantido para compatibilidade
+  de ciphers do GeoServer
+- **B3** — removido `verify=False` do client de ajustes. Certificado GTS validado (ECDSA 256)
+- **CONAB** — sanitizado URL interpolada em `page.evaluate()` via `json.dumps()` para
+  prevenir JS injection no download headless de XLSX
+- **B3** — split de flag `_WARNED` em `_WARNED_AJUSTES` e `_WARNED_POSICOES` para que
+  cada funcao emita seu proprio warning de licenca independentemente
+
 ### Added
 - **IBGE PEVS Silvicultura** — nova funcao `ibge.silvicultura()` para producao silvicultural
   (eucalipto, pinus, carvao vegetal, madeira). Tabela SIDRA 291 (producao, classificacao c194)
