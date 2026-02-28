@@ -64,8 +64,8 @@ AL;LIMOEIRO DE ANADIA;municipio;4759.0;14.0;;;;;media
 AL;OLHO D'AGUA GRANDE;municipio;1112.0;;;;;;media
 AL;SÃO BRAS;municipio;1630.0;;;;;;media
 AL;SÃO SEBASTIÃO;municipio;2427.0;16.0;10.0;;;;media
-AL;MATA ALAGOANA;mesorregiao;;;1425.0;56.0;210.0;;media
-AL;MATA ALAGOANA;microrregiao;;;924.0;23.0;142.0;;media
+AL;MATA ALAGOANA;mesorregiao;;;1425.0;56.0;210.0;;alta
+AL;MATA ALAGOANA;microrregiao;;;924.0;23.0;142.0;;alta
 AL;ATALAIA;municipio;;;203.0;;;;media
 AL;BRANQUINHA;municipio;;;;;;;media
 AL;CAJUEIRO;municipio;;;48.0;;;;media
@@ -85,7 +85,7 @@ AL;SANTANA DO MUNOAU;municipio;;;;;;;media
 AL;SÃO JOSE DA LAJE;municipio;;;138.0;;;;media
 AL;UNIÃO DOS PALMARES;municipio;;;50.0;;23.0;;media
 AL;VIÇOSA;municipio;;;103.0;;13.0;;media
-AL;LITORAL NORTE ALAGOANO;microrregiao;;;197.0;10.0;19.0;;media
+AL;LITORAL NORTE ALAGOANO;microrregiao;;;197.0;10.0;19.0;;alta
 AL;BARRA DE SANTO ANTONIO;municipio;;;;;;;media
 AL;.JAPARATINGA;municipio;;;;;;;media
 AL;MARAGOGI;municipio;;;;;;;media
@@ -94,7 +94,7 @@ AL;PASSO DE CAMARAGIBE;municipio;;;14.0;;;;media
 AL;PORTO CALVO;municipio;;;44.0;;;;media
 AL;PORTO DE PEDRAS;municipio;;;12.0;;;;media
 AL;SÃO MIGUEL DOS MILAGRES;municipio;;;;;;;media
-AL;TABULEIROS DE S MIGUEL DOS CAMPOS;microrregiao;;;304.0;23.0;49.0;;media
+AL;TABULEIROS DE S MIGUEL DOS CAMPOS;microrregiao;;;304.0;23.0;49.0;;alta
 AL;BARRA DE SÃO MIGUEL;municipio;;;;;;;media
 AL;BOCA DA MATA;municipio;;;111.0;;;;media
 AL;CAMPO ALEGRE;municipio;;;54.0;14.0;;;media
@@ -104,434 +104,434 @@ AL;SÃO MIGUEL DOS CAMPOS;municipio;;;57.0;;;;media
 AL;COQUE l RO SECO;municipio;;;;;2.0;;media
 AL;MARECHAL DEODORO;municipio;;;70.0;;;;media
 AL;PILAR;municipio;;;104.0;;;;media
-AM;TOTAIS;total;116302.0;165.0;180.0;91.0;193.0;;baixa
-AM;HILEIA AMAZONENSE;mesorregiao;75563.0;;;;37.0;;baixa
-AM;ALTO SOLIMÕES;microrregiao;12818.0;11.0;;;11.0;;baixa
-AM;AMATURA;municipio;839.0;;;;;;baixa
-AM;ATALAIA DO NORTE;municipio;813.0;;;;;;baixa
-AM;B(f:N JAMIN CONSTANT;municipio;902.0;;;;;;baixa
-AM;FONTE BOA;municipio;1811.0;;;;;;baixa
-AM;.JUTA(;municipio;2133.0;;;;;;baixa
-AM;SANTO ANTONIO DO IÇA;municipio;1722.0;1.0;;;;;baixa
-AM;SÃO PAULO DE OLIVENÇA;municipio;2007.0;2.0;;;2.0;;baixa
-AM;TABATINQA;municipio;997.0;;;;;;baixa
-AM;TONANTINS;municipio;1124.0;;;;;;baixa
-AM;.JURUA;microrregiao;20.0;19.0;;;;;baixa
-AM;CARAUARI;municipio;1695.0;;;;;;baixa
-AM;EIRUNEPE;municipio;1623.0;;;;;;baixa
-AM;ENVIAA;municipio;2792.0;;;;;;baixa
-AM;IPIXUNA;municipio;591.0;;2.0;;;;baixa
-AM;ITAMARATI;municipio;1309.0;;15.0;;;;baixa
-AM;.JUAUA;municipio;852.0;;;;;;baixa
-AM;PURUS;microrregiao;705.0;;;;;;baixa
-AM;BOCA DO ACRE;municipio;3005.0;;;;;;baixa
-AM;CANUTAMA;municipio;2175.0;;;;;;baixa
-AM;LABREA;municipio;982.0;;;;;;baixa
-AM;PAUJNI;municipio;1277.0;;;;;;baixa
-AM;TAPAUA;municipio;3266.0;;;;;;baixa
-AM;MADEIRA;microrregiao;12849.0;21.0;;;15.0;;baixa
-AM;BORBA;municipio;2971.0;;;;;;baixa
-AM;HIMAITA;municipio;2588.0;11.0;;;;;baixa
-AM;MANICORE;municipio;551.0;3.0;;;3.0;;baixa
-AM;NOVO ARIPUANÃ;municipio;2736.0;;;;3.0;;baixa
-AM;RIO NEGRO;microrregiao;6519.0;17.0;12.0;2.0;;;baixa
-AM;BARCELOS;municipio;1852.0;;;;;;baixa
-AM;NOVO AIRÃO;municipio;155.0;;;;;;baixa
-AM;SANTA ISABEL DO RIO NEGRO;municipio;70.0;;;;;;baixa
-AM;SÃO CIAllRIEL DA CACHOEIRA;municipio;3188.0;16.0;12.0;2.0;;;baixa
-AM;SOLillÕES JAPURA;microrregiao;15910.0;12.0;;;;;baixa
-AM;ALVARÃES;municipio;780.0;;;;;;baixa
-AM;ANAMÃ;municipio;810.0;;;;;;baixa
-AM;ANORI;municipio;120.0;;;;;;baixa
-AM;COAR(;municipio;273.0;;;;;;baixa
-AM;CODAJAS;municipio;250.0;;2.0;;;;baixa
-AM;JAPURA;municipio;;;;;;;baixa
-AM;MARAÃ;municipio;2328.0;;;;;;baixa
-AM;TEFE;municipio;1622.0;;;;;;baixa
-AM;UARINI uo;municipio;;;;;;;baixa
-AM;MEDIO AMAZONAS;microrregiao;;40639.0;371.0;;;;baixa
-AM;AUTAZES;municipio;1963.0;3.0;;;;;baixa
-AM;BARREIAINHA;municipio;15.0;11.0;3.0;;;;baixa
-AM;BERURI;municipio;876.0;;;;;;baixa
-AM;BOA VISTA DO RAMOS;municipio;877.0;22.0;21.0;;;;baixa
-AM;CAAPIRANOA;municipio;501.0;;;;;;baixa
-AM;CAREIRO;municipio;953.0;10.0;;;;;baixa
-AM;IRANDUBA;municipio;1872.0;31.0;31.0;;;;baixa
-AM;ITACOATIARA;municipio;2758.0;23.0;16.0;;;;baixa
-AM;lTAPIRANGA;municipio;269.0;13.0;12.0;;;;baixa
-AM;MANACAPURU;municipio;393.0;93.0;33.0;44.0;19.0;;baixa
-AM;MANAQUIRI;municipio;1302.0;2.0;2.0;;;;baixa
-AM;MAUES;municipio;3198.0;18.0;10.0;;;;baixa
-AM;NHAMUNDA;municipio;3031.0;4.0;4.0;;;;baixa
-AM;NOVA OLINDA DO NORTE;municipio;8.0;;;;;;baixa
-AM;PARINTINS;municipio;53.0;51.0;20.0;15.0;16.0;;baixa
-AM;PRESIDENTE FIGUEIREDO;municipio;322.0;;;;;;baixa
-AM;RIO PRETO DA EVA;municipio;397.0;24.0;2.0;12.0;;;baixa
-AM;SÃO SEBASTIÃO. DO UATUMÃ;municipio;752.0;;;;;;baixa
-AM;SILVES;municipio;812.0;4.0;;;;;baixa
-AM;URUCARA;municipio;976.0;3.0;;;;;baixa
-AM;URUCUR (TUBA;municipio;1383.0;3.0;3.0;;;;baixa
-AP;TOTAIS;total;4816.0;42.0;19.0;18.0;;;media
-AP;AMAPA;mesorregiao;4816.0;42.0;19.0;18.0;;;media
+AM;TOTAIS;total;116302.0;165.0;180.0;91.0;193.0;;media
+AM;HILEIA AMAZONENSE;mesorregiao;75563.0;;;;37.0;;media
+AM;ALTO SOLIMÕES;microrregiao;12818.0;11.0;;;11.0;;media
+AM;AMATURA;municipio;839.0;;;;;;media
+AM;ATALAIA DO NORTE;municipio;813.0;;;;;;media
+AM;B(f:N JAMIN CONSTANT;municipio;902.0;;;;;;media
+AM;FONTE BOA;municipio;1811.0;;;;;;media
+AM;.JUTA(;municipio;2133.0;;;;;;media
+AM;SANTO ANTONIO DO IÇA;municipio;1722.0;1.0;;;;;media
+AM;SÃO PAULO DE OLIVENÇA;municipio;2007.0;2.0;;;2.0;;media
+AM;TABATINQA;municipio;997.0;;;;;;media
+AM;TONANTINS;municipio;1124.0;;;;;;media
+AM;.JURUA;microrregiao;20.0;19.0;;;;;media
+AM;CARAUARI;municipio;1695.0;;;;;;media
+AM;EIRUNEPE;municipio;1623.0;;;;;;media
+AM;ENVIAA;municipio;2792.0;;;;;;media
+AM;IPIXUNA;municipio;591.0;;2.0;;;;media
+AM;ITAMARATI;municipio;1309.0;;15.0;;;;media
+AM;.JUAUA;municipio;852.0;;;;;;media
+AM;PURUS;microrregiao;705.0;;;;;;media
+AM;BOCA DO ACRE;municipio;3005.0;;;;;;media
+AM;CANUTAMA;municipio;2175.0;;;;;;media
+AM;LABREA;municipio;982.0;;;;;;media
+AM;PAUJNI;municipio;1277.0;;;;;;media
+AM;TAPAUA;municipio;3266.0;;;;;;media
+AM;MADEIRA;microrregiao;12849.0;21.0;;;15.0;;media
+AM;BORBA;municipio;2971.0;;;;;;media
+AM;HIMAITA;municipio;2588.0;11.0;;;;;media
+AM;MANICORE;municipio;551.0;3.0;;;3.0;;media
+AM;NOVO ARIPUANÃ;municipio;2736.0;;;;3.0;;media
+AM;RIO NEGRO;microrregiao;6519.0;17.0;12.0;2.0;;;media
+AM;BARCELOS;municipio;1852.0;;;;;;media
+AM;NOVO AIRÃO;municipio;155.0;;;;;;media
+AM;SANTA ISABEL DO RIO NEGRO;municipio;70.0;;;;;;media
+AM;SÃO CIAllRIEL DA CACHOEIRA;municipio;3188.0;16.0;12.0;2.0;;;media
+AM;SOLillÕES JAPURA;microrregiao;15910.0;12.0;;;;;media
+AM;ALVARÃES;municipio;780.0;;;;;;media
+AM;ANAMÃ;municipio;810.0;;;;;;media
+AM;ANORI;municipio;120.0;;;;;;media
+AM;COAR(;municipio;273.0;;;;;;media
+AM;CODAJAS;municipio;250.0;;2.0;;;;media
+AM;JAPURA;municipio;;;;;;;media
+AM;MARAÃ;municipio;2328.0;;;;;;media
+AM;TEFE;municipio;1622.0;;;;;;media
+AM;UARINI uo;municipio;;;;;;;media
+AM;MEDIO AMAZONAS;microrregiao;;40639.0;371.0;;;;media
+AM;AUTAZES;municipio;1963.0;3.0;;;;;media
+AM;BARREIAINHA;municipio;15.0;11.0;3.0;;;;media
+AM;BERURI;municipio;876.0;;;;;;media
+AM;BOA VISTA DO RAMOS;municipio;877.0;22.0;21.0;;;;media
+AM;CAAPIRANOA;municipio;501.0;;;;;;media
+AM;CAREIRO;municipio;953.0;10.0;;;;;media
+AM;IRANDUBA;municipio;1872.0;31.0;31.0;;;;media
+AM;ITACOATIARA;municipio;2758.0;23.0;16.0;;;;media
+AM;lTAPIRANGA;municipio;269.0;13.0;12.0;;;;media
+AM;MANACAPURU;municipio;393.0;93.0;33.0;44.0;19.0;;media
+AM;MANAQUIRI;municipio;1302.0;2.0;2.0;;;;media
+AM;MAUES;municipio;3198.0;18.0;10.0;;;;media
+AM;NHAMUNDA;municipio;3031.0;4.0;4.0;;;;media
+AM;NOVA OLINDA DO NORTE;municipio;8.0;;;;;;media
+AM;PARINTINS;municipio;53.0;51.0;20.0;15.0;16.0;;media
+AM;PRESIDENTE FIGUEIREDO;municipio;322.0;;;;;;media
+AM;RIO PRETO DA EVA;municipio;397.0;24.0;2.0;12.0;;;media
+AM;SÃO SEBASTIÃO. DO UATUMÃ;municipio;752.0;;;;;;media
+AM;SILVES;municipio;812.0;4.0;;;;;media
+AM;URUCARA;municipio;976.0;3.0;;;;;media
+AM;URUCUR (TUBA;municipio;1383.0;3.0;3.0;;;;media
+AP;TOTAIS;total;4816.0;42.0;19.0;18.0;;;alta
+AP;AMAPA;mesorregiao;4816.0;42.0;19.0;18.0;;;alta
 AP;MACAPA;microrregiao;667.0;14.0;;;;;media
 AP;MACAPA;municipio;2497.0;12.0;;;;;media
 AP;MAZAGÃO;municipio;1170.0;;;;;;media
-AP;AMAPA E OI APOOUE;microrregiao;1149.0;28.0;11.0;13.0;;;media
-AP;AMAPA;municipio;633.0;17.0;10.0;;;;media
-AP;CALÇOENE;municipio;217.0;;;;;;media
-AP;OIAPOQUE;municipio;299.0;11.0;;10.0;;;media
-BA;TOTAIS;total;739006.0;21552.0;13875.0;5527.0;429.0;4492.0;baixa
-BA;OESTE BAIANO;microrregiao;300262.0;4778.0;2749.0;1416.0;33.0;1224.0;baixa
-BA;CHAPADÕES DO ALTO RIO GRANDE;microrregiao;23844.0;359.0;278.0;102.0;;57.0;baixa
-BA;ANGICAL;municipio;1942.0;;;;;;baixa
-BA;BAIANOPOLIS;municipio;1321.0;12.0;;;;;baixa
-BA;BARREIRAS;municipio;2039.0;163.0;131.0;21.0;;24.0;baixa
-BA;BREJOLANDIA;municipio;1692.0;;;;;;baixa
-BA;CATOLANDIA;municipio;661.0;;;;;;baixa
-BA;COTEGIPE;municipio;1916.0;12.0;;;;;baixa
-BA;CRISTOPOLIS;municipio;1570.0;;;;;;baixa
-BA;FORMOSA DO RIO PRETO;municipio;1622.0;80.0;70.0;66.0;;;baixa
-BA;RIACHÂO DAS NEVES;municipio;2242.0;;;;;;baixa
-BA;SANTA RITA DE CASSIA;municipio;3534.0;;;;;;baixa
-BA;SÃO DESIDERIO;municipio;3123.0;71.0;54.0;;;16.0;baixa
-BA;TABOCAS DO BREJO VELHO;municipio;2182.0;;;;;;baixa
-BA;CHAPADÕES DO RIO CORRENTE;municipio;18907.0;841.0;542.0;208.0;;212.0;baixa
-BA;CANAPOLIS;municipio;1530.0;63.0;;;;58.0;baixa
-BA;cocos;municipio;1970.0;;;;;;baixa
-BA;CORIBE;municipio;2224.0;316.0;236.0;128.0;;50.0;baixa
-BA;CORRENT INA;municipio;3947.0;85.0;28.0;45.0;;16.0;baixa
-BA;SANTA MARIA DA VITORIA;municipio;3368.0;301.0;235.0;21.0;;62.0;baixa
-BA;SANTANA;municipio;2985.0;54.0;27.0;;;26.0;baixa
-BA;SERRA DOURADA;municipio;2883.0;18.0;;;;;baixa
-BA;BAIXO-MEDI O SÃO FRANCISCO;municipio;39076.0;106.0;24.0;34.0;;49.0;baixa
-BA;BARRA;municipio;7527.0;36.0;;20.0;;;baixa
-BA;CAMPO ALEGRE DE LOURDES;municipio;3659.0;22.0;;;;18.0;baixa
-BA;CASA NOVA;municipio;6896.0;10.0;;;;;baixa
-BA;IBOTIRAMA;municipio;1523.0;;;;;;baixa
-BA;MORPARA;municipio;982.0;;;;;;baixa
-BA;PI LÂO ARCADO;municipio;5474.0;;;;;;baixa
-BA;REMANSO;municipio;3960.0;;;;;;baixa
-BA;SENTO SE s;municipio;5025.0;;;;;;baixa
-BA;XIOUE-XIOUE;municipio;4030.0;21.0;15.0;;;;baixa
-BA;MEDI O SÃO FRANCISCO;municipio;17214.0;365.0;165.0;144.0;;63.0;baixa
-BA;BOM .JESUS DA LAPA;municipio;8635.0;190.0;88.0;91.0;;11.0;baixa
-BA;CAR I NHANHA;municipio;2505.0;63.0;17.0;;;45.0;baixa
-BA;MALHADA;municipio;2728.0;90.0;57.0;37.0;;;baixa
-BA;PARATINGA;municipio;3346.0;22.0;;14.0;;;baixa
-BA;CHAPADA DIAMANTINA SETENTRIONAL;municipio;32426.0;645.0;455.0;129.0;;103.0;baixa
-BA;BARRA DO MENDES;municipio;1903.0;;;;;;baixa
-BA;CAFARNAUM;municipio;364.0;28.0;;26.0;;;baixa
-BA;CANARANA;municipio;3791.0;20.0;;;;;baixa
-BA;CENTRAL;municipio;1564.0;16.0;;;;;baixa
-BA;GENTIO DO OURO;municipio;2480.0;;;;;;baixa
-BA;IBIPEBA;municipio;2275.0;;;;;;baixa
-BA;IBITITA;municipio;2344.0;;;;;;baixa
-BA;IRECE;municipio;6749.0;454.0;372.0;69.0;;50.0;baixa
-BA;JUSSARA;municipio;1130.0;54.0;29.0;13.0;;12.0;baixa
-BA;MORRO DO CHAPEU;municipio;2698.0;15.0;;;;;baixa
-BA;PRESIDENTE OUTRA;municipio;1473.0;27.0;16.0;;;11.0;baixa
-BA;SOUTO SOARES;municipio;103.0;;;;;;baixa
-BA;UIBAI;municipio;1552.0;;;;;;baixa
-BA;CHAPADA DIAMANTINA MERIDIONAL;microrregiao;65612.0;579.0;305.0;189.0;212.0;;baixa
-BA;ABAIRA;municipio;;1550.0;;;;;baixa
-BA;AGUA QUENTE;municipio;;1002.0;;;;;baixa
-BA;ANDARA(;municipio;;2908.0;100.0;;13.0;10.0;baixa
-BA;BARRA DA ESTIVA;municipio;1724.0;11.0;10.0;;;;baixa
-BA;BONINAL;municipio;;1621.0;;;;;baixa
-BA;BOQUIRA;municipio;;3068.0;;;;;baixa
-BA;BOTUPORÃ;municipio;;4756.0;25.0;;;25.0;baixa
-BA;BROTAS DE MACAUBAS;municipio;2639.0;3.0;;;;;baixa
-BA;CONTENDAS;municipio;;662.0;;;;;baixa
-BA;(BICOARA;municipio;;1057.0;22.0;;;;baixa
-BA;(BIPITANGA;municipio;;2193.0;;;;;baixa
-BA;IBITIARA;municipio;;4840.0;;;;;baixa
-BA;IPUPIARA;municipio;;1141.0;;;;;baixa
-BA;IRAMAIA;municipio;;1130.0;12.0;;;;baixa
-BA;IRAQUARA;municipio;;2651.0;105.0;;94.0;;baixa
-BA;ITAETE;municipio;;1223.0;15.0;;10.0;;baixa
-BA;ITUAÇU;municipio;;2092.0;;;;;baixa
-BA;JUSSIAPE;municipio;;1361.0;;;;;baixa
-BA;LENÇO IS;municipio;307.0;;;;;;baixa
-BA;MACAUBAS s;municipio;;5538.0;149.0;;148.0;123.0;baixa
-BA;MUCUGE;municipio;;1074.0;;;;;baixa
-BA;OLIVEIRA DOS BREJINHOS;municipio;3115.0;46.0;45.0;;;;baixa
-BA;PALMEIRAS;municipio;;556.0;;;;;baixa
-BA;PARAMIRIM;municipio;;3901.0;12.0;;;;baixa
-BA;PIATÃ;municipio;;3645.0;;;;;baixa
-BA;RIO DE CONTAS;municipio;750.0;;;;;;baixa
-BA;RIO DO PIRES;municipio;1813.0;;;;;;baixa
-BA;SEABRA;municipio;;3304.0;;;;;baixa
-BA;TANHAÇU;municipio;;639.0;20.0;;;;baixa
-BA;UTINGA;municipio;;1130.0;25.0;;15.0;;baixa
-BA;WAGNER;municipio;;222.0;;;;;baixa
-BA;SERRA GERAL DA BAHIA;microrregiao;61771.0;429.0;;;;;baixa
-BA;ARACATU;municipio;;2308.0;;;;;baixa
-BA;BRUMADO;municipio;;3343.0;58.0;;;;baixa
-BA;CACULE;municipio;;1715.0;;;;;baixa
-BA;CAETITE;municipio;;6145.0;34.0;;20.0;15.0;baixa
-BA;CANDIBA;municipio;;2134.0;89.0;;72.0;;baixa
-BA;CONDEUBA;municipio;;3101.0;;;;;baixa
-BA;CORDEIROS;municipio;;979.0;;;;;baixa
-BA;DOM BASILIO;municipio;1533.0;;;;;;baixa
-BA;GUANAMBI;municipio;;4354.0;342.0;;206.0;102.0;baixa
-BA;IBIASSUCE;municipio;;1433.0;;;;;baixa
-BA;IGAPORÃ;municipio;;1239.0;164.0;;;;baixa
-BA;.JACARACI;municipio;;2511.0;;;;;baixa
-BA;LICINIO DE ALMEIDA;municipio;1459.0;11.0;;;;;baixa
-BA;MALHADA OE PEDRAS;municipio;1477.0;2.0;;;;;baixa
-BA;MORTUGABA;municipio;;1393.0;;;;;baixa
-BA;PALMAS DE MONTE ALTO;municipio;2118.0;70.0;46.0;29.0;4.0;;baixa
-BA;PINDAI;municipio;;3139.0;30.0;;14.0;12.0;baixa
-BA;PIRIPA;municipio;;1078.0;;;;;baixa
-BA;PRESIDENTE .JANIO QUADROS;municipio;;2531.0;;;;;baixa
-BA;RIACHO DE SANTANA;municipio;5708.0;362.0;250.0;124.0;32.0;;baixa
-BA;SEBASTIÃO LARANJEIRAS;municipio;;828.0;54.0;;;39.0;baixa
-BA;TREMEDAL;municipio;;4256.0;37.0;;;2.0;baixa
-BA;URANO(;municipio;1954.0;100.0;88.0;;;;baixa
-BA;SENHOR DO BONFIM;microrregiao;29491.0;334.0;125.0;101.0;;112.0;baixa
-BA;ANTONIO GONÇALVES;municipio;1414.0;26.0;24.0;;;;baixa
-BA;CALDEIRÃO GRANDE;municipio;2327.0;16.0;;;;;baixa
-BA;CAMPO FORMOSO;municipio;8496.0;134.0;74.0;32.0;;27.0;baixa
-BA;JAGUARARI;municipio;2732.0;;;;;;baixa
-BA;MIRANGABA;municipio;3124.0;11.0;;;;;baixa
-BA;PINDOBAÇU;municipio;4223.0;57.0;10.0;33.0;;;baixa
-BA;SAUDE;municipio;1423.0;12.0;;;;;baixa
-BA;SENHOR DO BONFIM s;municipio;5752.0;69.0;;;;51.0;baixa
-BA;CORREDEIRAS DO SÃO FRANCISCO;microrregiao;11921.0;162.0;122.0;80.0;10.0;16.0;baixa
-BA;ABARE;municipio;1049.0;;;;;;baixa
-BA;CHORROCHO;municipio;1534.0;;;;;;baixa
-BA;CURAÇA;municipio;3040.0;15.0;;;;;baixa
-BA;.JUAZEIRO;municipio;4657.0;125.0;102.0;69.0;;10.0;baixa
-BA;MACURURE;municipio;1224.0;;;;;;baixa
-BA;RODELAS;municipio;417.0;15.0;;;;;baixa
-BA;LESTE BAIANO;mesorregiao;;8010.0;4542.0;501.0;300.0;772.0;baixa
-BA;PIEMONTE DA DIAMANTINA;microrregiao;36425.0;832.0;277.0;141.0;17.0;421.0;baixa
-BA;BAIXA GRANDE;municipio;2869.0;62.0;23.0;31.0;;;baixa
-BA;BOA VISTA DO TUPIM;municipio;1833.0;22.0;14.0;;;;baixa
-BA;CAEM;municipio;1629.0;16.0;;;;4.0;baixa
-BA;IBIQUERA;municipio;579.0;27.0;14.0;;;;baixa
-BA;ITABERABA;municipio;2278.0;43.0;20.0;18.0;;;baixa
-BA;JACOBINA;municipio;9021.0;141.0;36.0;36.0;;73.0;baixa
-BA;LAJEDINHO;municipio;478.0;32.0;;;;25.0;baixa
-BA;MACA JUBA;municipio;812.0;32.0;26.0;;;;baixa
-BA;MAIRI;municipio;3630.0;10.0;;;;;baixa
-BA;MIDUEL CALMON;municipio;3209.0;12.0;;;;;baixa
-BA;MUNDO NOVO;municipio;1644.0;187.0;39.0;;;148.0;baixa
-BA;PIRITIBA;municipio;2106.0;56.0;50.0;;;;baixa
-BA;RUY BARBOSA;municipio;1765.0;147.0;22.0;;;123.0;baixa
-BA;SERROLANDIA;municipio;2863.0;;;;;;baixa
-BA;TAPIRAMUTA;municipio;751.0;38.0;13.0;18.0;;;baixa
-BA;VÀRZEA DO POÇO;municipio;958.0;;;;;2.0;baixa
-BA;SERTÃO DE CANUDOS;microrregiao;42917.0;580.0;232.0;153.0;;198.0;baixa
-BA;CANSANÇÃO;municipio;5170.0;19.0;;;;2.0;baixa
-BA;EUCLIDES DA CUNHA;municipio;7826.0;243.0;87.0;17.0;;139.0;baixa
-BA;ITIUBA;municipio;4713.0;89.0;56.0;10.0;;27.0;baixa
-BA;MONTE SANTO;municipio;8571.0;11.0;;;;;baixa
-BA;QUEIMADAS;municipio;4467.0;14.0;;;;;baixa
-BA;QUIJINGUE;municipio;4291.0;139.0;46.0;89.0;;;baixa
-BA;TUCANO;municipio;4648.0;59.0;24.0;20.0;;12.0;baixa
-BA;SERRINHA;microrregiao;39164.0;1327.0;976.0;269.0;17.0;139.0;baixa
-BA;ARACI;municipio;5000.0;157.0;142.0;52.0;;;baixa
-BA;BIRITINGA;municipio;1986.0;124.0;81.0;36.0;;;baixa
-BA;CANDEAL;municipio;1041.0;16.0;12.0;;;;baixa
-BA;CONCEIÇÃO DO COITE s;municipio;5204.0;37.0;21.0;13.0;;;baixa
-BA;ICHU;municipio;645.0;30.0;;26.0;;;baixa
-BA;LAMARÃO;municipio;1660.0;85.0;80.0;;;;baixa
-BA;RETIROLANDIA;municipio;1545.0;27.0;7.0;18.0;;;baixa
-BA;RIACHÃO DO JACUIPE;municipio;7981.0;54.0;29.0;25.0;;;baixa
-BA;SANTALUZ;municipio;266.0;83.0;41.0;;;39.0;baixa
-BA;SERRINHA;municipio;6745.0;599.0;460.0;69.0;13.0;68.0;baixa
-BA;FEIRA DE SANTANA;microrregiao;55893.0;;642.0;361.0;126.0;153.0;baixa
-BA;AGUA FRIA;municipio;2726.0;35.0;23.0;10.0;;;baixa
-BA;ANGUERA;municipio;794.0;;;;;;baixa
-BA;ANTONIO CARDOSO;municipio;1798.0;11.0;;;;;baixa
-BA;CASTRO ALVES;municipio;6570.0;148.0;56.0;29.0;53.0;30.0;baixa
-BA;CORAÇÃO DE MARIA;municipio;3034.0;40.0;24.0;;;;baixa
-BA;ELISIO MEDRADO;municipio;1199.0;15.0;;;;;baixa
-BA;FEIRA DE SANTANA;municipio;8498.0;78.0;57.0;;;;baixa
-BA;IAÇU;municipio;1752.0;16.0;12.0;;;;baixa
-BA;IPECAETA;municipio;3349.0;15.0;10.0;;;;baixa
-BA;(PIRA;municipio;8409.0;541.0;325.0;261.0;;58.0;baixa
-BA;IRARA;municipio;2350.0;21.0;17.0;;;;baixa
-BA;OURIÇANGAS;municipio;738.0;17.0;17.0;;;;baixa
-BA;PEDRÂO;municipio;1049.0;51.0;35.0;;29.0;;baixa
-BA;SANTA BARBARA;municipio;2249.0;11.0;;;;;baixa
-BA;SANTANOPOLI S;municipio;2051.0;;;;;;baixa
-BA;SANTA TERESINHA;municipio;2168.0;31.0;10.0;14.0;;;baixa
-BA;SANTO ESTEVÃO;municipio;4213.0;12.0;;;;;baixa
-BA;SERRA PRETA;municipio;2205.0;44.0;14.0;;;26.0;baixa
-BA;TANQUINHO;municipio;741.0;;;;;;baixa
-BA;JEQUIE;microrregiao;27426.0;1242.0;733.0;382.0;;397.0;baixa
-BA;AIQUARA;municipio;395.0;27.0;26.0;;;;baixa
-BA;AMARGOSA;municipio;2099.0;103.0;72.0;21.0;;11.0;baixa
-BA;BREJÔES;municipio;902.0;;;;;;baixa
-BA;CRAVOLANOIA;municipio;388.0;;;;;;baixa
-BA;IRAJUBA;municipio;475.0;;;;;;baixa
-BA;ITAGI;municipio;1176.0;155.0;12.0;;;140.0;baixa
-BA;ITAQUARA;municipio;636.0;19.0;16.0;11.0;;;baixa
-BA;ITIRUÇU;municipio;296.0;37.0;37.0;;;;baixa
-BA;JAGUAQUARA;municipio;1977.0;502.0;392.0;252.0;;89.0;baixa
-BA;JEQUIE;municipio;3056.0;185.0;46.0;28.0;;122.0;baixa
-BA;JIQUIRIÇA;municipio;1092.0;;;;;;baixa
-BA;JITAUNA;municipio;880.0;35.0;34.0;10.0;;;baixa
-BA;LAFAIETE COUTINHO;municipio;323.0;;;;;;baixa
-BA;LAJE;municipio;1841.0;24.0;15.0;;;;baixa
-BA;MARACAS;municipio;3090.0;39.0;14.0;12.0;;16.0;baixa
-BA;MARCIONILIO SOUZA;municipio;925.0;14.0;;;;;baixa
-BA;MILAGRES;municipio;612.0;22.0;21.0;;;;baixa
-BA;MUTUIPE;municipio;2089.0;;;;;;baixa
-BA;NOVA ITARANA;municipio;490.0;;;;;;baixa
-BA;PLANAL TINO;municipio;995.0;12.0;;;;;baixa
-BA;SANTA INES;municipio;212.0;16.0;14.0;;;;baixa
-BA;SÃO MIGUEL DAS MATAS;municipio;1526.0;17.0;;;;;baixa
-BA;UBAIRA;municipio;1951.0;;;;;;baixa
-BA;PLANALTO DE CONQUISTA;microrregiao;23172.0;686.0;416.0;207.0;;176.0;baixa
-BA;ANAGE;municipio;3095.0;103.0;;;;96.0;baixa
-BA;BARRA DO CHOÇA;municipio;1505.0;163.0;146.0;68.0;;;baixa
-BA;BELO CAMPO;municipio;1265.0;;;;;;baixa
-BA;BOA NOVA;municipio;2205.0;14.0;;;;;baixa
-BA;CAATIBA;municipio;871.0;19.0;12.0;;;;baixa
-BA;CANO IDO SALES;municipio;1053.0;33.0;;26.0;;;baixa
-BA;DARIO MEIRA;municipio;1167.0;53.0;48.0;;;;baixa
-BA;MANOEL VITORINO;municipio;1274.0;;;;;;baixa
-BA;NOVA CANAÃ;municipio;877.0;45.0;;;;36.0;baixa
-BA;PLANALTO;municipio;1777.0;37.0;10.0;28.0;;;baixa
-BA;POÇÕES;municipio;3038.0;20.0;10.0;;2.0;;baixa
-BA;VITORIA DA CONQUISTA;municipio;5045.0;191.0;159.0;58.0;;14.0;baixa
-BA;PASTORIL DE ITAPETINGA;microrregiao;4901.0;869.0;557.0;619.0;51.0;;baixa
-BA;ENCRUZILHADA;municipio;2240.0;192.0;71.0;104.0;29.0;;baixa
-BA;ITAMBE;municipio;;;;119.0;;89.0;baixa
-BA;ITAPETINGA;municipio;;;;231.0;;109.0;baixa
-BA;ITARANTIM;municipio;;;;173.0;;139.0;baixa
-BA;MACARANI;municipio;;;;141.0;;139.0;baixa
-BA;MAIQUINIQUE;municipio;;;;13.0;;;baixa
-BA;SERTÃO DE PAULO AFONSO;microrregiao;13607.0;31.0;22.0;;;;baixa
-BA;CORONEL JOÃO SA;municipio;;;;;;;baixa
-BA;GLORIA;municipio;;;;;;;baixa
-BA;JEREMOABO;municipio;;;;10.0;;;baixa
-BA;PAULO AFONSO;municipio;1884.0;;;;;;baixa
-BA;PEDRO ALEXANDRE;municipio;420.0;;;;;;baixa
-BA;SANTA BRIGIDA;municipio;466.0;;;;;;baixa
-BA;AGRESTE DE ALAGOINHAS;microrregiao;63376.0;637.0;407.0;154.0;97.0;;baixa
-BA;ACAJUTIBA;municipio;;;;30.0;;14.0;baixa
-BA;ALAGOINHAS;municipio;;;;45.0;;30.0;baixa
-BA;ANTAS;municipio;;;;53.0;;;baixa
-BA;APORA;municipio;;;;;;;baixa
-BA;ARAMAR(;municipio;;;;15.0;;;baixa
-BA;CICERO DANTAS;municipio;6193.0;41.0;31.0;;;;baixa
-BA;CIPO;municipio;;;;;;;baixa
-BA;CRISOPOLIS;municipio;;;;;;;baixa
-BA;INHAMBUPE;municipio;;;;13.0;;;baixa
-BA;ITAPICURU;municipio;;;;40.0;;20.0;baixa
-BA;NOVA SOURE;municipio;3869.0;;;;;;baixa
-BA;OLINOINA;municipio;;;;;;;baixa
-BA;PARIPIRANGA;municipio;;;;302.0;;286.0;baixa
-BA;RIBEIRA DO AMPARO;municipio;4956.0;43.0;16.0;27.0;;;baixa
-BA;RIBEIRA DO POMBAL;municipio;7426.0;19.0;11.0;;;;baixa
-BA;RIO REAL;municipio;;;;10.0;;;baixa
-BA;SATIRO DIAS;municipio;2779.0;15.0;;;;;baixa
-BA;LITORAL NORTE BAIANO s;microrregiao;5376.0;97.0;66.0;20.0;13.0;;baixa
-BA;CARDEAL DA SILVA;municipio;176.0;18.0;17.0;;;;baixa
-BA;CONDE;municipio;;;;;;;baixa
-BA;ENTRE RIOS;municipio;1494.0;41.0;25.0;10.0;;;baixa
-BA;ESPLANADA;municipio;;;;27.0;;15.0;baixa
-BA;ITANAGRA;municipio;;;;;;;baixa
-BA;JANDAIRA;municipio;;;;;;;baixa
-BA;RECONCAVO BAIANO;microrregiao;35976.0;608.0;214.0;192.0;115.0;121.0;baixa
-BA;AME LIA RODRIGUES;municipio;655.0;;;;;;baixa
-BA;ARATUIPE;municipio;;;;;;;baixa
-BA;CACHOEIRA;municipio;;;;;;;baixa
-BA;CONCE;municipio;1257.0;79.0;68.0;;;;baixa
-BA;CONCEIÇÃO DO ALMEIDA;municipio;1856.0;41.0;26.0;;;;baixa
-BA;CONCEIÇÃO DO JACUIPE;municipio;749.0;27.0;26.0;;;;baixa
-BA;CRUZ DAS ALMAS;municipio;;;;;;;baixa
-BA;DOM MACEDO COSTA;municipio;;;;;;;baixa
-BA;GOVERNADOR MANGABEIRA;municipio;2341.0;12.0;12.0;;;;baixa
-BA;JAGUARIPE;municipio;;;;14.0;;;baixa
-BA;MARAOOGIPE;municipio;;;;;;;baixa
-BA;MUNIZ FERREIRA;municipio;424.0;;;;;;baixa
-BA;MURITIBA;municipio;;;;11.0;;;baixa
-BA;NAZARE;municipio;;;;;;;baixa
-BA;CAMAÇARI;municipio;;;;40.0;;;baixa
-BA;CANO E IAS;municipio;;;;;;;baixa
-BA;CATU;municipio;;;;25.0;19.0;;baixa
-BA;LAURO DE FREITAS;municipio;;;;;;;baixa
-BA;MATA DE SÃO JOÃO;municipio;1961.0;;;;;;baixa
-BA;POJUCA;municipio;;;;;;;baixa
-BA;SÃO FRANCISCO DO CONDE;municipio;907.0;;;;;;baixa
-BA;SIMÕES FILHO;municipio;;;;;;;baixa
-BA;LITORAL SUL BAIANO;mesorregiao;;;;6502.0;1583.0;94.0;baixa
-BA;TABULEIROS DE VALENÇA;microrregiao;20476.0;837.0;246.0;63.0;570.0;;baixa
-BA;CATRU;municipio;;;;;;;baixa
-BA;CAMAMU;municipio;;;;35.0;;;baixa
-BA;IBIRAPITANGA;municipio;;;;26.0;;;baixa
-BA;ITUBERA;municipio;;;;82.0;33.0;;baixa
-BA;MARAU;municipio;;;;33.0;;;baixa
-BA;NILO PEÇANHA;municipio;;;;;;;baixa
-BA;TAPEROA;municipio;;;;19.0;;;baixa
-BA;VALENÇA;municipio;;;;37.0;16.0;;baixa
-BA;ENCOSTA;microrregiao;9162.0;783.0;666.0;192.0;14.0;49.0;baixa
-BA;FIRMINO ALVES;municipio;;;;15.0;;;baixa
-BA;FLORESTA AZUL;municipio;;;;131.0;62.0;;baixa
-BA;IBICUI;municipio;;;;26.0;;;baixa
-BA;IGUAI;municipio;;;;;;;baixa
-BA;ITAGIBA;municipio;;;;206.0;;;baixa
-BA;ITAGIMIRIM;municipio;;;;23.0;10.0;;baixa
-BA;ITAJU;municipio;;;;57.0;35.0;;baixa
-BA;ITAPEBI;municipio;;;;50.0;;;baixa
-BA;ITORORO;municipio;;;;55.0;35.0;;baixa
-BA;PAU BRASIL;municipio;;;;62.0;;;baixa
-BA;POTIRAGUA;municipio;;;;14.0;;;baixa
-BA;SANTA CRUZ DA VITORIA;municipio;307.0;25.0;23.0;;;;baixa
-BA;CACAUEIRA;microrregiao;;;;4504.0;965.0;75.0;baixa
-BA;ALMADINA;municipio;;;;47.0;;;baixa
-BA;AURELINO LEAL;municipio;;;;21.0;;;baixa
-BA;BARRA DO ROCHA;municipio;;;;38.0;;;baixa
-BA;BARRO PRETO;municipio;;;;100.0;;;baixa
-BA;BELMONTE;municipio;;;;95.0;34.0;;baixa
-BA;BUERAREMA;municipio;;;;8.0;13.0;;baixa
-BA;CAMACAN;municipio;;;;244.0;79.0;;baixa
-BA;CANAVIEIRAS;municipio;;;;593.0;89.0;;baixa
-BA;COARAC I;municipio;;;;316.0;115.0;;baixa
-BA;GANDU;municipio;;;;10.0;;40.0;baixa
-BA;GONGOGI;municipio;;;;;;;baixa
-BA;IBICARAI;municipio;;;;269.0;96.0;13.0;baixa
-BA;IBIRATAIA;municipio;;;;44.0;11.0;;baixa
-BA;I LHEUS;municipio;;;;828.0;85.0;;baixa
-BA;IPIAU;municipio;;;;195.0;157.0;;baixa
-BA;ITABUNA;municipio;;;;232.0;12.0;;baixa
-BA;I T ACARE;municipio;;;;78.0;46.0;;baixa
-BA;ITAJUIPE;municipio;;;;258.0;58.0;;baixa
-BA;ITAMARI;municipio;;;;;;;baixa
-BA;ITAPE;municipio;;;;121.0;14.0;;baixa
-BA;ITAPITANGA;municipio;;;;95.0;;;baixa
-BA;MASCOTE;municipio;;;;118.0;;;baixa
-BA;TEOLANDIA;municipio;;;;;;;baixa
-BA;UBAITABA;municipio;;;;36.0;;;baixa
-BA;UBATÃ;municipio;;;;;;;baixa
-BA;URUÇUCA;municipio;;;;260.0;26.0;;baixa
-BA;WENCESLAU GUIMARÃES;municipio;;;;36.0;18.0;;baixa
-BA;INTERIORANA EXTREMO SUL DA BAHIA;microrregiao;765.0;346.0;187.0;267.0;;;baixa
-BA;GUARATINGA;municipio;;;;119.0;27.0;;baixa
-BA;IBIRAPUÂ;municipio;;;;55.0;14.0;;baixa
-BA;ITAMARAJU;municipio;;;;120.0;53.0;;baixa
-BA;ITANHEM;municipio;;;;30.0;53.0;;baixa
-BA;LAJEOÂO;municipio;;;;;;;baixa
-BA;MEDEIROS NETO;municipio;;;;18.0;40.0;;baixa
-BA;LITORANEA DO EXTREMO SUL DA BAHIA;microrregiao;8521.0;988.0;740.0;176.0;132.0;;baixa
-BA;ALCOBAÇA;municipio;;;;154.0;49.0;;baixa
-BA;CARAVELAS;municipio;;;;165.0;35.0;;baixa
-BA;MUCUR I;municipio;;;;72.0;29.0;;baixa
-BA;NOVA VIÇOSA;municipio;;;;42.0;13.0;;baixa
-BA;PORTO SEGURO;municipio;;;;213.0;;;baixa
-BA;PRADO;municipio;;;;64.0;43.0;;baixa
-BA;SANTA CRUZ CABRAL l A;municipio;;;;30.0;;;baixa
-ES;TOTAIS;total;69140.0;11349.0;10244.0;459.0;944.0;;media
-ES;ESPIRI TO-SANTENSE;mesorregiao;67541.0;11226.0;10129.0;458.0;937.0;;media
-ES;ALTO SÃO MATEUS;microrregiao;2774.0;1023.0;989.0;80.0;16.0;;media
-ES;ECOPORANGA;municipio;1740.0;504.0;481.0;58.0;;;media
-ES;MONTANHA;municipio;563.0;266.0;260.0;;;;media
-ES;MUCURICI;municipio;471.0;253.0;248.0;22.0;;;media
+AP;AMAPA E OI APOOUE;microrregiao;1149.0;28.0;11.0;13.0;;;alta
+AP;AMAPA;municipio;633.0;17.0;10.0;;;;alta
+AP;CALÇOENE;municipio;217.0;;;;;;alta
+AP;OIAPOQUE;municipio;299.0;11.0;;10.0;;;alta
+BA;TOTAIS;total;739006.0;21552.0;13875.0;5527.0;429.0;4492.0;media
+BA;OESTE BAIANO;microrregiao;300262.0;4778.0;2749.0;1416.0;33.0;1224.0;media
+BA;CHAPADÕES DO ALTO RIO GRANDE;microrregiao;23844.0;359.0;278.0;102.0;;57.0;media
+BA;ANGICAL;municipio;1942.0;;;;;;media
+BA;BAIANOPOLIS;municipio;1321.0;12.0;;;;;media
+BA;BARREIRAS;municipio;2039.0;163.0;131.0;21.0;;24.0;media
+BA;BREJOLANDIA;municipio;1692.0;;;;;;media
+BA;CATOLANDIA;municipio;661.0;;;;;;media
+BA;COTEGIPE;municipio;1916.0;12.0;;;;;media
+BA;CRISTOPOLIS;municipio;1570.0;;;;;;media
+BA;FORMOSA DO RIO PRETO;municipio;1622.0;80.0;70.0;66.0;;;media
+BA;RIACHÂO DAS NEVES;municipio;2242.0;;;;;;media
+BA;SANTA RITA DE CASSIA;municipio;3534.0;;;;;;media
+BA;SÃO DESIDERIO;municipio;3123.0;71.0;54.0;;;16.0;media
+BA;TABOCAS DO BREJO VELHO;municipio;2182.0;;;;;;media
+BA;CHAPADÕES DO RIO CORRENTE;municipio;18907.0;841.0;542.0;208.0;;212.0;media
+BA;CANAPOLIS;municipio;1530.0;63.0;;;;58.0;media
+BA;cocos;municipio;1970.0;;;;;;media
+BA;CORIBE;municipio;2224.0;316.0;236.0;128.0;;50.0;media
+BA;CORRENT INA;municipio;3947.0;85.0;28.0;45.0;;16.0;media
+BA;SANTA MARIA DA VITORIA;municipio;3368.0;301.0;235.0;21.0;;62.0;media
+BA;SANTANA;municipio;2985.0;54.0;27.0;;;26.0;media
+BA;SERRA DOURADA;municipio;2883.0;18.0;;;;;media
+BA;BAIXO-MEDI O SÃO FRANCISCO;municipio;39076.0;106.0;24.0;34.0;;49.0;media
+BA;BARRA;municipio;7527.0;36.0;;20.0;;;media
+BA;CAMPO ALEGRE DE LOURDES;municipio;3659.0;22.0;;;;18.0;media
+BA;CASA NOVA;municipio;6896.0;10.0;;;;;media
+BA;IBOTIRAMA;municipio;1523.0;;;;;;media
+BA;MORPARA;municipio;982.0;;;;;;media
+BA;PI LÂO ARCADO;municipio;5474.0;;;;;;media
+BA;REMANSO;municipio;3960.0;;;;;;media
+BA;SENTO SE s;municipio;5025.0;;;;;;media
+BA;XIOUE-XIOUE;municipio;4030.0;21.0;15.0;;;;media
+BA;MEDI O SÃO FRANCISCO;municipio;17214.0;365.0;165.0;144.0;;63.0;media
+BA;BOM .JESUS DA LAPA;municipio;8635.0;190.0;88.0;91.0;;11.0;media
+BA;CAR I NHANHA;municipio;2505.0;63.0;17.0;;;45.0;media
+BA;MALHADA;municipio;2728.0;90.0;57.0;37.0;;;media
+BA;PARATINGA;municipio;3346.0;22.0;;14.0;;;media
+BA;CHAPADA DIAMANTINA SETENTRIONAL;municipio;32426.0;645.0;455.0;129.0;;103.0;media
+BA;BARRA DO MENDES;municipio;1903.0;;;;;;media
+BA;CAFARNAUM;municipio;364.0;28.0;;26.0;;;media
+BA;CANARANA;municipio;3791.0;20.0;;;;;media
+BA;CENTRAL;municipio;1564.0;16.0;;;;;media
+BA;GENTIO DO OURO;municipio;2480.0;;;;;;media
+BA;IBIPEBA;municipio;2275.0;;;;;;media
+BA;IBITITA;municipio;2344.0;;;;;;media
+BA;IRECE;municipio;6749.0;454.0;372.0;69.0;;50.0;media
+BA;JUSSARA;municipio;1130.0;54.0;29.0;13.0;;12.0;media
+BA;MORRO DO CHAPEU;municipio;2698.0;15.0;;;;;media
+BA;PRESIDENTE OUTRA;municipio;1473.0;27.0;16.0;;;11.0;media
+BA;SOUTO SOARES;municipio;103.0;;;;;;media
+BA;UIBAI;municipio;1552.0;;;;;;media
+BA;CHAPADA DIAMANTINA MERIDIONAL;microrregiao;65612.0;579.0;305.0;189.0;212.0;;media
+BA;ABAIRA;municipio;;1550.0;;;;;media
+BA;AGUA QUENTE;municipio;;1002.0;;;;;media
+BA;ANDARA(;municipio;;2908.0;100.0;;13.0;10.0;media
+BA;BARRA DA ESTIVA;municipio;1724.0;11.0;10.0;;;;media
+BA;BONINAL;municipio;;1621.0;;;;;media
+BA;BOQUIRA;municipio;;3068.0;;;;;media
+BA;BOTUPORÃ;municipio;;4756.0;25.0;;;25.0;media
+BA;BROTAS DE MACAUBAS;municipio;2639.0;3.0;;;;;media
+BA;CONTENDAS;municipio;;662.0;;;;;media
+BA;(BICOARA;municipio;;1057.0;22.0;;;;media
+BA;(BIPITANGA;municipio;;2193.0;;;;;media
+BA;IBITIARA;municipio;;4840.0;;;;;media
+BA;IPUPIARA;municipio;;1141.0;;;;;media
+BA;IRAMAIA;municipio;;1130.0;12.0;;;;media
+BA;IRAQUARA;municipio;;2651.0;105.0;;94.0;;media
+BA;ITAETE;municipio;;1223.0;15.0;;10.0;;media
+BA;ITUAÇU;municipio;;2092.0;;;;;media
+BA;JUSSIAPE;municipio;;1361.0;;;;;media
+BA;LENÇO IS;municipio;307.0;;;;;;media
+BA;MACAUBAS s;municipio;;5538.0;149.0;;148.0;123.0;media
+BA;MUCUGE;municipio;;1074.0;;;;;media
+BA;OLIVEIRA DOS BREJINHOS;municipio;3115.0;46.0;45.0;;;;media
+BA;PALMEIRAS;municipio;;556.0;;;;;media
+BA;PARAMIRIM;municipio;;3901.0;12.0;;;;media
+BA;PIATÃ;municipio;;3645.0;;;;;media
+BA;RIO DE CONTAS;municipio;750.0;;;;;;media
+BA;RIO DO PIRES;municipio;1813.0;;;;;;media
+BA;SEABRA;municipio;;3304.0;;;;;media
+BA;TANHAÇU;municipio;;639.0;20.0;;;;media
+BA;UTINGA;municipio;;1130.0;25.0;;15.0;;media
+BA;WAGNER;municipio;;222.0;;;;;media
+BA;SERRA GERAL DA BAHIA;microrregiao;61771.0;429.0;;;;;media
+BA;ARACATU;municipio;;2308.0;;;;;media
+BA;BRUMADO;municipio;;3343.0;58.0;;;;media
+BA;CACULE;municipio;;1715.0;;;;;media
+BA;CAETITE;municipio;;6145.0;34.0;;20.0;15.0;media
+BA;CANDIBA;municipio;;2134.0;89.0;;72.0;;media
+BA;CONDEUBA;municipio;;3101.0;;;;;media
+BA;CORDEIROS;municipio;;979.0;;;;;media
+BA;DOM BASILIO;municipio;1533.0;;;;;;media
+BA;GUANAMBI;municipio;;4354.0;342.0;;206.0;102.0;media
+BA;IBIASSUCE;municipio;;1433.0;;;;;media
+BA;IGAPORÃ;municipio;;1239.0;164.0;;;;media
+BA;.JACARACI;municipio;;2511.0;;;;;media
+BA;LICINIO DE ALMEIDA;municipio;1459.0;11.0;;;;;media
+BA;MALHADA DE PEDRAS;municipio;1477.0;2.0;;;;;media
+BA;MORTUGABA;municipio;;1393.0;;;;;media
+BA;PALMAS DE MONTE ALTO;municipio;2118.0;70.0;46.0;29.0;4.0;;media
+BA;PINDAI;municipio;;3139.0;30.0;;14.0;12.0;media
+BA;PIRIPA;municipio;;1078.0;;;;;media
+BA;PRESIDENTE .JANIO QUADROS;municipio;;2531.0;;;;;media
+BA;RIACHO DE SANTANA;municipio;5708.0;362.0;250.0;124.0;32.0;;media
+BA;SEBASTIÃO LARANJEIRAS;municipio;;828.0;54.0;;;39.0;media
+BA;TREMEDAL;municipio;;4256.0;37.0;;;2.0;media
+BA;URANO(;municipio;1954.0;100.0;88.0;;;;media
+BA;SENHOR DO BONFIM;microrregiao;29491.0;334.0;125.0;101.0;;112.0;media
+BA;ANTONIO GONÇALVES;municipio;1414.0;26.0;24.0;;;;media
+BA;CALDEIRÃO GRANDE;municipio;2327.0;16.0;;;;;media
+BA;CAMPO FORMOSO;municipio;8496.0;134.0;74.0;32.0;;27.0;media
+BA;JAGUARARI;municipio;2732.0;;;;;;media
+BA;MIRANGABA;municipio;3124.0;11.0;;;;;media
+BA;PINDOBAÇU;municipio;4223.0;57.0;10.0;33.0;;;media
+BA;SAUDE;municipio;1423.0;12.0;;;;;media
+BA;SENHOR DO BONFIM s;municipio;5752.0;69.0;;;;51.0;media
+BA;CORREDEIRAS DO SÃO FRANCISCO;microrregiao;11921.0;162.0;122.0;80.0;10.0;16.0;media
+BA;ABARE;municipio;1049.0;;;;;;media
+BA;CHORROCHO;municipio;1534.0;;;;;;media
+BA;CURAÇA;municipio;3040.0;15.0;;;;;media
+BA;.JUAZEIRO;municipio;4657.0;125.0;102.0;69.0;;10.0;media
+BA;MACURURE;municipio;1224.0;;;;;;media
+BA;RODELAS;municipio;417.0;15.0;;;;;media
+BA;LESTE BAIANO;mesorregiao;;8010.0;4542.0;501.0;300.0;772.0;media
+BA;PIEMONTE DA DIAMANTINA;microrregiao;36425.0;832.0;277.0;141.0;17.0;421.0;media
+BA;BAIXA GRANDE;municipio;2869.0;62.0;23.0;31.0;;;media
+BA;BOA VISTA DO TUPIM;municipio;1833.0;22.0;14.0;;;;media
+BA;CAEM;municipio;1629.0;16.0;;;;4.0;media
+BA;IBIQUERA;municipio;579.0;27.0;14.0;;;;media
+BA;ITABERABA;municipio;2278.0;43.0;20.0;18.0;;;media
+BA;JACOBINA;municipio;9021.0;141.0;36.0;36.0;;73.0;media
+BA;LAJEDINHO;municipio;478.0;32.0;;;;25.0;media
+BA;MACA JUBA;municipio;812.0;32.0;26.0;;;;media
+BA;MAIRI;municipio;3630.0;10.0;;;;;media
+BA;MIDUEL CALMON;municipio;3209.0;12.0;;;;;media
+BA;MUNDO NOVO;municipio;1644.0;187.0;39.0;;;148.0;media
+BA;PIRITIBA;municipio;2106.0;56.0;50.0;;;;media
+BA;RUY BARBOSA;municipio;1765.0;147.0;22.0;;;123.0;media
+BA;SERROLANDIA;municipio;2863.0;;;;;;media
+BA;TAPIRAMUTA;municipio;751.0;38.0;13.0;18.0;;;media
+BA;VÀRZEA DO POÇO;municipio;958.0;;;;;2.0;media
+BA;SERTÃO DE CANUDOS;microrregiao;42917.0;580.0;232.0;153.0;;198.0;media
+BA;CANSANÇÃO;municipio;5170.0;19.0;;;;2.0;media
+BA;EUCLIDES DA CUNHA;municipio;7826.0;243.0;87.0;17.0;;139.0;media
+BA;ITIUBA;municipio;4713.0;89.0;56.0;10.0;;27.0;media
+BA;MONTE SANTO;municipio;8571.0;11.0;;;;;media
+BA;QUEIMADAS;municipio;4467.0;14.0;;;;;media
+BA;QUIJINGUE;municipio;4291.0;139.0;46.0;89.0;;;media
+BA;TUCANO;municipio;4648.0;59.0;24.0;20.0;;12.0;media
+BA;SERRINHA;microrregiao;39164.0;1327.0;976.0;269.0;17.0;139.0;media
+BA;ARACI;municipio;5000.0;157.0;142.0;52.0;;;media
+BA;BIRITINGA;municipio;1986.0;124.0;81.0;36.0;;;media
+BA;CANDEAL;municipio;1041.0;16.0;12.0;;;;media
+BA;CONCEIÇÃO DO COITE s;municipio;5204.0;37.0;21.0;13.0;;;media
+BA;ICHU;municipio;645.0;30.0;;26.0;;;media
+BA;LAMARÃO;municipio;1660.0;85.0;80.0;;;;media
+BA;RETIROLANDIA;municipio;1545.0;27.0;7.0;18.0;;;media
+BA;RIACHÃO DO JACUIPE;municipio;7981.0;54.0;29.0;25.0;;;media
+BA;SANTALUZ;municipio;266.0;83.0;41.0;;;39.0;media
+BA;SERRINHA;municipio;6745.0;599.0;460.0;69.0;13.0;68.0;media
+BA;FEIRA DE SANTANA;microrregiao;55893.0;;642.0;361.0;126.0;153.0;media
+BA;AGUA FRIA;municipio;2726.0;35.0;23.0;10.0;;;media
+BA;ANGUERA;municipio;794.0;;;;;;media
+BA;ANTONIO CARDOSO;municipio;1798.0;11.0;;;;;media
+BA;CASTRO ALVES;municipio;6570.0;148.0;56.0;29.0;53.0;30.0;media
+BA;CORAÇÃO DE MARIA;municipio;3034.0;40.0;24.0;;;;media
+BA;ELISIO MEDRADO;municipio;1199.0;15.0;;;;;media
+BA;FEIRA DE SANTANA;municipio;8498.0;78.0;57.0;;;;media
+BA;IAÇU;municipio;1752.0;16.0;12.0;;;;media
+BA;IPECAETA;municipio;3349.0;15.0;10.0;;;;media
+BA;(PIRA;municipio;8409.0;541.0;325.0;261.0;;58.0;media
+BA;IRARA;municipio;2350.0;21.0;17.0;;;;media
+BA;OURIÇANGAS;municipio;738.0;17.0;17.0;;;;media
+BA;PEDRÂO;municipio;1049.0;51.0;35.0;;29.0;;media
+BA;SANTA BARBARA;municipio;2249.0;11.0;;;;;media
+BA;SANTANOPOLI S;municipio;2051.0;;;;;;media
+BA;SANTA TERESINHA;municipio;2168.0;31.0;10.0;14.0;;;media
+BA;SANTO ESTEVÃO;municipio;4213.0;12.0;;;;;media
+BA;SERRA PRETA;municipio;2205.0;44.0;14.0;;;26.0;media
+BA;TANQUINHO;municipio;741.0;;;;;;media
+BA;JEQUIE;microrregiao;27426.0;1242.0;733.0;382.0;;397.0;media
+BA;AIQUARA;municipio;395.0;27.0;26.0;;;;media
+BA;AMARGOSA;municipio;2099.0;103.0;72.0;21.0;;11.0;media
+BA;BREJÔES;municipio;902.0;;;;;;media
+BA;CRAVOLANOIA;municipio;388.0;;;;;;media
+BA;IRAJUBA;municipio;475.0;;;;;;media
+BA;ITAGI;municipio;1176.0;155.0;12.0;;;140.0;media
+BA;ITAQUARA;municipio;636.0;19.0;16.0;11.0;;;media
+BA;ITIRUÇU;municipio;296.0;37.0;37.0;;;;media
+BA;JAGUAQUARA;municipio;1977.0;502.0;392.0;252.0;;89.0;media
+BA;JEQUIE;municipio;3056.0;185.0;46.0;28.0;;122.0;media
+BA;JIQUIRIÇA;municipio;1092.0;;;;;;media
+BA;JITAUNA;municipio;880.0;35.0;34.0;10.0;;;media
+BA;LAFAIETE COUTINHO;municipio;323.0;;;;;;media
+BA;LAJE;municipio;1841.0;24.0;15.0;;;;media
+BA;MARACAS;municipio;3090.0;39.0;14.0;12.0;;16.0;media
+BA;MARCIONILIO SOUZA;municipio;925.0;14.0;;;;;media
+BA;MILAGRES;municipio;612.0;22.0;21.0;;;;media
+BA;MUTUIPE;municipio;2089.0;;;;;;media
+BA;NOVA ITARANA;municipio;490.0;;;;;;media
+BA;PLANAL TINO;municipio;995.0;12.0;;;;;media
+BA;SANTA INES;municipio;212.0;16.0;14.0;;;;media
+BA;SÃO MIGUEL DAS MATAS;municipio;1526.0;17.0;;;;;media
+BA;UBAIRA;municipio;1951.0;;;;;;media
+BA;PLANALTO DE CONQUISTA;microrregiao;23172.0;686.0;416.0;207.0;;176.0;media
+BA;ANAGE;municipio;3095.0;103.0;;;;96.0;media
+BA;BARRA DO CHOÇA;municipio;1505.0;163.0;146.0;68.0;;;media
+BA;BELO CAMPO;municipio;1265.0;;;;;;media
+BA;BOA NOVA;municipio;2205.0;14.0;;;;;media
+BA;CAATIBA;municipio;871.0;19.0;12.0;;;;media
+BA;CANO IDO SALES;municipio;1053.0;33.0;;26.0;;;media
+BA;DARIO MEIRA;municipio;1167.0;53.0;48.0;;;;media
+BA;MANOEL VITORINO;municipio;1274.0;;;;;;media
+BA;NOVA CANAÃ;municipio;877.0;45.0;;;;36.0;media
+BA;PLANALTO;municipio;1777.0;37.0;10.0;28.0;;;media
+BA;POÇÕES;municipio;3038.0;20.0;10.0;;2.0;;media
+BA;VITORIA DA CONQUISTA;municipio;5045.0;191.0;159.0;58.0;;14.0;media
+BA;PASTORIL DE ITAPETINGA;microrregiao;4901.0;869.0;557.0;619.0;51.0;;media
+BA;ENCRUZILHADA;municipio;2240.0;192.0;71.0;104.0;29.0;;media
+BA;ITAMBE;municipio;;;;119.0;;89.0;media
+BA;ITAPETINGA;municipio;;;;231.0;;109.0;media
+BA;ITARANTIM;municipio;;;;173.0;;139.0;media
+BA;MACARANI;municipio;;;;141.0;;139.0;media
+BA;MAIQUINIQUE;municipio;;;;13.0;;;media
+BA;SERTÃO DE PAULO AFONSO;microrregiao;13607.0;31.0;22.0;;;;media
+BA;CORONEL JOÃO SA;municipio;;;;;;;media
+BA;GLORIA;municipio;;;;;;;media
+BA;JEREMOABO;municipio;;;;10.0;;;media
+BA;PAULO AFONSO;municipio;1884.0;;;;;;media
+BA;PEDRO ALEXANDRE;municipio;420.0;;;;;;media
+BA;SANTA BRIGIDA;municipio;466.0;;;;;;media
+BA;AGRESTE DE ALAGOINHAS;microrregiao;63376.0;637.0;407.0;154.0;97.0;;media
+BA;ACAJUTIBA;municipio;;;;30.0;;14.0;media
+BA;ALAGOINHAS;municipio;;;;45.0;;30.0;media
+BA;ANTAS;municipio;;;;53.0;;;media
+BA;APORA;municipio;;;;;;;media
+BA;ARAMAR(;municipio;;;;15.0;;;media
+BA;CICERO DANTAS;municipio;6193.0;41.0;31.0;;;;media
+BA;CIPO;municipio;;;;;;;media
+BA;CRISOPOLIS;municipio;;;;;;;media
+BA;INHAMBUPE;municipio;;;;13.0;;;media
+BA;ITAPICURU;municipio;;;;40.0;;20.0;media
+BA;NOVA SOURE;municipio;3869.0;;;;;;media
+BA;OLINOINA;municipio;;;;;;;media
+BA;PARIPIRANGA;municipio;;;;302.0;;286.0;media
+BA;RIBEIRA DO AMPARO;municipio;4956.0;43.0;16.0;27.0;;;media
+BA;RIBEIRA DO POMBAL;municipio;7426.0;19.0;11.0;;;;media
+BA;RIO REAL;municipio;;;;10.0;;;media
+BA;SATIRO DIAS;municipio;2779.0;15.0;;;;;media
+BA;LITORAL NORTE BAIANO s;microrregiao;5376.0;97.0;66.0;20.0;13.0;;media
+BA;CARDEAL DA SILVA;municipio;176.0;18.0;17.0;;;;media
+BA;CONDE;municipio;;;;;;;media
+BA;ENTRE RIOS;municipio;1494.0;41.0;25.0;10.0;;;media
+BA;ESPLANADA;municipio;;;;27.0;;15.0;media
+BA;ITANAGRA;municipio;;;;;;;media
+BA;JANDAIRA;municipio;;;;;;;media
+BA;RECONCAVO BAIANO;microrregiao;35976.0;608.0;214.0;192.0;115.0;121.0;media
+BA;AME LIA RODRIGUES;municipio;655.0;;;;;;media
+BA;ARATUIPE;municipio;;;;;;;media
+BA;CACHOEIRA;municipio;;;;;;;media
+BA;CONCE;municipio;1257.0;79.0;68.0;;;;media
+BA;CONCEIÇÃO DO ALMEIDA;municipio;1856.0;41.0;26.0;;;;media
+BA;CONCEIÇÃO DO JACUIPE;municipio;749.0;27.0;26.0;;;;media
+BA;CRUZ DAS ALMAS;municipio;;;;;;;media
+BA;DOM MACEDO COSTA;municipio;;;;;;;media
+BA;GOVERNADOR MANGABEIRA;municipio;2341.0;12.0;12.0;;;;media
+BA;JAGUARIPE;municipio;;;;14.0;;;media
+BA;MARAOOGIPE;municipio;;;;;;;media
+BA;MUNIZ FERREIRA;municipio;424.0;;;;;;media
+BA;MURITIBA;municipio;;;;11.0;;;media
+BA;NAZARE;municipio;;;;;;;media
+BA;CAMAÇARI;municipio;;;;40.0;;;media
+BA;CANO E IAS;municipio;;;;;;;media
+BA;CATU;municipio;;;;25.0;19.0;;media
+BA;LAURO DE FREITAS;municipio;;;;;;;media
+BA;MATA DE SÃO JOÃO;municipio;1961.0;;;;;;media
+BA;POJUCA;municipio;;;;;;;media
+BA;SÃO FRANCISCO DO CONDE;municipio;907.0;;;;;;media
+BA;SIMÕES FILHO;municipio;;;;;;;media
+BA;LITORAL SUL BAIANO;mesorregiao;;;;6502.0;1583.0;94.0;media
+BA;TABULEIROS DE VALENÇA;microrregiao;20476.0;837.0;246.0;63.0;570.0;;media
+BA;CATRU;municipio;;;;;;;media
+BA;CAMAMU;municipio;;;;35.0;;;media
+BA;IBIRAPITANGA;municipio;;;;26.0;;;media
+BA;ITUBERA;municipio;;;;82.0;33.0;;media
+BA;MARAU;municipio;;;;33.0;;;media
+BA;NILO PEÇANHA;municipio;;;;;;;media
+BA;TAPEROA;municipio;;;;19.0;;;media
+BA;VALENÇA;municipio;;;;37.0;16.0;;media
+BA;ENCOSTA;microrregiao;9162.0;783.0;666.0;192.0;14.0;49.0;media
+BA;FIRMINO ALVES;municipio;;;;15.0;;;media
+BA;FLORESTA AZUL;municipio;;;;131.0;62.0;;media
+BA;IBICUI;municipio;;;;26.0;;;media
+BA;IGUAI;municipio;;;;;;;media
+BA;ITAGIBA;municipio;;;;206.0;;;media
+BA;ITAGIMIRIM;municipio;;;;23.0;10.0;;media
+BA;ITAJU;municipio;;;;57.0;35.0;;media
+BA;ITAPEBI;municipio;;;;50.0;;;media
+BA;ITORORO;municipio;;;;55.0;35.0;;media
+BA;PAU BRASIL;municipio;;;;62.0;;;media
+BA;POTIRAGUA;municipio;;;;14.0;;;media
+BA;SANTA CRUZ DA VITORIA;municipio;307.0;25.0;23.0;;;;media
+BA;CACAUEIRA;microrregiao;;;;4504.0;965.0;75.0;media
+BA;ALMADINA;municipio;;;;47.0;;;media
+BA;AURELINO LEAL;municipio;;;;21.0;;;media
+BA;BARRA DO ROCHA;municipio;;;;38.0;;;media
+BA;BARRO PRETO;municipio;;;;100.0;;;media
+BA;BELMONTE;municipio;;;;95.0;34.0;;media
+BA;BUERAREMA;municipio;;;;8.0;13.0;;media
+BA;CAMACAN;municipio;;;;244.0;79.0;;media
+BA;CANAVIEIRAS;municipio;;;;593.0;89.0;;media
+BA;COARAC I;municipio;;;;316.0;115.0;;media
+BA;GANDU;municipio;;;;10.0;;40.0;media
+BA;GONGOGI;municipio;;;;;;;media
+BA;IBICARAI;municipio;;;;269.0;96.0;13.0;media
+BA;IBIRATAIA;municipio;;;;44.0;11.0;;media
+BA;I LHEUS;municipio;;;;828.0;85.0;;media
+BA;IPIAU;municipio;;;;195.0;157.0;;media
+BA;ITABUNA;municipio;;;;232.0;12.0;;media
+BA;I T ACARE;municipio;;;;78.0;46.0;;media
+BA;ITAJUIPE;municipio;;;;258.0;58.0;;media
+BA;ITAMARI;municipio;;;;;;;media
+BA;ITAPE;municipio;;;;121.0;14.0;;media
+BA;ITAPITANGA;municipio;;;;95.0;;;media
+BA;MASCOTE;municipio;;;;118.0;;;media
+BA;TEOLANDIA;municipio;;;;;;;media
+BA;UBAITABA;municipio;;;;36.0;;;media
+BA;UBATÃ;municipio;;;;;;;media
+BA;URUÇUCA;municipio;;;;260.0;26.0;;media
+BA;WENCESLAU GUIMARÃES;municipio;;;;36.0;18.0;;media
+BA;INTERIORANA EXTREMO SUL DA BAHIA;microrregiao;765.0;346.0;187.0;267.0;;;media
+BA;GUARATINGA;municipio;;;;119.0;27.0;;media
+BA;IBIRAPUÂ;municipio;;;;55.0;14.0;;media
+BA;ITAMARAJU;municipio;;;;120.0;53.0;;media
+BA;ITANHEM;municipio;;;;30.0;53.0;;media
+BA;LAJEOÂO;municipio;;;;;;;media
+BA;MEDEIROS NETO;municipio;;;;18.0;40.0;;media
+BA;LITORANEA DO EXTREMO SUL DA BAHIA;microrregiao;8521.0;988.0;740.0;176.0;132.0;;media
+BA;ALCOBAÇA;municipio;;;;154.0;49.0;;media
+BA;CARAVELAS;municipio;;;;165.0;35.0;;media
+BA;MUCUR I;municipio;;;;72.0;29.0;;media
+BA;NOVA VIÇOSA;municipio;;;;42.0;13.0;;media
+BA;PORTO SEGURO;municipio;;;;213.0;;;media
+BA;PRADO;municipio;;;;64.0;43.0;;media
+BA;SANTA CRUZ CABRAL l A;municipio;;;;30.0;;;media
+ES;TOTAIS;total;69140.0;11349.0;10244.0;459.0;944.0;;alta
+ES;ESPIRI TO-SANTENSE;mesorregiao;67541.0;11226.0;10129.0;458.0;937.0;;alta
+ES;ALTO SÃO MATEUS;microrregiao;2774.0;1023.0;989.0;80.0;16.0;;alta
+ES;ECOPORANGA;municipio;1740.0;504.0;481.0;58.0;;;alta
+ES;MONTANHA;municipio;563.0;266.0;260.0;;;;alta
+ES;MUCURICI;municipio;471.0;253.0;248.0;22.0;;;alta
 ES;COLATINA;microrregiao;16147.0;3449.0;3226.0;149.0;184.0;;media
 ES;BARRA DE SÃO FRANCISCO;municipio;3251.0;414.0;395.0;30.0;;;media
 ES;BOA ESPERANÇA;municipio;456.0;72.0;67.0;;;;media
@@ -574,33 +574,33 @@ ES;BOM JESUS DO NORTE;municipio;119.0;49.0;49.0;;;;media
 ES;CACHOEIRO DE (TAPEMIRIM;municipio;437.0;845.0;838.0;;;;media
 ES;DORES DO RIO PRETO;municipio;287.0;63.0;54.0;21.0;;;media
 ES;GUAÇUI;municipio;498.0;191.0;190.0;;;;media
-ES;VITORIA;mesorregiao;1599.0;123.0;115.0;;;;media
-ES;VITORIA;microrregiao;1599.0;123.0;115.0;;;;media
+ES;VITORIA;mesorregiao;1599.0;123.0;115.0;;;;alta
+ES;VITORIA;microrregiao;1599.0;123.0;115.0;;;;alta
 ES;CARIACICA;municipio;597.0;;;;;;media
 ES;SERRA;municipio;209.0;58.0;58.0;;;;media
 ES;VIANA;municipio;639.0;50.0;42.0;;;;media
 ES;VILA VELHA;municipio;137.0;14.0;14.0;;;;media
 ES;VITORIA;municipio;111.0;;;;;;media
 GO;TOTAIS;total;131365.0;19634.0;13878.0;1903.0;4403.0;2685.0;media
-GO;NORDESTE GOIANO;mesorregiao;10842.0;1057.0;260.0;;;743.0;media
-GO;SÃO MIGUEL;microrregiao;3448.0;456.0;57.0;;;369.0;media
+GO;NORDESTE GOIANO;mesorregiao;10842.0;1057.0;260.0;;;743.0;alta
+GO;SÃO MIGUEL;microrregiao;3448.0;456.0;57.0;;;369.0;alta
 GO;CRIXAS;municipio;1591.0;32.0;15.0;;;14.0;media
 GO;MOZARLANDIA;municipio;405.0;37.0;;;;;media
 GO;MUNDO NOVO;municipio;188.0;18.0;15.0;;;2.0;media
 GO;NOVA CAIXAS;municipio;593.0;12.0;;;;;media
 GO;SÃO MIGUEL DO ARAGUAIA;municipio;671.0;357.0;11.0;;;348.0;media
-GO;RIO VERMELHO;microrregiao;4802.0;373.0;140.0;;;207.0;media
+GO;RIO VERMELHO;microrregiao;4802.0;373.0;140.0;;;207.0;alta
 GO;ARAGUAPAZ;municipio;290.0;18.0;12.0;;;;media
 GO;ARUANÃ;municipio;327.0;19.0;12.0;;;;media
 GO;BRITANIA;municipio;89.0;14.0;;;;;media
 GO;GOIAS;municipio;2398.0;87.0;35.0;;;46.0;media
 GO;ITAPIRAPUÃ;municipio;708.0;71.0;38.0;;;22.0;media
 GO;JUSSARA;municipio;990.0;164.0;36.0;;;121.0;media
-GO;ARAGARÇAS;microrregiao;2592.0;228.0;63.0;;;167.0;media
+GO;ARAGARÇAS;microrregiao;2592.0;228.0;63.0;;;167.0;alta
 GO;ARAGARÇAS;municipio;69.0;;;;;;media
 GO;ARENOPOLIS;municipio;389.0;59.0;;;;57.0;media
 GO;BALIZA;municipio;236.0;;;;;;media
-GO;BOM JARDIM OE GOIAS;municipio;442.0;21.0;17.0;;;;media
+GO;BOM JARDIM DE GOIAS;municipio;442.0;21.0;17.0;;;;media
 GO;DIORAMA;municipio;255.0;;;;;;media
 GO;MONTES CLAROS DE GOIAS;municipio;620.0;29.0;21.0;;;;media
 GO;PIRANHAS;municipio;581.0;115.0;19.0;;;103.0;media
@@ -615,14 +615,14 @@ GO;MINAÇU;municipio;1142.0;;;;;;media
 GO;MUTUNOPOL IS;municipio;434.0;41.0;40.0;;;;media
 GO;NIOUELANDIA;municipio;3577.0;26.0;12.0;;;;media
 GO;PORANGATU;municipio;1604.0;249.0;210.0;;;19.0;media
-GO;SANTA TEREZA OE GOIAS;municipio;188.0;22.0;13.0;;;;media
-GO;SANTA TEREZINHA OE GOIAS;municipio;1228.0;11.0;;;;;media
+GO;SANTA TEREZA DE GOIAS;municipio;188.0;22.0;13.0;;;;media
+GO;SANTA TEREZINHA DE GOIAS;municipio;1228.0;11.0;;;;;media
 GO;URUAÇU;municipio;1225.0;54.0;13.0;;;40.0;media
 GO;CHAPADA DOS VEAOEIROS;microrregiao;4005.0;70.0;42.0;;;23.0;media
-GO;ALTO PARAIS O OE GOIAS;municipio;172.0;;;;;;media
+GO;ALTO PARAIS O DE GOIAS;municipio;172.0;;;;;;media
 GO;CAMPOS BELOS;municipio;330.0;;;;;;media
 GO;CAVALCANTE;municipio;1731.0;;;;;;media
-GO;MONTE ALEGRE OE GOIAS;municipio;572.0;;;;;;media
+GO;MONTE ALEGRE DE GOIAS;municipio;572.0;;;;;;media
 GO;NOVA ROMA;municipio;655.0;11.0;;;;;media
 GO;SÃO JOÃO D' ALIANÇA;municipio;545.0;49.0;35.0;;;12.0;media
 GO;CENTRO GOIANO;mesorregiao;40638.0;5520.0;3005.0;;2340.0;601.0;media
@@ -640,9 +640,9 @@ GO;ITAGUARU;municipio;;;;;;;media
 GO;ITAUÇU;municipio;;;;88.0;;;media
 GO;JARAGUA;municipio;;;28.0;;;;media
 GO;NOVA VENEZA;municipio;;;;28.0;;;media
-GO;OURO VERDE OE GOIAS;municipio;;;;60.0;;;media
+GO;OURO VERDE DE GOIAS;municipio;;;;60.0;;;media
 GO;PETROLINA DE GOIAS;municipio;;;;;;;media
-GO;SANTA ROSA OE GOIAS;municipio;;;;;;;media
+GO;SANTA ROSA DE GOIAS;municipio;;;;;;;media
 GO;SÃO FRANCISCO DE GOIAS;municipio;;;;15.0;;;media
 GO;TAQUARAL DE GOIAS;municipio;;;;;;;media
 GO;IPORA;microrregiao;;;27.0;24.0;;;media
@@ -667,8 +667,8 @@ GO;NAZARIO;municipio;;;;;;;media
 GO;SANCLERLANOIA;municipio;;;;46.0;;;media
 GO;SANTA BARBARA DE GOIAS;municipio;;;;10.0;;;media
 GO;TURVANIA;municipio;;;;68.0;;;media
-GO;LESTE GOIANO;mesorregiao;;18830.0;1316.0;;140.0;232.0;media
-GO;VÃO DO PARANÃ;microrregiao;;5235.0;70.0;;11.0;18.0;media
+GO;LESTE GOIANO;mesorregiao;;18830.0;1316.0;;140.0;232.0;alta
+GO;VÃO DO PARANÃ;microrregiao;;5235.0;70.0;;11.0;18.0;alta
 GO;AL VORAOA DO NORTE;municipio;195.0;;;;;;media
 GO;OAMIANOPOLIS;municipio;;386.0;;;;;media
 GO;FLORES DE GOIAS;municipio;;316.0;43.0;;;11.0;media
@@ -678,7 +678,7 @@ GO;MAMBAI;municipio;;677.0;;;;;media
 GO;POSSE;municipio;;1337.0;;;;;media
 GO;SÃO DOMINGOS;municipio;;856.0;;;;;media
 GO;SITIO D' ABADIA;municipio;;295.0;;;;;media
-GO;ENTORNO DE BRASILIA;microrregiao;;13595.0;1246.0;;129.0;214.0;media
+GO;ENTORNO DE BRASILIA;microrregiao;;13595.0;1246.0;;129.0;214.0;alta
 GO;ABADIANIA;municipio;;824.0;71.0;;;;media
 GO;ALEXANJA;municipio;;990.0;81.0;;;;media
 GO;CABECEIRAS;municipio;;465.0;66.0;;;18.0;media
@@ -690,7 +690,7 @@ GO;PADRE BERNARDO;municipio;;1293.0;112.0;;;;media
 GO;PI RENOPOL IS;municipio;;2368.0;294.0;;26.0;33.0;media
 GO;SANTO ANTONIO;municipio;;703.0;15.0;;;11.0;media
 GO;SUL GOIANO;mesorregiao;;42184.0;11143.0;;1318.0;990.0;media
-GO;SUDOESTE OE GOIAS;microrregiao;;10015.0;3006.0;;878.0;200.0;media
+GO;SUDOESTE DE GOIAS;microrregiao;;10015.0;3006.0;;878.0;200.0;media
 GO;APORE;municipio;;373.0;98.0;;14.0;;media
 GO;CAIAPONIA;municipio;;1388.0;359.0;;;30.0;media
 GO;DOVERLANOIA;municipio;;544.0;116.0;;;17.0;media
@@ -727,15 +727,15 @@ GO;PANAMA;municipio;314.0;72.0;70.0;;;;media
 GO;PI RACANJUBA;municipio;1703.0;229.0;171.0;10.0;23.0;;media
 GO;PONTALINA;municipio;780.0;76.0;60.0;;;;media
 GO;VICENTINOPOLIS;municipio;195.0;87.0;50.0;;12.0;;media
-GO;PIRES DO RIO;microrregiao;5714.0;524.0;266.0;21.0;206.0;;media
-GO;CRISTIANOPOLIS;municipio;132.0;;;;;;media
-GO;ORIZONA;municipio;1518.0;25.0;19.0;;;;media
-GO;PALME LO;municipio;52.0;;;;;;media
-GO;PIRES DO RIO;municipio;554.0;39.0;36.0;;;;media
-GO;SANTA CRUZ DE GOIAS;municipio;487.0;20.0;12.0;;;;media
-GO;S(LVANIA;municipio;2109.0;329.0;119.0;17.0;178.0;;media
-GO;URUTAI;municipio;303.0;52.0;51.0;;;;media
-GO;VIANOPOLIS;municipio;559.0;58.0;29.0;;19.0;;media
+GO;PIRES DO RIO;microrregiao;5714.0;524.0;266.0;21.0;206.0;;alta
+GO;CRISTIANOPOLIS;municipio;132.0;;;;;;alta
+GO;ORIZONA;municipio;1518.0;25.0;19.0;;;;alta
+GO;PALME LO;municipio;52.0;;;;;;alta
+GO;PIRES DO RIO;municipio;554.0;39.0;36.0;;;;alta
+GO;SANTA CRUZ DE GOIAS;municipio;487.0;20.0;12.0;;;;alta
+GO;S(LVANIA;municipio;2109.0;329.0;119.0;17.0;178.0;;alta
+GO;URUTAI;municipio;303.0;52.0;51.0;;;;alta
+GO;VIANOPOLIS;municipio;559.0;58.0;29.0;;19.0;;alta
 GO;CATALÃO;microrregiao;5256.0;1457.0;1432.0;32.0;;;media
 GO;ANHANGUERA;municipio;19.0;;;;;;media
 GO;CAMPO ALEGRE DE GOlAS;municipio;483.0;141.0;138.0;;;;media
@@ -756,20 +756,20 @@ GO;PARANAIGUARA;municipio;376.0;22.0;17.0;;2.0;;media
 GO;QUIRINOPOLIS;municipio;2104.0;855.0;726.0;156.0;45.0;;media
 GO;SÃO SIMÃO;municipio;67.0;10.0;10.0;;;;media
 MG;TOTAIS;total;551488.0;102982.0;86099.0;10587.0;7063.0;14728.0;media
-MG;NORDESTE MINEIRO;mesorregiao;45492.0;5588.0;4270.0;1278.0;803.0;397.0;media
-MG;SANFRANCISCANA OE JANUARIA;microrregiao;14040.0;425.0;172.0;90.0;;173.0;media
+MG;NORDESTE MINEIRO;mesorregiao;45492.0;5588.0;4270.0;1278.0;803.0;397.0;alta
+MG;SANFRANCISCANA DE JANUARIA;microrregiao;14040.0;425.0;172.0;90.0;;173.0;alta
 MG;ITACARAMBI;municipio;1625.0;26.0;13.0;;;;media
 MG;JANUARIA;municipio;3849.0;286.0;105.0;60.0;;124.0;media
 MG;MANGA;municipio;3153.0;55.0;28.0;15.0;;14.0;media
 MG;MONTALVANIA;municipio;759.0;16.0;12.0;;;;media
 MG;SÃO FRANCISCO;municipio;4654.0;42.0;14.0;;;28.0;media
-MG;SERRA GERAL DE MINAS;microrregiao;14927.0;1203.0;449.0;922.0;727.0;38.0;media
+MG;SERRA GERAL DE MINAS;microrregiao;14927.0;1203.0;449.0;922.0;727.0;38.0;alta
 MG;ESP INOSA;municipio;3658.0;39.0;10.0;10.0;18.0;10.0;media
 MG;MATO VERDE;municipio;374.0;108.0;60.0;47.0;13.0;;media
 MG;MONTE AZUL;municipio;3006.0;750.0;139.0;701.0;695.0;;media
 MG;PORTEIRINHA;municipio;5631.0;293.0;234.0;157.0;;20.0;media
 MG;RIACHO DOS MACHADOS;municipio;1258.0;13.0;;;;;media
-MG;CHAPADÕES DO PARACATU;microrregiao;14657.0;3793.0;3520.0;224.0;74.0;160.0;media
+MG;CHAPADÕES DO PARACATU;microrregiao;14657.0;3793.0;3520.0;224.0;74.0;160.0;alta
 MG;ARINOS;municipio;936.0;248.0;240.0;10.0;;;media
 MG;BONFINOPOLIS DE MINAS;municipio;1275.0;153.0;147.0;;;;media
 MG;BURITIS;municipio;841.0;57.0;43.0;;14.0;;media
@@ -781,10 +781,10 @@ MG;PARACATU;municipio;1511.0;778.0;772.0;80.0;;;media
 MG;PRESIDENTE OLEGARIO;municipio;2095.0;427.0;332.0;67.0;46.0;29.0;media
 MG;UNAI;municipio;3391.0;1192.0;1173.0;19.0;;14.0;media
 MG;VAZANTE;municipio;732.0;80.0;70.0;;;;media
-MG;ALTO-MEDI O SÃO FRANCISCO;microrregiao;1868.0;167.0;129.0;42.0;;26.0;media
+MG;ALTO-MEDI O SÃO FRANCISCO;microrregiao;1868.0;167.0;129.0;42.0;;26.0;alta
 MG;SURITIZEIRO;municipio;617.0;90.0;70.0;20.0;;11.0;media
 MG;PIRAPORA;municipio;210.0;57.0;50.0;20.0;;;media
-MG;SANTA FE OE MINAS;municipio;300.0;;;;;;media
+MG;SANTA FE DE MINAS;municipio;300.0;;;;;;media
 MG;SÃO ROMÃO;municipio;741.0;14.0;;;;;media
 MG;NORDESTE MINEIRO;mesorregiao;102122.0;7641.0;4308.0;769.0;93.0;3135.0;media
 MG;ALTO RIO PARDO;microrregiao;14601.0;820.0;182.0;37.0;12.0;619.0;media
@@ -799,7 +799,7 @@ MG;BOCAIUVA;municipio;157.0;;;;;;media
 MG;BRASILIA DE MINAS;municipio;2069.0;48.0;;;;38.0;media
 MG;CAPITÃO ENEAS;municipio;292.0;162.0;149.0;144.0;;11.0;media
 MG;CLARO DOS POÇÕES;municipio;660.0;43.0;24.0;;;19.0;media
-MG;CORAÇÃO OE JESUS;municipio;2358.0;280.0;;;;276.0;media
+MG;CORAÇÃO DE JESUS;municipio;2358.0;280.0;;;;276.0;media
 MG;ENGENHEIRO NAVARRO;municipio;492.0;20.0;13.0;;;;media
 MG;FRANCISCO DUMONT;municipio;296.0;20.0;16.0;;;;media
 MG;FRANCISCO SA;municipio;1671.0;669.0;658.0;45.0;;10.0;media
@@ -821,7 +821,7 @@ MG;NOVO CRUZEIRO;municipio;;3436.0;53.0;;49.0;10.0;media
 MG;PADRE PARAISO;municipio;;768.0;;;;;media
 MG;PEDRA AZUL;municipio;;327.0;150.0;;150.0;;media
 MG;VIRGEM DA LAPA;municipio;;1305.0;;;;;media
-MG;PASTORIL OE ALMENARA;microrregiao;;6709.0;711.0;;411.0;27.0;media
+MG;PASTORIL DE ALMENARA;microrregiao;;6709.0;711.0;;411.0;27.0;media
 MG;ALMENARA;municipio;;1263.0;92.0;;20.0;;media
 MG;BANDEIRA;municipio;;414.0;;;;;media
 MG;FELISBURGO;municipio;;227.0;74.0;;;;media
@@ -902,7 +902,7 @@ MG;GUIMARANIA;municipio;;;;77.0;;76.0;media
 MG;LAGOA FORMOSA;municipio;1784.0;174.0;113.0;16.0;47.0;;media
 MG;MATUTINA;municipio;;;;117.0;;;media
 MG;PATOS DE MINAS;municipio;3326.0;807.0;654.0;24.0;309.0;;media
-MG;TRIANGULO MINEIRO;mesorregiao;27832.0;1158.0;9593.0;493.0;1879.0;121.0;media
+MG;TRIANGULO MINEIRO;mesorregiao;27832.0;1158.0;9593.0;493.0;879.0;121.0;media
 MG;UBERLANO IA;microrregiao;11150.0;4462.0;3890.0;148.0;93.0;652.0;media
 MG;ARAGUAR l;municipio;1648.0;221.0;191.0;12.0;25.0;;media
 MG;CACHOEIRA DOURADA;municipio;87.0;33.0;32.0;;;;media
@@ -926,7 +926,7 @@ MG;ITURAMA;municipio;;;;578.0;;569.0;media
 MG;PIRAJUBA;municipio;;;;112.0;;112.0;media
 MG;PLANURA;municipio;;;;71.0;;54.0;media
 MG;PRATA;municipio;;;;1029.0;;1012.0;media
-MG;SÃO FRANCISCO OE SALES;municipio;597.0;68.0;61.0;;;;media
+MG;SÃO FRANCISCO DE SALES;municipio;597.0;68.0;61.0;;;;media
 MG;UBERABA;microrregiao;;;;2357.0;;1932.0;media
 MG;AGUA COMPRIDA;municipio;220.0;141.0;131.0;28.0;50.0;;media
 MG;CAMPO FLORIDO;municipio;413.0;207.0;185.0;11.0;65.0;22.0;media
@@ -937,12 +937,12 @@ MG;MATA E RIO DOCE MINEIRO;mesorregiao;20197.0;19016.0;2935.0;430.0;386.0;;media
 MG;BACIA DO SUAÇUI;microrregiao;16786.0;973.0;947.0;159.0;23.0;;media
 MG;AÇUCENA;municipio;;;;118.0;;116.0;media
 MG;AGUA BOA;municipio;1232.0;69.0;67.0;13.0;;;media
-MG;ALVORADA OE MINAS;municipio;247.0;34.0;34.0;;;;media
+MG;ALVORADA DE MINAS;municipio;247.0;34.0;34.0;;;;media
 MG;BELO ORIENTE;municipio;;416.0;27.0;;26.0;;media
 MG;BRAUNAS;municipio;;530.0;28.0;;28.0;;media
 MG;CARMESIA;municipio;;133.0;15.0;;14.0;;media
 MG;COLUNA;municipio;;576.0;;;;;media
-MG;OIVINOLANDIA OE MINAS;municipio;274.0;27.0;27.0;;;;media
+MG;OIVINOLANDIA DE MINAS;municipio;274.0;27.0;27.0;;;;media
 MG;DOM .JOAQUIM;municipio;;250.0;14.0;;14.0;;media
 MG;DORES DE GUANHÃES;municipio;;217.0;54.0;;53.0;20.0;media
 MG;GONZAGA;municipio;;490.0;21.0;;19.0;;media
@@ -974,7 +974,7 @@ MG;MARILAC;municipio;;148.0;74.0;;73.0;;media
 MG;NACIP RAYOAN;municipio;;304.0;36.0;;36.0;;media
 MG;NOVA MODICA;municipio;;405.0;30.0;;29.0;;media
 MG;PESCADOR;municipio;;191.0;42.0;;41.0;;media
-MG;SANTA EFIGENIA OE MINAS;municipio;274.0;;;;;;media
+MG;SANTA EFIGENIA DE MINAS;municipio;274.0;;;;;;media
 MG;SÃO GERALDO DA PIEDADE;municipio;343.0;24.0;24.0;;;;media
 MG;SÃO JOSE DA SAFIRA;municipio;71.0;26.0;25.0;;;;media
 MG;SÃO JOSE DO DIVINO;municipio;238.0;;;;;;media
@@ -1048,18 +1048,18 @@ MG;ARGIRITA;municipio;274.0;;;173.0;;;media
 MG;CATAGUASES;municipio;879.0;;;286.0;;;media
 MG;DONA EUZEBIA;municipio;205.0;;;67.0;;;media
 MG;ESTRELA CALVA;municipio;137.0;;;86.0;;;media
-MG;ITAMARATI OE MINAS;municipio;273.0;;;37.0;;;media
+MG;ITAMARATI DE MINAS;municipio;273.0;;;37.0;;;media
 MG;LARAN;municipio;628.0;;;121.0;;;media
 MG;LEOPOLDINA;municipio;1283.0;;;674.0;;18.0;media
 MG;PALMA;municipio;679.0;;;68.0;;;media
 MG;PI RAPET I NGA;municipio;375.0;;;151.0;;;media
 MG;RECREIO;municipio;567.0;;;234.0;;;media
 MG;SUDOESTE MINEIRO;mesorregiao;148826.0;;;28943.0;3941.0;2098.0;media
-MG;PLANALTO OE ARAXA;microrregiao;7059.0;;;949.0;129.0;139.0;media
+MG;PLANALTO DE ARAXA;microrregiao;7059.0;;;949.0;129.0;139.0;media
 MG;ARAXA;municipio;526.0;;;346.0;;;media
 MG;CAMPOS ALTOS;municipio;317.0;;;29.0;26.0;;media
 MG;IBIA;municipio;901.0;;;60.0;17.0;;media
-MG;IRAI OE MINAS;municipio;391.0;;;22.0;11.0;;media
+MG;IRAI DE MINAS;municipio;391.0;;;22.0;11.0;;media
 MG;NOVA PONTE;municipio;520.0;;;90.0;16.0;106.0;media
 MG;PEORINOPOLIS;municipio;252.0;;;23.0;;;media
 MG;PERDIZES;municipio;1088.0;;;201.0;24.0;;media
@@ -1130,7 +1130,7 @@ MG;PIRACEMA;municipio;;;;448.0;;447.0;media
 MG;RIBEIRÃO VERMELHO;municipio;110.0;11.0;;;;;media
 MG;SANTANA;municipio;0.0;122.0;26.0;26.0;;;media
 MG;SANTO ANTONIO DO AMPARO;municipio;605.0;199.0;154.0;74.0;27.0;;media
-MG;SÃO FRANCISCO OE PAULA;municipio;444.0;130.0;125.0;10.0;120.0;;media
+MG;SÃO FRANCISCO DE PAULA;municipio;444.0;130.0;125.0;10.0;120.0;;media
 MG;SÃO SEBASTIÃO DO OESTE;municipio;810.0;195.0;190.0;;;;media
 MG;MOGIANA MINEIRA;microrregiao;;;;7275.0;;6593.0;media
 MG;ARCEBURGO;municipio;;;;100.0;;88.0;media
@@ -1154,7 +1154,7 @@ MG;SÃO TOMAS DE AQUINO;municipio;;;;253.0;;248.0;media
 MG;ARANTINA;municipio;;201.0;;;;;media
 MG;BAEPENDI;municipio;;1326.0;56.0;;45.0;;media
 MG;BDCAINA DE MINAS;municipio;;549.0;198.0;;196.0;29.0;media
-MG;BOM JARDIM OE MINAS;municipio;396.0;;;;;;media
+MG;BOM JARDIM DE MINAS;municipio;396.0;;;;;;media
 MG;CARRANCAS;municipio;;334.0;118.0;;105.0;;media
 MG;CARVALHOS;municipio;;478.0;;;;;media
 MG;CRUZILIA;municipio;;480.0;209.0;;209.0;;media
@@ -1165,7 +1165,7 @@ MG;ITUTINGA;municipio;;350.0;22.0;;15.0;;media
 MG;LAVRAS;municipio;;885.0;250.0;;240.0;11.0;media
 MG;LIBERDADE;municipio;;629.0;;;;;media
 MG;LUMINARIAS;municipio;;356.0;53.0;;47.0;;media
-MG;MADRE DE DEUS OE MI NAS;municipio;264.0;;;;;;media
+MG;MADRE DE DEUS DE MI NAS;municipio;264.0;;;;;;media
 MG;MINDURI;municipio;;104.0;;;;;media
 MG;PASSA VINTE;municipio;;165.0;53.0;;53.0;;media
 MG;PIEDADE;municipio;353.0;139.0;138.0;139.0;;;media
@@ -1247,8 +1247,8 @@ MG;EWBANK DA CAMARA;municipio;98.0;;;;;;media
 MG;GUARARA;municipio;151.0;;;65.0;;;media
 MG;JUIZ DE FORA;municipio;1337.0;;;315.0;;;media
 MG;LI MA DUARTE;municipio;918.0;;;292.0;;;media
-MG;MAR OE ESPANHA;municipio;396.0;;;219.0;;;media
-MG;MARIPA OE MINAS;municipio;161.0;;;74.0;;;media
+MG;MAR DE ESPANHA;municipio;396.0;;;219.0;;;media
+MG;MARIPA DE MINAS;municipio;161.0;;;74.0;;;media
 MG;MATIAS BARBOSA;municipio;279.0;;;29.0;;11.0;media
 MG;MERCES;municipio;815.0;;;;;;media
 MG;OLARIA;municipio;274.0;;;;;;media
@@ -1299,7 +1299,7 @@ MS;AMAMBAI;municipio;1945.0;87.0;72.0;19.0;;13.0;media
 MS;ANGELICA;municipio;830.0;380.0;337.0;145.0;;15.0;media
 MS;DEOOAPOLIS;municipio;1384.0;439.0;342.0;61.0;88.0;53.0;media
 MS;ELDORADO;municipio;877.0;51.0;20.0;10.0;;30.0;media
-MS;GLORIA OE DOURADOS;municipio;1015.0;235.0;148.0;75.0;22.0;60.0;media
+MS;GLORIA DE DOURADOS;municipio;1015.0;235.0;148.0;75.0;22.0;60.0;media
 MS;IGUATEMI;municipio;486.0;75.0;56.0;25.0;;13.0;media
 MS;ITAQUIRAI;municipio;541.0;152.0;116.0;69.0;;35.0;media
 MS;IVINHEMA;municipio;1775.0;614.0;543.0;55.0;;51.0;media
@@ -1325,7 +1325,7 @@ MS;ALTO TAQUARI;microrregiao;4607.0;388.0;310.0;69.0;;51.0;media
 MS;CAMAPUÃ;municipio;1226.0;182.0;162.0;32.0;;;media
 MS;COXIM;municipio;1421.0;60.0;44.0;15.0;;10.0;media
 MS;PEOF(O GOMES;municipio;663.0;48.0;28.0;;;19.0;media
-MS;fUO VERDE OE MATO GROSSO;municipio;712.0;29.0;16.0;;;;media
+MS;fUO VERDE DE MATO GROSSO;municipio;712.0;29.0;16.0;;;;media
 MS;SÃO GABRIEL DO OESTE;municipio;585.0;69.0;60.0;;;;media
 MS;PARANAIBA;microrregiao;6012.0;986.0;721.0;95.0;171.0;102.0;media
 MS;APARECIDA DO TABOAOO;municipio;834.0;225.0;78.0;11.0;156.0;;media
@@ -1339,31 +1339,31 @@ MS;AGUA CLARA;municipio;400.0;129.0;115.0;26.0;;16.0;media
 MS;BRASILAND-IA;municipio;1055.0;175.0;143.0;49.0;;22.0;media
 MS;RIBAS DO RIO PARDO;municipio;598.0;47.0;40.0;;;;media
 MS;TRES LAGOAS;municipio;1219.0;229.0;206.0;55.0;;20.0;media
-MS;NOVA ANDRAOINA;microrregiao;3063.0;1431.0;1238.0;530.0;11.0;120.0;media
-MS;ANAURILANDIA;municipio;443.0;240.0;203.0;51.0;;35.0;media
-MS;BATAGUASSU;municipio;637.0;181.0;171.0;64.0;;10.0;media
-MS;BATAIPORÃ;municipio;638.0;322.0;297.0;156.0;;14.0;media
-MS;NOVA ANDRAOINA;municipio;573.0;289.0;202.0;162.0;;27.0;media
-MS;TAQUARUSSU;municipio;772.0;399.0;365.0;97.0;;34.0;media
+MS;NOVA ANDRAOINA;microrregiao;3063.0;1431.0;1238.0;530.0;11.0;120.0;alta
+MS;ANAURILANDIA;municipio;443.0;240.0;203.0;51.0;;35.0;alta
+MS;BATAGUASSU;municipio;637.0;181.0;171.0;64.0;;10.0;alta
+MS;BATAIPORÃ;municipio;638.0;322.0;297.0;156.0;;14.0;alta
+MS;NOVA ANDRAOINA;municipio;573.0;289.0;202.0;162.0;;27.0;alta
+MS;TAQUARUSSU;municipio;772.0;399.0;365.0;97.0;;34.0;alta
 MT;TOTAIS;total;77921.0;7641.0;5663.0;370.0;126.0;1782.0;media
-MT;NORTE DE MATO GROSSO;mesorregiao;34675.0;5650.0;4111.0;167.0;2.0;1541.0;media
-MT;NORTE MATOGROSSENSE;microrregiao;17450.0;3794.0;2596.0;17.0;;1205.0;media
-MT;ALTA FLORESTA;municipio;3070.0;539.0;402.0;;;144.0;media
-MT;ARIPUANÂ;municipio;944.0;424.0;236.0;;;188.0;media
-MT;COLIDER;municipio;6303.0;1358.0;727.0;;;630.0;media
-MT;JUARA;municipio;1402.0;30.0;10.0;;;20.0;media
-MT;JUINA;municipio;2689.0;820.0;691.0;;;129.0;media
-MT;PORTO DOS GAUCHOS;municipio;723.0;20.0;;;;11.0;media
-MT;SÃO .JOSE;municipio;614.0;51.0;45.0;;;;media
-MT;SlNOP;municipio;1705.0;552.0;476.0;;;80.0;media
-MT;NORTE ARAGUAIA;microrregiao;3387.0;214.0;197.0;;;15.0;media
-MT;LUCIARA;municipio;750.0;;;;;;media
-MT;SANTA TEREZINHA;municipio;1617.0;179.0;177.0;;;;media
-MT;SÃO FELIX DO ARAGUAIA;municipio;1020.0;26.0;15.0;;;10.0;media
-MT;PARECIS-ALTO TELES PIRES;microrregiao;2154.0;418.0;290.0;124.0;;124.0;media
-MT;DIAMANTINO;municipio;1281.0;260.0;201.0;91.0;;56.0;media
-MT;NOBRES;municipio;873.0;158.0;89.0;33.0;;68.0;media
-MT;MEDIO ARAGUAIA;microrregiao;11684.0;1224.0;1028.0;22.0;;197.0;media
+MT;NORTE DE MATO GROSSO;mesorregiao;34675.0;5650.0;4111.0;167.0;2.0;1541.0;alta
+MT;NORTE MATOGROSSENSE;microrregiao;17450.0;3794.0;2596.0;17.0;;1205.0;alta
+MT;ALTA FLORESTA;municipio;3070.0;539.0;402.0;;;144.0;alta
+MT;ARIPUANÂ;municipio;944.0;424.0;236.0;;;188.0;alta
+MT;COLIDER;municipio;6303.0;1358.0;727.0;;;630.0;alta
+MT;JUARA;municipio;1402.0;30.0;10.0;;;20.0;alta
+MT;JUINA;municipio;2689.0;820.0;691.0;;;129.0;alta
+MT;PORTO DOS GAUCHOS;municipio;723.0;20.0;;;;11.0;alta
+MT;SÃO .JOSE;municipio;614.0;51.0;45.0;;;;alta
+MT;SlNOP;municipio;1705.0;552.0;476.0;;;80.0;alta
+MT;NORTE ARAGUAIA;microrregiao;3387.0;214.0;197.0;;;15.0;alta
+MT;LUCIARA;municipio;750.0;;;;;;alta
+MT;SANTA TEREZINHA;municipio;1617.0;179.0;177.0;;;;alta
+MT;SÃO FELIX DO ARAGUAIA;municipio;1020.0;26.0;15.0;;;10.0;alta
+MT;PARECIS-ALTO TELES PIRES;microrregiao;2154.0;418.0;290.0;124.0;;124.0;alta
+MT;DIAMANTINO;municipio;1281.0;260.0;201.0;91.0;;56.0;alta
+MT;NOBRES;municipio;873.0;158.0;89.0;33.0;;68.0;alta
+MT;MEDIO ARAGUAIA;microrregiao;11684.0;1224.0;1028.0;22.0;;197.0;alta
 MT;AGUA BOA;municipio;751.0;254.0;235.0;16.0;;19.0;media
 MT;BARRA DO GARÇAS;municipio;2593.0;144.0;120.0;;;24.0;media
 MT;CANARANA;municipio;2206.0;484.0;460.0;;;25.0;media
@@ -1394,14 +1394,14 @@ MT;PONTE BRANCA;municipio;335.0;;;;;;media
 MT;POXOREO;municipio;1538.0;34.0;16.0;;7.0;;media
 MT;TESOURO;municipio;188.0;;;;;;media
 MT;TORIXOREU;municipio;1040.0;33.0;;11.0;17.0;;media
-MT;SUDOESTE OE MATO GROSSO;mesorregiao;21945.0;906.0;770.0;80.0;79.0;;media
-MT;ALTO GUAPORE;microrregiao;2234.0;35.0;30.0;;;;media
-MT;PONTES E LACERDA;municipio;1227.0;;;;;;media
-MT;VILA BELA SANTISSIMA TRINDADE;municipio;1007.0;30.0;26.0;;;;media
-MT;ALTO PARAGUAI;microrregiao;2262.0;23.0;14.0;;;;media
-MT;ALTO PARAGUAI;municipio;1064.0;;;;;;media
-MT;ARENAPOL IS;municipio;1004.0;;7.0;;;;media
-MT;NORTELANDIA;municipio;194.0;;2.0;;;;media
+MT;SUDOESTE DE MATO GROSSO;mesorregiao;21945.0;906.0;770.0;80.0;79.0;;media
+MT;ALTO GUAPORE;microrregiao;2234.0;35.0;30.0;;;;alta
+MT;PONTES E LACERDA;municipio;1227.0;;;;;;alta
+MT;VILA BELA SANTISSIMA TRINDADE;municipio;1007.0;30.0;26.0;;;;alta
+MT;ALTO PARAGUAI;microrregiao;2262.0;23.0;14.0;;;;alta
+MT;ALTO PARAGUAI;municipio;1064.0;;;;;;alta
+MT;ARENAPOL IS;municipio;1004.0;;7.0;;;;alta
+MT;NORTELANDIA;municipio;194.0;;2.0;;;;alta
 MT;PARAGUAI JAURU;microrregiao;11278.0;703.0;642.0;37.0;38.0;;media
 MT;ARAPUT ANGA;municipio;1027.0;165.0;162.0;;;;media
 MT;BARRA DO BUGRES;municipio;902.0;;;;;;media
@@ -1415,8 +1415,8 @@ MT;ALTO PANTANAL;microrregiao;6171.0;145.0;84.0;31.0;33.0;;media
 MT;BARÃO DE MELGAÇO;municipio;38.0;;;;;;media
 MT;CACERES;municipio;4013.0;50.0;35.0;;14.0;;media
 MT;POCONE;municipio;120.0;86.0;5.0;27.0;10.0;;media
-PA;TOTAIS;total;253222.0;2927.0;1950.0;586.0;527.0;;media
-PA;HILEIA PARAENSE;mesorregiao;78004.0;1372.0;867.0;340.0;176.0;;media
+PA;TOTAIS;total;253222.0;2927.0;1950.0;586.0;527.0;;alta
+PA;HILEIA PARAENSE;mesorregiao;78004.0;1372.0;867.0;340.0;176.0;;alta
 PA;MEDI O AMAZONAS PARAENSE;microrregiao;3676.0;512.0;377.0;38.0;100.0;;media
 PA;ALENQUER;municipio;5353.0;83.0;37.0;;46.0;;media
 PA;FARO;municipio;1225.0;;;;;;media
@@ -1425,13 +1425,13 @@ PA;MONTE ALEGRE;municipio;4024.0;86.0;70.0;;14.0;;media
 PA;OBIOOS;municipio;3537.0;25.0;;24.0;;;media
 PA;ORIXIMINA;municipio;3262.0;;;;;;media
 PA;SANT AREM;municipio;15076.0;307.0;268.0;;34.0;;media
-PA;TAPAJOS;microrregiao;8703.0;484.0;434.0;;50.0;;media
-PA;AVEIRO;municipio;2917.0;;;;;;media
-PA;ITAITUBA;municipio;5786.0;483.0;433.0;;50.0;;media
-PA;BAIXO AMAZONAS;microrregiao;12940.0;35.0;23.0;;;;media
-PA;ALMEIRIM;municipio;2199.0;;;;;;media
-PA;PORTO DE MOZ;municipio;1873.0;;;;;;media
-PA;PRAINHA;municipio;8868.0;33.0;23.0;;;;media
+PA;TAPAJOS;microrregiao;8703.0;484.0;434.0;;50.0;;alta
+PA;AVEIRO;municipio;2917.0;;;;;;alta
+PA;ITAITUBA;municipio;5786.0;483.0;433.0;;50.0;;alta
+PA;BAIXO AMAZONAS;microrregiao;12940.0;35.0;23.0;;;;alta
+PA;ALMEIRIM;municipio;2199.0;;;;;;alta
+PA;PORTO DE MOZ;municipio;1873.0;;;;;;alta
+PA;PRAINHA;municipio;8868.0;33.0;23.0;;;;alta
 PA;XINGU;microrregiao;3404.0;33.0;22.0;;;;media
 PA;ALTAMIRA;municipio;2029.0;18.0;;;;;media
 PA;SÃO FEL IX DO XINGU;municipio;1375.0;15.0;13.0;;;;media
@@ -1441,7 +1441,7 @@ PA;REDENÇÃO;municipio;2283.0;;;;;;media
 PA;RIO MARIA;municipio;2215.0;;;13.0;;;media
 PA;SANTANA;municipio;1625.0;;;;;;media
 PA;XINGUARA;municipio;6769.0;271.0;;268.0;;;media
-PA;LESTE PARAENSE;mesorregiao;173582.0;1534.0;1066.0;242.0;350.0;;media
+PA;LESTE PARAENSE;mesorregiao;173582.0;1534.0;1066.0;242.0;350.0;;alta
 PA;FUROS;microrregiao;26325.0;63.0;35.0;;23.0;;media
 PA;AFUA;municipio;2699.0;13.0;;;12.0;;media
 PA;ANAJAS;municipio;2037.0;;;;;;media
@@ -1452,10 +1452,10 @@ PA;MELGAÇO;municipio;1982.0;13.0;12.0;;;;media
 PA;PORTEL;municipio;6493.0;21.0;13.0;;;;media
 PA;SÃO SEBASTIÃO DA BOA VISTA;municipio;1515.0;;;;;;media
 PA;SENADOR JOSE PORFIRIO;municipio;660.0;;;;;;media
-PA;CAMPOS OE MARA JO;microrregiao;8738.0;252.0;237.0;12.0;;;media
+PA;CAMPOS DE MARA JO;microrregiao;8738.0;252.0;237.0;12.0;;;media
 PA;CHAVES;municipio;901.0;10.0;10.0;;;;media
 PA;MUANA;municipio;2943.0;;;;;;media
-PA;PONTA OE PEDRAS;municipio;1548.0;101.0;91.0;10.0;;;media
+PA;PONTA DE PEDRAS;municipio;1548.0;101.0;91.0;10.0;;;media
 PA;SALVATERRA;municipio;;;;;;;media
 PA;SANTA CRUZ;municipio;128.0;24.0;21.0;;;;media
 PA;SOURE;municipio;249.0;68.0;68.0;;;;media
@@ -1512,353 +1512,353 @@ PA;PEIXE-BOI;municipio;;543.0;4.0;;;;media
 PA;SANTA ISABEL DO PARA;municipio;1014.0;30.0;23.0;2.0;;;media
 PA;SANTA MARIA DO PARA;municipio;1414.0;7.0;;;;;media
 PA;SÃO FRANCISCO DO PARA;municipio;;726.0;16.0;;12.0;;media
-PB;TOTAIS;total;203277.0;11238.0;6623.0;3004.0;2247.0;1093.0;baixa
-PB;SERTÃO PARAIBANO;mesorregiao;112974.0;8566.0;5333.0;2023.0;1621.0;812.0;baixa
-PB;CATOLE DO ROCHA;microrregiao;5018.0;865.0;576.0;169.0;208.0;96.0;baixa
-PB;BOM SUCESSO;municipio;590.0;123.0;94.0;22.0;45.0;;baixa
-PB;BREJO DO CRUZ;municipio;643.0;294.0;250.0;42.0;4.0;31.0;baixa
-PB;BREJO DOS SANTOS;municipio;515.0;15.0;11.0;;;;baixa
-PB;CATOLE DO ROCHA;municipio;974.0;128.0;70.0;;34.0;35.0;baixa
-PB;JERICO;municipio;568.0;37.0;;;;;baixa
-PB;RIACHO DOS CAVALOS;municipio;9.0;64.0;59.0;59.0;14.0;;baixa
-PB;SÃO BENTO;municipio;490.0;105.0;;2.0;99.0;;baixa
-PB;SER IDO PARAIBANO;microrregiao;7304.0;99.0;68.0;26.0;10.0;;baixa
-PB;CUBATI;municipio;593.0;;;;;;baixa
-PB;FREI MARTINHO;municipio;294.0;;;;;;baixa
-PB;JUAZEIRINHO;municipio;1589.0;23.0;23.0;;;;baixa
-PB;NOVA PALMEIRA;municipio;415.0;;;;;;baixa
-PB;PEDRA LAVRADA;municipio;874.0;;;2.0;;;baixa
-PB;PICUI;municipio;2749.0;61.0;40.0;12.0;10.0;;baixa
-PB;SERIDO;municipio;790.0;;;;;;baixa
-PB;CURIMATAU;microrregiao;12781.0;495.0;250.0;252.0;;34.0;baixa
-PB;ARARUNA;municipio;1765.0;36.0;13.0;14.0;;10.0;baixa
-PB;BARRA OE SANTA ROSA;municipio;1836.0;67.0;;61.0;;2.0;baixa
-PB;CACIMBA OE DENTRO;municipio;2684.0;25.0;;24.0;;;baixa
-PB;CUITE;municipio;3339.0;312.0;197.0;146.0;;14.0;baixa
-PB;DONA INES;municipio;1176.0;14.0;;;;;baixa
-PB;NOVA FLORESTA;municipio;430.0;39.0;32.0;;;;baixa
-PB;TACIMA;municipio;1549.0;2.0;;;;;baixa
-PB;SERTÃO DE CAJAZE IRAS;microrregiao;16658.0;1584.0;594.0;522.0;537.0;62.0;baixa
-PB;ANTENOR NAVARRO;municipio;2455.0;248.0;100.0;35.0;121.0;;baixa
-PB;BOA VENTURA;municipio;579.0;69.0;46.0;2.0;11.0;15.0;baixa
-PB;BOM JESUS;municipio;107.0;22.0;;;22.0;;baixa
-PB;BONITO DE SANTA FE;municipio;428.0;;;;;;baixa
-PB;CACHOEIRA DOS INDIOS;municipio;607.0;143.0;103.0;11.0;57.0;;baixa
-PB;CAJAZE IRAS;municipio;1366.0;169.0;17.0;13.0;145.0;;baixa
-PB;CARRAPATEIRA;municipio;108.0;;;;;;baixa
-PB;CONCEIÇÃO;municipio;2214.0;67.0;39.0;;44.0;;baixa
-PB;CURRAL VELHO;municipio;347.0;;;;;;baixa
-PB;DIAMANTE;municipio;456.0;44.0;7.0;4.0;;;baixa
-PB;(BIARA;municipio;855.0;27.0;22.0;;;;baixa
-PB;MOh fE HOREBE;municipio;246.0;13.0;;;;;baixa
-PB;PEDRA BRANCA;municipio;329.0;24.0;17.0;2.0;;;baixa
-PB;SANTA HELENA;municipio;706.0;31.0;;3.0;26.0;;baixa
-PB;SANTANA DE MANGUEIRA;municipio;975.0;27.0;26.0;;;;baixa
-PB;SÃO JOSE DE CAI ANA;municipio;;;;;;;baixa
-PB;SÃO JOSE DE PIRANHAS;municipio;1647.0;137.0;81.0;32.0;18.0;18.0;baixa
-PB;SERRA GRANDE;municipio;228.0;;;;;;baixa
-PB;TRIUNFO;municipio;1026.0;351.0;33.0;299.0;38.0;;baixa
-PB;UIRAUNA;municipio;1614.0;170.0;39.0;100.0;35.0;2.0;baixa
-PB;DEPRESSÃO DO ALTO PIRANHAS;microrregiao;21778.0;4197.0;3252.0;593.0;641.0;401.0;baixa
-PB;AGUIAR;municipio;862.0;13.0;;;;7.0;baixa
-PB;BOQUEIRÃO DOS COCHOS;municipio;362.0;68.0;;;;63.0;baixa
-PB;CACIMBA DE AREIA;municipio;255.0;107.0;103.0;;2.0;4.0;baixa
-PB;CATINGUEIRA;municipio;386.0;139.0;131.0;;;;baixa
-PB;CONDADO;municipio;439.0;90.0;87.0;23.0;;;baixa
-PB;COREMAS;municipio;784.0;12.0;10.0;;;;baixa
-PB;DESTERRO DE MALTA;municipio;197.0;10.0;;;;;baixa
-PB;EMAS;municipio;233.0;64.0;62.0;;;;baixa
-PB;I T APORANGA;municipio;50.0;115.0;33.0;15.0;30.0;45.0;baixa
-PB;.JUNCO DO SE RIDO;municipio;473.0;35.0;33.0;;;;baixa
-PB;LAGOA;municipio;699.0;10.0;;;;;baixa
-PB;LASTRO;municipio;156.0;;;;;;baixa
-PB;MALTA;municipio;125.0;54.0;53.0;;;;baixa
-PB;NAZAREZ I NHO;municipio;809.0;23.0;;;15.0;;baixa
-PB;NOVA OLINDA;municipio;475.0;20.0;;;;11.0;baixa
-PB;OLHO D' AGUA;municipio;875.0;62.0;53.0;;;;baixa
-PB;PASSAGEM;municipio;586.0;80.0;44.0;36.0;;;baixa
-PB;PATOS;municipio;514.0;220.0;207.0;;12.0;12.0;baixa
-PB;PAULISTA;municipio;845.0;236.0;101.0;71.0;151.0;10.0;baixa
-PB;PIANCO;municipio;876.0;166.0;153.0;;;10.0;baixa
-PB;POMBAL;municipio;1899.0;536.0;502.0;293.0;70.0;;baixa
-PB;OUIXABA;municipio;125.0;98.0;92.0;;;;baixa
-PB;SALGADINHO;municipio;405.0;24.0;22.0;;;;baixa
-PB;SANTA CRUZ;municipio;628.0;70.0;;;;65.0;baixa
-PB;SANTA LUZIA;municipio;598.0;232.0;227.0;;;;baixa
-PB;SANTANA DOS GARROTES;municipio;894.0;53.0;49.0;;;;baixa
-PB;SANTA TERESINHA;municipio;319.0;184.0;174.0;;;;baixa
-PB;SÃO JOSE DA LAGOA TAPADA;municipio;935.0;30.0;;;24.0;;baixa
-PB;SÃO .JOSE OE ESPINHARAS;municipio;351.0;171.0;156.0;;38.0;;baixa
-PB;SÃO JOSE DO BONFIM;municipio;358.0;75.0;65.0;10.0;;;baixa
-PB;SÃO JOSE DO SABUGI;municipio;451.0;124.0;98.0;25.0;;;baixa
-PB;SÃO MAMEDE;municipio;590.0;412.0;351.0;68.0;43.0;54.0;baixa
-PB;SOUSA;municipio;2978.0;556.0;330.0;10.0;224.0;10.0;baixa
-PB;VARZEA;municipio;246.0;104.0;75.0;;;31.0;baixa
-PB;CARIRIS VELHOS;microrregiao;31587.0;852.0;344.0;364.0;159.0;115.0;baixa
-PB;AROEIRAS;municipio;4569.0;123.0;45.0;86.0;18.0;;baixa
-PB;BARRA OE SÃO MIGUEL;municipio;713.0;;;;;;baixa
-PB;BOQUEIRÃO;municipio;2937.0;269.0;137.0;191.0;;;baixa
-PB;CABACEIRAS;municipio;805.0;36.0;;31.0;;;baixa
-PB;CAMALAU;municipio;928.0;;;;;;baixa
-PB;CONGO;municipio;702.0;;;;;;baixa
-PB;GURJÃO;municipio;786.0;;;;;;baixa
-PB;LIVRAMENTO;municipio;253.0;;;;;;baixa
-PB;MONTEIRO;municipio;3209.0;93.0;12.0;;;80.0;baixa
-PB;NATUBA;municipio;1080.0;112.0;11.0;;95.0;;baixa
-PB;OLIVEOOS;municipio;442.0;;;;;;baixa
-PB;OURO VELHO;municipio;504.0;;;;;;baixa
-PB;PRATA;municipio;490.0;;;;;;baixa
-PB;SÃO JOÃO DO CARIRI;municipio;1031.0;10.0;;;;;baixa
-PB;SÃO JOÃO DO TIGRE;municipio;1015.0;37.0;18.0;;20.0;;baixa
-PB;SÃO JOSE DOS CORDEIROS;municipio;1237.0;;;;;;baixa
-PB;SÃO SEBASTIÃO DO UMBUZEIRO;municipio;1199.0;21.0;20.0;;;;baixa
-PB;SERRA BRANCA;municipio;1418.0;16.0;10.0;4.0;;;baixa
-PB;SOLEDADE;municipio;622.0;17.0;12.0;10.0;;;baixa
-PB;SUME;municipio;937.0;52.0;52.0;;;;baixa
-PB;TAPEROA;municipio;152.0;;2.0;;;;baixa
-PB;UMBUZEIRO;municipio;3958.0;;;;12.0;;baixa
-PB;SERRA DO TEIXEIRA;microrregiao;17848.0;474.0;249.0;97.0;57.0;98.0;baixa
-PB;AGUA BRANCA;municipio;1152.0;;;;;;baixa
-PB;DESTERRO;municipio;1415.0;42.0;18.0;;;19.0;baixa
-PB;IMACULADA;municipio;1411.0;44.0;22.0;14.0;;;baixa
-PB;JURU;municipio;2177.0;;;;;;baixa
-PB;MÃE D' AGUA;municipio;639.0;111.0;102.0;;;;baixa
-PB;MANAIRA;municipio;626.0;;;;;;baixa
-PB;AGRESTE E BREJO PARAIBANO;mesorregiao;72874.0;2396.0;1229.0;874.0;570.0;203.0;baixa
-PB;PIEMONTE DA BORBOREMA;microrregiao;;;;429.0;423.0;152.0;baixa
-PB;A LAGOA GRANDE;municipio;;;;;51.0;;baixa
-PB;ALAGOINHA;municipio;;;;18.0;17.0;22.0;baixa
-PB;ARAÇAGI;municipio;;;;34.0;;13.0;baixa
-PB;CAIÇARA;municipio;;;;;;;baixa
-PB;CUITEGI;municipio;;;;;;;baixa
-PB;DUAS ESTRADAS;municipio;;;;;;;baixa
-PB;GUARABIRA;municipio;;;;37.0;31.0;16.0;baixa
-PB;GURINHEM;municipio;;;;;;27.0;baixa
-PB;INGA;municipio;;;;;;;baixa
-PB;ITATUBA;municipio;;;;249.0;256.0;22.0;baixa
-PB;JUAREZ TAVORA;municipio;;;;;;;baixa
-PB;LAGOA OE DENTRO;municipio;;;;;;;baixa
-PB;MULUNGU;municipio;;;;41.0;;32.0;baixa
-PB;PILÕEZINHOS;municipio;;;;;;;baixa
-PB;SERRA DA RAIZ;municipio;;;;;;;baixa
-PB;SERRA REDONDA;municipio;;;;;;;baixa
-PB;AGRESTE DA BORBOREMA;microrregiao;;;;325.0;263.0;94.0;baixa
-PB;AREIAL;municipio;;;;10.0;73.0;;baixa
-PB;CAMPINA GRANDE;municipio;;;;14.0;18.0;;baixa
-PB;ESPERANÇA;municipio;;;;247.0;33.0;15.0;baixa
-PB;FAGUNDES;municipio;;;;;;;baixa
-PB;LAGOA SECA;municipio;;;;;;;baixa
-PB;MASSARANDUBA;municipio;;;;;;;baixa
-PB;MONTADAS;municipio;;;;;;;baixa
-PB;POCINHOS;municipio;;;;;;;baixa
-PB;PUXINANÃ;municipio;;;;;;56.0;baixa
-PB;QUEIMADAS;municipio;;;;25.0;;;baixa
-PB;REMIGIO;municipio;;;;;;;baixa
-PB;SOLANEA;municipio;;;;11.0;114.0;;baixa
-PB;BREJO PARAIBANO;microrregiao;;;;60.0;133.0;214.0;baixa
-PB;ALAGOA NOVA;municipio;;;;;;31.0;baixa
-PB;AREIA;municipio;;;;;10.0;74.0;baixa
-PB;BANANEIRAS;municipio;;;;21.0;30.0;81.0;baixa
-PB;BORBOREMA;municipio;;;;;2.0;;baixa
-PB;PILÕES;municipio;;;;;;;baixa
-PB;PIRPIRITUBA;municipio;;;;12.0;;;baixa
-PB;SÃO SEBASTIÃO OE LAGOA OE ROÇA;municipio;1449.0;26.0;10.0;11.0;;;baixa
-PB;SERRARIA;municipio;;;;;65.0;;baixa
-PB;AGRO-PASTORIL;microrregiao;9216.0;575.0;415.0;55.0;110.0;15.0;baixa
-PB;CALDAS BRANDÃO;municipio;;;;;;19.0;baixa
-PB;ITABAIANA;municipio;;;;18.0;;;baixa
-PB;JURIPIRANGA;municipio;;;;;;;baixa
-PB;MOGEIRO;municipio;;;;37.0;;10.0;baixa
-PB;PILAR;municipio;;;;;;;baixa
-PB;SALGADO OE SÃO FEL IX;municipio;1821.0;313.0;309.0;;;;baixa
-PB;SÃO MIGUEL OE TAIPU;municipio;444.0;2.0;;;;;baixa
-PB;SAPE;municipio;;;;25.0;;70.0;baixa
-PB;JOÃO PESSOA;mesorregiao;;;;61.0;107.0;56.0;baixa
-PB;LITORAL PARAIBANO;microrregiao;;;;61.0;107.0;56.0;baixa
-PB;ALHANDRA;municipio;;;;;;11.0;baixa
-PB;BAIA DA TRAI ÇÂO;municipio;566.0;;;;;;baixa
-PB;BAYEUX;municipio;;;;;;;baixa
-PB;CAAPORÂ;municipio;;;;19.0;10.0;;baixa
-PB;CABEOELO;municipio;;;;;;;baixa
-PB;CONDE;municipio;;;;;;;baixa
-PB;CRUZ DO ESPIRITO SANTO;municipio;790.0;20.0;19.0;;;;baixa
-PB;I T APOROROCA;municipio;;;;;17.0;;baixa
-PB;JACARAU;municipio;;;;;;;baixa
-PB;JOÃO PESSOA;municipio;;;;10.0;;12.0;baixa
-PB;LUCENA;municipio;;;;;;;baixa
-PB;MAMANGUAPE;municipio;;;;;11.0;;baixa
-PB;MATARACA;municipio;;;;;;;baixa
-PB;PEDRAS DE FOGO;municipio;;;;;17.0;;baixa
-PB;PITIMBU;municipio;;;;;;;baixa
-PB;RIO TINTO;municipio;;;;;;;baixa
-PB;SANTA RITA;municipio;;;;;12.0;;baixa
-PE;TOTAIS;total;356041.0;21134.0;6030.0;6547.0;2561.0;;baixa
-PE;SERTÃO PERNAMBUCANO;mesorregiao;122325.0;6961.0;1086.0;2593.0;663.0;;baixa
-PE;ARARIPINA;mesorregiao;30484.0;1148.0;236.0;242.0;104.0;;baixa
-PE;ARARIPINA;microrregiao;6789.0;401.0;93.0;106.0;37.0;;baixa
-PE;BODOCO;microrregiao;3408.0;148.0;97.0;29.0;16.0;;baixa
-PE;GRANITO;microrregiao;466.0;;;;;;baixa
-PE;IPUBI;microrregiao;2864.0;26.0;11.0;;;;baixa
-PE;OURICURI;microrregiao;9368.0;528.0;29.0;80.0;33.0;;baixa
-PE;SITIO DOS MOREIRAS;microrregiao;1401.0;;;;;;baixa
-PE;TRINDADE;microrregiao;962.0;12.0;;;;;baixa
-PE;SALGUEIRO;microrregiao;15391.0;450.0;226.0;103.0;44.0;;baixa
-PE;CEDRO;microrregiao;944.0;;;;;;baixa
-PE;MIRANDIBA;microrregiao;1786.0;11.0;;;;;baixa
-PE;PARNAMIRIM;microrregiao;2176.0;36.0;12.0;17.0;;;baixa
-PE;SALGUEIRO;microrregiao;2174.0;254.0;170.0;15.0;26.0;;baixa
-PE;SÃO JOSE DO BELMONTE;microrregiao;3522.0;29.0;10.0;11.0;;;baixa
-PE;SERRITA;microrregiao;3095.0;56.0;10.0;17.0;;;baixa
-PE;TERRA NOVA;microrregiao;334.0;;;;;;baixa
-PE;VERDEJANTE;microrregiao;1360.0;57.0;24.0;29.0;;;baixa
-PE;SERTÃO PERNAMBUCANO SÃO FRANCISCO;microrregiao;23283.0;1406.0;209.0;722.0;152.0;;baixa
-PE;AFRANIO;microrregiao;2086.0;210.0;20.0;24.0;27.0;;baixa
-PE;SELEM DE SÃO FRANCISCO;microrregiao;2873.0;168.0;;87.0;39.0;;baixa
-PE;CABROBO;microrregiao;1916.0;214.0;38.0;89.0;;;baixa
-PE;FLORESTA;microrregiao;5452.0;234.0;;144.0;10.0;;baixa
-PE;ITACURUBA;microrregiao;772.0;;;;;;baixa
-PE;OROCO;microrregiao;746.0;90.0;14.0;68.0;;;baixa
-PE;PETROLANDIA;microrregiao;1309.0;;;;;;baixa
-PE;PETROLINA;microrregiao;968.0;334.0;;;;;baixa
-PE;SANTA MARIA DA BOA '/ISTA;microrregiao;2161.0;149.0;;49.0;59.0;;baixa
-PE;ALTO PAJEU;microrregiao;37194.0;2916.0;355.0;1510.0;217.0;;baixa
-PE;AFOGADOS DA I NGAZE IRA;microrregiao;2618.0;410.0;54.0;72.0;72.0;;baixa
-PE;BREJINHO;microrregiao;1202.0;15.0;;;;;baixa
-PE;CALUMBI;microrregiao;1022.0;79.0;;79.0;;;baixa
-PE;CARNAIBA;microrregiao;5419.0;124.0;16.0;39.0;14.0;;baixa
-PE;FLORES;microrregiao;3857.0;226.0;10.0;147.0;;;baixa
-PE;IGUARACI;microrregiao;18511.0;87.0;;49.0;;;baixa
-PE;INGAZEIRA;microrregiao;692.0;206.0;50.0;2.0;28.0;;baixa
-PE;ITAPETIM;microrregiao;2180.0;65.0;23.0;;2.0;;baixa
-PE;SANTA TEREZINHA;microrregiao;1523.0;28.0;;;;;baixa
-PE;SÃO JOSE DO EGITO;microrregiao;2641.0;261.0;23.0;57.0;38.0;;baixa
-PE;SERRA TALHADA;microrregiao;6209.0;164.0;47.0;95.0;;;baixa
-PE;SOLIDÃO;microrregiao;1045.0;63.0;29.0;;;;baixa
-PE;TABIRA;microrregiao;2594.0;204.0;65.0;;19.0;;baixa
-PE;TRIUNFO;microrregiao;3871.0;959.0;16.0;949.0;;;baixa
-PE;TUPARETAMA;microrregiao;465.0;25.0;5.0;12.0;;;baixa
-PE;SERTÃO DO MOXOTO;microrregiao;15973.0;1041.0;60.0;16.0;146.0;;baixa
-PE;BETANIA;microrregiao;1956.0;;;;;;baixa
-PE;CUSTODIA;microrregiao;3421.0;129.0;;;26.0;;baixa
-PE;IBIMIRIM;microrregiao;1926.0;268.0;;;;;baixa
-PE;INAJA;microrregiao;3787.0;16.0;;;2.0;;baixa
-PE;SERTANIA;microrregiao;2778.0;514.0;15.0;;109.0;;baixa
-PE;AGRESTE PERNAMBUCANO;mesorregiao;200357.0;9795.0;2884.0;2520.0;1348.0;;baixa
-PE;ARCO VERDE;microrregiao;20049.0;410.0;155.0;207.0;22.0;;baixa
-PE;AGUAS BELAS;municipio;4470.0;29.0;10.0;;;;baixa
-PE;ARCOVERDE;municipio;935.0;209.0;;97.0;;;baixa
-PE;BUIQUE;municipio;5186.0;341.0;36.0;67.0;;;baixa
-PE;ITAIBA;municipio;3879.0;290.0;54.0;12.0;;;baixa
-PE;PEDRA;municipio;1806.0;305.0;11.0;21.0;;;baixa
-PE;TUPANATINGA;municipio;3010.0;105.0;11.0;;;;baixa
-PE;VENTUROSA;municipio;763.0;131.0;31.0;;;;baixa
-PE;AGRESTE SETENTRIONAL PERNAMBUCANO;microrregiao;52106.0;;578.0;313.0;587.0;;baixa
-PE;BOM JARDIM;municipio;5376.0;207.0;;;188.0;;baixa
-PE;CHÃ GRANDE;municipio;1912.0;55.0;41.0;;;;baixa
-PE;CUMARU;municipio;4370.0;217.0;104.0;23.0;;;baixa
-PE;FEIRA NOVA;municipio;2125.0;10.0;;;;;baixa
-PE;FREI MIGUELINHO;municipio;2280.0;;;;;;baixa
-PE;GLORIA DO GOITA;municipio;3622.0;84.0;18.0;64.0;;;baixa
-PE;JOÃO ALFREDO;municipio;4596.0;294.0;17.0;47.0;230.0;;baixa
-PE;LIMOEIRO;municipio;2836.0;79.0;45.0;;21.0;;baixa
-PE;MACHADOS;municipio;1237.0;23.0;;17.0;;;baixa
-PE;OROBO;municipio;3250.0;26.0;;21.0;;;baixa
-PE;PASSIRA;municipio;4044.0;6.0;82.0;26.0;;;baixa
-PE;POMBOS;municipio;2824.0;27.0;;;;;baixa
-PE;SALGADINHO;municipio;1258.0;45.0;;;;;baixa
-PE;SANTA MARIA DO CAMBUCA;municipio;1877.0;20.0;14.0;;;;baixa
-PE;SÃO VICENTE FERRER;municipio;821.0;171.0;;67.0;121.0;;baixa
-PE;SURUBIM;municipio;5678.0;230.0;;;;;baixa
-PE;TAQUARITINGA DO NORTE;municipio;1880.0;15.0;;;;;baixa
-PE;TORITAMA;municipio;232.0;;;;;;baixa
-PE;VERTENTES;municipio;888.0;12.0;;;;;baixa
-PE;VALE DO IPOJJCA;microrregiao;55387.0;2764.0;557.0;859.0;376.0;;baixa
-PE;BELO .JARDIM;municipio;4590.0;46.0;;13.0;;;baixa
-PE;BEZERROS;municipio;4551.0;82.0;29.0;17.0;16.0;;baixa
-PE;BREJO DA MADRE DE DEUS;municipio;5222.0;37.0;24.0;;;;baixa
-PE;CACHOEIRINHA;municipio;999.0;22.0;;;;;baixa
-PE;CAPOEIRAS;municipio;2460.0;137.0;;;108.0;;baixa
-PE;CARUARU;municipio;7413.0;656.0;26.0;547.0;;;baixa
-PE;GRAVATA;municipio;3695.0;73.0;23.0;41.0;;;baixa
-PE;.JATAUBA;municipio;2681.0;10.0;;;;;baixa
-PE;PESQUEIRA;municipio;3821.0;298.0;270.0;;;;baixa
-PE;POÇÃO;municipio;1648.0;55.0;;;;;baixa
-PE;RIACHO DAS ALMAS;municipio;3791.0;113.0;71.0;;;;baixa
-PE;SANHARO;municipio;2423.0;222.0;21.0;;;;baixa
-PE;SANTA CRUZ DO CAPIBARIBE;municipio;662.0;;;;;;baixa
-PE;SÃO BENTO DO UNA;municipio;314.0;514.0;41.0;191.0;;;baixa
-PE;SÃO CAITANO;municipio;4446.0;175.0;;14.0;139.0;;baixa
-PE;TACAIMBO;municipio;1236.0;21.0;;;;;baixa
-PE;AGRESTE MERIDIONAL PERNAMBUCANO;microrregiao;72815.0;3980.0;594.0;1141.0;363.0;;baixa
-PE;AGRESTINA;municipio;246.0;36.0;;;22.0;;baixa
-PE;AL TINHO;municipio;936.0;771.0;727.0;79.0;;;baixa
-PE;ANGELIM;municipio;913.0;18.0;;13.0;;;baixa
-PE;BARRA DE GUABIRABA;municipio;458.0;47.0;;22.0;12.0;;baixa
-PE;BOM CONSELHO;municipio;2613.0;272.0;33.0;27.0;;;baixa
-PE;BONITO;municipio;2727.0;275.0;44.0;34.0;7.0;;baixa
-PE;BRE JÃO;municipio;832.0;125.0;;105.0;;;baixa
-PE;CAETES;municipio;;;47.0;;;;baixa
-PE;CALÇADO;municipio;;;203.0;186.0;98.0;;baixa
-PE;CAMOCIM DE SÃO FEL IX;municipio;898.0;230.0;203.0;62.0;58.0;;baixa
-PE;CANHOTINHO;municipio;;;13.0;27.0;42.0;;baixa
-PE;CORRENTES;municipio;;;51.0;10.0;;;baixa
-PE;CUPIRA;municipio;;;27.0;;;;baixa
-PE;GARANHUNS;municipio;;;59.0;57.0;95.0;;baixa
-PE;IATI;municipio;;;10.0;11.0;12.0;;baixa
-PE;IBIRAJUBA;municipio;;;;23.0;;;baixa
-PE;JUPI;municipio;;;52.0;72.0;24.0;;baixa
-PE;.JUREMA;municipio;;;17.0;62.0;31.0;;baixa
-PE;LAGOA;municipio;;;18.0;;;;baixa
-PE;LAGOA DOS GATOS;municipio;;;;10.0;;;baixa
-PE;LAJEDO;municipio;;;127.0;71.0;18.0;;baixa
-PE;PALMEIRINA;municipio;;;;;17.0;;baixa
-PE;PANELAS;municipio;;;;112.0;19.0;;baixa
-PE;P ARANA T AMA;municipio;;;;;147.0;;baixa
-PE;SAIRE;municipio;;;12.0;;38.0;;baixa
-PE;SALDA;municipio;;;28.0;;107.0;;baixa
-PE;SÃO JOÃO;municipio;;;26.0;11.0;110.0;;baixa
-PE;SÃO .JOAQUIM DO MONTE;municipio;2782.0;52.0;19.0;22.0;13.0;;baixa
-PE;TEREZINHA;municipio;;;26.0;;12.0;;baixa
-PE;MATA PERNAMBUCANA;mesorregiao;;;751.0;1823.0;1284.0;;baixa
-PE;MATA SECA PERNAMBUCANA;microrregiao;;;161.0;437.0;886.0;;baixa
-PE;ALIANÇA;municipio;;;26.0;78.0;79.0;;baixa
-PE;BUENOS AIRES;municipio;;;;17.0;80.0;;baixa
-PE;CAMUT ANGA;municipio;;;;;;;baixa
-PE;CARPINA;municipio;;;22.0;65.0;285.0;;baixa
-PE;CHÃ DE ALEGRIA;municipio;;;;;;;baixa
-PE;CONDADO;municipio;;;;21.0;;;baixa
-PE;FERREIROS;municipio;;;;12.0;;;baixa
-PE;GOIANA;municipio;;;;10.0;20.0;;baixa
-PE;IGARASSU;municipio;;;12.0;;159.0;;baixa
-PE;ITAMARACA;municipio;;;;;;;baixa
-PE;ITAMBE;municipio;;;;36.0;;;baixa
-PE;ITAPISSUMA;municipio;;;;;;;baixa
-PE;ITAQUITINGA;municipio;;;;16.0;11.0;;baixa
-PE;LAGOA;municipio;;;;20.0;;;baixa
-PE;MACAPARANA;municipio;;;10.0;;20.0;;baixa
-PE;NAZARE DA MATA;municipio;;;;30.0;16.0;;baixa
-PE;PAUDALHO;municipio;;;13.0;36.0;;;baixa
-PE;TIMBAUBA;municipio;;;24.0;29.0;57.0;;baixa
-PE;TRACUNHAEM;municipio;;;;24.0;36.0;;baixa
-PE;VICENCIA;municipio;;;17.0;29.0;89.0;;baixa
-PE;MATA UMIOA PERNAMBUCANA;microrregiao;;;590.0;386.0;398.0;;baixa
-PE;AGUA PRETA;municipio;;;;70.0;13.0;;baixa
-PE;AMARAJI;municipio;;;97.0;22.0;25.0;;baixa
-PE;BARREIROS;municipio;;;;16.0;;;baixa
-PE;CATENDE;municipio;;;;;;;baixa
-PE;CORTES;municipio;;;;2.0;;;baixa
-PE;ESCADA;municipio;;;100.0;43.0;57.0;;baixa
-PE;GAMELEIRA;municipio;;;;51.0;2.0;;baixa
-PE;lPO JUCA;municipio;;;;134.0;;;baixa
-PE;JOAQUIM NABUCO;municipio;;;;107.0;;;baixa
-PE;MARAIAL;municipio;;;;46.0;;;baixa
-PE;PALMARES;municipio;;;327.0;250.0;;;baixa
-PE;PRIMAVERA;municipio;;;;3.0;;;baixa
-PE;QUIPAPA;municipio;;;;30.0;16.0;;baixa
-PE;RIBEIRÃO;municipio;;;;344.0;;;baixa
+PB;TOTAIS;total;203277.0;11238.0;6623.0;3004.0;2247.0;1093.0;media
+PB;SERTÃO PARAIBANO;mesorregiao;112974.0;8566.0;5333.0;2023.0;1621.0;812.0;alta
+PB;CATOLE DO ROCHA;microrregiao;5018.0;865.0;576.0;169.0;208.0;96.0;alta
+PB;BOM SUCESSO;municipio;590.0;123.0;94.0;22.0;45.0;;media
+PB;BREJO DO CRUZ;municipio;643.0;294.0;250.0;42.0;4.0;31.0;media
+PB;BREJO DOS SANTOS;municipio;515.0;15.0;11.0;;;;media
+PB;CATOLE DO ROCHA;municipio;974.0;128.0;70.0;;34.0;35.0;media
+PB;JERICO;municipio;568.0;37.0;;;;;media
+PB;RIACHO DOS CAVALOS;municipio;9.0;64.0;59.0;59.0;14.0;;media
+PB;SÃO BENTO;municipio;490.0;105.0;;2.0;99.0;;media
+PB;SER IDO PARAIBANO;microrregiao;7304.0;99.0;68.0;26.0;10.0;;alta
+PB;CUBATI;municipio;593.0;;;;;;media
+PB;FREI MARTINHO;municipio;294.0;;;;;;media
+PB;JUAZEIRINHO;municipio;1589.0;23.0;23.0;;;;media
+PB;NOVA PALMEIRA;municipio;415.0;;;;;;media
+PB;PEDRA LAVRADA;municipio;874.0;;;2.0;;;media
+PB;PICUI;municipio;2749.0;61.0;40.0;12.0;10.0;;media
+PB;SERIDO;municipio;790.0;;;;;;media
+PB;CURIMATAU;microrregiao;12781.0;495.0;250.0;252.0;;34.0;alta
+PB;ARARUNA;municipio;1765.0;36.0;13.0;14.0;;10.0;media
+PB;BARRA DE SANTA ROSA;municipio;1836.0;67.0;;61.0;;2.0;media
+PB;CACIMBA DE DENTRO;municipio;2684.0;25.0;;24.0;;;media
+PB;CUITE;municipio;3339.0;312.0;197.0;146.0;;14.0;media
+PB;DONA INES;municipio;1176.0;14.0;;;;;media
+PB;NOVA FLORESTA;municipio;430.0;39.0;32.0;;;;media
+PB;TACIMA;municipio;1549.0;2.0;;;;;media
+PB;SERTÃO DE CAJAZE IRAS;microrregiao;16658.0;1584.0;594.0;522.0;537.0;62.0;alta
+PB;ANTENOR NAVARRO;municipio;2455.0;248.0;100.0;35.0;121.0;;media
+PB;BOA VENTURA;municipio;579.0;69.0;46.0;2.0;11.0;15.0;media
+PB;BOM JESUS;municipio;107.0;22.0;;;22.0;;media
+PB;BONITO DE SANTA FE;municipio;428.0;;;;;;media
+PB;CACHOEIRA DOS INDIOS;municipio;607.0;143.0;103.0;11.0;57.0;;media
+PB;CAJAZE IRAS;municipio;1366.0;169.0;17.0;13.0;145.0;;media
+PB;CARRAPATEIRA;municipio;108.0;;;;;;media
+PB;CONCEIÇÃO;municipio;2214.0;67.0;39.0;;44.0;;media
+PB;CURRAL VELHO;municipio;347.0;;;;;;media
+PB;DIAMANTE;municipio;456.0;44.0;7.0;4.0;;;media
+PB;(BIARA;municipio;855.0;27.0;22.0;;;;media
+PB;MOh fE HOREBE;municipio;246.0;13.0;;;;;media
+PB;PEDRA BRANCA;municipio;329.0;24.0;17.0;2.0;;;media
+PB;SANTA HELENA;municipio;706.0;31.0;;3.0;26.0;;media
+PB;SANTANA DE MANGUEIRA;municipio;975.0;27.0;26.0;;;;media
+PB;SÃO JOSE DE CAI ANA;municipio;;;;;;;media
+PB;SÃO JOSE DE PIRANHAS;municipio;1647.0;137.0;81.0;32.0;18.0;18.0;media
+PB;SERRA GRANDE;municipio;228.0;;;;;;media
+PB;TRIUNFO;municipio;1026.0;351.0;33.0;299.0;38.0;;media
+PB;UIRAUNA;municipio;1614.0;170.0;39.0;100.0;35.0;2.0;media
+PB;DEPRESSÃO DO ALTO PIRANHAS;microrregiao;21778.0;4197.0;3252.0;593.0;641.0;401.0;alta
+PB;AGUIAR;municipio;862.0;13.0;;;;7.0;media
+PB;BOQUEIRÃO DOS COCHOS;municipio;362.0;68.0;;;;63.0;media
+PB;CACIMBA DE AREIA;municipio;255.0;107.0;103.0;;2.0;4.0;media
+PB;CATINGUEIRA;municipio;386.0;139.0;131.0;;;;media
+PB;CONDADO;municipio;439.0;90.0;87.0;23.0;;;media
+PB;COREMAS;municipio;784.0;12.0;10.0;;;;media
+PB;DESTERRO DE MALTA;municipio;197.0;10.0;;;;;media
+PB;EMAS;municipio;233.0;64.0;62.0;;;;media
+PB;I T APORANGA;municipio;50.0;115.0;33.0;15.0;30.0;45.0;media
+PB;.JUNCO DO SE RIDO;municipio;473.0;35.0;33.0;;;;media
+PB;LAGOA;municipio;699.0;10.0;;;;;media
+PB;LASTRO;municipio;156.0;;;;;;media
+PB;MALTA;municipio;125.0;54.0;53.0;;;;media
+PB;NAZAREZ I NHO;municipio;809.0;23.0;;;15.0;;media
+PB;NOVA OLINDA;municipio;475.0;20.0;;;;11.0;media
+PB;OLHO D' AGUA;municipio;875.0;62.0;53.0;;;;media
+PB;PASSAGEM;municipio;586.0;80.0;44.0;36.0;;;media
+PB;PATOS;municipio;514.0;220.0;207.0;;12.0;12.0;media
+PB;PAULISTA;municipio;845.0;236.0;101.0;71.0;151.0;10.0;media
+PB;PIANCO;municipio;876.0;166.0;153.0;;;10.0;media
+PB;POMBAL;municipio;1899.0;536.0;502.0;293.0;70.0;;media
+PB;OUIXABA;municipio;125.0;98.0;92.0;;;;media
+PB;SALGADINHO;municipio;405.0;24.0;22.0;;;;media
+PB;SANTA CRUZ;municipio;628.0;70.0;;;;65.0;media
+PB;SANTA LUZIA;municipio;598.0;232.0;227.0;;;;media
+PB;SANTANA DOS GARROTES;municipio;894.0;53.0;49.0;;;;media
+PB;SANTA TERESINHA;municipio;319.0;184.0;174.0;;;;media
+PB;SÃO JOSE DA LAGOA TAPADA;municipio;935.0;30.0;;;24.0;;media
+PB;SÃO .JOSE DE ESPINHARAS;municipio;351.0;171.0;156.0;;38.0;;media
+PB;SÃO JOSE DO BONFIM;municipio;358.0;75.0;65.0;10.0;;;media
+PB;SÃO JOSE DO SABUGI;municipio;451.0;124.0;98.0;25.0;;;media
+PB;SÃO MAMEDE;municipio;590.0;412.0;351.0;68.0;43.0;54.0;media
+PB;SOUSA;municipio;2978.0;556.0;330.0;10.0;224.0;10.0;media
+PB;VARZEA;municipio;246.0;104.0;75.0;;;31.0;media
+PB;CARIRIS VELHOS;microrregiao;31587.0;852.0;344.0;364.0;159.0;115.0;alta
+PB;AROEIRAS;municipio;4569.0;123.0;45.0;86.0;18.0;;media
+PB;BARRA DE SÃO MIGUEL;municipio;713.0;;;;;;media
+PB;BOQUEIRÃO;municipio;2937.0;269.0;137.0;191.0;;;media
+PB;CABACEIRAS;municipio;805.0;36.0;;31.0;;;media
+PB;CAMALAU;municipio;928.0;;;;;;media
+PB;CONGO;municipio;702.0;;;;;;media
+PB;GURJÃO;municipio;786.0;;;;;;media
+PB;LIVRAMENTO;municipio;253.0;;;;;;media
+PB;MONTEIRO;municipio;3209.0;93.0;12.0;;;80.0;media
+PB;NATUBA;municipio;1080.0;112.0;11.0;;95.0;;media
+PB;OLIVEOOS;municipio;442.0;;;;;;media
+PB;OURO VELHO;municipio;504.0;;;;;;media
+PB;PRATA;municipio;490.0;;;;;;media
+PB;SÃO JOÃO DO CARIRI;municipio;1031.0;10.0;;;;;media
+PB;SÃO JOÃO DO TIGRE;municipio;1015.0;37.0;18.0;;20.0;;media
+PB;SÃO JOSE DOS CORDEIROS;municipio;1237.0;;;;;;media
+PB;SÃO SEBASTIÃO DO UMBUZEIRO;municipio;1199.0;21.0;20.0;;;;media
+PB;SERRA BRANCA;municipio;1418.0;16.0;10.0;4.0;;;media
+PB;SOLEDADE;municipio;622.0;17.0;12.0;10.0;;;media
+PB;SUME;municipio;937.0;52.0;52.0;;;;media
+PB;TAPEROA;municipio;152.0;;2.0;;;;media
+PB;UMBUZEIRO;municipio;3958.0;;;;12.0;;media
+PB;SERRA DO TEIXEIRA;microrregiao;17848.0;474.0;249.0;97.0;57.0;98.0;alta
+PB;AGUA BRANCA;municipio;1152.0;;;;;;media
+PB;DESTERRO;municipio;1415.0;42.0;18.0;;;19.0;media
+PB;IMACULADA;municipio;1411.0;44.0;22.0;14.0;;;media
+PB;JURU;municipio;2177.0;;;;;;media
+PB;MÃE D' AGUA;municipio;639.0;111.0;102.0;;;;media
+PB;MANAIRA;municipio;626.0;;;;;;media
+PB;AGRESTE E BREJO PARAIBANO;mesorregiao;72874.0;2396.0;1229.0;874.0;570.0;203.0;media
+PB;PIEMONTE DA BORBOREMA;microrregiao;;;;429.0;423.0;152.0;media
+PB;A LAGOA GRANDE;municipio;;;;;51.0;;media
+PB;ALAGOINHA;municipio;;;;18.0;17.0;22.0;media
+PB;ARAÇAGI;municipio;;;;34.0;;13.0;media
+PB;CAIÇARA;municipio;;;;;;;media
+PB;CUITEGI;municipio;;;;;;;media
+PB;DUAS ESTRADAS;municipio;;;;;;;media
+PB;GUARABIRA;municipio;;;;37.0;31.0;16.0;media
+PB;GURINHEM;municipio;;;;;;27.0;media
+PB;INGA;municipio;;;;;;;media
+PB;ITATUBA;municipio;;;;249.0;256.0;22.0;media
+PB;JUAREZ TAVORA;municipio;;;;;;;media
+PB;LAGOA DE DENTRO;municipio;;;;;;;media
+PB;MULUNGU;municipio;;;;41.0;;32.0;media
+PB;PILÕEZINHOS;municipio;;;;;;;media
+PB;SERRA DA RAIZ;municipio;;;;;;;media
+PB;SERRA REDONDA;municipio;;;;;;;media
+PB;AGRESTE DA BORBOREMA;microrregiao;;;;325.0;263.0;94.0;media
+PB;AREIAL;municipio;;;;10.0;73.0;;media
+PB;CAMPINA GRANDE;municipio;;;;14.0;18.0;;media
+PB;ESPERANÇA;municipio;;;;247.0;33.0;15.0;media
+PB;FAGUNDES;municipio;;;;;;;media
+PB;LAGOA SECA;municipio;;;;;;;media
+PB;MASSARANDUBA;municipio;;;;;;;media
+PB;MONTADAS;municipio;;;;;;;media
+PB;POCINHOS;municipio;;;;;;;media
+PB;PUXINANÃ;municipio;;;;;;56.0;media
+PB;QUEIMADAS;municipio;;;;25.0;;;media
+PB;REMIGIO;municipio;;;;;;;media
+PB;SOLANEA;municipio;;;;11.0;114.0;;media
+PB;BREJO PARAIBANO;microrregiao;;;;60.0;133.0;214.0;media
+PB;ALAGOA NOVA;municipio;;;;;;31.0;media
+PB;AREIA;municipio;;;;;10.0;74.0;media
+PB;BANANEIRAS;municipio;;;;21.0;30.0;81.0;media
+PB;BORBOREMA;municipio;;;;;2.0;;media
+PB;PILÕES;municipio;;;;;;;media
+PB;PIRPIRITUBA;municipio;;;;12.0;;;media
+PB;SÃO SEBASTIÃO DE LAGOA DE ROÇA;municipio;1449.0;26.0;10.0;11.0;;;media
+PB;SERRARIA;municipio;;;;;65.0;;media
+PB;AGRO-PASTORIL;microrregiao;9216.0;575.0;415.0;55.0;110.0;15.0;media
+PB;CALDAS BRANDÃO;municipio;;;;;;19.0;media
+PB;ITABAIANA;municipio;;;;18.0;;;media
+PB;JURIPIRANGA;municipio;;;;;;;media
+PB;MOGEIRO;municipio;;;;37.0;;10.0;media
+PB;PILAR;municipio;;;;;;;media
+PB;SALGADO DE SÃO FEL IX;municipio;1821.0;313.0;309.0;;;;media
+PB;SÃO MIGUEL DE TAIPU;municipio;444.0;2.0;;;;;media
+PB;SAPE;municipio;;;;25.0;;70.0;media
+PB;JOÃO PESSOA;mesorregiao;;;;61.0;107.0;56.0;alta
+PB;LITORAL PARAIBANO;microrregiao;;;;61.0;107.0;56.0;alta
+PB;ALHANDRA;municipio;;;;;;11.0;media
+PB;BAIA DA TRAI ÇÂO;municipio;566.0;;;;;;media
+PB;BAYEUX;municipio;;;;;;;media
+PB;CAAPORÂ;municipio;;;;19.0;10.0;;media
+PB;CABEOELO;municipio;;;;;;;media
+PB;CONDE;municipio;;;;;;;media
+PB;CRUZ DO ESPIRITO SANTO;municipio;790.0;20.0;19.0;;;;media
+PB;I T APOROROCA;municipio;;;;;17.0;;media
+PB;JACARAU;municipio;;;;;;;media
+PB;JOÃO PESSOA;municipio;;;;10.0;;12.0;media
+PB;LUCENA;municipio;;;;;;;media
+PB;MAMANGUAPE;municipio;;;;;11.0;;media
+PB;MATARACA;municipio;;;;;;;media
+PB;PEDRAS DE FOGO;municipio;;;;;17.0;;media
+PB;PITIMBU;municipio;;;;;;;media
+PB;RIO TINTO;municipio;;;;;;;media
+PB;SANTA RITA;municipio;;;;;12.0;;media
+PE;TOTAIS;total;356041.0;21134.0;6030.0;6547.0;2561.0;;media
+PE;SERTÃO PERNAMBUCANO;mesorregiao;122325.0;6961.0;1086.0;2593.0;663.0;;media
+PE;ARARIPINA;mesorregiao;30484.0;1148.0;236.0;242.0;104.0;;media
+PE;ARARIPINA;microrregiao;6789.0;401.0;93.0;106.0;37.0;;media
+PE;BODOCO;microrregiao;3408.0;148.0;97.0;29.0;16.0;;media
+PE;GRANITO;microrregiao;466.0;;;;;;media
+PE;IPUBI;microrregiao;2864.0;26.0;11.0;;;;media
+PE;OURICURI;microrregiao;9368.0;528.0;29.0;80.0;33.0;;media
+PE;SITIO DOS MOREIRAS;microrregiao;1401.0;;;;;;media
+PE;TRINDADE;microrregiao;962.0;12.0;;;;;media
+PE;SALGUEIRO;microrregiao;15391.0;450.0;226.0;103.0;44.0;;media
+PE;CEDRO;microrregiao;944.0;;;;;;media
+PE;MIRANDIBA;microrregiao;1786.0;11.0;;;;;media
+PE;PARNAMIRIM;microrregiao;2176.0;36.0;12.0;17.0;;;media
+PE;SALGUEIRO;microrregiao;2174.0;254.0;170.0;15.0;26.0;;media
+PE;SÃO JOSE DO BELMONTE;microrregiao;3522.0;29.0;10.0;11.0;;;media
+PE;SERRITA;microrregiao;3095.0;56.0;10.0;17.0;;;media
+PE;TERRA NOVA;microrregiao;334.0;;;;;;media
+PE;VERDEJANTE;microrregiao;1360.0;57.0;24.0;29.0;;;media
+PE;SERTÃO PERNAMBUCANO SÃO FRANCISCO;microrregiao;23283.0;1406.0;209.0;722.0;152.0;;media
+PE;AFRANIO;microrregiao;2086.0;210.0;20.0;24.0;27.0;;media
+PE;SELEM DE SÃO FRANCISCO;microrregiao;2873.0;168.0;;87.0;39.0;;media
+PE;CABROBO;microrregiao;1916.0;214.0;38.0;89.0;;;media
+PE;FLORESTA;microrregiao;5452.0;234.0;;144.0;10.0;;media
+PE;ITACURUBA;microrregiao;772.0;;;;;;media
+PE;OROCO;microrregiao;746.0;90.0;14.0;68.0;;;media
+PE;PETROLANDIA;microrregiao;1309.0;;;;;;media
+PE;PETROLINA;microrregiao;968.0;334.0;;;;;media
+PE;SANTA MARIA DA BOA '/ISTA;microrregiao;2161.0;149.0;;49.0;59.0;;media
+PE;ALTO PAJEU;microrregiao;37194.0;2916.0;355.0;1510.0;217.0;;media
+PE;AFOGADOS DA I NGAZE IRA;microrregiao;2618.0;410.0;54.0;72.0;72.0;;media
+PE;BREJINHO;microrregiao;1202.0;15.0;;;;;media
+PE;CALUMBI;microrregiao;1022.0;79.0;;79.0;;;media
+PE;CARNAIBA;microrregiao;5419.0;124.0;16.0;39.0;14.0;;media
+PE;FLORES;microrregiao;3857.0;226.0;10.0;147.0;;;media
+PE;IGUARACI;microrregiao;18511.0;87.0;;49.0;;;media
+PE;INGAZEIRA;microrregiao;692.0;206.0;50.0;2.0;28.0;;media
+PE;ITAPETIM;microrregiao;2180.0;65.0;23.0;;2.0;;media
+PE;SANTA TEREZINHA;microrregiao;1523.0;28.0;;;;;media
+PE;SÃO JOSE DO EGITO;microrregiao;2641.0;261.0;23.0;57.0;38.0;;media
+PE;SERRA TALHADA;microrregiao;6209.0;164.0;47.0;95.0;;;media
+PE;SOLIDÃO;microrregiao;1045.0;63.0;29.0;;;;media
+PE;TABIRA;microrregiao;2594.0;204.0;65.0;;19.0;;media
+PE;TRIUNFO;microrregiao;3871.0;959.0;16.0;949.0;;;media
+PE;TUPARETAMA;microrregiao;465.0;25.0;5.0;12.0;;;media
+PE;SERTÃO DO MOXOTO;microrregiao;15973.0;1041.0;60.0;16.0;146.0;;media
+PE;BETANIA;microrregiao;1956.0;;;;;;media
+PE;CUSTODIA;microrregiao;3421.0;129.0;;;26.0;;media
+PE;IBIMIRIM;microrregiao;1926.0;268.0;;;;;media
+PE;INAJA;microrregiao;3787.0;16.0;;;2.0;;media
+PE;SERTANIA;microrregiao;2778.0;514.0;15.0;;109.0;;media
+PE;AGRESTE PERNAMBUCANO;mesorregiao;200357.0;9795.0;2884.0;2520.0;1348.0;;media
+PE;ARCO VERDE;microrregiao;20049.0;410.0;155.0;207.0;22.0;;media
+PE;AGUAS BELAS;municipio;4470.0;29.0;10.0;;;;media
+PE;ARCOVERDE;municipio;935.0;209.0;;97.0;;;media
+PE;BUIQUE;municipio;5186.0;341.0;36.0;67.0;;;media
+PE;ITAIBA;municipio;3879.0;290.0;54.0;12.0;;;media
+PE;PEDRA;municipio;1806.0;305.0;11.0;21.0;;;media
+PE;TUPANATINGA;municipio;3010.0;105.0;11.0;;;;media
+PE;VENTUROSA;municipio;763.0;131.0;31.0;;;;media
+PE;AGRESTE SETENTRIONAL PERNAMBUCANO;microrregiao;52106.0;;578.0;313.0;587.0;;media
+PE;BOM JARDIM;municipio;5376.0;207.0;;;188.0;;media
+PE;CHÃ GRANDE;municipio;1912.0;55.0;41.0;;;;media
+PE;CUMARU;municipio;4370.0;217.0;104.0;23.0;;;media
+PE;FEIRA NOVA;municipio;2125.0;10.0;;;;;media
+PE;FREI MIGUELINHO;municipio;2280.0;;;;;;media
+PE;GLORIA DO GOITA;municipio;3622.0;84.0;18.0;64.0;;;media
+PE;JOÃO ALFREDO;municipio;4596.0;294.0;17.0;47.0;230.0;;media
+PE;LIMOEIRO;municipio;2836.0;79.0;45.0;;21.0;;media
+PE;MACHADOS;municipio;1237.0;23.0;;17.0;;;media
+PE;OROBO;municipio;3250.0;26.0;;21.0;;;media
+PE;PASSIRA;municipio;4044.0;6.0;82.0;26.0;;;media
+PE;POMBOS;municipio;2824.0;27.0;;;;;media
+PE;SALGADINHO;municipio;1258.0;45.0;;;;;media
+PE;SANTA MARIA DO CAMBUCA;municipio;1877.0;20.0;14.0;;;;media
+PE;SÃO VICENTE FERRER;municipio;821.0;171.0;;67.0;121.0;;media
+PE;SURUBIM;municipio;5678.0;230.0;;;;;media
+PE;TAQUARITINGA DO NORTE;municipio;1880.0;15.0;;;;;media
+PE;TORITAMA;municipio;232.0;;;;;;media
+PE;VERTENTES;municipio;888.0;12.0;;;;;media
+PE;VALE DO IPOJJCA;microrregiao;55387.0;2764.0;557.0;859.0;376.0;;media
+PE;BELO .JARDIM;municipio;4590.0;46.0;;13.0;;;media
+PE;BEZERROS;municipio;4551.0;82.0;29.0;17.0;16.0;;media
+PE;BREJO DA MADRE DE DEUS;municipio;5222.0;37.0;24.0;;;;media
+PE;CACHOEIRINHA;municipio;999.0;22.0;;;;;media
+PE;CAPOEIRAS;municipio;2460.0;137.0;;;108.0;;media
+PE;CARUARU;municipio;7413.0;656.0;26.0;547.0;;;media
+PE;GRAVATA;municipio;3695.0;73.0;23.0;41.0;;;media
+PE;.JATAUBA;municipio;2681.0;10.0;;;;;media
+PE;PESQUEIRA;municipio;3821.0;298.0;270.0;;;;media
+PE;POÇÃO;municipio;1648.0;55.0;;;;;media
+PE;RIACHO DAS ALMAS;municipio;3791.0;113.0;71.0;;;;media
+PE;SANHARO;municipio;2423.0;222.0;21.0;;;;media
+PE;SANTA CRUZ DO CAPIBARIBE;municipio;662.0;;;;;;media
+PE;SÃO BENTO DO UNA;municipio;314.0;514.0;41.0;191.0;;;media
+PE;SÃO CAITANO;municipio;4446.0;175.0;;14.0;139.0;;media
+PE;TACAIMBO;municipio;1236.0;21.0;;;;;media
+PE;AGRESTE MERIDIONAL PERNAMBUCANO;microrregiao;72815.0;3980.0;594.0;1141.0;363.0;;media
+PE;AGRESTINA;municipio;246.0;36.0;;;22.0;;media
+PE;AL TINHO;municipio;936.0;771.0;727.0;79.0;;;media
+PE;ANGELIM;municipio;913.0;18.0;;13.0;;;media
+PE;BARRA DE GUABIRABA;municipio;458.0;47.0;;22.0;12.0;;media
+PE;BOM CONSELHO;municipio;2613.0;272.0;33.0;27.0;;;media
+PE;BONITO;municipio;2727.0;275.0;44.0;34.0;7.0;;media
+PE;BRE JÃO;municipio;832.0;125.0;;105.0;;;media
+PE;CAETES;municipio;;;47.0;;;;media
+PE;CALÇADO;municipio;;;203.0;186.0;98.0;;media
+PE;CAMOCIM DE SÃO FEL IX;municipio;898.0;230.0;203.0;62.0;58.0;;media
+PE;CANHOTINHO;municipio;;;13.0;27.0;42.0;;media
+PE;CORRENTES;municipio;;;51.0;10.0;;;media
+PE;CUPIRA;municipio;;;27.0;;;;media
+PE;GARANHUNS;municipio;;;59.0;57.0;95.0;;media
+PE;IATI;municipio;;;10.0;11.0;12.0;;media
+PE;IBIRAJUBA;municipio;;;;23.0;;;media
+PE;JUPI;municipio;;;52.0;72.0;24.0;;media
+PE;.JUREMA;municipio;;;17.0;62.0;31.0;;media
+PE;LAGOA;municipio;;;18.0;;;;media
+PE;LAGOA DOS GATOS;municipio;;;;10.0;;;media
+PE;LAJEDO;municipio;;;127.0;71.0;18.0;;media
+PE;PALMEIRINA;municipio;;;;;17.0;;media
+PE;PANELAS;municipio;;;;112.0;19.0;;media
+PE;P ARANA T AMA;municipio;;;;;147.0;;media
+PE;SAIRE;municipio;;;12.0;;38.0;;media
+PE;SALDA;municipio;;;28.0;;107.0;;media
+PE;SÃO JOÃO;municipio;;;26.0;11.0;110.0;;media
+PE;SÃO .JOAQUIM DO MONTE;municipio;2782.0;52.0;19.0;22.0;13.0;;media
+PE;TEREZINHA;municipio;;;26.0;;12.0;;media
+PE;MATA PERNAMBUCANA;mesorregiao;;;751.0;823.0;1284.0;;alta
+PE;MATA SECA PERNAMBUCANA;microrregiao;;;161.0;437.0;886.0;;alta
+PE;ALIANÇA;municipio;;;26.0;78.0;79.0;;media
+PE;BUENOS AIRES;municipio;;;;17.0;80.0;;media
+PE;CAMUT ANGA;municipio;;;;;;;media
+PE;CARPINA;municipio;;;22.0;65.0;285.0;;media
+PE;CHÃ DE ALEGRIA;municipio;;;;;;;media
+PE;CONDADO;municipio;;;;21.0;;;media
+PE;FERREIROS;municipio;;;;12.0;;;media
+PE;GOIANA;municipio;;;;10.0;20.0;;media
+PE;IGARASSU;municipio;;;12.0;;159.0;;media
+PE;ITAMARACA;municipio;;;;;;;media
+PE;ITAMBE;municipio;;;;36.0;;;media
+PE;ITAPISSUMA;municipio;;;;;;;media
+PE;ITAQUITINGA;municipio;;;;16.0;11.0;;media
+PE;LAGOA;municipio;;;;20.0;;;media
+PE;MACAPARANA;municipio;;;10.0;;20.0;;media
+PE;NAZARE DA MATA;municipio;;;;30.0;16.0;;media
+PE;PAUDALHO;municipio;;;13.0;36.0;;;media
+PE;TIMBAUBA;municipio;;;24.0;29.0;57.0;;media
+PE;TRACUNHAEM;municipio;;;;24.0;36.0;;media
+PE;VICENCIA;municipio;;;17.0;29.0;89.0;;media
+PE;MATA UMIOA PERNAMBUCANA;microrregiao;;;590.0;386.0;398.0;;alta
+PE;AGUA PRETA;municipio;;;;70.0;13.0;;media
+PE;AMARAJI;municipio;;;97.0;22.0;25.0;;media
+PE;BARREIROS;municipio;;;;16.0;;;media
+PE;CATENDE;municipio;;;;;;;media
+PE;CORTES;municipio;;;;2.0;;;media
+PE;ESCADA;municipio;;;100.0;43.0;57.0;;media
+PE;GAMELEIRA;municipio;;;;51.0;2.0;;media
+PE;lPO JUCA;municipio;;;;134.0;;;media
+PE;JOAQUIM NABUCO;municipio;;;;107.0;;;media
+PE;MARAIAL;municipio;;;;46.0;;;media
+PE;PALMARES;municipio;;;327.0;250.0;;;media
+PE;PRIMAVERA;municipio;;;;3.0;;;media
+PE;QUIPAPA;municipio;;;;30.0;16.0;;media
+PE;RIBEIRÃO;municipio;;;;344.0;;;media
 PR;TOTAIS;total;466397.0;176765.0;138019.0;43937.0;5527.0;35694.0;media
-PR;CURITIBA;mesorregiao;16837.0;1038.0;878.0;140.0;;255.0;media
-PR;CURITIBA;microrregiao;16837.0;1038.0;878.0;140.0;;255.0;media
+PR;CURITIBA;mesorregiao;16837.0;1038.0;878.0;140.0;;255.0;alta
+PR;CURITIBA;microrregiao;16837.0;1038.0;878.0;140.0;;255.0;alta
 PR;ALMIRANTE T AMANOARE;municipio;1289.0;15.0;13.0;;;;media
 PR;ARAUCARIA;municipio;1327.0;85.0;54.0;;;32.0;media
 PR;BALSA NOVA;municipio;444.0;17.0;17.0;;;;media
@@ -1921,11 +1921,11 @@ PR;PEABIRU;municipio;1010.0;;;572.0;418.0;10.0;media
 PR;QUINTA DO SOL;municipio;377.0;286.0;154.0;25.0;;;media
 PR;RONCADOR;municipio;2967.0;;;434.0;;;media
 PR;UBIRATÃ;municipio;2705.0;;;1789.0;1509.0;;media
-PR;PITANGA;microrregiao;20027.0;;;5941.0;421.0;;media
-PR;AL TAMIRA;municipio;1296.0;;;750.0;407.0;;media
-PR;MANOEL RIBAS;municipio;1581.0;;;571.0;;;media
-PR;PALMITAL;municipio;3678.0;;;1227.0;;;media
-PR;PITANGA;municipio;13472.0;;;3393.0;;;media
+PR;PITANGA;microrregiao;20027.0;;;5941.0;421.0;;alta
+PR;AL TAMIRA;municipio;1296.0;;;750.0;407.0;;alta
+PR;MANOEL RIBAS;municipio;1581.0;;;571.0;;;alta
+PR;PALMITAL;municipio;3678.0;;;1227.0;;;alta
+PR;PITANGA;municipio;13472.0;;;3393.0;;;alta
 PR;EXTREMO OESTE PARANAENSE;microrregiao;70075.0;;;28709.0;11588.0;3681.0;media
 PR;ASSIS CHATEAUBRIAND;municipio;4081.0;;;3115.0;1039.0;10.0;media
 PR;BOA VISTA DA APARECIDA;municipio;1828.0;;;213.0;;;media
@@ -1983,14 +1983,14 @@ PR;SÃO JOÂO;municipio;113.0;;;764.0;;677.0;media
 PR;SÃO JORGE D' OESTE;municipio;1836.0;;;571.0;;557.0;media
 PR;VERE;municipio;1815.0;;;704.0;;551.0;media
 PR;VITORINO;municipio;871.0;;;204.0;;105.0;media
-PR;CAMPOS DE GUARAPUAVA;microrregiao;24892.0;;;3885.0;;889.0;media
-PR;CANTAGALO;municipio;3532.0;;;304.0;;176.0;media
-PR;GUARAPUAVA;municipio;5971.0;;;1185.0;;509.0;media
-PR;INACIO MARTINS;municipio;696.0;;;38.0;;;media
-PR;LARANJEIRAS DO SUL;municipio;6355.0;;;1269.0;;15.0;media
-PR;PINHÃO;municipio;4146.0;;;329.0;;147.0;media
-PR;QUEDAS DO IGUAÇU;municipio;2698.0;;;544.0;;;media
-PR;TURVO;municipio;1494.0;;;216.0;;40.0;media
+PR;CAMPOS DE GUARAPUAVA;microrregiao;24892.0;;;3885.0;;889.0;alta
+PR;CANTAGALO;municipio;3532.0;;;304.0;;176.0;alta
+PR;GUARAPUAVA;municipio;5971.0;;;1185.0;;509.0;alta
+PR;INACIO MARTINS;municipio;696.0;;;38.0;;;alta
+PR;LARANJEIRAS DO SUL;municipio;6355.0;;;1269.0;;15.0;alta
+PR;PINHÃO;municipio;4146.0;;;329.0;;147.0;alta
+PR;QUEDAS DO IGUAÇU;municipio;2698.0;;;544.0;;;alta
+PR;TURVO;municipio;1494.0;;;216.0;;40.0;alta
 PR;NORTE PARANAENSE;microrregiao;135753.0;;;54328.0;12667.0;;media
 PR;NORTE VELHO DE JACAREZINHO;municipio;14587.0;;;6498.0;;578.0;media
 PR;ABATIA;municipio;909.0;;;347.0;;109.0;media
@@ -2021,7 +2021,7 @@ PR;SANTA CECILIA DO PAVÃO;municipio;715.0;176.0;22.0;;;;media
 PR;SÃO JERONIMO DA SERRA;municipio;;579.0;455.0;20.0;;115.0;media
 PR;SÃO SEBASTIÂO DA AMOREIRA;municipio;548.0;336.0;146.0;69.0;;;media
 PR;URAI;municipio;;562.0;444.0;95.0;;9.0;media
-PR;NORTE NOVO DE LONDRINA;microrregiao;19630.0;13511.0;12202.0;6189.0;1247.0;;media
+PR;NORTE NOVO DE LONDRINA;microrregiao;9630.0;13511.0;12202.0;6189.0;1247.0;;media
 PR;ALVORADA DO SUL;municipio;;508.0;486.0;33.0;;22.0;media
 PR;ARAPONGAS;municipio;1270.0;620.0;59.0;;;;media
 PR;ASTORGA;municipio;1026.0;871.0;153.0;53.0;;;media
@@ -2093,7 +2093,7 @@ PR;PLANALTINA DO PARANA;mesorregiao;507.0;;;157.0;;;media
 PR;PORTO RICO;mesorregiao;383.0;;;14.0;;;media
 PR;PRESIDENTE CASTELO BRANCO;mesorregiao;291.0;;;71.0;30.0;;media
 PR;QUERENCIA DO NORTE;mesorregiao;870.0;;;426.0;127.0;;media
-PR;SANTA CRUZ OE MONTE CASTELO;mesorregiao;717.0;;;147.0;34.0;;media
+PR;SANTA CRUZ DE MONTE CASTELO;mesorregiao;717.0;;;147.0;34.0;;media
 PR;SANTA ISABEL DO IVA(;mesorregiao;1327.0;;;170.0;60.0;;media
 PR;SANTO ANTONIO DO CAIUA;mesorregiao;265.0;;;85.0;;;media
 PR;SÃO .JOÃO DO CAIUA;mesorregiao;333.0;;;107.0;;;media
@@ -2148,8 +2148,8 @@ RJ;PORCI UNCULA;municipio;1039.0;160.0;159.0;;;;alta
 RJ;MIRACEMA;microrregiao;6864.0;1491.0;1488.0;;;;alta
 RJ;CAMBUCI;municipio;1628.0;623.0;623.0;;;;alta
 RJ;MIRACEMA;municipio;1423.0;180.0;180.0;;;;alta
-RJ;SANTO ANTONIO OE PAOUA;municipio;3813.0;688.0;685.0;;;;alta
-RJ;AÇUCAREI RA OE CAMPOS;microrregiao;22150.0;7171.0;3242.0;4044.0;437.0;96.0;alta
+RJ;SANTO ANTONIO DE PAOUA;municipio;3813.0;688.0;685.0;;;;alta
+RJ;AÇUCAREI RA DE CAMPOS;microrregiao;22150.0;7171.0;3242.0;4044.0;437.0;96.0;alta
 RJ;CAMPOS;municipio;11242.0;4515.0;1648.0;132.0;89.0;46.0;alta
 RJ;CONCE I ÇÂO DE M-CABU;municipio;309.0;173.0;165.0;;;;alta
 RJ;MACAE;municipio;73.0;453.0;404.0;65.0;;;alta
@@ -2188,7 +2188,7 @@ RJ;PARAIBA DO SUL;municipio;588.0;273.0;270.0;;;;alta
 RJ;SAPUCAIA;municipio;;765.0;314.0;;314.0;;alta
 RJ;TRES RIOS;municipio;;511.0;162.0;;160.0;19.0;alta
 RJ;VASSOURAS E DO PIRAI;microrregiao;2682.0;672.0;652.0;15.0;;;alta
-RJ;ENGENHEIRO PAULO OE FRONTIN;municipio;;265.0;10.0;;;;alta
+RJ;ENGENHEIRO PAULO DE FRONTIN;municipio;;265.0;10.0;;;;alta
 RJ;MENDES;municipio;;56.0;;;;;alta
 RJ;MIGUEL PEREIRA;municipio;;131.0;10.0;;;;alta
 RJ;PIRAI;municipio;;559.0;163.0;;163.0;;alta
@@ -2205,7 +2205,7 @@ RJ;RESENDE;municipio;;822.0;507.0;;463.0;;alta
 RJ;RIO DAS FLORES;municipio;;269.0;164.0;;164.0;;alta
 RJ;VALENÇA;municipio;;1373.0;938.0;;938.0;37.0;alta
 RJ;VOLTA REDONDA;municipio;;161.0;28.0;;28.0;;alta
-RJ;GRANDE RIO OE .JANEIRO;mesorregiao;18763.0;644.0;424.0;49.0;178.0;77.0;alta
+RJ;GRANDE RIO DE .JANEIRO;mesorregiao;18763.0;644.0;424.0;49.0;178.0;77.0;alta
 RJ;FLUMINENSE;microrregiao;0.0;14823.0;594.0;;393.0;45.0;alta
 RJ;DUQUE DE CAXIAS;municipio;1694.0;12.0;12.0;;;;alta
 RJ;ITABORAI;municipio;;4610.0;239.0;;87.0;;alta
@@ -2221,31 +2221,31 @@ RJ;SÃO GONÇALO;municipio;;490.0;;;;;alta
 RJ;SÃO JOÃO DE MERITI;municipio;53.0;;;;;;alta
 RJ;GUANABARA;microrregiao;;3940.0;50.0;;31.0;;alta
 RJ;RIO DE JANEIRO;municipio;;3940.0;50.0;;31.0;;alta
-RO;TOTAIS;total;80615.0;1881.0;883.0;134.0;92.0;881.0;media
-RO;PORTO VELHO;mesorregiao;15245.0;234.0;132.0;;;97.0;media
-RO;PORTO VELHO;microrregiao;15245.0;234.0;132.0;;;97.0;media
-RO;COSTA MARQUES;municipio;4509.0;52.0;;;;51.0;media
-RO;GUA JARA-MIRIM;municipio;1721.0;45.0;;;;38.0;media
-RO;PORTO VELHO;municipio;9015.0;137.0;124.0;;;8.0;media
-RO;LESTE DE RONDONIA;mesorregiao;65370.0;1647.0;751.0;126.0;92.0;784.0;media
-RO;Jl-PARANA;microrregiao;52520.0;1310.0;557.0;7.0;67.0;659.0;media
-RO;ARIQUEMES;municipio;10598.0;233.0;144.0;27.0;;74.0;media
-RO;CACOAL;municipio;8069.0;187.0;9.0;5.0;;62.0;media
-RO;.JARU;municipio;5500.0;81.0;57.0;;;22.0;media
-RO;Jl-PARANA;municipio;5294.0;55.0;12.0;;1.0;40.0;media
-RO;OURO PRETO DO OESTE;municipio;9175.0;548.0;185.0;63.0;55.0;308.0;media
-RO;PRESIDENTE MEDICI;municipio;7235.0;38.0;20.0;;;15.0;media
-RO;ROLIM DE MOURA;municipio;6349.0;168.0;20.0;;;138.0;media
-RO;VILHENA;microrregiao;6063.0;162.0;92.0;;21.0;54.0;media
-RO;ESPIGÃO D'OESTE;municipio;837.0;22.0;3.0;;;15.0;media
-RO;PIMENTA BUENO;municipio;3646.0;40.0;;;;35.0;media
-RO;VILHENA;municipio;580.0;100.0;87.0;;17.0;;media
-RO;COLORADO DO OESTE;microrregiao;6787.0;175.0;102.0;;;71.0;media
-RO;CEREJEIRAS;municipio;1158.0;58.0;51.0;;;;media
-RO;COLORADO DO OESTE;municipio;5629.0;7.0;51.0;;;64.0;media
+RO;TOTAIS;total;80615.0;1881.0;883.0;134.0;92.0;881.0;alta
+RO;PORTO VELHO;mesorregiao;15245.0;234.0;132.0;;;97.0;alta
+RO;PORTO VELHO;microrregiao;15245.0;234.0;132.0;;;97.0;alta
+RO;COSTA MARQUES;municipio;4509.0;52.0;;;;51.0;alta
+RO;GUA JARA-MIRIM;municipio;1721.0;45.0;;;;38.0;alta
+RO;PORTO VELHO;municipio;9015.0;137.0;124.0;;;8.0;alta
+RO;LESTE DE RONDONIA;mesorregiao;65370.0;1647.0;751.0;126.0;92.0;784.0;alta
+RO;Jl-PARANA;microrregiao;52520.0;1310.0;557.0;7.0;67.0;659.0;alta
+RO;ARIQUEMES;municipio;10598.0;233.0;144.0;27.0;;74.0;alta
+RO;CACOAL;municipio;8069.0;187.0;9.0;5.0;;62.0;alta
+RO;.JARU;municipio;5500.0;81.0;57.0;;;22.0;alta
+RO;Jl-PARANA;municipio;5294.0;55.0;12.0;;1.0;40.0;alta
+RO;OURO PRETO DO OESTE;municipio;9175.0;548.0;185.0;63.0;55.0;308.0;alta
+RO;PRESIDENTE MEDICI;municipio;7235.0;38.0;20.0;;;15.0;alta
+RO;ROLIM DE MOURA;municipio;6349.0;168.0;20.0;;;138.0;alta
+RO;VILHENA;microrregiao;6063.0;162.0;92.0;;21.0;54.0;alta
+RO;ESPIGÃO D'OESTE;municipio;837.0;22.0;3.0;;;15.0;alta
+RO;PIMENTA BUENO;municipio;3646.0;40.0;;;;35.0;alta
+RO;VILHENA;municipio;580.0;100.0;87.0;;17.0;;alta
+RO;COLORADO DO OESTE;microrregiao;6787.0;175.0;102.0;;;71.0;alta
+RO;CEREJEIRAS;municipio;1158.0;58.0;51.0;;;;alta
+RO;COLORADO DO OESTE;municipio;5629.0;7.0;51.0;;;64.0;alta
 RR;"TOTAiS""";total;6389.0;106.0;78.0;3.0;;;media
-RR;RORAIMA;mesorregiao;6389.0;106.0;78.0;;;;media
-RR;RORAIMA;microrregiao;389.0;106.0;78.0;;;;media
+RR;RORAIMA;mesorregiao;389.0;106.0;78.0;;;;alta
+RR;RORAIMA;microrregiao;389.0;106.0;78.0;;;;alta
 RR;AL TO ALEGRE;municipio;671.0;;5.0;;;;media
 RR;BOA VI S TA;municipio;777.0;25.0;15.0;;;;media
 RR;BONFIM;municipio;698.0;24.0;22.0;;;;media
@@ -2254,8 +2254,8 @@ RR;MUCAJA I;municipio;604.0;5.0;2.0;;;;media
 RR;NORMANDIA;municipio;167.0;13.0;12.0;;;;media
 RR;SÃO JOÃO DA BALIZA;municipio;455.0;6.0;1.0;;;;media
 RS;TOTAIS;total;497172.0;243072.0;194607.0;46676.0;63328.0;22198.0;media
-RS;PORTO ALEGRE;mesorregiao;9613.0;827.0;445.0;162.0;266.0;77.0;media
-RS;PORTO ALEGRE;microrregiao;9613.0;827.0;445.0;162.0;266.0;77.0;media
+RS;PORTO ALEGRE;mesorregiao;9613.0;827.0;445.0;162.0;266.0;77.0;alta
+RS;PORTO ALEGRE;microrregiao;9613.0;827.0;445.0;162.0;266.0;77.0;alta
 RS;ALVORADA;municipio;67.0;;;;;;media
 RS;BARRA DO RIBEIRO;municipio;629.0;60.0;36.0;;;25.0;media
 RS;CACHOEIRINHA;municipio;38.0;;;;;;media
@@ -2331,11 +2331,11 @@ RS;PEDRO OSORIO;municipio;;833.0;808.0;32.0;;15.0;media
 RS;PELOTAS;municipio;;2878.0;2787.0;33.0;;93.0;media
 RS;SÃO LOURENÇO DO SUL;municipio;;1065.0;1020.0;26.0;;44.0;media
 RS;TAPES;municipio;;33.0;18.0;;;;media
-RS;LITORAL ORIENTAL LAGOA DOS PATOS;microrregiao;;529.0;515.0;;;12.0;media
-RS;MOSTARDAS;municipio;;115.0;110.0;2.0;2.0;;media
-RS;RIO GRANDE;municipio;;396.0;392.0;;;;media
-RS;SÃO JOSE DO NORTE;municipio;;6.0;;;;;media
-RS;TAVARES;municipio;;12.0;10.0;;;2.0;media
+RS;LITORAL ORIENTAL LAGOA DOS PATOS;microrregiao;;529.0;515.0;;;2.0;alta
+RS;MOSTARDAS;municipio;;115.0;110.0;2.0;2.0;;alta
+RS;RIO GRANDE;municipio;;396.0;392.0;;;;alta
+RS;SÃO JOSE DO NORTE;municipio;;6.0;;;;;alta
+RS;TAVARES;municipio;;12.0;10.0;;;2.0;alta
 RS;LAGOA MIRIM;microrregiao;;934.0;2832.0;48.0;21.0;81.0;media
 RS;ARROIO GRANDE;municipio;;432.0;6.0;13.0;20.0;;media
 RS;HERVAL;municipio;;849.0;837.0;;;;media
@@ -2348,8 +2348,8 @@ RS;PINHEIRO MACHADO;municipio;;869.0;852.0;175.0;;16.0;media
 RS;PIRATINI;municipio;;1185.0;1147.0;11.0;;39.0;media
 RS;SANTANA DA BOA VISTA;municipio;;974.0;909.0;21.0;;64.0;media
 RS;SÃO SEPE;municipio;2498.0;1857.0;1500.0;145.0;54.0;;media
-RS;CAXIAS DO SUL;mesorregiao;7278.0;;204.0;511.0;556.0;;media
-RS;VINICULTORA DE CAXiAs DO SUL;microrregiao;7278.0;;204.0;511.0;556.0;;media
+RS;CAXIAS DO SUL;mesorregiao;7278.0;;204.0;511.0;556.0;;alta
+RS;VINICULTORA DE CAXiAs DO SUL;microrregiao;7278.0;;204.0;511.0;556.0;;alta
 RS;ANTONIO PRADO soo;municipio;1084.0;;;;;;media
 RS;BENTO GONÇALVES;municipio;1296.0;;;;48.0;;media
 RS;CARLOS BARBOSA;municipio;733.0;;;206.0;15.0;;media
@@ -2427,7 +2427,7 @@ RS;SARANDI;municipio;2039.0;;;1654.0;374.0;12.0;media
 RS;SEBERI;municipio;2103.0;;;553.0;24.0;309.0;media
 RS;COLONIAL DE ERECHIM;microrregiao;;;;23170.0;8896.0;7351.0;media
 RS;ARATIBA;municipio;2261.0;;;1091.0;385.0;45.0;media
-RS;BARÃO OE COTEGIPE;municipio;1257.0;;;731.0;242.0;;media
+RS;BARÃO DE COTEGIPE;municipio;1257.0;;;731.0;242.0;;media
 RS;BARRACÃO;municipio;106.0;;;469.0;;;media
 RS;CACIQUE DOBLE;municipio;984.0;;;465.0;12.0;;media
 RS;CAMPINAS;municipio;1433.0;;;1098.0;738.0;351.0;media
@@ -2449,7 +2449,7 @@ RS;SANANDUVA;municipio;1901.0;;;1400.0;680.0;888.0;media
 RS;SÃO JOSE DO OURO;municipio;2134.0;;;1125.0;18.0;75.0;media
 RS;SÃO VALENTIM;municipio;2615.0;;;983.0;458.0;156.0;media
 RS;SERTÃO;municipio;1055.0;838.0;66.0;572.0;71.0;;media
-RS;SEVERIANO OE ALMEIDA;municipio;902.0;;;429.0;195.0;28.0;media
+RS;SEVERIANO DE ALMEIDA;municipio;902.0;;;429.0;195.0;28.0;media
 RS;TAPEJARA;municipio;3404.0;;;1177.0;61.0;1812.0;media
 RS;VIADUTOS;municipio;1550.0;;;840.0;217.0;107.0;media
 RS;COLONIAL DE IJUI;microrregiao;10671.0;9033.0;1678.0;5597.0;459.0;;media
@@ -2473,11 +2473,11 @@ RS;NÃO-ME-TOQUE;municipio;;48.0;999.0;18.0;595.0;33.0;media
 RS;SELBACH;municipio;;682.0;639.0;504.0;399.0;30.0;media
 RS;TAPERA;municipio;;755.0;723.0;641.0;493.0;11.0;media
 RS;VICTOR GRAEFF;municipio;;779.0;750.0;437.0;479.0;10.0;media
-RS;SOLEDADE;microrregiao;;8364.0;7024.0;2472.0;;1011.0;media
-RS;BARROS CASSAL;municipio;;1121.0;799.0;24.0;414.0;169.0;media
-RS;ESPUMOSO;municipio;;2818.0;2575.0;1245.0;1201.0;203.0;media
-RS;SAL TO DO JACU(;municipio;;627.0;518.0;23.0;168.0;90.0;media
-RS;SOLEDADE;municipio;;3798.0;3132.0;1180.0;619.0;549.0;media
+RS;SOLEDADE;microrregiao;;8364.0;7024.0;2472.0;;1011.0;alta
+RS;BARROS CASSAL;municipio;;1121.0;799.0;24.0;414.0;169.0;alta
+RS;ESPUMOSO;municipio;;2818.0;2575.0;1245.0;1201.0;203.0;alta
+RS;SAL TO DO JACU(;municipio;;627.0;518.0;23.0;168.0;90.0;alta
+RS;SOLEDADE;municipio;;3798.0;3132.0;1180.0;619.0;549.0;alta
 RS;CAMPOS DE VACARIA;microrregiao;;4727.0;4084.0;1027.0;80.0;467.0;media
 RS;BOM JESUS;municipio;;486.0;8.0;16.0;;28.0;media
 RS;CAMBARA;municipio;;21.0;;13.0;;;media
@@ -2485,7 +2485,7 @@ RS;ESMERAL DA;municipio;;199.0;171.0;25.0;;13.0;media
 RS;(BIRAIARAS;municipio;;900.0;741.0;752.0;;112.0;media
 RS;LAQOA YE-MELHA;municipio;;996.0;898.0;88.0;;62.0;media
 RS;SÃO FRANCISCO DE PAULA;municipio;;717.0;640.0;85.0;;15.0;media
-RS;VACARIA;municipio;;1408.0;1168.0;1148.0;;234.0;media
+RS;VACARIA;municipio;;1408.0;1168.0;48.0;;234.0;media
 RS;OESTE OAUCHO;mesorregiao;;35664.0;33252.0;8308.0;3983.0;820.0;media
 RS;SANTA MARIA;microrregiao;;7021.0;6199.0;881.0;348.0;552.0;media
 RS;FORMIGUEIRO;municipio;;647.0;619.0;;;27.0;media
@@ -2495,63 +2495,63 @@ RS;RESTINGA SECA;municipio;;822.0;732.0;;92.0;88.0;media
 RS;SANTA MARIA;municipio;;1127.0;784.0;61.0;209.0;138.0;media
 RS;SÃO PEDRO DO SUL;municipio;;860.0;1716.0;;45.0;130.0;media
 RS;SÃO VICENTE DO SUL;municipio;;429.0;404.0;;;21.0;media
-RS;CAMPANHA;microrregiao;;14606.0;13747.0;2708.0;445.0;676.0;media
-RS;ALEGRE TE;municipio;;2042.0;1985.0;559.0;16.0;44.0;media
-RS;BAGE;municipio;;1997.0;1930.0;39.0;243.0;62.0;media
-RS;CACEOUI;municipio;;320.0;299.0;44.0;;15.0;media
-RS;DOM PEDA I TO;municipio;;911.0;898.0;10.0;;17.0;media
-RS;ITAQUI;municipio;;920.0;872.0;353.0;;39.0;media
-RS;OUARAI;municipio;;579.0;544.0;234.0;;38.0;media
-RS;ROSARIC DO SUL;municipio;;1345.0;1162.0;596.0;;101.0;media
-RS;SANTANA DO LIVRAMENTO;municipio;;1160.0;1089.0;25.0;;77.0;media
-RS;SANTO ANTONIO DAS MISSÕES;municipio;;1111.0;989.0;199.0;126.0;74.0;media
-RS;SÃO BORJA;municipio;;1524.0;1403.0;199.0;;105.0;media
-RS;SÃO GABRIEL;municipio;;1514.0;1419.0;247.0;33.0;77.0;media
-RS;URUGUAI ANA;municipio;;1183.0;1157.0;203.0;5.0;27.0;media
+RS;CAMPANHA;microrregiao;;14606.0;13747.0;2708.0;445.0;676.0;alta
+RS;ALEGRE TE;municipio;;2042.0;1985.0;559.0;16.0;44.0;alta
+RS;BAGE;municipio;;1997.0;1930.0;39.0;243.0;62.0;alta
+RS;CACEOUI;municipio;;320.0;299.0;44.0;;15.0;alta
+RS;DOM PEDA I TO;municipio;;911.0;898.0;10.0;;17.0;alta
+RS;ITAQUI;municipio;;920.0;872.0;353.0;;39.0;alta
+RS;OUARAI;municipio;;579.0;544.0;234.0;;38.0;alta
+RS;ROSARIC DO SUL;municipio;;1345.0;1162.0;596.0;;101.0;alta
+RS;SANTANA DO LIVRAMENTO;municipio;;1160.0;1089.0;25.0;;77.0;alta
+RS;SANTO ANTONIO DAS MISSÕES;municipio;;1111.0;989.0;199.0;126.0;74.0;alta
+RS;SÃO BORJA;municipio;;1524.0;1403.0;199.0;;105.0;alta
+RS;SÃO GABRIEL;municipio;;1514.0;1419.0;247.0;33.0;77.0;alta
+RS;URUGUAI ANA;municipio;;1183.0;1157.0;203.0;5.0;27.0;alta
 SC;TOTAIS;total;234973.0;;;;;;media
-SC;LESTE CATARINENSE;mesorregiao;47368.0;;;;;;media
-SC;COLONIAL DE JOINVILE;microrregiao;7687.0;;;;;;media
-SC;ARAQUARI;municipio;258.0;;;;;;media
-SC;BARRA VELHA;municipio;610.0;;;;;;media
-SC;CORUPA;municipio;1325.0;;;;;;media
-SC;GARUVA;municipio;411.0;;;;;;media
-SC;GUARAMIRIM;municipio;865.0;;;;;;media
-SC;JARAGUA;municipio;1939.0;;;;;;media
-SC;JOINVILLE;municipio;1715.0;;;;;;media
-SC;SÃO FRANCISCO DO SUL;municipio;200.0;;;;;;media
-SC;SCHROEDER;municipio;364.0;;;;;;media
-SC;LITORAL DE ITAJAI;microrregiao;1511.0;;;;;;media
-SC;BALNEARIO CAMBORIU;municipio;16.0;;;;;;media
-SC;CAMBORIU;municipio;248.0;;;;;;media
-SC;ILHOTA;municipio;430.0;;;;;;media
-SC;ITAJAI;municipio;369.0;;;;;;media
-SC;ITAPEMA;municipio;83.0;;;;;;media
-SC;NAVEGANTES;municipio;133.0;;;;;;media
-SC;PENHA;municipio;87.0;;;;;;media
-SC;PIÇARRAS;municipio;145.0;;;;;;media
-SC;COLONIAL DE BLUMENAU;microrregiao;17107.0;;;;;;media
-SC;ASCURRA;municipio;302.0;;;;;;media
-SC;BENEDITO NOVO;municipio;1368.0;;;;;;media
-SC;BLUMENAU;municipio;2223.0;;;;;;media
-SC;BOTUVERA;municipio;586.0;;;;;;media
-SC;BRUSQUE;municipio;487.0;;;;;;media
-SC;GASPAR;municipio;1013.0;;;;;;media
-SC;GUABIRUBA;municipio;827.0;;;;;;media
-SC;INDAIAL;municipio;1864.0;;;;;;media
-SC;LUIZ ALVES;municipio;890.0;;;;;;media
-SC;MASSARANDUBA;municipio;1542.0;;;;;;media
-SC;POMERODE;municipio;1461.0;;;;;;media
-SC;PRESIDENTE NEREU;municipio;501.0;;;;;;media
-SC;RIO DOS CEDROS;municipio;1442.0;;;;;;media
-SC;RODEIO;municipio;651.0;;;;;;media
-SC;TIMBO;municipio;759.0;;;;;;media
-SC;VI DAL RAMOS;municipio;1191.0;;;;;;media
-SC;COLONIAL DO ITAJAI DO NORTE;microrregiao;4683.0;;;;;;media
-SC;DONA EMMA;municipio;571.0;;;;;;media
-SC;(BIRAMA;municipio;2463.0;;;;;;media
-SC;PRESIDENTE GETULIO;municipio;1017.0;;;;;;media
-SC;WITMARSUM;municipio;632.0;;;;;;media
-SC;COLONIAL DO ALTO ITAJAI;microrregiao;16380.0;;;;;;media
+SC;LESTE CATARINENSE;mesorregiao;47368.0;;;;;;alta
+SC;COLONIAL DE JOINVILE;microrregiao;7687.0;;;;;;alta
+SC;ARAQUARI;municipio;258.0;;;;;;alta
+SC;BARRA VELHA;municipio;610.0;;;;;;alta
+SC;CORUPA;municipio;1325.0;;;;;;alta
+SC;GARUVA;municipio;411.0;;;;;;alta
+SC;GUARAMIRIM;municipio;865.0;;;;;;alta
+SC;JARAGUA;municipio;1939.0;;;;;;alta
+SC;JOINVILLE;municipio;1715.0;;;;;;alta
+SC;SÃO FRANCISCO DO SUL;municipio;200.0;;;;;;alta
+SC;SCHROEDER;municipio;364.0;;;;;;alta
+SC;LITORAL DE ITAJAI;microrregiao;1511.0;;;;;;alta
+SC;BALNEARIO CAMBORIU;municipio;16.0;;;;;;alta
+SC;CAMBORIU;municipio;248.0;;;;;;alta
+SC;ILHOTA;municipio;430.0;;;;;;alta
+SC;ITAJAI;municipio;369.0;;;;;;alta
+SC;ITAPEMA;municipio;83.0;;;;;;alta
+SC;NAVEGANTES;municipio;133.0;;;;;;alta
+SC;PENHA;municipio;87.0;;;;;;alta
+SC;PIÇARRAS;municipio;145.0;;;;;;alta
+SC;COLONIAL DE BLUMENAU;microrregiao;17107.0;;;;;;alta
+SC;ASCURRA;municipio;302.0;;;;;;alta
+SC;BENEDITO NOVO;municipio;1368.0;;;;;;alta
+SC;BLUMENAU;municipio;2223.0;;;;;;alta
+SC;BOTUVERA;municipio;586.0;;;;;;alta
+SC;BRUSQUE;municipio;487.0;;;;;;alta
+SC;GASPAR;municipio;1013.0;;;;;;alta
+SC;GUABIRUBA;municipio;827.0;;;;;;alta
+SC;INDAIAL;municipio;1864.0;;;;;;alta
+SC;LUIZ ALVES;municipio;890.0;;;;;;alta
+SC;MASSARANDUBA;municipio;1542.0;;;;;;alta
+SC;POMERODE;municipio;1461.0;;;;;;alta
+SC;PRESIDENTE NEREU;municipio;501.0;;;;;;alta
+SC;RIO DOS CEDROS;municipio;1442.0;;;;;;alta
+SC;RODEIO;municipio;651.0;;;;;;alta
+SC;TIMBO;municipio;759.0;;;;;;alta
+SC;VI DAL RAMOS;municipio;1191.0;;;;;;alta
+SC;COLONIAL DO ITAJAI DO NORTE;microrregiao;4683.0;;;;;;alta
+SC;DONA EMMA;municipio;571.0;;;;;;alta
+SC;(BIRAMA;municipio;2463.0;;;;;;alta
+SC;PRESIDENTE GETULIO;municipio;1017.0;;;;;;alta
+SC;WITMARSUM;municipio;632.0;;;;;;alta
+SC;COLONIAL DO ALTO ITAJAI;microrregiao;16380.0;;;;;;alta
 SC;AGROLANDIA;municipio;856.0;;;;;;media
 SC;AGRONOMICA;municipio;667.0;;;;;;media
 SC;ATALANTA;municipio;541.0;;;;;;media
@@ -2657,7 +2657,7 @@ SE;BREJO GRANDE;municipio;1660.0;;;;;;media
 SE;CANHOBA;municipio;136.0;57.0;;;;;media
 SE;ILHA DAS FLORES;municipio;728.0;64.0;;;59.0;;media
 SE;NEOPOLIS;municipio;1211.0;109.0;;;19.0;;media
-SE;NOSSA SENHORA OE LOURDES;municipio;502.0;38.0;;;;;media
+SE;NOSSA SENHORA DE LOURDES;municipio;502.0;38.0;;;;;media
 SE;PACATUBA;municipio;2085.0;;;;;;media
 SE;PROPRIA;municipio;1519.0;194.0;108.0;;41.0;;media
 SE;TELHA;municipio;236.0;32.0;27.0;;;;media
@@ -2702,22 +2702,22 @@ SE;MACAMBIRA;municipio;;;;;;;media
 SE;MALHADOR;municipio;;;111.0;;;;media
 SE;MOITA BONITA;municipio;;;;;;;media
 SE;SÃO DOMINGOS;municipio;;;;;;;media
-SE;AGRESTE DE LAGARTO;microrregiao;;;703.0;;;;media
-SE;ARAUA;municipio;;;11.0;;;;media
-SE;BOQUIM;municipio;;;143.0;;;;media
-SE;ITABAIANINHA;municipio;;;;;;;media
-SE;LAGARTO;municipio;;;252.0;;;;media
-SE;PEDRINHAS;municipio;;;;;;;media
-SE;RIACHÃO DO DANTAS;municipio;;;;;;;media
-SE;SALGADO;municipio;;;263.0;;;;media
-SE;SIMÃO DIAS;municipio;;;23.0;;;;media
+SE;AGRESTE DE LAGARTO;microrregiao;;;703.0;;;;alta
+SE;ARAUA;municipio;;;11.0;;;;alta
+SE;BOQUIM;municipio;;;143.0;;;;alta
+SE;ITABAIANINHA;municipio;;;;;;;alta
+SE;LAGARTO;municipio;;;252.0;;;;alta
+SE;PEDRINHAS;municipio;;;;;;;alta
+SE;RIACHÃO DO DANTAS;municipio;;;;;;;alta
+SE;SALGADO;municipio;;;263.0;;;;alta
+SE;SIMÃO DIAS;municipio;;;23.0;;;;alta
 SE;SERTÃO;microrregiao;7358.0;67.0;46.0;;;;media
 SE;CRISTINAPOLlS;municipio;;;35.0;;;;media
 SE;POÇO VERDE;municipio;;;;;;;media
 SE;TOBIAS BARRETO;municipio;;;;;;;media
 SE;TOMAR;municipio;;;;;;;media
-SE;ARACAJU;mesorregiao;;;306.0;175.0;;;media
-SE;LITORAL SUL SERGIPANO;microrregiao;;;306.0;175.0;;;media
+SE;ARACAJU;mesorregiao;;;306.0;175.0;;;alta
+SE;LITORAL SUL SERGIPANO;microrregiao;;;306.0;175.0;;;alta
 SE;ARACAJU;municipio;;;;;;;media
 SE;BARRA DOS COQUEIROS;municipio;;;;;;;media
 SE;ESTANCIA;municipio;;;168.0;85.0;;;media
@@ -2758,7 +2758,7 @@ SP;TURMALINA;municipio;325.0;;;;;;media
 SP;URANIA;municipio;1394.0;17.0;;;;;media
 SP;ALTA ARARAOUARENSE DE YOTUPORANGA;municipio;4999.0;625.0;284.0;;;322.0;media
 SP;ALVARES FLORENCE;municipio;915.0;147.0;84.0;;;62.0;media
-SP;AMERICO OE CAMPOS;municipio;585.0;26.0;25.0;;;;media
+SP;AMERICO DE CAMPOS;municipio;585.0;26.0;25.0;;;;media
 SP;CARDOSO;municipio;593.0;88.0;52.0;;;31.0;media
 SP;COSMORAMA;municipio;951.0;98.0;77.0;;;10.0;media
 SP;PONTES GESTAL;municipio;240.0;17.0;11.0;;;;media
@@ -2844,23 +2844,23 @@ SP;MIGUELOPOLIS;municipio;179.0;168.0;;;;;media
 SP;MORRO AGUDO;municipio;323.0;258.0;;19.0;;;media
 SP;ORLANOIA;municipio;71.0;67.0;;;;;media
 SP;SÃO .JOAQUIM DA BARRA;municipio;131.0;115.0;;12.0;;;media
-SP;SERRA OE .JABOT I CABAL;microrregiao;3095.0;1425.0;;1411.0;;;media
-SP;BEBEDOURO;municipio;560.0;303.0;;279.0;;;media
-SP;CANDIDO RODRIGUES;municipio;;;;;;;media
-SP;FERNANDO PRESTES;municipio;62.0;;;55.0;;;media
-SP;GUARIBA;municipio;74.0;23.0;;14.0;;;media
-SP;JASOTICASAL;municipio;343.0;116.0;;215.0;;;media
-SP;MONTE ALTO;municipio;87.0;60.0;;15.0;;;media
-SP;MONTE AZUL PAULISTA;municipio;286.0;39.0;;202.0;;;media
-SP;PIRANGI;municipio;191.0;71.0;;128.0;;;media
-SP;PITANGUEIRAS;municipio;298.0;193.0;;32.0;;;media
-SP;SANTA ERNESTINA;municipio;14.0;;;;;;media
-SP;TAIAÇU;municipio;107.0;25.0;;60.0;;;media
-SP;TAIUVA;municipio;141.0;45.0;;102.0;;;media
-SP;TAQUARITINGA;municipio;451.0;225.0;;225.0;;;media
-SP;TERRA ROXA;municipio;203.0;133.0;;;;;media
-SP;VIRADOURO;municipio;194.0;171.0;;;;;media
-SP;VISTA ALEGRE DO ALTO;municipio;77.0;;;61.0;;;media
+SP;SERRA DE .JABOT I CABAL;microrregiao;3095.0;1425.0;;1411.0;;;alta
+SP;BEBEDOURO;municipio;560.0;303.0;;279.0;;;alta
+SP;CANDIDO RODRIGUES;municipio;;;;;;;alta
+SP;FERNANDO PRESTES;municipio;62.0;;;55.0;;;alta
+SP;GUARIBA;municipio;74.0;23.0;;14.0;;;alta
+SP;JASOTICASAL;municipio;343.0;116.0;;215.0;;;alta
+SP;MONTE ALTO;municipio;87.0;60.0;;15.0;;;alta
+SP;MONTE AZUL PAULISTA;municipio;286.0;39.0;;202.0;;;alta
+SP;PIRANGI;municipio;191.0;71.0;;128.0;;;alta
+SP;PITANGUEIRAS;municipio;298.0;193.0;;32.0;;;alta
+SP;SANTA ERNESTINA;municipio;14.0;;;;;;alta
+SP;TAIAÇU;municipio;107.0;25.0;;60.0;;;alta
+SP;TAIUVA;municipio;141.0;45.0;;102.0;;;alta
+SP;TAQUARITINGA;municipio;451.0;225.0;;225.0;;;alta
+SP;TERRA ROXA;municipio;203.0;133.0;;;;;alta
+SP;VIRADOURO;municipio;194.0;171.0;;;;;alta
+SP;VISTA ALEGRE DO ALTO;municipio;77.0;;;61.0;;;alta
 SP;RIBEIRÃO PRETO;microrregiao;901.0;493.0;;339.0;;;media
 SP;BARRINHA;municipio;42.0;36.0;;;;;media
 SP;CRAVINHOS;municipio;153.0;120.0;;35.0;;;media
@@ -2872,7 +2872,7 @@ SP;PRADOPOLIS;municipio;21.0;13.0;;;;;media
 SP;RIBEIRÃO PRETO;municipio;252.0;222.0;;28.0;;;media
 SP;SALES OLIVEIRA;municipio;168.0;163.0;;;;;media
 SP;SANTA RITA DO PASSA QUATRO;municipio;225.0;95.0;;131.0;;;media
-SP;SANTA ROSA OE VI TERBO;municipio;54.0;46.0;;;;;media
+SP;SANTA ROSA DE VI TERBO;municipio;54.0;46.0;;;;;media
 SP;SÃO SIMÃO;municipio;39.0;27.0;;13.0;;;media
 SP;SERRA AZUL;municipio;47.0;44.0;;;;;media
 SP;SERRANA;municipio;55.0;49.0;;;;;media
@@ -2907,7 +2907,7 @@ SP;IPERO;municipio;14.0;;;;;;media
 SP;MAIRINQUE;municipio;53.0;;;;;;media
 SP;PORTO FELIZ;municipio;151.0;59.0;;51.0;;;media
 SP;SAL TO;municipio;53.0;18.0;;31.0;;;media
-SP;SAL TO OE PI RAP ORA;municipio;73.0;65.0;;7.0;;;media
+SP;SAL TO DE PI RAP ORA;municipio;73.0;65.0;;7.0;;;media
 SP;SÃO ROQUE;municipio;52.0;46.0;;;;;media
 SP;SARAPUI;municipio;22.0;19.0;;;;;media
 SP;SOROCABA;municipio;187.0;106.0;80.0;;;;media
@@ -2922,7 +2922,7 @@ SP;LOUYEIRA;municipio;1.0;;;;;;media
 SP;MORUNGABA;municipio;;;;;;;media
 SP;YARZEA PAULISTA;municipio;;;;;;;media
 SP;MANTIQUEIRA PAULISTA;mesorregiao;9739.0;7964.0;604.0;1393.0;;;media
-SP;PLANALTO OE FRANCA;microrregiao;1812.0;1666.0;234.0;53.0;;;media
+SP;PLANALTO DE FRANCA;microrregiao;1812.0;1666.0;234.0;53.0;;;media
 SP;CRISTAIS PAULISTA;municipio;241.0;239.0;;;;;media
 SP;FRANCA;municipio;265.0;213.0;10.0;15.0;;;media
 SP;ITIRAPUÃ;municipio;113.0;111.0;;;;;media
@@ -2970,7 +2970,7 @@ SP;SALMOURÂO;municipio;109.0;28.0;92.0;;;;media
 SP;SANTA MERCEDES;municipio;133.0;126.0;;;;;media
 SP;SÂO JOÃO DO PAU O' ALHO;municipio;111.0;104.0;;;;;media
 SP;TUPI PAULISTA;municipio;519.0;491.0;12.0;25.0;;;media
-SP;ALTA NORDESTE OE PENAPOLIS;microrregiao;2759.0;2528.0;88.0;65.0;;;media
+SP;ALTA NORDESTE DE PENAPOLIS;microrregiao;2759.0;2528.0;88.0;65.0;;;media
 SP;ALTO ALEGRE;municipio;355.0;313.0;62.0;;;;media
 SP;A YANHANOA YA;municipio;116.0;113.0;15.0;;;;media
 SP;BARBOSA;municipio;85.0;82.0;;;;;media
@@ -3057,22 +3057,22 @@ SP;SANTO EXPEDITO;municipio;;;11.0;;;;media
 SP;TACIBA;municipio;;;22.0;;;;media
 SP;TARABAI;municipio;;;;;;;media
 SP;TEODORO SAMPAIO;municipio;;;36.0;;;;media
-SP;ALTA SOROCABANA DE ASSIS;microrregiao;;;1521.0;776.0;;;media
-SP;ASSIS;municipio;;;90.0;4.0;;;media
-SP;BORA;municipio;;;2.0;22.0;;;media
-SP;CAMPOS NOVOS PAULISTA;municipio;;;13.0;10.0;;;media
-SP;CANOIDO MOTA;municipio;;;588.0;;;;media
-SP;CRUZALIA;municipio;;;102.0;;;;media
-SP;ECHAPORÃ;municipio;;;235.0;;;;media
-SP;FLORINIA;municipio;;;;;;;media
-SP;IBIRAREMA;municipio;;;11.0;91.0;;;media
-SP;LUTECIA;municipio;;;79.0;42.0;;;media
-SP;MARACAI;municipio;;;80.0;10.0;;;media
-SP;OSCAR BRESSANE;municipio;;;151.0;10.0;;;media
-SP;PALMITAL;municipio;;;48.0;293.0;;;media
-SP;PARAGUAÇU PAULISTA;municipio;;;70.0;190.0;;;media
-SP;PLATINA;municipio;;;35.0;35.0;;;media
-SP;OUATA;municipio;;;;52.0;;;media
+SP;ALTA SOROCABANA DE ASSIS;microrregiao;;;1521.0;776.0;;;alta
+SP;ASSIS;municipio;;;90.0;4.0;;;alta
+SP;BORA;municipio;;;2.0;22.0;;;alta
+SP;CAMPOS NOVOS PAULISTA;municipio;;;13.0;10.0;;;alta
+SP;CANOIDO MOTA;municipio;;;588.0;;;;alta
+SP;CRUZALIA;municipio;;;102.0;;;;alta
+SP;ECHAPORÃ;municipio;;;235.0;;;;alta
+SP;FLORINIA;municipio;;;;;;;alta
+SP;IBIRAREMA;municipio;;;11.0;91.0;;;alta
+SP;LUTECIA;municipio;;;79.0;42.0;;;alta
+SP;MARACAI;municipio;;;80.0;10.0;;;alta
+SP;OSCAR BRESSANE;municipio;;;151.0;10.0;;;alta
+SP;PALMITAL;municipio;;;48.0;293.0;;;alta
+SP;PARAGUAÇU PAULISTA;municipio;;;70.0;190.0;;;alta
+SP;PLATINA;municipio;;;35.0;35.0;;;alta
+SP;OUATA;municipio;;;;52.0;;;alta
 SP;OURINHOS;microrregiao;;;;;;;media
 SP;BERNARD( NO DE CAMPOS;municipio;;;;68.0;;;media
 SP;CHAVANTES;municipio;;;12.0;;;;media
@@ -3090,7 +3090,7 @@ SP;SARUTAIA;municipio;;;;;;;media
 SP;TAGUAI;municipio;;;50.0;;;;media
 SP;TEjUPA;municipio;;;42.0;;;;media
 SP;TIMBURI;municipio;;;3.0;;;;media
-SP;SERRA OE BOTUCATU;microrregiao;;;155.0;360.0;;;media
+SP;SERRA DE BOTUCATU;microrregiao;;;155.0;360.0;;;media
 SP;AGUAS DE SANTA BARBARA;municipio;;;;61.0;;;media
 SP;ANHEMBI;municipio;;;;;;;media
 SP;ARANOU;municipio;;;;;;;media
@@ -3113,8 +3113,8 @@ SP;BURI;municipio;;;;;;;media
 SP;GUARE(;municipio;;;;;;;media
 SP;ITABERA;municipio;;;;;;;media
 SP;IT APETI N I NGA;municipio;;;83.0;12.0;;;media
-SP;VALE;mesorregiao;6214.0;2720.0;2674.0;931.0;27.0;;media
-SP;VALE DO PARAIBA PAULISTA;microrregiao;6214.0;2720.0;2674.0;931.0;27.0;;media
+SP;VALE;mesorregiao;6214.0;2720.0;2674.0;931.0;27.0;;alta
+SP;VALE DO PARAIBA PAULISTA;microrregiao;6214.0;2720.0;2674.0;931.0;27.0;;alta
 SP;APARECIDA;municipio;76.0;48.0;47.0;;;;media
 SP;CAÇAPAVA;municipio;320.0;96.0;94.0;45.0;;;media
 SP;CACHOEIRA PAULISTA;municipio;243.0;134.0;133.0;;;;media
@@ -3136,22 +3136,22 @@ SP;SÃO BENTO DO SAPUCAI;municipio;715.0;140.0;137.0;;;;media
 SP;SÃO JOSE DOS CAMPOS;municipio;775.0;433.0;420.0;224.0;;;media
 SP;TAUBATE SOS;municipio;215.0;214.0;;;;;media
 SP;TREMEMBE;municipio;121.0;49.0;49.0;;;;media
-SP;SUL PAULISTA;mesorregiao;25440.0;2721.0;1089.0;444.0;289.0;;media
-SP;PARANAP (ACABA;microrregiao;13592.0;2061.0;846.0;397.0;189.0;;media
-SP;CAPÂO BONITO;municipio;2399.0;104.0;86.0;33.0;17.0;;media
-SP;GUAPIARA;municipio;1987.0;107.0;56.0;32.0;50.0;;media
-SP;(BIUNA;municipio;1504.0;338.0;173.0;105.0;22.0;;media
-SP;PIEDADE;municipio;2241.0;887.0;100.0;34.0;22.0;;media
-SP;PILAR DO SUL;municipio;1135.0;233.0;184.0;117.0;32.0;;media
-SP;RIBEIRÃO BRANCO;municipio;2746.0;59.0;23.0;;35.0;;media
-SP;SÃO MIGUEL ARCANJO;municipio;1238.0;211.0;197.0;65.0;11.0;;media
-SP;TAPIRAI;municipio;342.0;122.0;27.0;;;;media
-SP;APIAI;microrregiao;5054.0;142.0;118.0;16.0;20.0;;media
-SP;APIAI;municipio;2741.0;122.0;98.0;16.0;20.0;;media
-SP;BARRA DO TURVO;municipio;641.0;;;;;;media
-SP;IPORANGA;municipio;787.0;;;;;;media
-SP;RIBEIRA;municipio;885.0;18.0;18.0;;;;media
-SP;BAIXADA DO RIBEIRA;microrregiao;6794.0;518.0;125.0;31.0;80.0;;media
+SP;SUL PAULISTA;mesorregiao;25440.0;2721.0;1089.0;444.0;289.0;;alta
+SP;PARANAP (ACABA;microrregiao;13592.0;2061.0;846.0;397.0;189.0;;alta
+SP;CAPÂO BONITO;municipio;2399.0;104.0;86.0;33.0;17.0;;alta
+SP;GUAPIARA;municipio;1987.0;107.0;56.0;32.0;50.0;;alta
+SP;(BIUNA;municipio;1504.0;338.0;173.0;105.0;22.0;;alta
+SP;PIEDADE;municipio;2241.0;887.0;100.0;34.0;22.0;;alta
+SP;PILAR DO SUL;municipio;1135.0;233.0;184.0;117.0;32.0;;alta
+SP;RIBEIRÃO BRANCO;municipio;2746.0;59.0;23.0;;35.0;;alta
+SP;SÃO MIGUEL ARCANJO;municipio;1238.0;211.0;197.0;65.0;11.0;;alta
+SP;TAPIRAI;municipio;342.0;122.0;27.0;;;;alta
+SP;APIAI;microrregiao;5054.0;142.0;118.0;16.0;20.0;;alta
+SP;APIAI;municipio;2741.0;122.0;98.0;16.0;20.0;;alta
+SP;BARRA DO TURVO;municipio;641.0;;;;;;alta
+SP;IPORANGA;municipio;787.0;;;;;;alta
+SP;RIBEIRA;municipio;885.0;18.0;18.0;;;;alta
+SP;BAIXADA DO RIBEIRA;microrregiao;6794.0;518.0;125.0;31.0;80.0;;alta
 SP;CANANEIA;municipio;108.0;;;;;;media
 SP;ELDORADO;municipio;1176.0;74.0;;;13.0;;media
 SP;IGUAPE;municipio;808.0;36.0;23.0;11.0;10.0;;media
@@ -3191,7 +3191,7 @@ SP;RIBEIRÃO PIRES;microrregiao;;;;;;;media
 SP;RIO GRANDE DA SERRA;microrregiao;;;;;;;media
 SP;SALESOPOLIS;microrregiao;;;;;;;media
 SP;SANTA ISABEL;microrregiao;;;;;;;media
-SP;SANTANA OE PARNAI BA;microrregiao;;;;;;;media
+SP;SANTANA DE PARNAI BA;microrregiao;;;;;;;media
 SP;SANTO ANDRE;microrregiao;;;;;;;media
 SP;SÃO BERNARDO;microrregiao;;;;;;;media
 SP;SÃO CAETANO DO SUL;microrregiao;;;;;;;media

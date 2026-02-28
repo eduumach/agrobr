@@ -1,6 +1,6 @@
 ﻿_uf;_label;_level;val_1;val_2;val_3;val_4;val_5;val_6;confianca
-AC;TOTAIS;total;15.0;49.0;130.0;;;;media
-AC;ACRE;mesorregiao;15.0;49.0;130.0;;;;media
+AC;TOTAIS;total;15.0;49.0;130.0;;;;alta
+AC;ACRE;mesorregiao;15.0;49.0;130.0;;;;alta
 AC;ALTO JURUA;microrregiao;160.0;;;;;;media
 AC;CRUZEIRO DO SUL;municipio;;;;;;;media
 AC;FEIJO;municipio;;;;;;;media
@@ -8,38 +8,38 @@ AC;TARAUACA;municipio;;;;;;;media
 AC;ALTO PURUS;microrregiao;12.0;33.0;;;;;media
 AC;BRASILEIA;municipio;;;;;;;media
 AC;SENA MADUREIRA;municipio;170.0;;;;;;media
-AC;TOTAIS;total;;;13.0;;;;media
-AC;ACRE;mesorregiao;;;13.0;;;;media
-AC;ALTO JURUA;microrregiao;;;;;;;media
-AC;ALTO PURUS;microrregiao;;;13.0;;;;media
+AC;TOTAIS;total;;;13.0;;;;alta
+AC;ACRE;mesorregiao;;;13.0;;;;alta
+AC;ALTO JURUA;microrregiao;;;;;;;alta
+AC;ALTO PURUS;microrregiao;;;13.0;;;;alta
 AC;SENA MADURE l RA;municipio;;;;;;;media
-AC;TOTAIS;total;;;53.0;;;;media
-AC;ACRE;mesorregiao;;;53.0;;;;media
-AC;Al TO JURUA;microrregiao;;;;;;;media
+AC;TOTAIS;total;;;53.0;;;;alta
+AC;ACRE;mesorregiao;;;53.0;;;;alta
+AC;Al TO JURUA;microrregiao;;;;;;;alta
 AC;CRUZEIRO DO SUL;municipio;16.0;;;;;;media
-AC;Al TO PURUS;microrregiao;;;51.0;;;;media
+AC;Al TO PURUS;microrregiao;;;51.0;;;;alta
 AC;SENA MADURE l RA;municipio;;;25.0;;;;media
-AC;I TONELADAS;microrregiao;;;;;;;media
-AC;Acre Goiás;mesorregiao;;;;;;;media
-AC;Alagoas Maranhão;mesorregiao;;;;;;;media
-AC;Rua Tibúrcio Valeriano;mesorregiao;;;;;;;media
-AC;Amapá;mesorregiao;;;;;;;media
+AC;I TONELADAS;microrregiao;;;;;;;alta
+AC;Acre Goiás;mesorregiao;;;;;;;alta
+AC;Alagoas Maranhão;mesorregiao;;;;;;;alta
+AC;Rua Tibúrcio Valeriano;mesorregiao;;;;;;;alta
+AC;Amapá;mesorregiao;;;;;;;alta
 AC;Mato Grosso;municipio;;;;;;;media
-AC;Rua Jovino Dinoá;mesorregiao;;;;;;;media
-AC;Amazonas;mesorregiao;;;;;;;media
+AC;Rua Jovino Dinoá;mesorregiao;;;;;;;alta
+AC;Amazonas;mesorregiao;;;;;;;alta
 AC;Mato Grosso do Sul;municipio;;;;;;;media
-AC;Av. Ayrão;mesorregiao;;;;;;;media
-AC;Bahia;mesorregiao;;;;;;;media
+AC;Av. Ayrão;mesorregiao;;;;;;;alta
+AC;Bahia;mesorregiao;;;;;;;alta
 AC;Minas Gerais;municipio;;;;;;;media
-AC;Ceará Pará;mesorregiao;;;;;;;media
-AC;Distrito Federal Paraíba;mesorregiao;;;;;;;media
-AC;SOS - BI. H - Edifício Venâncio li;mesorregiao;;;;;;;media
-AC;Espírito Santo Paraná;mesorregiao;;;;;;;media
-AC;Censo Agropecuário -;mesorregiao;;;;;;;media
-AC;SECRETARIA OE PLANEJAMENTO DA PRESIDl(NClA DA REPÚBLICA;mesorregiao;;;;;;;media
+AC;Ceará Pará;mesorregiao;;;;;;;alta
+AC;Distrito Federal Paraíba;mesorregiao;;;;;;;alta
+AC;SOS - BI. H - Edifício Venâncio li;mesorregiao;;;;;;;alta
+AC;Espírito Santo Paraná;mesorregiao;;;;;;;alta
+AC;Censo Agropecuário -;mesorregiao;;;;;;;alta
+AC;SECRETARIA DE PLANEJAMENTO DA PRESIDl(NClA DA REPÚBLICA;mesorregiao;;;;;;;alta
 AC;FUNDAÇÃO INSTITUTO BRASILEIRO DE Q(OQRAFIA E ESTATISTICA - IBGi;municipio;;;;;;;media
-AC;CENSOS ECONÔMICOS DE;mesorregiao;1985.0;;;;;;media
-AC;CENSO AGROPECUÁRIO;mesorregiao;;;;;;;media
+AC;CENSOS ECONÔMICOS DE;mesorregiao;1985.0;;;;;;alta
+AC;CENSO AGROPECUÁRIO;mesorregiao;;;;;;;alta
 AC;Nome ou razão social;microrregiao;;;;;;;media
 AC;Proprietário;microrregiao;;;;;;;media
 AC;Arrendatário;microrregiao;;;;;;;media
@@ -59,7 +59,7 @@ AC;Utiliza assistência técnica: Uso de adubos e corretivos;microrregiao;;;;;;;
 AC;Não utiliza;microrregiao;;;;;;;media
 AC;Finalidade Os;microrregiao;;;;;;;media
 AC;Origem;microrregiao;;;;;;;media
-AC;li Emprego de serviço de empreitada;mesorregiao;;;;;;;media
+AC;li Emprego de serviço de empreitada;mesorregiao;;;;;;;alta
 AC;Não usou , Ordenha com Não usa;microrregiao;;;;;;;media
 AC;Com fornecimento de máquinas;microrregiao;;;;;;;media
 AC;Com fornecimento só de mão-de-obra;microrregiao;;;;;;;media
@@ -162,143 +162,143 @@ AC;Al cool;mesorregiao;1.0;;;;;;media
 AC;Gasolina;mesorregiao;5.0;;;;;;media
 AC;Oleo Diesel;mesorregiao;9.0;;;;;;media
 AC;OBSERVÃÇÕES;mesorregiao;;;;;;;media
-AL;MATA ALAGOANA;mesorregiao;88.0;;;;;;media
-AL;MATA ALAGOANA;microrregiao;66.0;;;;;;media
-AL;CAPELA;municipio;12.0;;;;;;media
-AL;CHÃ PRETA;municipio;;;;;;;media
-AL;COLONIA LEQPOLDINA;municipio;;;;;;;media
-AL;IBATEGUARAr;municipio;;;;;;;media
-AL;.JACU IPE;municipio;;;;;;;media
-AL;.JOAQUIM GOMES;municipio;;;;;;;media
-AL;.JUNDIA;municipio;;;;;;;media
-AL;NOVO LINO;municipio;;;;;;;media
-AL;PINOOBA;municipio;;;;;;;media
-AL;SANTANA DO MUNDAU;municipio;;;;;;;media
-AL;SÂO .JOSE DA LAJE;municipio;;;;;;;media
-AL;"'ll ÇOS""A";municipio;25.0;;;;;;media
-AL;LITORAL NORTE ALAGOANO;microrregiao;;;;;;;media
-AL;MARAGOGI;municipio;;;;;;;media
-AL;PORTO CALVO;municipio;;;;;;;media
-AL;SÂO MIGUEL DOS MILAGRES;municipio;;;;;;;media
-AL;TABULEIROS DE s MIGUEL DOS CAMPOS;microrregiao;13.0;;;;;;media
-AL;BOCA DA MATA;municipio;;;;;;;media
-AL;CAMPO ALEGRE;municipio;;;;;;;media
-AL;ROTEIRO;municipio;;;;;;;media
-AL;SÁO MIGUEL DOS CAMPOS;municipio;;;;;;;media
-AL;MARECHAL DEODORO;municipio;;;;;;;media
-AL;SANTA LUZIA DO NORTE;municipio;;;;;;;media
-AL;TONELADAS;municipio;;;;;;;media
-AL;Nome ou razão soei a;microrregiao;;;;;;;media
-AL;Ocupante ç;microrregiao;;;;;;;media
-AL;Em outro local;microrregiao;;;;;;;media
-AL;Oi reção dos trabal ::::a;microrregiao;;;;;;;media
-AL;Produtor nfvel oª;microrregiao;;;;;;;media
-AL;Administrador;microrregiao;;;;;;;media
-AL;Norne ou razão social ção;microrregiao;;;;;;;media
-AL;Condição do proprietârio;microrregiao;;;;;;;media
-AL;Governo (Federal, Estadual, Municipal);microrregiao;;;;;;;media
-AL;Outra condição Lavoura;microrregiao;;;;;;;media
-AL;Utiliza assistência técnica;microrregiao;;;;;;;media
-AL;Não utiliza Não usa;microrregiao;;;;;;;media
-AL;Final idade Os;microrregiao;;;;;;;media
-AL;li Emprego de serviço de empreitada: Outros animais;mesorregiao;;;;;;;media
-AL;Não usou Não usa;microrregiao;;;;;;;media
-AL;Com fornecimento de mâquinas Usa;microrregiao;;;;;;;media
-AL;Com fornecimento só de mão-de-obr UNIDADE DE SUPERFICIE;microrregiao;;;;;;;media
-AL;Preparo do solo;microrregiao;;;;;;;media
-AL;Plantio usada nas dec;microrregiao;;;;;;;media
-AL;Tratos culturais;microrregiao;;;;;;;media
-AL;Limpeza de pasto;microrregiao;;;;;;;media
-AL;Outros serviços;microrregiao;;;;;;;media
-AL;Assoc:ia-ão;microrregiao;;;;;;;media
-AL;Nenhuma;microrregiao;;;;;;;media
-AL;Cómercial ização;microrregiao;;;;;;;media
-AL;Crédito ::B;microrregiao;;;;;;;media
-AL;TOTAL;total;10.0;;;;;;media
-AL;TOTAL;total;;;;;;;media
-AL;Total da ãrea irrigada;total;11.0;;;;;;media
-AL;Si los Depõs i tos;microrregiao;;;;;;;media
-AL;BOVINOS BúFALOS EQUINOS;municipio;;;;;;;media
-AL;TOTAL;total;11.0;;;;;;media
-AL;Nascidos em;microrregiao;;;;;;;media
-AL;Vitimados em;microrregiao;;;;;;;media
-AL;Comprados( Número;microrregiao;;;;;;;media
-AL;"Vendidos p; ntos de rúmero";microrregiao;;;;;;;media
-AL;Abatidos Naúm e rroCr'S';microrregiao;;;;;;;media
-AL;de lei te tros);microrregiao;;;;;;;media
-AL;Nas e idos em;microrregiao;;;;;;;media
-AL;Comprados;microrregiao;;;;;;;media
-AL;Vendi dos;microrregiao;;;;;;;media
-AL;de casulos;microrregiao;;;;;;;media
-AL;lenha;mesorregiao;;;;;;;media
-AL;Carvão vegetal;mesorregiao;;;;;;;media
-AL;Madeira em toras;mesorregiao;;;;;;;media
-AL;Mudas vendidas;mesorregiao;;;;;;;media
-AL;Banana;mesorregiao;;;;;;;media
-AL;C-:icau (amêndoa);mesorregiao;;;;;;;media
-AL;Café em coco;mesorregiao;;;;;;;media
-AL;Coco-da-baía;mesorregiao;;;;;;;media
-AL;Laranja;mesorregiao;;;;;;;media
-AL;Mamão;mesorregiao;;;;;;;media
-AL;Tangerina;mesorregiao;;;;;;;media
-AL;Uvd para vinho kg;mesorregiao;;;;;;;media
-AL;Lavouras temporãrias;microrregiao;;;;;;;media
-AL;NOME DO PRODUTO tino Equiva- Area TIVO;municipio;;;;;;;media
-AL;AI godão em caroço;mesorregiao;3.0;;;;;;media
-AL;Arroz em casca;mesorregiao;8.0;;;;;;media
-AL;Batata-inglesa li kg;mesorregiao;;;;;;;media
-AL;Cana-de-açúcar;mesorregiao;14.0;;;;;;media
-AL;Feijão em grão;mesorregiao;23.0;;;;;;media
-AL;Mandioca;mesorregiao;43.0;;;;;;media
-AL;Mi lho em grão;mesorregiao;46.0;;;;;;media
-AL;Soja em grão;mesorregiao;58.0;;;;;;media
-AL;lama te;mesorregiao;61.0;;;;;;media
-AL;Trigo em grão;mesorregiao;63.0;;;;;;media
-AL;Mudas vendi das;mesorregiao;50.0;;;;;;media
-AL;"Semente:; vendi das";mesorregiao;57.0;;;;;;media
-AL;Vagem;mesorregiao;;;;;;;media
-AL;Doe- Do De (CrS) De;municipio;;;;;;;media
-AL;NOME DO PRODUTO tino Produtor Terceiros Equiva- NOME DO PRODUTO Total Produção Equiva;total;;;;;;;media
-AL;Açúcar;mesorregiao;;;;;;;media
-AL;Aguardente -de cana l;mesorregiao;;;;;;;media
-AL;Rapadura;mesorregiao;;;;;;;media
-AL;Manteiga;mesorregiao;;;;;;;media
-AL;Queijo;mesorregiao;;;;;;;media
-AL;Farinha;mesorregiao;;;;;;;media
-AL;Goma;mesorregiao;;;;;;;media
-AL;Fubá;mesorregiao;;;;;;;media
-AL;Aguardente de uva;mesorregiao;;;;;;;media
-AL;Vinho de uva;mesorregiao;;;;;;;media
-AL;Arroz beneficiado;mesorregiao;;;;;;;media
-AL;(em grão);mesorregiao;;;;;;;media
-AL;Cafê em grão;mesorregiao;;;;;;;media
-AL;Fumo em corda;mesorregiao;;;;;;;media
-AL;Banha;mesorregiao;;;;;;;media
-AL;Carne;mesorregiao;;;;;;;media
-AL;Embuti dos;mesorregiao;;;;;;;media
-AL;Toucinho;mesorregiao;;;;;;;media
-AL;Couros e peles kg;mesorregiao;;;;;;;media
-AL;"Combustíveis e lubrificante.; consumidos no ano de";microrregiao;;;;;;;media
-AL;-I CONSUMO NO ANO OE;mesorregiao;;;;;;;media
-AL;Quantidade Unidade de Medida Valor em;municipio;;;;;;;media
-AL;Lenna;mesorregiao;;;;;;;media
-AL;til cool;mesorregiao;;;;;;;media
-AL;Gasul i na;mesorregiao;;;;;;;media
-AL;Óleo Diesel;mesorregiao;;;;;;;media
+AL;MATA ALAGOANA;mesorregiao;88.0;;;;;;alta
+AL;MATA ALAGOANA;microrregiao;66.0;;;;;;alta
+AL;CAPELA;municipio;12.0;;;;;;alta
+AL;CHÃ PRETA;municipio;;;;;;;alta
+AL;COLONIA LEQPOLDINA;municipio;;;;;;;alta
+AL;IBATEGUARAr;municipio;;;;;;;alta
+AL;.JACU IPE;municipio;;;;;;;alta
+AL;.JOAQUIM GOMES;municipio;;;;;;;alta
+AL;.JUNDIA;municipio;;;;;;;alta
+AL;NOVO LINO;municipio;;;;;;;alta
+AL;PINOOBA;municipio;;;;;;;alta
+AL;SANTANA DO MUNDAU;municipio;;;;;;;alta
+AL;SÂO .JOSE DA LAJE;municipio;;;;;;;alta
+AL;"'ll ÇOS""A";municipio;25.0;;;;;;alta
+AL;LITORAL NORTE ALAGOANO;microrregiao;;;;;;;alta
+AL;MARAGOGI;municipio;;;;;;;alta
+AL;PORTO CALVO;municipio;;;;;;;alta
+AL;SÂO MIGUEL DOS MILAGRES;municipio;;;;;;;alta
+AL;TABULEIROS DE s MIGUEL DOS CAMPOS;microrregiao;13.0;;;;;;alta
+AL;BOCA DA MATA;municipio;;;;;;;alta
+AL;CAMPO ALEGRE;municipio;;;;;;;alta
+AL;ROTEIRO;municipio;;;;;;;alta
+AL;SÁO MIGUEL DOS CAMPOS;municipio;;;;;;;alta
+AL;MARECHAL DEODORO;municipio;;;;;;;alta
+AL;SANTA LUZIA DO NORTE;municipio;;;;;;;alta
+AL;TONELADAS;municipio;;;;;;;alta
+AL;Nome ou razão soei a;microrregiao;;;;;;;alta
+AL;Ocupante ç;microrregiao;;;;;;;alta
+AL;Em outro local;microrregiao;;;;;;;alta
+AL;Oi reção dos trabal ::::a;microrregiao;;;;;;;alta
+AL;Produtor nfvel oª;microrregiao;;;;;;;alta
+AL;Administrador;microrregiao;;;;;;;alta
+AL;Norne ou razão social ção;microrregiao;;;;;;;alta
+AL;Condição do proprietârio;microrregiao;;;;;;;alta
+AL;Governo (Federal, Estadual, Municipal);microrregiao;;;;;;;alta
+AL;Outra condição Lavoura;microrregiao;;;;;;;alta
+AL;Utiliza assistência técnica;microrregiao;;;;;;;alta
+AL;Não utiliza Não usa;microrregiao;;;;;;;alta
+AL;Final idade Os;microrregiao;;;;;;;alta
+AL;li Emprego de serviço de empreitada: Outros animais;mesorregiao;;;;;;;alta
+AL;Não usou Não usa;microrregiao;;;;;;;alta
+AL;Com fornecimento de mâquinas Usa;microrregiao;;;;;;;alta
+AL;Com fornecimento só de mão-de-obr UNIDADE DE SUPERFICIE;microrregiao;;;;;;;alta
+AL;Preparo do solo;microrregiao;;;;;;;alta
+AL;Plantio usada nas dec;microrregiao;;;;;;;alta
+AL;Tratos culturais;microrregiao;;;;;;;alta
+AL;Limpeza de pasto;microrregiao;;;;;;;alta
+AL;Outros serviços;microrregiao;;;;;;;alta
+AL;Assoc:ia-ão;microrregiao;;;;;;;alta
+AL;Nenhuma;microrregiao;;;;;;;alta
+AL;Cómercial ização;microrregiao;;;;;;;alta
+AL;Crédito ::B;microrregiao;;;;;;;alta
+AL;TOTAL;total;10.0;;;;;;alta
+AL;TOTAL;total;;;;;;;alta
+AL;Total da ãrea irrigada;total;11.0;;;;;;alta
+AL;Si los Depõs i tos;microrregiao;;;;;;;alta
+AL;BOVINOS BúFALOS EQUINOS;municipio;;;;;;;alta
+AL;TOTAL;total;11.0;;;;;;alta
+AL;Nascidos em;microrregiao;;;;;;;alta
+AL;Vitimados em;microrregiao;;;;;;;alta
+AL;Comprados( Número;microrregiao;;;;;;;alta
+AL;"Vendidos p; ntos de rúmero";microrregiao;;;;;;;alta
+AL;Abatidos Naúm e rroCr'S';microrregiao;;;;;;;alta
+AL;de lei te tros);microrregiao;;;;;;;alta
+AL;Nas e idos em;microrregiao;;;;;;;alta
+AL;Comprados;microrregiao;;;;;;;alta
+AL;Vendi dos;microrregiao;;;;;;;alta
+AL;de casulos;microrregiao;;;;;;;alta
+AL;lenha;mesorregiao;;;;;;;alta
+AL;Carvão vegetal;mesorregiao;;;;;;;alta
+AL;Madeira em toras;mesorregiao;;;;;;;alta
+AL;Mudas vendidas;mesorregiao;;;;;;;alta
+AL;Banana;mesorregiao;;;;;;;alta
+AL;C-:icau (amêndoa);mesorregiao;;;;;;;alta
+AL;Café em coco;mesorregiao;;;;;;;alta
+AL;Coco-da-baía;mesorregiao;;;;;;;alta
+AL;Laranja;mesorregiao;;;;;;;alta
+AL;Mamão;mesorregiao;;;;;;;alta
+AL;Tangerina;mesorregiao;;;;;;;alta
+AL;Uvd para vinho kg;mesorregiao;;;;;;;alta
+AL;Lavouras temporãrias;microrregiao;;;;;;;alta
+AL;NOME DO PRODUTO tino Equiva- Area TIVO;municipio;;;;;;;alta
+AL;AI godão em caroço;mesorregiao;3.0;;;;;;alta
+AL;Arroz em casca;mesorregiao;8.0;;;;;;alta
+AL;Batata-inglesa li kg;mesorregiao;;;;;;;alta
+AL;Cana-de-açúcar;mesorregiao;14.0;;;;;;alta
+AL;Feijão em grão;mesorregiao;23.0;;;;;;alta
+AL;Mandioca;mesorregiao;43.0;;;;;;alta
+AL;Mi lho em grão;mesorregiao;46.0;;;;;;alta
+AL;Soja em grão;mesorregiao;58.0;;;;;;alta
+AL;lama te;mesorregiao;61.0;;;;;;alta
+AL;Trigo em grão;mesorregiao;63.0;;;;;;alta
+AL;Mudas vendi das;mesorregiao;50.0;;;;;;alta
+AL;"Semente:; vendi das";mesorregiao;57.0;;;;;;alta
+AL;Vagem;mesorregiao;;;;;;;alta
+AL;Doe- Do De (CrS) De;municipio;;;;;;;alta
+AL;NOME DO PRODUTO tino Produtor Terceiros Equiva- NOME DO PRODUTO Total Produção Equiva;total;;;;;;;alta
+AL;Açúcar;mesorregiao;;;;;;;alta
+AL;Aguardente -de cana l;mesorregiao;;;;;;;alta
+AL;Rapadura;mesorregiao;;;;;;;alta
+AL;Manteiga;mesorregiao;;;;;;;alta
+AL;Queijo;mesorregiao;;;;;;;alta
+AL;Farinha;mesorregiao;;;;;;;alta
+AL;Goma;mesorregiao;;;;;;;alta
+AL;Fubá;mesorregiao;;;;;;;alta
+AL;Aguardente de uva;mesorregiao;;;;;;;alta
+AL;Vinho de uva;mesorregiao;;;;;;;alta
+AL;Arroz beneficiado;mesorregiao;;;;;;;alta
+AL;(em grão);mesorregiao;;;;;;;alta
+AL;Cafê em grão;mesorregiao;;;;;;;alta
+AL;Fumo em corda;mesorregiao;;;;;;;alta
+AL;Banha;mesorregiao;;;;;;;alta
+AL;Carne;mesorregiao;;;;;;;alta
+AL;Embuti dos;mesorregiao;;;;;;;alta
+AL;Toucinho;mesorregiao;;;;;;;alta
+AL;Couros e peles kg;mesorregiao;;;;;;;alta
+AL;"Combustíveis e lubrificante.; consumidos no ano de";microrregiao;;;;;;;alta
+AL;-I CONSUMO NO ANO DE;mesorregiao;;;;;;;alta
+AL;Quantidade Unidade de Medida Valor em;municipio;;;;;;;alta
+AL;Lenna;mesorregiao;;;;;;;alta
+AL;til cool;mesorregiao;;;;;;;alta
+AL;Gasul i na;mesorregiao;;;;;;;alta
+AL;Óleo Diesel;mesorregiao;;;;;;;alta
 AM;TOTAIS;total;45.0;11.0;;;;;media
-AM;HILEIA AMAZONENSE;mesorregiao;36.0;11.0;;;;;media
-AM;ALTO SOL IMÔES;microrregiao;17.0;;;;;;media
+AM;HILEIA AMAZONENSE;mesorregiao;36.0;11.0;;;;;alta
+AM;ALTO SOL IMÔES;microrregiao;17.0;;;;;;alta
 AM;FONTE BOA;municipio;;;;;;;media
 AM;JUTA(;municipio;10.0;;;;;;media
 AM;TONANTINS;municipio;;;;;;;media
-AM;PURUS;microrregiao;;;;;;;media
+AM;PURUS;microrregiao;;;;;;;alta
 AM;BOCA;municipio;;;;;;;media
-AM;MADEIRA;microrregiao;;;;;;;media
+AM;MADEIRA;microrregiao;;;;;;;alta
 AM;BORBA;municipio;;;;;;;media
-AM;SOL IMÔES- JAPURA;microrregiao;18.0;;;;;;media
-AM;ALVARÂES;municipio;15.0;;;;;;media
-AM;TEFE;municipio;;;;;;;media
-AM;MEDI O AMAZONAS;microrregiao;;;;;;;media
+AM;SOL IMÔES- JAPURA;microrregiao;18.0;;;;;;alta
+AM;ALVARÂES;municipio;15.0;;;;;;alta
+AM;TEFE;municipio;;;;;;;alta
+AM;MEDI O AMAZONAS;microrregiao;;;;;;;alta
 AM;BOA VISTA DO RAMOS;municipio;;;;;;;media
 AM;ITACOATIARA;municipio;;;;;;;media
 AM;PARINTINS;municipio;2.0;;;;;;media
@@ -371,7 +371,7 @@ AP;Corte Leite Trabalho Ol;microrregiao;74.0;2.0;;;;;baixa
 AP;-TOTAL;total;3.0;;;;;;baixa
 AP;TOTAL;total;11.0;;;;;;baixa
 AP;TOTAL;total;;;1985.0;;;;baixa
-AP;Total de cabeças;total;125.0;21.0;21.0;;;;baixa
+AP;Total de cabeças;total;25.0;21.0;21.0;;;;baixa
 AP;Lenha;mesorregiao;6.0;1.0;;;;;baixa
 AP;Carvão vegeta;mesorregiao;1.0;2.0;14.0;;;;baixa
 AP;Madeira em toras;mesorregiao;;;;;;;baixa
@@ -389,7 +389,7 @@ BA;COTEGIPE;microrregiao;;;89.0;61.0;15.0;;baixa
 BA;CRISTOPOLIS;microrregiao;;;;;;;baixa
 BA;FORMOSA DO RIO PRETO;microrregiao;20.0;10.0;;;;;baixa
 BA;RIACHÃO DAS NEVES;microrregiao;;;17.0;12.0;;;baixa
-BA;SANTA RITA OE CASSJA;microrregiao;;;68.0;61.0;43.0;;baixa
+BA;SANTA RITA DE CASSJA;microrregiao;;;68.0;61.0;43.0;;baixa
 BA;TABOCAS DO BREJO VELHO;microrregiao;;;;;;;baixa
 BA;CHAPADÕES DO RIO CORRENTE;microrregiao;11.0;;179.0;76.0;;;baixa
 BA;CANAPOLIS;microrregiao;;;;;;;baixa
@@ -488,13 +488,12 @@ BA;RIACHÃO DO JACU IPE;microrregiao;;;;;;;baixa
 BA;SANTALUZ;microrregiao;;;;;;;baixa
 BA;TEOF(LANDIA;microrregiao;;;;;;;baixa
 BA;VALENTE;microrregiao;;;;;;;baixa
-BA;FEIRA OE SANTANA;microrregiao;;;;;;;baixa
+BA;FEIRA DE SANTANA;microrregiao;;;;;;;baixa
 BA;ANGUERA;microrregiao;;;;;;;baixa
 BA;ANTONIO CARDOSO;microrregiao;;;;;;;baixa
 BA;CASTRO ALVES;microrregiao;;;;;;;baixa
 BA;CORAÇÃO DE MARIA;microrregiao;;;;;;;baixa
 BA;ELISIO MEDRADO;microrregiao;;;;;;;baixa
-BA;FEIRA DE SANTANA;microrregiao;;;;;;;baixa
 BA;IPECAETA;microrregiao;;;;;;;baixa
 BA;IP IRA;microrregiao;;;;;;;baixa
 BA;IRARA;microrregiao;;;;;;;baixa
@@ -522,13 +521,13 @@ BA;PLANAL TINO;microrregiao;;;;;;;baixa
 BA;SANTA INES;microrregiao;;;;;;;baixa
 BA;SÃO MIGUEL DAS MATAS;microrregiao;;;;;;;baixa
 BA;UBAIRA;microrregiao;;;;;;;baixa
-BA;PLANALTO OE CONQUISTA;microrregiao;;;;;;;baixa
+BA;PLANALTO DE CONQUISTA;microrregiao;;;;;;;baixa
 BA;ANAGE;microrregiao;;;;;;;baixa
-BA;PASTOR( L DE ITAPETINGA;microrregiao;;289.0;364.0;;;;baixa
-BA;ENCRUZILHADA;municipio;;56.0;120.0;;;;baixa
-BA;ITAMBE;municipio;;;;;;;baixa
-BA;ITARANTIM;municipio;;11.0;;;;;baixa
-BA;MAIQU(NIQUE;municipio;;217.0;232.0;;;;baixa
+BA;PASTOR( L DE ITAPETINGA;microrregiao;;289.0;364.0;;;;alta
+BA;ENCRUZILHADA;municipio;;56.0;120.0;;;;alta
+BA;ITAMBE;municipio;;;;;;;alta
+BA;ITARANTIM;municipio;;11.0;;;;;alta
+BA;MAIQU(NIQUE;municipio;;217.0;232.0;;;;alta
 BA;SERTÃO DE PAULO AFONSO;microrregiao;;;;;;;baixa
 BA;JEREMOABO;municipio;;;;;;;baixa
 BA;AGRESTE DE ALAGOINHAS;microrregiao;;108.0;78.0;;;;baixa
@@ -539,11 +538,11 @@ BA;ITAPICURU;municipio;;35.0;29.0;;;;baixa
 BA;RIBEIRA DO AMPARO;municipio;;;;;;;baixa
 BA;RIBEIRA DO POMBAL;municipio;;14.0;;;;;baixa
 BA;SATIRO DIAS;municipio;;;;;;;baixa
-BA;LITORAL NORTE BAIANO;microrregiao;;167.0;243.0;;;;baixa
-BA;CONDE;municipio;;158.0;233.0;;;;baixa
-BA;ENTRE RIOS;municipio;;;2.0;;;;baixa
-BA;ESPLANADA;municipio;;;;;;;baixa
-BA;JANDAIRA;municipio;;;;;;;baixa
+BA;LITORAL NORTE BAIANO;microrregiao;;167.0;243.0;;;;alta
+BA;CONDE;municipio;;158.0;233.0;;;;alta
+BA;ENTRE RIOS;municipio;;;2.0;;;;alta
+BA;ESPLANADA;municipio;;;;;;;alta
+BA;JANDAIRA;municipio;;;;;;;alta
 BA;RECONCAVO BAIANO;microrregiao;322.0;424.0;;;;;baixa
 BA;ARATUIPE;municipio;;;14.0;;;;baixa
 BA;CONCEIÇÃO DA FEIRA;municipio;;38.0;30.0;;;;baixa
@@ -570,13 +569,13 @@ BA;CAMAMU;municipio;;;;;;;baixa
 BA;ITUBERA;municipio;;;;;;;baixa
 BA;MARAU;municipio;;;;;;;baixa
 BA;VALENÇA;municipio;;;;;;;baixa
-BA;ENCOSTA DO PLANALTO DE;microrregiao;;;584.0;1273.0;;;baixa
-BA;FIRMINO ALVES;municipio;;;;;;;baixa
-BA;IBICUI;municipio;;;202.0;285.0;;;baixa
-BA;IGUAI;municipio;;;214.0;606.0;;;baixa
-BA;ITAGIBA;municipio;;;2.0;;;;baixa
-BA;ITAGIMIRIM;municipio;;;156.0;373.0;;;baixa
-BA;I TORORO;municipio;;;;;;;baixa
+BA;ENCOSTA DO PLANALTO DE;microrregiao;;;584.0;1273.0;;;alta
+BA;FIRMINO ALVES;municipio;;;;;;;alta
+BA;IBICUI;municipio;;;202.0;285.0;;;alta
+BA;IGUAI;municipio;;;214.0;606.0;;;alta
+BA;ITAGIBA;municipio;;;2.0;;;;alta
+BA;ITAGIMIRIM;municipio;;;156.0;373.0;;;alta
+BA;I TORORO;municipio;;;;;;;alta
 BA;CACAUEIRA;microrregiao;;;143.0;321.0;;;baixa
 BA;BELMONTE;municipio;;;;;;;baixa
 BA;CANAVIEIRAS;municipio;;;;12.0;;;baixa
@@ -604,7 +603,7 @@ BA;NOVA VIÇOSA;municipio;;;12.0;10.0;;;baixa
 BA;PORTO SEGURO;municipio;;;;;;;baixa
 BA;PRADO;municipio;;;27.0;37.0;;;baixa
 BA;SANTA CRUZ CABRALIA;municipio;;;30.0;48.0;;;baixa
-BA;"SECRETARIA OE PLANEJAMENTO DA PRESIOj;:NCIA DA REPÚBLICA";mesorregiao;;;;;;;baixa
+BA;"SECRETARIA DE PLANEJAMENTO DA PRESIOj;:NCIA DA REPÚBLICA";mesorregiao;;;;;;;baixa
 BA;FUNDAÇiO INSTITUTO BRASILEIRO DE GEO-RAFIA E ESTATISTICA - IBOE;municipio;;;;;;;baixa
 BA;CENSOS ECONÔMICOS DE;mesorregiao;1985.0;;;;;;baixa
 BA;CENSO AGROPECUÁRIO;mesorregiao;;;;;;;baixa
@@ -698,8 +697,8 @@ BA;Embuti dos;mesorregiao;47.0;;;;;;baixa
 BA;Toucinho;mesorregiao;48.0;;;;;;baixa
 BA;Couros e pe;mesorregiao;;;;;;;baixa
 BA;TOTAL;total;;;;;;;baixa
-BA;de transporte Usados;microrregiao;6.0;;;;;;baixa
-BA;De reprodução (matrizes e reprodutores);municipio;7.0;;;;;;baixa
+BA;de transporte Usados;microrregiao;6.0;;;;;;alta
+BA;De reprodução (matrizes e reprodutores);municipio;7.0;;;;;;alta
 BA;-e De criação ou recriação;microrregiao;8.0;11.0;;;;;baixa
 BA;Outros fins;municipio;9.0;;;;;;baixa
 BA;ag rãr i os Usados;municipio;11.0;;;;;;baixa
@@ -767,7 +766,7 @@ DF;Origem;microrregiao;;;;;;;alta
 DF;li Emprego de serviço de empreitada;mesorregiao;;;;;;;alta
 DF;Não usou -i-e;microrregiao;;;;;;;alta
 DF;Com fornecimento de máquinas H;microrregiao;;;;;;;alta
-DF;Com fornecimento sõ de UNIDADE OE SUPERFICIE;microrregiao;;;;;;;alta
+DF;Com fornecimento sõ de UNIDADE DE SUPERFICIE;microrregiao;;;;;;;alta
 DF;"Prepa;o do solo";microrregiao;20.0;;;;;;alta
 DF;Plantio;microrregiao;;;;;;;alta
 DF;Tratos culturais;microrregiao;1.0;;;;;;alta
@@ -842,14 +841,14 @@ DF;Embuti dps;mesorregiao;47.0;;;;;;alta
 DF;Toucinho;mesorregiao;48.0;;;;;;alta
 DF;Couros e peles kg;mesorregiao;;;;;;;alta
 DF;TOTAL;total;6.0;;;;;;alta
-DF;-I CONSUMO NO ANO OE;mesorregiao;1985.0;;;;;;alta
+DF;-I CONSUMO NO ANO DE;mesorregiao;1985.0;;;;;;alta
 DF;Quantidade Unidade de Medida Valor em;municipio;;;;;;;alta
 DF;lenha;mesorregiao;;;;;;;alta
 DF;AI cool;mesorregiao;;;;;;;alta
 DF;Gasolina;mesorregiao;;;;;;;alta
 DF;OBSERVAÇÕES;mesorregiao;;;;;;;alta
-ES;TOTAIS;total;27.0;30.0;;;;;media
-ES;ESPIRITO-SANTENSE;mesorregiao;26.0;28.0;;;;;media
+ES;TOTAIS;total;27.0;30.0;;;;;alta
+ES;ESPIRITO-SANTENSE;mesorregiao;26.0;28.0;;;;;alta
 ES;COLATINA;microrregiao;11.0;;;;;;media
 ES;BAIXO GUANDU;municipio;;;;;;;media
 ES;BARRA DE SÃO FRANCISCO;municipio;;;;;;;media
@@ -862,15 +861,15 @@ ES;COL. SERRANA ESPIRITO-SANTENSE;microrregiao;;;;;;;media
 ES;AFONSO CLAUDIO;municipio;;;;;;;media
 ES;SANTA LEOPOLDINA;municipio;;;;;;;media
 ES;SANTA TERESA;municipio;;;;;;;media
-ES;VERTENTE ORIENTAL DO CAPARAO;microrregiao;;14.0;;;;;media
-ES;CONCEIÇÃO DO CASTELO;municipio;;;;;;;media
-ES;MUNIZ FREIRE;municipio;;13.0;;;;;media
-ES;CACHOEIRO OE ITAPEMIRIM;microrregiao;;;;;;;media
+ES;VERTENTE ORIENTAL DO CAPARAO;microrregiao;;14.0;;;;;alta
+ES;CONCEIÇÃO DO CASTELO;municipio;;;;;;;alta
+ES;MUNIZ FREIRE;municipio;;13.0;;;;;alta
+ES;CACHOEIRO DE ITAPEMIRIM;microrregiao;;;;;;;media
 ES;ALEGRE;municipio;;;;;;;media
 ES;CACHOEIRO DE ITAPEMIRIM;municipio;;;;;;;media
 ES;LITORAL SUL ESPIRITO-SANTENSE;microrregiao;;;;;;;media
 ES;ANCHIETA;municipio;;;;;;;media
-ES;VITORIA;mesorregiao;;;;;;;media
+ES;VITORIA;mesorregiao;;;;;;;alta
 ES;VITORIA;microrregiao;;;;;;;media
 ES;CARIACICA;municipio;;;;;;;media
 ES;TONELADAS;municipio;;;;;;;media
@@ -883,25 +882,25 @@ ES;BAIXO GUANOU;municipio;;;;;;;media
 ES;COLATINA;municipio;12.0;;;;;;media
 ES;NOVA VENECIA;municipio;;;;;;;media
 ES;SÃO GABRIEL DA PALHA;municipio;;;;;;;media
-ES;BAIXADA ESPIRITO-SANTENSE;microrregiao;;27.0;;;;;media
-ES;ARACRUZ;municipio;;;;;;;media
-ES;FUNDÃO;municipio;;26.0;;;;;media
+ES;BAIXADA ESPIRITO-SANTENSE;microrregiao;;27.0;;;;;alta
+ES;ARACRUZ;municipio;;;;;;;alta
+ES;FUNDÃO;municipio;;26.0;;;;;alta
 ES;COL. SERRANA ESP IRITO-SANTENSE;microrregiao;18.0;;;;;;media
 ES;AFONSO CLAUDIO;municipio;;2.0;;;;;media
 ES;DOMINGOS MARTINS;municipio;;;;;;;media
 ES;ITAGUAÇU;municipio;;;;;;;media
 ES;SANTA LEOPOLDINA;municipio;;2.0;;;;;media
-ES;VERTENTE ORIENTAL DO CAPARAO;microrregiao;17.0;26.0;;;;;media
-ES;CASTELO;municipio;;;;;;;media
-ES;IBATISA;municipio;;;;;;;media
-ES;IUNA;municipio;;;;;;;media
-ES;MUNIZ FREIRE;municipio;13.0;25.0;;;;;media
+ES;VERTENTE ORIENTAL DO CAPARAO;microrregiao;17.0;26.0;;;;;alta
+ES;CASTELO;municipio;;;;;;;alta
+ES;IBATISA;municipio;;;;;;;alta
+ES;IUNA;municipio;;;;;;;alta
+ES;MUNIZ FREIRE;municipio;13.0;25.0;;;;;alta
 ES;CACHOEIRO DE ITAPEMIRIM;microrregiao;10.0;;;;;;media
 ES;SÂO JOSE DO CALÇADO;municipio;;;;;;;media
 ES;GUARAPARI;municipio;;;;;;;media
 ES;PI UMA;municipio;;;;;;;media
 ES;RIO NOVO DO SUL;municipio;;;;;;;media
-GO;BELA VISTA OE GOIAS;municipio;;;;;;;baixa
+GO;BELA VISTA DE GOIAS;municipio;;;;;;;baixa
 GO;'GOIANAPOLIS;municipio;;;;;;;baixa
 GO;GOIANIRA;municipio;;;;;;;baixa
 GO;GUAPO;municipio;;;;;;;baixa
@@ -920,8 +919,8 @@ GO;FORMOSA;municipio;;;;;;;baixa
 GO;LUZIANIA;municipio;;;;;;;baixa
 GO;PADRE BERNARDO;municipio;;;;;;;baixa
 GO;PLANALTINA;municipio;;;;;;;baixa
-GO;SUL GOIANO;mesorregiao;89.0;13.0;30.0;;;;baixa
-GO;SUDOESTE DE GOIAS;microrregiao;18.0;10.0;;;;;baixa
+GO;SUL GOIANO;mesorregiao;89.0;13.0;30.0;;;;media
+GO;SUDOESTE DE GOIAS;microrregiao;18.0;10.0;;;;;media
 GO;CAIAPONIA;municipio;;;;;;;baixa
 GO;JATAI;municipio;;;;;;;baixa
 GO;MAURILANDIA;municipio;;;;;;;baixa
@@ -929,20 +928,20 @@ GO;MINEIROS;municipio;;;;;;;baixa
 GO;PORTELANDIA;municipio;;;;;;;baixa
 GO;RIO VERDE;municipio;;;;;;;baixa
 GO;SERRANOPOLIS;municipio;;2.0;;;;;baixa
-GO;YALE DO RIO DOS BOIS;microrregiao;;;;;;;baixa
+GO;YALE DO RIO DOS BOIS;microrregiao;;;;;;;media
 GO;ACREUNA;municipio;;;;;;;baixa
 GO;INDIARA;municipio;;;;;;;baixa
-GO;MEIA PONTE;microrregiao;;;12.0;;;;baixa
-GO;CACHOEIRA DOURADA;municipio;;;;;;;baixa
-GO;GOIATUBA;municipio;;;;;;;baixa
-GO;ITUMBIARA;municipio;;;;;;;baixa
-GO;MORRINHOS;municipio;;;;;;;baixa
-GO;PI RACANjUBA;municipio;;;;;;;baixa
-GO;PONTALINA;municipio;;;12.0;;;;baixa
-GO;PIRES DO RIO;microrregiao;;;;;;;baixa
+GO;MEIA PONTE;microrregiao;;;12.0;;;;alta
+GO;CACHOEIRA DOURADA;municipio;;;;;;;alta
+GO;GOIATUBA;municipio;;;;;;;alta
+GO;ITUMBIARA;municipio;;;;;;;alta
+GO;MORRINHOS;municipio;;;;;;;alta
+GO;PI RACANjUBA;municipio;;;;;;;alta
+GO;PONTALINA;municipio;;;12.0;;;;alta
+GO;PIRES DO RIO;microrregiao;;;;;;;media
 GO;PALMELO;municipio;;;;;;;baixa
 GO;PIRES DO RIO;municipio;;;;;;;baixa
-GO;CATALÃO;microrregiao;;;16.0;;;;baixa
+GO;CATALÃO;microrregiao;;;16.0;;;;media
 GO;CAMPO ALEGRE DE GOIAS;municipio;;;;;;;baixa
 GO;TOTAIS;total;72.0;20.0;362.0;80.0;123.0;15.0;baixa
 GO;NORDESTE GOIANO;mesorregiao;;;;;;;baixa
@@ -954,15 +953,15 @@ GO;ARUANÂ;municipio;;;;;;;baixa
 GO;ITAPIRAPUÃ;municipio;;;;;;;baixa
 GO;JUSSARA;municipio;;;;;;;baixa
 GO;ARAGARÇAS;microrregiao;2.0;;;;;;baixa
-GO;BOM JARDIM OE GOIAS;municipio;;;;;;;baixa
+GO;BOM JARDIM DE GOIAS;municipio;;;;;;;baixa
 GO;PIRANHAS;municipio;;;;;;;baixa
 GO;NORTE GOIANO;mesorregiao;;;35.0;11.0;;;baixa
 GO;PORANGATU;microrregiao;;;14.0;2.0;;;baixa
 GO;CAMP I NORTE;municipio;;;;;;;baixa
 GO;FORMOSO;municipio;;;;;;;baixa
 GO;NIOUELANOIA;municipio;;;;;;;baixa
-GO;SANTA TE REZA OE GOIAS;municipio;;;;;;;baixa
-GO;SANTA TEREZINHA OE GOIAS;municipio;;;;;;;baixa
+GO;SANTA TE REZA DE GOIAS;municipio;;;;;;;baixa
+GO;SANTA TEREZINHA DE GOIAS;municipio;;;;;;;baixa
 GO;URUAÇU;municipio;;;;;;;baixa
 GO;CHAPADA DOS VEAOEIROS;microrregiao;21.0;;;;;;baixa
 GO;CAMPOS BELOS;municipio;;;15.0;;;;baixa
@@ -978,7 +977,7 @@ GO;ITAPACI;municipio;;;;;;;baixa
 GO;I T APURANGA;municipio;;;;;;;baixa
 GO;'(l)VA AMERICA;municipio;10.0;;;;;;baixa
 GO;NOVA GLORIA;municipio;;;;;;;baixa
-GO;PILAR OE GOIAS;municipio;;;;;;;baixa
+GO;PILAR DE GOIAS;municipio;;;;;;;baixa
 GO;RI ALMA;municipio;;;;;;;baixa
 GO;ANAPOLIS;microrregiao;12.0;;;;;;baixa
 GO;INHUMAS;municipio;;;;;;;baixa
@@ -992,17 +991,16 @@ GO;AVELINOPOLIS;municipio;;;;;;;baixa
 GO;FIRMINOPOLIS;municipio;;;;;;;baixa
 GO;MOSSAMEDES;municipio;14.0;;;;;;baixa
 GO;SANCLERLANO IA;municipio;;;;;;;baixa
-GO;BELA VISTA DE GOIAS;municipio;;;;;;;baixa
 GO;GOIANAPOLIS;municipio;;;;;;;baixa
 GO;HIOROLANDIA;municipio;;;;;;;baixa
-GO;LESTE GOIANO;mesorregiao;;;83.0;27.0;;;baixa
-GO;VÃO DO PARANÁ;microrregiao;;;68.0;23.0;;;baixa
+GO;LESTE GOIANO;mesorregiao;;;83.0;27.0;;;alta
+GO;VÃO DO PARANÁ;microrregiao;;;68.0;23.0;;;alta
 GO;GALHEIROS;municipio;;;;;;;baixa
 GO;GUARANI DE GOIAS;municipio;;;17.0;;;;baixa
 GO;MAMBAI;municipio;25.0;;;;;;baixa
 GO;POSSE;municipio;;;18.0;;;;baixa
 GO;SITIO;municipio;;;;;;;baixa
-GO;ENTORNO OE BRASILIA;microrregiao;10.0;;15.0;;;;baixa
+GO;ENTORNO DE BRASILIA;microrregiao;10.0;;15.0;;;;alta
 GO;SUL GOIANO;mesorregiao;45.0;11.0;109.0;19.0;48.0;;baixa
 GO;SUDOESTE DE GOIAS;microrregiao;;;;;;;baixa
 GO;.JATAI;municipio;;;;;;;baixa
@@ -1032,7 +1030,7 @@ GO;TONELADAS;municipio;;;;;;;baixa
 MG;DIVINOPOLIS;microrregiao;;;;;;;baixa
 MG;CARMO;municipio;;;;;;;baixa
 MG;FLORESTAL;municipio;;;;;;;baixa
-MG;ONÇA OE PITANGUI;municipio;;;;;;;baixa
+MG;ONÇA DE PITANGUI;municipio;;;;;;;baixa
 MG;SÃO JOSE DA VARG l NHA;municipio;;;;;;;baixa
 MG;ESPINHAÇO MERIDIONAL;microrregiao;;;;;;;baixa
 MG;ALVINOPOLIS;municipio;;;;;;;baixa
@@ -1043,7 +1041,7 @@ MG;DESTERRO DE ENTRE RIOS;municipio;;;;;;;baixa
 MG;RESENDE COSTA;municipio;;;;;;;baixa
 MG;SÃO JOÃO OEL REI;municipio;;;;;;;baixa
 MG;SÃO TIAGO;municipio;;;;;;;baixa
-MG;.JUIZ OE FORA;microrregiao;;;;;;;baixa
+MG;.JUIZ DE FORA;microrregiao;;;;;;;baixa
 MG;ARACITABA;municipio;;;;;;;baixa
 MG;BICAS;municipio;;;;;;;baixa
 MG;JUIZ DE FORA;municipio;;;;;;;baixa
@@ -1200,12 +1198,12 @@ MS;AGUA CLARA;municipio;;;;;;;baixa
 MS;BRASILANDIA;municipio;10.0;;;;;;baixa
 MS;RIBAS DO RIO PARDO;municipio;30.0;;;;;;baixa
 MS;TRES LAGOAS;municipio;40.0;;;;;;baixa
-MS;NOVA ANDRADINA;microrregiao;22.0;167.0;;;;;baixa
-MS;ANAURILANDIA;municipio;;16.0;;;;;baixa
-MS;BATAGUASSU;municipio;;;;;;;baixa
-MS;BATAIPORÃ;municipio;;;;;;;baixa
-MS;NOVA ANDRAOINA;municipio;;137.0;;;;;baixa
-MS;T AQUARUSSU;municipio;;;;;;;baixa
+MS;NOVA ANDRADINA;microrregiao;22.0;167.0;;;;;alta
+MS;ANAURILANDIA;municipio;;16.0;;;;;alta
+MS;BATAGUASSU;municipio;;;;;;;alta
+MS;BATAIPORÃ;municipio;;;;;;;alta
+MS;NOVA ANDRAOINA;municipio;;137.0;;;;;alta
+MS;T AQUARUSSU;municipio;;;;;;;alta
 MS;TOTAIS;total;271.0;537.0;107.0;50.0;230.0;598.0;baixa
 MS;ANASTACIO;microrregiao;;;;;;;baixa
 MS;ROCHEDO;microrregiao;;;;;;;baixa
@@ -1257,11 +1255,11 @@ MS;SELVIRIA;municipio;;;;;;39.0;baixa
 MS;TRES LAGOAS;microrregiao;11.0;19.0;;;;;baixa
 MS;BRASILANDIA;municipio;;;;;;;baixa
 MS;TRES LAGOAS;municipio;;;;;;;baixa
-MS;NOVA ANDRADINA;microrregiao;;;;;10.0;26.0;baixa
-MS;ANAURILANDIA;municipio;;;;;;22.0;baixa
-MS;NOVA ANDRADINA;municipio;;;;;;;baixa
-MS;T AOUARUSSU;municipio;;;;;;;baixa
-MS;TONELADAS;municipio;;;;;;;baixa
+MS;NOVA ANDRADINA;microrregiao;;;;;10.0;26.0;alta
+MS;ANAURILANDIA;municipio;;;;;;22.0;alta
+MS;NOVA ANDRADINA;municipio;;;;;;;alta
+MS;T AOUARUSSU;municipio;;;;;;;alta
+MS;TONELADAS;municipio;;;;;;;alta
 MS;Acre Goiás;mesorregiao;;;;;;;baixa
 MS;Alagoas Maranhão;mesorregiao;;;;;;;baixa
 MS;Rua Tibúrcio Valeriano;mesorregiao;;;;;;;baixa
@@ -1282,7 +1280,7 @@ MS;SOS BI. H - Edifício Venâncio li;mesorregiao;;;;;;;baixa
 MS;Espírito Santo Paraná;mesorregiao;;;;;;;baixa
 MS;Rua Duque de Caxias;mesorregiao;625.0;;;;;;baixa
 MS;Censo Agropecuário -;mesorregiao;;;1985.0;;;;baixa
-MS;SECRETARIA OE PLANEJAMENTO DA PRESIOE:NCIA DA REPÚBLICA;mesorregiao;;;;;;;baixa
+MS;SECRETARIA DE PLANEJAMENTO DA PRESIOE:NCIA DA REPÚBLICA;mesorregiao;;;;;;;baixa
 MS;FUNDAÇÃO INSTITUTO BRASILEIRO DE GEOGRAFIA E ESTUISTICA IBGE;municipio;;;;;;;baixa
 MS;CENSOS ECONÔMICOS DE;mesorregiao;1985.0;;;;;;baixa
 MS;CENSO AGROPECUÁRIO;mesorregiao;;;;;;;baixa
@@ -1433,8 +1431,8 @@ MT;NOSSA SENHORA DO LIVRAMENTO;municipio;;;7.0;;;;media
 MT;ROSARIO OESTE;municipio;10.0;58.0;13.0;24.0;;;media
 MT;SANTO ANTONIO DO LEVERGER;municipio;;;;;;;media
 MT;VARZEA GRANDE;municipio;2.0;;2.0;;;;media
-MT;SUDESTE OE MATO GROSSO;mesorregiao;27.0;37.0;115.0;240.0;;;media
-MT;RONOONOPOL l S;microrregiao;11.0;21.0;68.0;130.0;;;media
+MT;SUDESTE DE MATO GROSSO;mesorregiao;27.0;37.0;115.0;240.0;;;alta
+MT;RONOONOPOL l S;microrregiao;11.0;21.0;68.0;130.0;;;alta
 MT;ALTO ARAGUAIA;municipio;;;2.0;;;;media
 MT;DOM AQUINO;municipio;4.0;;32.0;68.0;;;media
 MT;ITIQUIRA;municipio;;;;2.0;;;media
@@ -1442,16 +1440,16 @@ MT;.JACIARA;municipio;;;;;;;media
 MT;JUSCIMEIRA;municipio;2.0;;;;;;media
 MT;PEDRA PRETA;municipio;;;;4.0;;;media
 MT;RONDONOPOLIS;municipio;2.0;;18.0;41.0;;;media
-MT;TESOURO;microrregiao;16.0;16.0;47.0;110.0;;;media
+MT;TESOURO;microrregiao;16.0;16.0;47.0;110.0;;;alta
 MT;ARAGUAINHA;municipio;;;;56.0;;;media
 MT;GENERAL CARNEIRO;municipio;2.0;3.0;;;;;media
 MT;GUIRATINGA;municipio;;2.0;14.0;19.0;;;media
 MT;PONTE BRANCA;municipio;7.0;;;;;;media
-MT;SUDOESTE DE MATO GROSSO;mesorregiao;;;;264.0;;;media
-MT;ALTO GUAPORE;microrregiao;;;;39.0;;;media
-MT;PONTES E LACERDA;municipio;;;;;;;media
-MT;VILA BELA SANTISSIMA TRINDADE;municipio;;;;36.0;;;media
-MT;PARAGUAl-.JAURU;microrregiao;;;;177.0;;;media
+MT;SUDOESTE DE MATO GROSSO;mesorregiao;;;;264.0;;;alta
+MT;ALTO GUAPORE;microrregiao;;;;39.0;;;alta
+MT;PONTES E LACERDA;municipio;;;;;;;alta
+MT;VILA BELA SANTISSIMA TRINDADE;municipio;;;;36.0;;;alta
+MT;PARAGUAl-.JAURU;microrregiao;;;;177.0;;;alta
 MT;ARAPUT ANGA;municipio;;;;33.0;;;media
 MT;BARRA DO BUGRES;municipio;;;;;;;media
 MT;DENISE;municipio;;;;;;;media
@@ -1459,33 +1457,33 @@ MT;JAURU;municipio;;;;120.0;;;media
 MT;MIRASSOL D' OESTE;municipio;;;;2.0;;;media
 MT;SÃO JOSE DOS QUATRO MARCOS;municipio;;;;;;;media
 MT;TANGARA DA SERRA;municipio;;;;;;;media
-MT;ALTO PANTANAL;microrregiao;;;;48.0;;;media
+MT;ALTO PANTANAL;microrregiao;;;;48.0;;;alta
 MT;BARÃO DE MELGAÇO;municipio;;;;10.0;;;media
 MT;CACERES;municipio;;;;32.0;;;media
 MT;PC CONE;municipio;;;;;;;media
 MT;TONELADAS;municipio;;;;;;;media
-MT;Nome ou razão social;microrregiao;;;;;;;media
-MT;Proprietário;microrregiao;;;;;;;media
-MT;Arrendatário;microrregiao;;;;;;;media
-MT;Parceiro (meeiro, terceiro, quartista, etc.);microrregiao;;;;;;;media
-MT;Ocupante;microrregiao;;;;;;;media
+MT;Nome ou razão social;microrregiao;;;;;;;alta
+MT;Proprietário;microrregiao;;;;;;;alta
+MT;Arrendatário;microrregiao;;;;;;;alta
+MT;Parceiro (meeiro, terceiro, quartista, etc.);microrregiao;;;;;;;alta
+MT;Ocupante;microrregiao;;;;;;;alta
 MT;Na zona urbana;municipio;;;;;;;media
-MT;Em :utro local;microrregiao;;;;;;;media
-MT;Produtor nível;microrregiao;;;;;;;media
-MT;Administrador-oª;microrregiao;;;;;;;media
-MT;Condição do proprietário;microrregiao;;;;;;;media
-MT;Proprietário individual;microrregiao;;;;;;;media
-MT;Condomínio ou sociedade de pessoas rsão;microrregiao;;;;;;;media
-MT;Cooperativa;microrregiao;;;;;;;media
-MT;Governo (Federal, Estadual, Municipal);microrregiao;;;;;;;media
-MT;Outra condição Os;microrregiao;;;;;;;media
-MT;Utiliza assistência técnica: Uso de adubos e corroetivos;microrregiao;;;;;;;media
-MT;Não ut i;microrregiao;;;;;;;media
+MT;Em :utro local;microrregiao;;;;;;;alta
+MT;Produtor nível;microrregiao;;;;;;;alta
+MT;Administrador-oª;microrregiao;;;;;;;alta
+MT;Condição do proprietário;microrregiao;;;;;;;alta
+MT;Proprietário individual;microrregiao;;;;;;;alta
+MT;Condomínio ou sociedade de pessoas rsão;microrregiao;;;;;;;alta
+MT;Cooperativa;microrregiao;;;;;;;alta
+MT;Governo (Federal, Estadual, Municipal);microrregiao;;;;;;;alta
+MT;Outra condição Os;microrregiao;;;;;;;alta
+MT;Utiliza assistência técnica: Uso de adubos e corroetivos;microrregiao;;;;;;;alta
+MT;Não ut i;microrregiao;;;;;;;alta
 MT;Exploraç:o vegetal Ad.ubos químicos;municipio;;;;;;;media
-MT;Final idade Os;microrregiao;;;;;;;media
+MT;Final idade Os;microrregiao;;;;;;;alta
 MT;Exploraçao animal Adubos orgânicos;municipio;;;;;;;media
 MT;Governamental;municipio;;;;;;;media
-MT;Origem;microrregiao;;;;;;;media
+MT;Origem;microrregiao;;;;;;;alta
 MT;li Emprego de serviço de empreitada;mesorregiao;;;;;;;media
 MT;Não usou o Ordenha com Não usa;microrregiao;;;;;;;media
 MT;Com fornecimento de máquinas mecan;microrregiao;;;;;;;media
@@ -1736,11 +1734,11 @@ PB;SERRA BRANCA;municipio;;;;131.0;;;baixa
 PB;SOLEDADE;municipio;;;;77.0;;;baixa
 PB;SUME;municipio;;;;42.0;;;baixa
 PB;UMBUZEIRO;municipio;;;;39.0;;;baixa
-PB;SERRA DO TEIXEIRA;microrregiao;;;;80.0;;;baixa
-PB;DESTERRO;municipio;;;;65.0;;;baixa
-PB;(MACULADA;municipio;;;;7.0;;;baixa
-PB;MÃE D' AGUA;municipio;;;;;;;baixa
-PB;TEIXEIRA;municipio;;;;;;;baixa
+PB;SERRA DO TEIXEIRA;microrregiao;;;;80.0;;;alta
+PB;DESTERRO;municipio;;;;65.0;;;alta
+PB;(MACULADA;municipio;;;;7.0;;;alta
+PB;MÃE D' AGUA;municipio;;;;;;;alta
+PB;TEIXEIRA;municipio;;;;;;;alta
 PB;AGRESTE E BREJO PARAIBANO;mesorregiao;;;;2669.0;;;baixa
 PB;ALAOOA GRANDE;municipio;;;;8.0;;;baixa
 PB;ALAGO(NHA;municipio;;;;99.0;;;baixa
@@ -1776,7 +1774,7 @@ PB;BANANEIRAS;microrregiao;;;;;;;baixa
 PB;BORBOREMA;microrregiao;;;;;;;baixa
 PB;PILÕES;microrregiao;;;;;;;baixa
 PB;PIRPIRITUBA;microrregiao;;;;;;;baixa
-PB;SÂO SEBASTIÃO OE LAGOA DE ROÇA;microrregiao;;;;;;;baixa
+PB;SÂO SEBASTIÃO DE LAGOA DE ROÇA;microrregiao;;;;;;;baixa
 PB;SERRARIA;microrregiao;;;;;;;baixa
 PB;AGRO-PASTORIL DO BAIXO PARAIBA;mesorregiao;;;;;;;baixa
 PB;CALDAS BRANDÃO;microrregiao;;;;;;;baixa
@@ -1808,13 +1806,13 @@ PB;BREJO DO CRUZ;municipio;;;;;;;baixa
 PB;SERIDO PARAIBANO;microrregiao;;;;;;;baixa
 PB;FREI MARTINHO;municipio;;;;;;;baixa
 PB;PICUI;municipio;;;;;;;baixa
-PB;CURIMATAU;microrregiao;35.0;;;;;;baixa
-PB;ARARUNA;municipio;33.0;;;;;;baixa
-PB;CUITE;municipio;;;;;;;baixa
-PB;DONA INES;municipio;;;;;;;baixa
-PB;SERTÃO DE CAJAZEIRAS;microrregiao;17.0;3.0;;;;;baixa
-PB;ANTENOR NAVARRO;municipio;;;;;;;baixa
-PB;UIRAUNA;municipio;16.0;;;;;;baixa
+PB;CURIMATAU;microrregiao;35.0;;;;;;alta
+PB;ARARUNA;municipio;33.0;;;;;;alta
+PB;CUITE;municipio;;;;;;;alta
+PB;DONA INES;municipio;;;;;;;alta
+PB;SERTÃO DE CAJAZEIRAS;microrregiao;17.0;3.0;;;;;alta
+PB;ANTENOR NAVARRO;municipio;;;;;;;alta
+PB;UIRAUNA;municipio;16.0;;;;;;alta
 PB;DEPRESSÃO DO ALTO PIRANHAS;microrregiao;16.0;22.0;40.0;81.0;;;baixa
 PB;JUNCO DO SER IDO;municipio;;;;;;;baixa
 PB;PAULISTA;municipio;2.0;;;;;;baixa
@@ -1831,17 +1829,17 @@ PB;SOLEDADE;municipio;;;;;;;baixa
 PB;UMBUZEIRO;municipio;;;;;;;baixa
 PB;SERRA DO TEIXEIRA;microrregiao;;;;;;;baixa
 PB;AGRESTE E BREJO PARAIBANO;mesorregiao;;64.0;;;;;baixa
-PB;PIEMONTE DA BORBOREMA;microrregiao;;28.0;;;;;baixa
-PB;A LAGOA GRANDE;municipio;187.0;15.0;63.0;133.0;;;baixa
-PB;ALAGOINHA;municipio;;11.0;;;;;baixa
-PB;CUITEGI;municipio;;;;;;;baixa
-PB;DUAS ESTRADAS;municipio;2.0;;;;;;baixa
-PB;GUARABIRA;municipio;;;;;;;baixa
-PB;INGA;municipio;2.0;;;;;;baixa
-PB;LAGOA DE DENTRO;municipio;;;;;;;baixa
-PB;MULUNGU;municipio;;;;;;;baixa
-PB;PILÕEZINHOS;municipio;;3.0;;;;;baixa
-PB;SERRA DA RAIZ;municipio;;;;;;;baixa
+PB;PIEMONTE DA BORBOREMA;microrregiao;;28.0;;;;;alta
+PB;A LAGOA GRANDE;municipio;187.0;15.0;63.0;133.0;;;alta
+PB;ALAGOINHA;municipio;;11.0;;;;;alta
+PB;CUITEGI;municipio;;;;;;;alta
+PB;DUAS ESTRADAS;municipio;2.0;;;;;;alta
+PB;GUARABIRA;municipio;;;;;;;alta
+PB;INGA;municipio;2.0;;;;;;alta
+PB;LAGOA DE DENTRO;municipio;;;;;;;alta
+PB;MULUNGU;municipio;;;;;;;alta
+PB;PILÕEZINHOS;municipio;;3.0;;;;;alta
+PB;SERRA DA RAIZ;municipio;;;;;;;alta
 PB;AGRESTE DA BORBOREMA;microrregiao;;27.0;;;;;baixa
 PB;AREIAL;municipio;;;;;;;baixa
 PB;FAGUNDES;municipio;;10.0;;;;;baixa
@@ -1849,17 +1847,17 @@ PB;MONTADAS;municipio;;;;;;;baixa
 PB;POCINHOS;municipio;;;;;;;baixa
 PB;PUX(NANÃ;municipio;;;;;;;baixa
 PB;SDLANEA;municipio;;;;;;;baixa
-PB;BREJO PARAIBANO;microrregiao;;345.0;;;;;baixa
-PB;A LAGOA NOVA;municipio;;;;;;;baixa
-PB;AREIA;municipio;;205.0;;;;;baixa
-PB;BANANEIRAS;municipio;;;;;;;baixa
-PB;PILÕES;municipio;;;;;;;baixa
-PB;PIRPIRITUBA;municipio;;17.0;;;;;baixa
-PB;SERRARIA;municipio;;98.0;;;;;baixa
+PB;BREJO PARAIBANO;microrregiao;;345.0;;;;;alta
+PB;A LAGOA NOVA;municipio;;;;;;;alta
+PB;AREIA;municipio;;205.0;;;;;alta
+PB;BANANEIRAS;municipio;;;;;;;alta
+PB;PILÕES;municipio;;;;;;;alta
+PB;PIRPIRITUBA;municipio;;17.0;;;;;alta
+PB;SERRARIA;municipio;;98.0;;;;;alta
 PB;AGRO-PASTOR( L DO BAIXO PARAIBA;microrregiao;47.0;;;;;;baixa
 PB;SAPE;municipio;;45.0;;;;;baixa
-PB;JOÃO PESSOA;mesorregiao;;104.0;;;;;baixa
-PB;LITORAL PARAIBANO;microrregiao;;104.0;;;;;baixa
+PB;JOÃO PESSOA;mesorregiao;;104.0;;;;;alta
+PB;LITORAL PARAIBANO;microrregiao;;104.0;;;;;alta
 PB;CRUZ DO ESPIRITO SANTO;municipio;70.0;16.0;73.0;;;;baixa
 PB;JACARAU;municipio;;;;;;;baixa
 PB;RIO TINTO;municipio;;;;;;;baixa
@@ -1928,8 +1926,8 @@ PE;SÃO JOSE DO EGITO;municipio;;;;;;;media
 PE;TRIUNFO;municipio;;;;;;;media
 PE;SERTÃO DO MOXOTO;microrregiao;;;;;;;media
 PE;SERTANIA;municipio;;;;;;;media
-PE;AGRESTE;mesorregiao;158.0;62.0;22.0;;;;media
-PE;AGRESTE SETENTRIONAL PERNAMBUCANO;microrregiao;81.0;18.0;;;;;media
+PE;AGRESTE;mesorregiao;158.0;62.0;22.0;;;;alta
+PE;AGRESTE SETENTRIONAL PERNAMBUCANO;microrregiao;81.0;18.0;;;;;alta
 PE;BOM JARDIM;municipio;;;;;;;media
 PE;CHÃ GRANDE;municipio;;;;;;;media
 PE;LIMOEIRO;municipio;;;;;;;media
@@ -1938,10 +1936,10 @@ PE;POMBOS;municipio;10.0;;;;;;media
 PE;SÃO VICENTE FERRER;municipio;56.0;16.0;;;;;media
 PE;SURUBIM;municipio;;;;;;;media
 PE;TAQUARITINGA DO NORTE;municipio;;;;;;;media
-PE;VALE;microrregiao;;;;;;;media
+PE;VALE;microrregiao;;;;;;;alta
 PE;BELO JARDIM;municipio;;;;;;;media
 PE;CARUARU;municipio;;;;;;;media
-PE;AGRESTE MERIDIONAL PERNAMBUCANO;microrregiao;71.0;42.0;;;;;media
+PE;AGRESTE MERIDIONAL PERNAMBUCANO;microrregiao;71.0;42.0;;;;;alta
 PE;AGREST(NA;municipio;;;;;;;media
 PE;ALTINHO;municipio;;3.0;;;;;media
 PE;BOM CONSELHO;municipio;;;;;;;media
@@ -1955,27 +1953,27 @@ PE;PANELAS;municipio;12.0;;;;;;media
 PE;SAIRE;municipio;;;;;;;media
 PE;SÃO JOÃO;municipio;;;;;;;media
 PE;MATA PERNAMBUCANA;mesorregiao;;;;761.0;;;media
-PE;MATA SECA PERNAMBUCANA;mesorregiao;;;;691.0;;;media
-PE;ALIANÇA;microrregiao;;;;133.0;;;media
-PE;BUENOS AIRES;microrregiao;;;;19.0;;;media
-PE;CAMUTANGA;microrregiao;;;;;;;media
-PE;CARPINA;microrregiao;;;;15.0;;;media
-PE;CONDADO;microrregiao;;;;15.0;;;media
-PE;FERREIROS;microrregiao;;;;30.0;;;media
-PE;GOIANA;microrregiao;;;;23.0;;;media
-PE;IGARASSU;microrregiao;;;;;;;media
-PE;lTAMARACA;microrregiao;;;;;;;media
-PE;lTAMBE;microrregiao;;;;64.0;;;media
-PE;ITAPISSUMA;microrregiao;;;;;;;media
-PE;ITAQUITINGA;microrregiao;;;;;;;media
-PE;LAGOA DO lTAENGA;microrregiao;;;;;;;media
-PE;MACAPARANA;microrregiao;;;;;;;media
-PE;NAZARE DA MATA;microrregiao;;;;14.0;;;media
+PE;MATA SECA PERNAMBUCANA;mesorregiao;;;;691.0;;;alta
+PE;ALIANÇA;microrregiao;;;;133.0;;;alta
+PE;BUENOS AIRES;microrregiao;;;;19.0;;;alta
+PE;CAMUTANGA;microrregiao;;;;;;;alta
+PE;CARPINA;microrregiao;;;;15.0;;;alta
+PE;CONDADO;microrregiao;;;;15.0;;;alta
+PE;FERREIROS;microrregiao;;;;30.0;;;alta
+PE;GOIANA;microrregiao;;;;23.0;;;alta
+PE;IGARASSU;microrregiao;;;;;;;alta
+PE;lTAMARACA;microrregiao;;;;;;;alta
+PE;lTAMBE;microrregiao;;;;64.0;;;alta
+PE;ITAPISSUMA;microrregiao;;;;;;;alta
+PE;ITAQUITINGA;microrregiao;;;;;;;alta
+PE;LAGOA DO lTAENGA;microrregiao;;;;;;;alta
+PE;MACAPARANA;microrregiao;;;;;;;alta
+PE;NAZARE DA MATA;microrregiao;;;;14.0;;;alta
 PE;o , s zo;municipio;25.0;;;;;;media
-PE;PAUDALHO;microrregiao;;;;;;;media
-PE;TIMBAUBA;microrregiao;;;;210.0;;;media
-PE;TRACUNHAEM;microrregiao;;;;39.0;;;media
-PE;VICENCIA;microrregiao;;;;96.0;;;media
+PE;PAUDALHO;microrregiao;;;;;;;alta
+PE;TIMBAUBA;microrregiao;;;;210.0;;;alta
+PE;TRACUNHAEM;microrregiao;;;;39.0;;;alta
+PE;VICENCIA;microrregiao;;;;96.0;;;alta
 PE;MATA UMIDA PERNAMBUCANA;mesorregiao;;;;70.0;;;media
 PE;AGUA PRETA;microrregiao;;;;;;;media
 PE;AMARAJI;microrregiao;;;;;;;media
@@ -1993,11 +1991,11 @@ PE;RIO FORMOSO;microrregiao;;;;;;;media
 PE;SÃO BENEDITO DO SUL;microrregiao;;;;;;;media
 PE;SÃO .JOSE DA COROA GRANDE;microrregiao;;;;;;;media
 PE;VITORIA DE SANTO ANTÃO;microrregiao;;;;12.0;;;media
-PE;RECIFE;mesorregiao;;;;154.0;;;media
-PE;CABO;microrregiao;;;;;;;media
-PE;JABOATÃO;microrregiao;;;;39.0;;;media
-PE;MORENO;microrregiao;;;;94.0;;;media
-PE;SÃO LOURENÇO DA MATA;microrregiao;;;;17.0;;;media
+PE;RECIFE;mesorregiao;;;;154.0;;;alta
+PE;CABO;microrregiao;;;;;;;alta
+PE;JABOATÃO;microrregiao;;;;39.0;;;alta
+PE;MORENO;microrregiao;;;;94.0;;;alta
+PE;SÃO LOURENÇO DA MATA;microrregiao;;;;17.0;;;alta
 PE;TOTAIS;total;;;;;;;media
 PE;SERTÃO PERNAMBUCANO;mesorregiao;39.0;51.0;;;;;media
 PE;ARARIPINA;microrregiao;21.0;31.0;;;;;media
@@ -2173,8 +2171,8 @@ PR;LESTE PARANAENSE;mesorregiao;22.0;;10.0;72.0;11.0;59.0;baixa
 PR;LITORAL PARANAENSE;microrregiao;;;;;;;baixa
 PR;GUARAQUEÇABA;municipio;;;;;;;baixa
 PR;MORRETES;municipio;;;;;;;baixa
-PR;ALTO RIBEIRA;microrregiao;65.0;11.0;59.0;;;;baixa
-PR;CERRO AZUL;municipio;65.0;11.0;59.0;;;;baixa
+PR;ALTO RIBEIRA;microrregiao;65.0;11.0;59.0;;;;alta
+PR;CERRO AZUL;municipio;65.0;11.0;59.0;;;;alta
 PR;NORTE VELHO DE VENCESLAU BRAZ;microrregiao;16.0;;;;;;baixa
 PR;CARLOPOLI S;municipio;;;;;;;baixa
 PR;IBAITI;municipio;;;;;;;baixa
@@ -2186,17 +2184,17 @@ PR;TOMAZINA;municipio;;;;;;;baixa
 PR;OESTE PARANAENSE;mesorregiao;269.0;;36.0;49.0;10.0;13.0;baixa
 PR;ALTO IVA(;microrregiao;;;;;;;baixa
 PR;CANDIDO DE ABREU;municipio;;;;;;;baixa
-PR;CAMPO MOURÃO;microrregiao;187.0;;28.0;25.0;;2.0;baixa
-PR;ARARUNA;municipio;;;;;;;baixa
-PR;BARBOSA FERRAZ;municipio;136.0;;27.0;21.0;;2.0;baixa
-PR;BOA ESPERANÇA;municipio;;;;;;;baixa
-PR;CAMPO MOURÃO;municipio;32.0;;;;;;baixa
-PR;FENIX;municipio;;;;;;;baixa
-PR;GOIO-ERE;municipio;;;;;;;baixa
-PR;MAMBORE;municipio;;;;;;;baixa
-PR;MOREIRA SALES;municipio;;;;;;;baixa
-PR;PEABIRU;municipio;;;;;;;baixa
-PR;UBIRATÃ;municipio;;;;;;;baixa
+PR;CAMPO MOURÃO;microrregiao;187.0;;28.0;25.0;;2.0;media
+PR;ARARUNA;municipio;;;;;;;media
+PR;BARBOSA FERRAZ;municipio;136.0;;27.0;21.0;;2.0;media
+PR;BOA ESPERANÇA;municipio;;;;;;;media
+PR;CAMPO MOURÃO;municipio;32.0;;;;;;media
+PR;FENIX;municipio;;;;;;;media
+PR;GOIO-ERE;municipio;;;;;;;media
+PR;MAMBORE;municipio;;;;;;;media
+PR;MOREIRA SALES;municipio;;;;;;;media
+PR;PEABIRU;municipio;;;;;;;media
+PR;UBIRATÃ;municipio;;;;;;;media
 PR;PITANGA;microrregiao;;;;;;;baixa
 PR;MANOEL RIBAS;municipio;;;;;;;baixa
 PR;EXTREMO OESTE PARANAENSE;microrregiao;34.0;;;10.0;3.0;10.0;baixa
@@ -2237,7 +2235,7 @@ PR;ROLANOIA;municipio;;;;;;;baixa
 PR;SABAUOIA;municipio;;;;;;;baixa
 PR;SANTA FE;municipio;;;;;;;baixa
 PR;SERTANOPOLIS;municipio;;;;;;;baixa
-PR;NORTE NOVO OE MARINGA;microrregiao;;;;;;;baixa
+PR;NORTE NOVO DE MARINGA;microrregiao;;;;;;;baixa
 PR;FLORAi;municipio;;;;;;;baixa
 PR;MANDAGUAÇU;municipio;;;;;;;baixa
 PR;MANDAGUAR I;municipio;;;;;;;baixa
@@ -2251,7 +2249,7 @@ PR;NOVA ESPERANÇA;municipio;;;;;;;baixa
 PR;PARA ISO DO NORTE;municipio;;;;;;;baixa
 PR;PARANACITY;municipio;;;;;;;baixa
 PR;PARANAVAI;municipio;;;;;;;baixa
-PR;NORTE NOVO OE APUCARANA;microrregiao;124.0;;;;;;baixa
+PR;NORTE NOVO DE APUCARANA;microrregiao;124.0;;;;;;baixa
 PR;APUCARANA;municipio;2.0;;;;;;baixa
 PR;BOM SUCESSO;municipio;19.0;;;;;;baixa
 PR;BORRAZOPOL IS;municipio;;;;;;;baixa
@@ -2281,12 +2279,12 @@ PR;SÃO TOME;municipio;;;;;;;baixa
 PR;TERRA BOA;municipio;;;;;;;baixa
 PR;UMUARAMA;municipio;;;;;;;baixa
 PR;MIL CACHOS;municipio;;;;;;;baixa
-PR;TOTAIS;total;;;;114.0;;;baixa
-PR;CURITIBA;mesorregiao;;;;;;;baixa
+PR;TOTAIS;total;;;;114.0;;;alta
+PR;CURITIBA;mesorregiao;;;;;;;alta
 PR;CURITIBA;microrregiao;;;;;;;baixa
 PR;COLOMBO;municipio;;;;;;;baixa
 PR;CURITIBA;municipio;;;;;;;baixa
-PR;LESTE PARANAENSE;mesorregiao;;;;10.0;;;baixa
+PR;LESTE PARANAENSE;mesorregiao;;;;10.0;;;alta
 PR;ALTO RIBEIRA;microrregiao;;;;;;;baixa
 PR;CERRO AZUL;municipio;;;;;;;baixa
 PR;CAMPOS DE LAPA;microrregiao;;;;;;;baixa
@@ -2302,13 +2300,13 @@ PR;JOAQUIM TAVORA;municipio;;;;;;;baixa
 PR;MEDI O IGUAÇU;microrregiao;;;;;;;baixa
 PR;BITURUNA;municipio;;;;;;;baixa
 PR;PALMAS;municipio;;;;;;;baixa
-PR;OESTE PARANAENSE;mesorregiao;;;;71.0;;;baixa
+PR;OESTE PARANAENSE;mesorregiao;;;;71.0;;;alta
 PR;ALTO IVAI;microrregiao;;;;;;;baixa
 PR;CANO IDO DE ABREU;municipio;;;;;;;baixa
 PR;BARBOSA FERRAZ;municipio;;;;;;;baixa
-PR;PITANGA;mesorregiao;;;;;;;baixa
+PR;PITANGA;mesorregiao;;;;;;;alta
 PR;MANOEL RIBAS;microrregiao;;;;;;;baixa
-PR;EXTREMO OESTE PARANAENSE;mesorregiao;23.0;23.0;;;;;baixa
+PR;EXTREMO OESTE PARANAENSE;mesorregiao;23.0;23.0;;;;;alta
 PR;CASCAVEL;microrregiao;;;;;;;baixa
 PR;CORBELIA;microrregiao;;;;;;;baixa
 PR;GUAIRA;microrregiao;;;;;;;baixa
@@ -2317,7 +2315,7 @@ PR;PALOTINA;microrregiao;;;;;;;baixa
 PR;SANTA HELENA;microrregiao;2.0;;;;;;baixa
 PR;SÃO MIGUEL DO IGUAÇU;microrregiao;;;;;;;baixa
 PR;TERRA ROXA;microrregiao;2.0;;;;;;baixa
-PR;SUDOESTE PARANAENSE;mesorregiao;53.0;22.0;15.0;34.0;;;baixa
+PR;SUDOESTE PARANAENSE;mesorregiao;53.0;22.0;15.0;34.0;;;alta
 PR;AMPERE;microrregiao;;;;;;;baixa
 PR;CAPANEMA;microrregiao;2.0;;;;;;baixa
 PR;DOIS VIZINHOS;microrregiao;19.0;12.0;;;;;baixa
@@ -2331,7 +2329,7 @@ PR;SALTO DO LONTRA;microrregiao;;;;;;;baixa
 PR;SANTA IZABEL DO OESTE;microrregiao;;;;;;;baixa
 PR;CAMPOS DE GUARAPUAVA;microrregiao;;;;;;;baixa
 PR;GUARAPUAVA;microrregiao;;;;;;;baixa
-PR;NORTE PARANAENSE;mesorregiao;;;;;12.0;;baixa
+PR;NORTE PARANAENSE;mesorregiao;;;;;12.0;;alta
 PR;NORTE VELHO DE .JACAREZINHO;microrregiao;;;;;;;baixa
 PR;I T AMBARACA;microrregiao;;;;;;;baixa
 PR;RIBEIRÃO CLARO;microrregiao;;;;;;;baixa
@@ -2343,7 +2341,6 @@ PR;IGUARAÇU;microrregiao;;;;;;;baixa
 PR;MUNHOZ DE MELO;microrregiao;;;;;;;baixa
 PR;SABAUDIA;microrregiao;;;;;;;baixa
 PR;SERTANOPOLI S;microrregiao;;;;;;;baixa
-PR;NORTE NOVO DE MARINGA;microrregiao;;;;;;;baixa
 PR;FLORAI;microrregiao;;;;;;;baixa
 PR;MANDAGUARI;microrregiao;;;;;;;baixa
 PR;NOVISSIMO DE PARANAVAI;municipio;;;;;;;baixa
@@ -2373,7 +2370,7 @@ PR;PINHALÃO;microrregiao;;;;;;;baixa
 PR;MEOIO IGUAÇU;microrregiao;;;;;;;baixa
 PR;BITURUNA;microrregiao;;;;;;;baixa
 PR;OESTE PARANAENSE;mesorregiao;;;;;148.0;;baixa
-PR;CANOIOO OE ABREU;microrregiao;;;;;;;baixa
+PR;CANOIOO DE ABREU;microrregiao;;;;;;;baixa
 PR;CAMPO MOURÃO;microrregiao;;;;;51.0;;baixa
 PR;ARARUNA;microrregiao;;;;;;;baixa
 PR;BARBOSA FERRAZ;microrregiao;;;;;47.0;;baixa
@@ -2422,15 +2419,15 @@ PR;SANTA CRUZ DE MONTE CASTELO;municipio;;;;;;;baixa
 PR;SANTA ISABEL DO IVAI;municipio;;;;;;;baixa
 PR;SÃO PEDRO DO PARANA;municipio;;;;;;;baixa
 PR;TERRA RICA;municipio;;;;;;;baixa
-PR;NORTE NOVO DE APUCARANA;microrregiao;;;;144.0;;;baixa
-PR;BOM SUCESSO;municipio;;;;;;;baixa
-PR;BORRAZOPOLIS;municipio;;;;41.0;;;baixa
-PR;CAMBIRA;municipio;;;;13.0;;;baixa
-PR;JANDAIA DO SUL;municipio;;;;13.0;;;baixa
-PR;KALORE;municipio;;;;;;;baixa
-PR;MARUMBI;municipio;;;;67.0;;;baixa
-PR;SÃO JOÃO DO IVAI;municipio;;;;;;;baixa
-PR;SÃO PEDRO DO IVAI;municipio;;;;;;;baixa
+PR;NORTE NOVO DE APUCARANA;microrregiao;;;;144.0;;;alta
+PR;BOM SUCESSO;municipio;;;;;;;alta
+PR;BORRAZOPOLIS;municipio;;;;41.0;;;alta
+PR;CAMBIRA;municipio;;;;13.0;;;alta
+PR;JANDAIA DO SUL;municipio;;;;13.0;;;alta
+PR;KALORE;municipio;;;;;;;alta
+PR;MARUMBI;municipio;;;;67.0;;;alta
+PR;SÃO JOÃO DO IVAI;municipio;;;;;;;alta
+PR;SÃO PEDRO DO IVAI;municipio;;;;;;;alta
 PR;SECRETARIA DE PLANEJAMENTO DA PRESID(NCIA DA REPÚBLICA;microrregiao;;;;;;;baixa
 PR;CENSOS ECONÔMICOS DE;mesorregiao;1985.0;;;;;;baixa
 PR;CENSO AGROPECUÁRIO;mesorregiao;;;;;;;baixa
@@ -2565,43 +2562,43 @@ RJ;MAGE;municipio;;;;;;;media
 RJ;GUANABARA;microrregiao;;;;;;;media
 RJ;RIO DE JANEIRO;municipio;;;;;;;media
 RJ;TOTAIS;total;289.0;914.0;;;;;media
-RJ;NORTE FLUMINENSE;mesorregiao;68.0;198.0;;;;;media
-RJ;ITAPERUNA;microrregiao;45.0;116.0;;;;;media
+RJ;NORTE FLUMINENSE;mesorregiao;68.0;198.0;;;;;alta
+RJ;ITAPERUNA;microrregiao;45.0;116.0;;;;;alta
 RJ;BOM JESUS;municipio;;51.0;;;;;media
 RJ;ITAPERUNA;municipio;16.0;37.0;;;;;media
 RJ;NATIVIDADE;municipio;23.0;15.0;;;;;media
 RJ;PORC(UNCULA;municipio;;11.0;;;;;media
-RJ;MIRACEMA;microrregiao;;33.0;;;;;media
+RJ;MIRACEMA;microrregiao;;33.0;;;;;alta
 RJ;CAMBUCI;municipio;;;;;;;media
 RJ;MIRACEMA;municipio;;21.0;;;;;media
-RJ;SANTO ANTONIO OE PADUA;municipio;;;;;;;media
-RJ;AÇUCAREI RA DE CAMPOS;microrregiao;17.0;48.0;;;;;media
-RJ;CAMPOS;municipio;;36.0;;;;;media
-RJ;MACAE;municipio;;;;;;;media
-RJ;SÃO FIDELIS;municipio;;11.0;;;;;media
-RJ;SÃO JOÃO DA BARRA;municipio;;;;;;;media
-RJ;CENTRO-LESTE FLUMINENSE;mesorregiao;118.0;334.0;;;;;media
-RJ;CANTAGALO;microrregiao;44.0;220.0;;;;;media
-RJ;CANTAGALO;municipio;40.0;194.0;;;;;media
-RJ;CARMO;municipio;;17.0;;;;;media
-RJ;DUAS BARRAS;municipio;;;;;;;media
-RJ;ITAOCARA;municipio;;;;;;;media
-RJ;SUMIDOURO;municipio;;;;;;;media
-RJ;CORDEIRO;microrregiao;33.0;104.0;;;;;media
+RJ;SANTO ANTONIO DE PADUA;municipio;;;;;;;media
+RJ;AÇUCAREI RA DE CAMPOS;microrregiao;17.0;48.0;;;;;alta
+RJ;CAMPOS;municipio;;36.0;;;;;alta
+RJ;MACAE;municipio;;;;;;;alta
+RJ;SÃO FIDELIS;municipio;;11.0;;;;;alta
+RJ;SÃO JOÃO DA BARRA;municipio;;;;;;;alta
+RJ;CENTRO-LESTE FLUMINENSE;mesorregiao;118.0;334.0;;;;;alta
+RJ;CANTAGALO;microrregiao;44.0;220.0;;;;;alta
+RJ;CANTAGALO;municipio;40.0;194.0;;;;;alta
+RJ;CARMO;municipio;;17.0;;;;;alta
+RJ;DUAS BARRAS;municipio;;;;;;;alta
+RJ;ITAOCARA;municipio;;;;;;;alta
+RJ;SUMIDOURO;municipio;;;;;;;alta
+RJ;CORDEIRO;microrregiao;33.0;104.0;;;;;alta
 RJ;BOM JARDIM;municipio;;10.0;;;;;media
 RJ;CORDEIRO;municipio;;16.0;;;;;media
 RJ;SANTA MARIA MADALENA;municipio;18.0;57.0;;;;;media
 RJ;SÃO SEBASTIÃO;municipio;;;;;;;media
 RJ;TRAJANO DE MORAIS;municipio;;16.0;;;;;media
-RJ;SERRANA FLUMINENSE;microrregiao;12.0;;;;;;media
-RJ;NOVA FRIBURGO;municipio;11.0;;;;;;media
-RJ;TERESOPOLI S;municipio;;;;;;;media
-RJ;BACIAS DO SÃO .JOÃO E MACACU;microrregiao;12.0;;;;;;media
+RJ;SERRANA FLUMINENSE;microrregiao;12.0;;;;;;alta
+RJ;NOVA FRIBURGO;municipio;11.0;;;;;;alta
+RJ;TERESOPOLI S;municipio;;;;;;;alta
+RJ;BACIAS DO SÃO .JOÃO E MACACU;microrregiao;12.0;;;;;;alta
 RJ;CACHOEIRAS DE MACACU;municipio;;;;;;;media
-RJ;CASIMIRO OE ABREU;municipio;;;;;;;media
+RJ;CASIMIRO DE ABREU;municipio;;;;;;;media
 RJ;RIO BONITO;municipio;;2.0;;;;;media
 RJ;SILVA .JARDIM;municipio;;;;;;;media
-RJ;CABO FRIO;microrregiao;17.0;;;;;;media
+RJ;CABO FRIO;microrregiao;17.0;;;;;;alta
 RJ;ARARUAMA;municipio;11.0;;;;;;media
 RJ;SAOUAREMA;municipio;;;;;;;media
 RJ;PERIFERIA DO GRANDE RIO;mesorregiao;;;;;;;media
@@ -2638,27 +2635,26 @@ RJ;PORCIUNCULA;municipio;2.0;;;;;;media
 RJ;MIRACEMA;microrregiao;;;;;;;media
 RJ;MIRACEMA;municipio;6.0;;;;;;media
 RJ;SANTO ANTONIO DE PAOUA;municipio;;;;;;;media
-RJ;AÇUCARE IRA DE CAMPOS;microrregiao;17.0;;;;;;media
-RJ;CAMPOS;municipio;17.0;2.0;;;;;media
-RJ;CENTRO LESTE FLUMINENSE;mesorregiao;36.0;;;;;;media
-RJ;CANTAGALO;microrregiao;;;;;;;media
+RJ;AÇUCARE IRA DE CAMPOS;microrregiao;17.0;;;;;;alta
+RJ;CAMPOS;municipio;17.0;2.0;;;;;alta
+RJ;CENTRO LESTE FLUMINENSE;mesorregiao;36.0;;;;;;alta
+RJ;CANTAGALO;microrregiao;;;;;;;alta
 RJ;CANTAGALO;municipio;3.0;;;;;;media
 RJ;CARMO;municipio;;;;;;;media
 RJ;JTAOCARA;municipio;2.0;32.0;;;;;media
-RJ;CORDEIRO;microrregiao;31.0;;;;;;media
-RJ;BOM JARDIM;municipio;;;;;;;media
-RJ;CORDEIRO;municipio;;;;;;;media
-RJ;SANTA MARIA MADALENA;municipio;26.0;;;;;;media
-RJ;SÃO SEBASTIÃO DO ALTO;municipio;3.0;;;;;;media
-RJ;TRA JANO DE MORAIS;municipio;2.0;;;;;;media
-RJ;SERRANA FLUMINENSE;microrregiao;3.0;;;;;;media
-RJ;NOVA FRIBURGO;municipio;2.0;;;;;;media
-RJ;TERESOPOLIS;municipio;;;;;;;media
-RJ;BACIAS DO SÃO JOÃO E MACACU;microrregiao;;;;;;;media
-RJ;CASIMIRO DE ABREU;municipio;;;;;;;media
+RJ;CORDEIRO;microrregiao;31.0;;;;;;alta
+RJ;BOM JARDIM;municipio;;;;;;;alta
+RJ;CORDEIRO;municipio;;;;;;;alta
+RJ;SANTA MARIA MADALENA;municipio;26.0;;;;;;alta
+RJ;SÃO SEBASTIÃO DO ALTO;municipio;3.0;;;;;;alta
+RJ;TRA JANO DE MORAIS;municipio;2.0;;;;;;alta
+RJ;SERRANA FLUMINENSE;microrregiao;3.0;;;;;;alta
+RJ;NOVA FRIBURGO;municipio;2.0;;;;;;alta
+RJ;TERESOPOLIS;municipio;;;;;;;alta
+RJ;BACIAS DO SÃO JOÃO E MACACU;microrregiao;;;;;;;alta
 RJ;RIO BONITO;municipio;3.0;;;;;;media
 RJ;SILVA JARDIM;municipio;;;;;;;media
-RJ;CABO FRIO;microrregiao;;;;;;;media
+RJ;CABO FRIO;microrregiao;;;;;;;alta
 RJ;ARARUAMA;municipio;20.0;;;;;;media
 RJ;SÃO PEDRO DA ALDEIA;municipio;;;;;;;media
 RJ;SAQUAREMA;municipio;;;;;;;media
@@ -2676,114 +2672,114 @@ RJ;SERRANA FLUMINENSE;microrregiao;;;;;;;media
 RJ;VASSOURAS E;microrregiao;;;;;;;media
 RJ;FLUMINENSE;microrregiao;;;;;;;media
 RJ;ITABDRAI;municipio;;;;;;;media
-RO;TOTAIS;total;29.0;37.0;125.0;;;;media
-RO;PORTO VELHO;mesorregiao;;;42.0;;;;media
-RO;PORTO VELHO;microrregiao;;;42.0;;;;media
-RO;COSTA MARQUES;municipio;;;29.0;;;;media
-RO;GUAJARA-MIR(M;municipio;;;;;;;media
-RO;PORTO VELHO;municipio;;2.0;12.0;;;;media
-RO;LESTE DE RONDONIA;mesorregiao;21.0;33.0;83.0;;;;media
-RO;JI-PARANA;microrregiao;20.0;32.0;83.0;;;;media
-RO;CACOAL;municipio;;;;;;;media
-RO;JARU;municipio;10.0;15.0;23.0;;;;media
-RO;JI-PARANA;municipio;;12.0;29.0;;;;media
-RO;OURO PRETO DO OESTE;municipio;2.0;;;;;;media
-RO;PRESIDENTE MEO(CI;municipio;;4.0;18.0;;;;media
-RO;ROLIM OE MOURA;municipio;;;;;;;media
-RO;VILHENA;microrregiao;;;;;;;media
-RO;PIMENTA BUENO;municipio;;;;;;;media
-RO;VILHENA;municipio;;;;;;;media
-RO;COLORADO DO OESTE;microrregiao;;;;;;;media
-RO;CEREJEIRAS;municipio;;;;;;;media
-RO;TOTAIS;total;;167.0;;;;;media
-RO;PORTO VELHO;mesorregiao;;31.0;;;;;media
-RO;PORTO VELHO;microrregiao;;31.0;;;;;media
-RO;COSTA MARQUES;municipio;;28.0;;;;;media
-RO;GUAJARA-MIRIM;municipio;;;;;;;media
-RO;PORTO VELHO;municipio;;;;;;;media
-RO;LESTE OE RONDONIA;mesorregiao;;135.0;;;;;media
-RO;Jl-PARANA;microrregiao;;102.0;;;;;media
-RO;CACOAL;municipio;;4.0;;;;;media
-RO;JARU;municipio;;32.0;;;;;media
-RO;JI-PARANA;municipio;;41.0;;;;;media
-RO;PRESIDENTE MEOICI;municipio;;21.0;;;;;media
-RO;VILHENA;microrregiao;;11.0;;;;;media
-RO;VILHENA;municipio;;8.0;;;;;media
-RO;COLORADO DO OESTE;microrregiao;;21.0;;;;;media
-RO;CEREJEIRAS;municipio;;21.0;;;;;media
-RO;TONELADAS;municipio;;;;;;;media
-RO;Acre Goiás;mesorregiao;;;;;;;media
-RO;Alagoas Maranhão;mesorregiao;;;;;;;media
-RO;Rua Tibúrcio Valeriano;mesorregiao;;;;;;;media
-RO;Amapá;mesorregiao;;;;;;;media
-RO;Mato Grosso;municipio;;;;;;;media
-RO;Rua Jovino Dinoá;mesorregiao;;;;;;;media
-RO;Amazonas;mesorregiao;;;;;;;media
-RO;Mato Grosso do Sul;municipio;;;;;;;media
-RO;Av. Ayrão;mesorregiao;;;;;;;media
-RO;Bahia;mesorregiao;;;;;;;media
-RO;Minas Gerais;municipio;;;;;;;media
-RO;Ceará Pará;mesorregiao;;;;;;;media
-RO;Distrito Federal Paraíba;mesorregiao;;;;;;;media
-RO;SOS- BI. H - Edifício Venâncio li -;mesorregiao;;;;;;;media
-RO;Espírito Santo Paraná;mesorregiao;;;;;;;media
-RO;Censo Agropecuário -;mesorregiao;1985.0;;;;;;media
-RO;aB SECRETARIA DE PLANEJAMENTO DA PRESIDENCIA DA REPÚBLICA;mesorregiao;;;;;;;media
-RO;FUNDAÇÃO INSTITUTO llRAllLEIAO DE GEOGRAFIA E (STATISTICA - lllQE;municipio;;;;;;;media
-RO;CENSOS ECONÓMICOS DE;mesorregiao;1985.0;;;;;;media
-RO;CENSO AGROPECUÁRIO;mesorregiao;;;;;;;media
-RO;Nome ou razão soei a;microrregiao;;;;;;;media
-RO;Proprietário;microrregiao;;;;;;;media
-RO;ArrendatárÍo;microrregiao;;;;;;;media
-RO;Parceiro (meeiro, terceiro, quartista, etc.);microrregiao;;;;;;;media
-RO;Ocupante ç;microrregiao;;;;;;;media
-RO;Em outro local (Na zona urbana;microrregiao;;;;;;;media
-RO;Direção dos;microrregiao;;;;;;;media
-RO;Produtor;microrregiao;;;;;;;media
-RO;Administrador;microrregiao;;;;;;;media
-RO;Norne ou razão irrigação;microrregiao;;;;;;;media
-RO;Condição do proprietãrio;microrregiao;;;;;;;media
-RO;Proprietário individual;microrregiao;;;;;;;media
-RO;Condomínio ou sociedade de pessoas;microrregiao;107.0;;;;;;media
-RO;Sociedade anônima ou por cotas de responsabl;microrregiao;;;;;;;media
-RO;Cooperativa;microrregiao;;;;;;;media
-RO;Governo (Federal, Estadual, Huniclpal);microrregiao;;;;;;;media
-RO;Instituição Pia ou Religiosa;microrregiao;;;;;;;media
-RO;"Outra condição ------f; i-i i f Lavoura";microrregiao;;;;;;;media
-RO;Não utiliza Não usa;microrregiao;;;;;;;media
-RO;Final idade Os;microrregiao;;;;;;;media
-RO;li Emprego de serviço de empreitada: Outros animais;mesorregiao;;;;;;;media
-RO;Não usou Ordenha com Hão usa;microrregiao;;;;;;;media
-RO;Com fornecimento só de mão-de-obra UNIDADE DE SUPERFICIE;microrregiao;;;;;;;media
-RO;Preparo do solo;microrregiao;;;;;;;media
-RO;Plantio usada nas dec;microrregiao;;;;;;;media
-RO;Tratos culturais;microrregiao;;;;;;;media
-RO;Limpeza de pasto;microrregiao;;;;;;;media
-RO;Outros serv r ços;microrregiao;;;;;;;media
-RO;Associação à cooperativa de;microrregiao;;;;;;;media
-RO;Nenhuma Terras arrendadas;microrregiao;;;;;;;media
-RO;Comercial tzação;microrregiao;;;;;;;media
-RO;Crédito;microrregiao;;;;;;;media
-RO;Eletrificação;microrregiao;;;;;;;media
-RO;Oút ra;microrregiao;0.0;;;;;;media
-RO;TOTAL;total;;;;;;;media
-RO;TOTAL;total;10.0;;;;;;media
-RO;TERRAS IRRIGADAS NO ANO DE;municipio;1985.0;10.0;;;;;media
-RO;Do total acima, registre quantas pes;total;;;;;;;media
-RO;Total da área i rd gada;total;11.0;12.0;12.0;;;;media
-RO;SILOS PARA FORRAGEM E DEPOSITO S PARA GUARDA DA PRODUÇAO (em;mesorregiao;;;;;;;media
-RO;Si los Depôs i tos;microrregiao;;;;;;;media
-RO;BOVINOS Bl)FALOS EQÜINOS;municipio;;;;;;;media
-RO;TOTAL;total;;2.0;;;;;media
-RO;TOTAL;total;;11.0;;;;;media
-RO;TOTAL;total;;5.0;;;;;media
-RO;COELHOS em;municipio;;;;;;;media
-RO;BICHO-DA-SEDA;microrregiao;;;;;;;media
-RO;Lenha;mesorregiao;6.0;;;;;;media
-RO;Carvão vegeta;mesorregiao;2.0;;;;;;media
-RO;Hade i ra em toras;mesorregiao;7.0;;;;;;media
-RO;Madeira para papel;mesorregiao;8.0;;;;;;media
-RO;Mudas .end idas;mesorregiao;10.0;;;;;;media
+RO;TOTAIS;total;29.0;37.0;125.0;;;;alta
+RO;PORTO VELHO;mesorregiao;;;42.0;;;;alta
+RO;PORTO VELHO;microrregiao;;;42.0;;;;alta
+RO;COSTA MARQUES;municipio;;;29.0;;;;alta
+RO;GUAJARA-MIR(M;municipio;;;;;;;alta
+RO;PORTO VELHO;municipio;;2.0;12.0;;;;alta
+RO;LESTE DE RONDONIA;mesorregiao;21.0;33.0;83.0;;;;alta
+RO;JI-PARANA;microrregiao;20.0;32.0;83.0;;;;alta
+RO;CACOAL;municipio;;;;;;;alta
+RO;JARU;municipio;10.0;15.0;23.0;;;;alta
+RO;JI-PARANA;municipio;;12.0;29.0;;;;alta
+RO;OURO PRETO DO OESTE;municipio;2.0;;;;;;alta
+RO;PRESIDENTE MEO(CI;municipio;;4.0;18.0;;;;alta
+RO;ROLIM DE MOURA;municipio;;;;;;;alta
+RO;VILHENA;microrregiao;;;;;;;alta
+RO;PIMENTA BUENO;municipio;;;;;;;alta
+RO;VILHENA;municipio;;;;;;;alta
+RO;COLORADO DO OESTE;microrregiao;;;;;;;alta
+RO;CEREJEIRAS;municipio;;;;;;;alta
+RO;TOTAIS;total;;167.0;;;;;alta
+RO;PORTO VELHO;mesorregiao;;31.0;;;;;alta
+RO;PORTO VELHO;microrregiao;;31.0;;;;;alta
+RO;COSTA MARQUES;municipio;;28.0;;;;;alta
+RO;GUAJARA-MIRIM;municipio;;;;;;;alta
+RO;PORTO VELHO;municipio;;;;;;;alta
+RO;LESTE DE RONDONIA;mesorregiao;;135.0;;;;;alta
+RO;Jl-PARANA;microrregiao;;102.0;;;;;alta
+RO;CACOAL;municipio;;4.0;;;;;alta
+RO;JARU;municipio;;32.0;;;;;alta
+RO;JI-PARANA;municipio;;41.0;;;;;alta
+RO;PRESIDENTE MEOICI;municipio;;21.0;;;;;alta
+RO;VILHENA;microrregiao;;11.0;;;;;alta
+RO;VILHENA;municipio;;8.0;;;;;alta
+RO;COLORADO DO OESTE;microrregiao;;21.0;;;;;alta
+RO;CEREJEIRAS;municipio;;21.0;;;;;alta
+RO;TONELADAS;municipio;;;;;;;alta
+RO;Acre Goiás;mesorregiao;;;;;;;alta
+RO;Alagoas Maranhão;mesorregiao;;;;;;;alta
+RO;Rua Tibúrcio Valeriano;mesorregiao;;;;;;;alta
+RO;Amapá;mesorregiao;;;;;;;alta
+RO;Mato Grosso;municipio;;;;;;;alta
+RO;Rua Jovino Dinoá;mesorregiao;;;;;;;alta
+RO;Amazonas;mesorregiao;;;;;;;alta
+RO;Mato Grosso do Sul;municipio;;;;;;;alta
+RO;Av. Ayrão;mesorregiao;;;;;;;alta
+RO;Bahia;mesorregiao;;;;;;;alta
+RO;Minas Gerais;municipio;;;;;;;alta
+RO;Ceará Pará;mesorregiao;;;;;;;alta
+RO;Distrito Federal Paraíba;mesorregiao;;;;;;;alta
+RO;SOS- BI. H - Edifício Venâncio li -;mesorregiao;;;;;;;alta
+RO;Espírito Santo Paraná;mesorregiao;;;;;;;alta
+RO;Censo Agropecuário -;mesorregiao;1985.0;;;;;;alta
+RO;aB SECRETARIA DE PLANEJAMENTO DA PRESIDENCIA DA REPÚBLICA;mesorregiao;;;;;;;alta
+RO;FUNDAÇÃO INSTITUTO llRAllLEIAO DE GEOGRAFIA E (STATISTICA - lllQE;municipio;;;;;;;alta
+RO;CENSOS ECONÓMICOS DE;mesorregiao;1985.0;;;;;;alta
+RO;CENSO AGROPECUÁRIO;mesorregiao;;;;;;;alta
+RO;Nome ou razão soei a;microrregiao;;;;;;;alta
+RO;Proprietário;microrregiao;;;;;;;alta
+RO;ArrendatárÍo;microrregiao;;;;;;;alta
+RO;Parceiro (meeiro, terceiro, quartista, etc.);microrregiao;;;;;;;alta
+RO;Ocupante ç;microrregiao;;;;;;;alta
+RO;Em outro local (Na zona urbana;microrregiao;;;;;;;alta
+RO;Direção dos;microrregiao;;;;;;;alta
+RO;Produtor;microrregiao;;;;;;;alta
+RO;Administrador;microrregiao;;;;;;;alta
+RO;Norne ou razão irrigação;microrregiao;;;;;;;alta
+RO;Condição do proprietãrio;microrregiao;;;;;;;alta
+RO;Proprietário individual;microrregiao;;;;;;;alta
+RO;Condomínio ou sociedade de pessoas;microrregiao;107.0;;;;;;alta
+RO;Sociedade anônima ou por cotas de responsabl;microrregiao;;;;;;;alta
+RO;Cooperativa;microrregiao;;;;;;;alta
+RO;Governo (Federal, Estadual, Huniclpal);microrregiao;;;;;;;alta
+RO;Instituição Pia ou Religiosa;microrregiao;;;;;;;alta
+RO;"Outra condição ------f; i-i i f Lavoura";microrregiao;;;;;;;alta
+RO;Não utiliza Não usa;microrregiao;;;;;;;alta
+RO;Final idade Os;microrregiao;;;;;;;alta
+RO;li Emprego de serviço de empreitada: Outros animais;mesorregiao;;;;;;;alta
+RO;Não usou Ordenha com Hão usa;microrregiao;;;;;;;alta
+RO;Com fornecimento só de mão-de-obra UNIDADE DE SUPERFICIE;microrregiao;;;;;;;alta
+RO;Preparo do solo;microrregiao;;;;;;;alta
+RO;Plantio usada nas dec;microrregiao;;;;;;;alta
+RO;Tratos culturais;microrregiao;;;;;;;alta
+RO;Limpeza de pasto;microrregiao;;;;;;;alta
+RO;Outros serv r ços;microrregiao;;;;;;;alta
+RO;Associação à cooperativa de;microrregiao;;;;;;;alta
+RO;Nenhuma Terras arrendadas;microrregiao;;;;;;;alta
+RO;Comercial tzação;microrregiao;;;;;;;alta
+RO;Crédito;microrregiao;;;;;;;alta
+RO;Eletrificação;microrregiao;;;;;;;alta
+RO;Oút ra;microrregiao;0.0;;;;;;alta
+RO;TOTAL;total;;;;;;;alta
+RO;TOTAL;total;10.0;;;;;;alta
+RO;TERRAS IRRIGADAS NO ANO DE;municipio;1985.0;10.0;;;;;alta
+RO;Do total acima, registre quantas pes;total;;;;;;;alta
+RO;Total da área i rd gada;total;11.0;12.0;12.0;;;;alta
+RO;SILOS PARA FORRAGEM E DEPOSITO S PARA GUARDA DA PRODUÇAO (em;mesorregiao;;;;;;;alta
+RO;Si los Depôs i tos;microrregiao;;;;;;;alta
+RO;BOVINOS Bl)FALOS EQÜINOS;municipio;;;;;;;alta
+RO;TOTAL;total;;2.0;;;;;alta
+RO;TOTAL;total;;11.0;;;;;alta
+RO;TOTAL;total;;5.0;;;;;alta
+RO;COELHOS em;municipio;;;;;;;alta
+RO;BICHO-DA-SEDA;microrregiao;;;;;;;alta
+RO;Lenha;mesorregiao;6.0;;;;;;alta
+RO;Carvão vegeta;mesorregiao;2.0;;;;;;alta
+RO;Hade i ra em toras;mesorregiao;7.0;;;;;;alta
+RO;Madeira para papel;mesorregiao;8.0;;;;;;alta
+RO;Mudas .end idas;mesorregiao;10.0;;;;;;alta
 RR;TOTAIS;total;20.0;35.0;18.0;20.0;;;alta
 RR;RORA I MA;mesorregiao;20.0;35.0;18.0;20.0;;;alta
 RR;RORAIMA;microrregiao;20.0;35.0;;20.0;;;alta
@@ -2803,7 +2799,7 @@ RS;SANTO ANTONIO DAS MISSÕES;municipio;;;;;;;baixa
 RS;SÃO BORJA;municipio;;;;;;;baixa
 RS;SÃO OABRIEL;municipio;;;;10.0;;;baixa
 RS;URUQUAIANA;municipio;;;;13.0;;;baixa
-RS;TRITICUL TORA OE CRUZ ALTA uo;microrregiao;;;125.0;212.0;;;baixa
+RS;TRITICUL TORA DE CRUZ ALTA uo;microrregiao;;;125.0;212.0;;;baixa
 RS;CRUZ ALTA;municipio;21.0;;22.0;11.0;;;baixa
 RS;IBIRUBA;municipio;;;;;;;baixa
 RS;JOIA;municipio;24.0;;15.0;11.0;;;baixa
@@ -2812,9 +2808,9 @@ RS;SANTA BARBARA;municipio;10.0;;;;;;baixa
 RS;SANTIAGO;municipio;13.0;;12.0;;;;baixa
 RS;SÃO FRANCISCO DE ASSIS;municipio;29.0;3.0;169.0;43.0;;;baixa
 RS;TUPANCIRETÃ;municipio;;;16.0;;;;baixa
-RS;TOTAIS;total;2154.0;629.0;1639.0;2846.0;;;baixa
-RS;PORTO ALEGRE;mesorregiao;11.0;;57.0;299.0;;;baixa
-RS;PORTO ALEGRE;microrregiao;11.0;;57.0;299.0;;;baixa
+RS;TOTAIS;total;2154.0;629.0;1639.0;2846.0;;;media
+RS;PORTO ALEGRE;mesorregiao;11.0;;57.0;299.0;;;alta
+RS;PORTO ALEGRE;microrregiao;11.0;;57.0;299.0;;;alta
 RS;CANOAS;municipio;;;;;;;baixa
 RS;ORAVATAI;municipio;27.0;136.0;;;;;baixa
 RS;GUAIBA;municipio;;;;;;;baixa
@@ -2824,7 +2820,7 @@ RS;PORTO ALEGRE;municipio;;;;;;;baixa
 RS;SAPIRANGA;municipio;3.0;;;;;;baixa
 RS;SAPUCAIA;municipio;;;;;;;baixa
 RS;VIAMÂO;municipio;10.0;25.0;;;;;baixa
-RS;ENCOSTA DO PLANALTO MERIDIONAL;mesorregiao;311.0;74.0;291.0;556.0;;;baixa
+RS;ENCOSTA DO PLANALTO MERIDIONAL;mesorregiao;311.0;74.0;291.0;556.0;;;media
 RS;COLONIAL ENCOSTA DA SERRA GERAL;microrregiao;67.0;12.0;78.0;100.0;;;baixa
 RS;BOM PRINCIPIO;municipio;10.0;;;;;;baixa
 RS;CANELA;municipio;13.0;;;;;;baixa
@@ -2846,28 +2842,28 @@ RS;ESTRELA;municipio;;;;;;;baixa
 RS;LAJEADO;municipio;29.0;;;;;;baixa
 RS;ROCA SALES;municipio;;;;;;;baixa
 RS;TEUTONIA;municipio;2.0;3.0;;;;;baixa
-RS;FUMI CULTORA DE SANTA CRUZ DO SUL;microrregiao;195.0;50.0;185.0;;;;baixa
-RS;AGUDO;municipio;24.0;14.0;19.0;39.0;;;baixa
-RS;ARROIO DO TIGRE;municipio;;;;2.0;;;baixa
-RS;CANOE LAR IA;municipio;;;;;;;baixa
-RS;FAXINAL DO SOTURNO;municipio;12.0;;11.0;2.0;;;baixa
-RS;NOVA PALMA;municipio;;;;8.0;;;baixa
-RS;SANTA CRUZ;municipio;23.0;;18.0;21.0;;;baixa
-RS;SOBRADINHO;municipio;;;;;;;baixa
-RS;VENANCIO AIRES;municipio;106.0;18.0;119.0;327.0;;;baixa
-RS;VERA CRUZ;municipio;18.0;;;;;;baixa
-RS;LESTE RIO-GRANDENSE;mesorregiao;522.0;212.0;205.0;412.0;;;baixa
+RS;FUMI CULTORA DE SANTA CRUZ DO SUL;microrregiao;195.0;50.0;185.0;;;;media
+RS;AGUDO;municipio;24.0;14.0;19.0;39.0;;;media
+RS;ARROIO DO TIGRE;municipio;;;;2.0;;;media
+RS;CANOE LAR IA;municipio;;;;;;;media
+RS;FAXINAL DO SOTURNO;municipio;12.0;;11.0;2.0;;;media
+RS;NOVA PALMA;municipio;;;;8.0;;;media
+RS;SANTA CRUZ;municipio;23.0;;18.0;21.0;;;media
+RS;SOBRADINHO;municipio;;;;;;;media
+RS;VENANCIO AIRES;municipio;106.0;18.0;119.0;327.0;;;media
+RS;VERA CRUZ;municipio;18.0;;;;;;media
+RS;LESTE RIO-GRANDENSE;mesorregiao;522.0;212.0;205.0;412.0;;;media
 RS;LITORAL SETENT, RIO GRANDE DO SUL;microrregiao;10.0;;15.0;65.0;;;baixa
 RS;CAPÃO DA CANOA;municipio;41.0;;;;;;baixa
-RS;LAGOA DOS PATOS;microrregiao;;;135.0;;;;baixa
-RS;CAMAOUÃ;municipio;;;10.0;;;;baixa
-RS;CANGUÇU;municipio;;;107.0;;;;baixa
-RS;CAPÃO DO LEÃO;municipio;;;;;;;baixa
-RS;DOM FELICIANO;municipio;;;;;;;baixa
-RS;PEDRO OSORIO;municipio;;;;;;;baixa
-RS;PELOTAS;municipio;;;;;;;baixa
-RS;SÃO LOURENÇO DO SUL;municipio;;;11.0;;;;baixa
-RS;TAPES;municipio;;;3.0;;;;baixa
+RS;LAGOA DOS PATOS;microrregiao;;;135.0;;;;alta
+RS;CAMAOUÃ;municipio;;;10.0;;;;alta
+RS;CANGUÇU;municipio;;;107.0;;;;alta
+RS;CAPÃO DO LEÃO;municipio;;;;;;;alta
+RS;DOM FELICIANO;municipio;;;;;;;alta
+RS;PEDRO OSORIO;municipio;;;;;;;alta
+RS;PELOTAS;municipio;;;;;;;alta
+RS;SÃO LOURENÇO DO SUL;municipio;;;11.0;;;;alta
+RS;TAPES;municipio;;;3.0;;;;alta
 RS;LITORAL ORIENTAL LAGOA DOS PATOS;microrregiao;18.0;;;;;;baixa
 RS;RIO GRANDE;municipio;;;;;;;baixa
 RS;TAVARES;municipio;;;;;;;baixa
@@ -2883,7 +2879,7 @@ RS;LAVRAS DO SUL;municipio;;;;;;;baixa
 RS;PINHEIRO MACHADO;municipio;;;10.0;;;;baixa
 RS;PIRATINI ss;municipio;;;22.0;;;;baixa
 RS;SÃO SEPE;municipio;;;3.0;;;;baixa
-RS;CAXIAS DO SUL;mesorregiao;;;11.0;;;;baixa
+RS;CAXIAS DO SUL;mesorregiao;;;11.0;;;;media
 RS;VINICULTORA DE CAXIAS DO SUL;microrregiao;76.0;;;;;;baixa
 RS;BENTO GONÇALVES;municipio;;;;;;;baixa
 RS;CAXIAS;municipio;;;;;;;baixa
@@ -2893,7 +2889,7 @@ RS;FLORES DA CUNHA;municipio;;;;;;;baixa
 RS;GARIBALDI;municipio;;;;;;;baixa
 RS;SÃO MARCOS;municipio;;;;;;;baixa
 RS;VERANOPOLIS;municipio;;;;;;;baixa
-RS;PLANALTO MERID. RIO GRANDE DO SUL;mesorregiao;922.0;245.0;640.0;845.0;;;baixa
+RS;PLANALTO MERID. RIO GRANDE DO SUL;mesorregiao;922.0;245.0;640.0;845.0;;;media
 RS;COLONIAL DO ALTO TAOUARI;microrregiao;;;20.0;;;;baixa
 RS;ANTA GORDA;municipio;;;;;;;baixa
 RS;BOSSOROCA;municipio;;;;;;;baixa
@@ -2938,15 +2934,15 @@ RS;SÃO MARTINHO;municipio;18.0;42.0;;;;;baixa
 RS;SARANOI;municipio;;;;;;;baixa
 RS;SEBERI;municipio;;;;;;;baixa
 RS;VICENTE OUTRA;municipio;;;10.0;;;;baixa
-RS;OESTE. GAUCHO;mesorregiao;312.0;83.0;2.0;725.0;;;baixa
-RS;SANTA MARIA;microrregiao;66.0;16.0;128.0;284.0;;;baixa
-RS;FORMIGUEIRO;municipio;;;;;;;baixa
-RS;.JAGUAR(;municipio;32.0;11.0;;67.0;;;baixa
-RS;MATA;municipio;;;;;;;baixa
-RS;RESTINGA SECA;municipio;15.0;;26.0;61.0;;;baixa
-RS;SANTA MARIA;municipio;13.0;;5.0;122.0;;;baixa
-RS;SÃO PEDRO DO SUL;municipio;;;;10.0;;;baixa
-RS;SÃO VICENTE DO SUL;municipio;10.0;;;;;;baixa
+RS;OESTE. GAUCHO;mesorregiao;312.0;83.0;2.0;725.0;;;media
+RS;SANTA MARIA;microrregiao;66.0;16.0;128.0;284.0;;;media
+RS;FORMIGUEIRO;municipio;;;;;;;media
+RS;.JAGUAR(;municipio;32.0;11.0;;67.0;;;media
+RS;MATA;municipio;;;;;;;media
+RS;RESTINGA SECA;municipio;15.0;;26.0;61.0;;;media
+RS;SANTA MARIA;municipio;13.0;;5.0;122.0;;;media
+RS;SÃO PEDRO DO SUL;municipio;;;;10.0;;;media
+RS;SÃO VICENTE DO SUL;municipio;10.0;;;;;;media
 RS;CAMPANHA;microrregiao;32.0;13.0;88.0;160.0;;;baixa
 RS;ALEGRETE;municipio;27.0;19.0;;;;;baixa
 RS;CACEOUI;municipio;;;;16.0;;;baixa
@@ -2966,8 +2962,8 @@ RS;SANTIAGO;municipio;21.0;;16.0;30.0;;;baixa
 RS;SÃO FRANCISCO DE ASSIS;municipio;68.0;21.0;93.0;;;;baixa
 RS;TUPANCIRETÃ;municipio;37.0;;19.0;33.0;;;baixa
 RS;TOTAIS;total;;2924.0;;5264.0;;;baixa
-RS;PORTO ALEGRE;mesorregiao;;24.0;;23.0;;;baixa
-RS;PORTO ALEGRE;microrregiao;;24.0;;23.0;;;baixa
+RS;PORTO ALEGRE;mesorregiao;;24.0;;23.0;;;alta
+RS;PORTO ALEGRE;microrregiao;;24.0;;23.0;;;alta
 RS;GRAVATAl;municipio;;;;;;;baixa
 RS;PORTÃO;municipio;;;;;;;baixa
 RS;SAPIRANGA;municipio;;;;;;;baixa
@@ -3029,7 +3025,7 @@ RS;PINHEIRO MACHADO;municipio;;;;;;;baixa
 RS;PIRATINI;municipio;;;;10.0;;;baixa
 RS;SÃO SEPE;municipio;;;;;;;baixa
 RS;CAXIAS DO SUL;mesorregiao;;;;;;;baixa
-RS;VINICULTORA OE CAXIAS DO SUL;microrregiao;69.0;74.0;;;;;baixa
+RS;VINICULTORA DE CAXIAS DO SUL;microrregiao;69.0;74.0;;;;;baixa
 RS;GARIBALOl;municipio;;;;;;;baixa
 RS;VERANOPOL IS;municipio;;;;;;;baixa
 RS;PLANALTO MERID. RIO GRANDE DO SUL;mesorregiao;1235.0;2277.0;676.0;393.0;;;baixa
@@ -3077,7 +3073,7 @@ RS;SARAND I;municipio;;;;;;;baixa
 RS;VICENTE OUTRA;municipio;;;;16.0;;;baixa
 RS;COLONIAL DE ERECHIM;microrregiao;;;;90.0;;;baixa
 RS;ARATIBA;municipio;;;;;;;baixa
-RS;BARÃO OE COTEGJPE;municipio;;;;;;;baixa
+RS;BARÃO DE COTEGJPE;municipio;;;;;;;baixa
 RS;BARRACÃO;municipio;13.0;28.0;;;;;baixa
 RS;CAMPINAS;municipio;;12.0;;;;;baixa
 RS;ERECHIM;municipio;;38.0;;;;;baixa
@@ -3093,7 +3089,7 @@ RS;SANANDUVA;municipio;13.0;13.0;;20.0;;;baixa
 RS;SÃO JOSE DO OURO;municipio;12.0;22.0;;;;;baixa
 RS;SÃO VALENTIM;municipio;;;;;;;baixa
 RS;SERTÃO;municipio;;;;;;;baixa
-RS;SEVERIANO OE ALMEIDA;municipio;;;;;;;baixa
+RS;SEVERIANO DE ALMEIDA;municipio;;;;;;;baixa
 RS;TAPEJARA;municipio;10.0;12.0;;24.0;;;baixa
 RS;VIADUTOS;municipio;;48.0;;15.0;;;baixa
 RS;COLONIAL DE lJUI;microrregiao;34.0;43.0;30.0;88.0;;;baixa
@@ -3115,12 +3111,12 @@ RS;NÃO-ME-TOQUE;municipio;;;;;;;baixa
 RS;SELBACH;municipio;15.0;;;;;;baixa
 RS;TAPERA;municipio;;;;;;;baixa
 RS;V l CTOR GRAEFF;municipio;13.0;41.0;12.0;41.0;;;baixa
-RS;SOLEDADE;microrregiao;83.0;149.0;28.0;52.0;;;baixa
-RS;BARROS CASSAL;municipio;19.0;21.0;;;;;baixa
-RS;ESPUMOSO;municipio;26.0;50.0;12.0;22.0;;;baixa
-RS;SAL TO DO JACU(;municipio;13.0;24.0;12.0;20.0;;;baixa
-RS;SOLEOAOE;municipio;25.0;54.0;;10.0;;;baixa
-RS;CAMPOS OE VACARIA;microrregiao;186.0;441.0;;;;;baixa
+RS;SOLEDADE;microrregiao;83.0;149.0;28.0;52.0;;;alta
+RS;BARROS CASSAL;municipio;19.0;21.0;;;;;alta
+RS;ESPUMOSO;municipio;26.0;50.0;12.0;22.0;;;alta
+RS;SAL TO DO JACU(;municipio;13.0;24.0;12.0;20.0;;;alta
+RS;SOLEOAOE;municipio;25.0;54.0;;10.0;;;alta
+RS;CAMPOS DE VACARIA;microrregiao;186.0;441.0;;;;;baixa
 RS;BOM JESUS;municipio;20.0;56.0;;;;;baixa
 RS;CAMBARA DO SUL;municipio;;;;;;;baixa
 RS;ESMERALDA;municipio;;22.0;;;;;baixa
@@ -3133,11 +3129,11 @@ SC;LESTE CATARJNENSE;mesorregiao;27.0;;;;;;baixa
 SC;COLONIAL DE JOINVILE;microrregiao;;;;;;;baixa
 SC;ARAQUARI;municipio;;;;;;;baixa
 SC;JARAGUA;municipio;;;;;;;baixa
-SC;COLONIAL OE BLUMENAU;microrregiao;20.0;;;;;;baixa
-SC;ASCURRA;municipio;;;;;;;baixa
-SC;GASPAR;municipio;15.0;;;;;;baixa
-SC;RIO DOS CEDROS;municipio;;;;;;;baixa
-SC;TIMBO;municipio;;;;;;;baixa
+SC;COLONIAL DE BLUMENAU;microrregiao;20.0;;;;;;alta
+SC;ASCURRA;municipio;;;;;;;alta
+SC;GASPAR;municipio;15.0;;;;;;alta
+SC;RIO DOS CEDROS;municipio;;;;;;;alta
+SC;TIMBO;municipio;;;;;;;alta
 SC;COLONIAL;microrregiao;;;;;;;baixa
 SC;IMBUIA;municipio;;;;;;;baixa
 SC;PETROLANDIA;municipio;;;;;;;baixa
@@ -3159,11 +3155,11 @@ SC;ORLEANS;municipio;;;;;;;baixa
 SC;PEDRAS GRANDES;municipio;;;;;;;baixa
 SC;URUSSANGA;municipio;;;;;;;baixa
 SC;OESTE CATARINENSE;mesorregiao;80.0;13.0;72.0;67.0;;;baixa
-SC;CAMPOS DE LAGES;microrregiao;25.0;;;;;;baixa
-SC;BOM RETIRO;municipio;;;;;;;baixa
-SC;CORREIA PINTO;municipio;;;;;;;baixa
-SC;LAGES;municipio;13.0;;;;;;baixa
-SC;SÃO JOAQUIM;municipio;10.0;;;;;;baixa
+SC;CAMPOS DE LAGES;microrregiao;25.0;;;;;;alta
+SC;BOM RETIRO;municipio;;;;;;;alta
+SC;CORREIA PINTO;municipio;;;;;;;alta
+SC;LAGES;municipio;13.0;;;;;;alta
+SC;SÃO JOAQUIM;municipio;10.0;;;;;;alta
 SC;CAMPOS DE CURITIBANOS;microrregiao;12.0;29.0;26.0;;;;baixa
 SC;CAMPOS NOVOS;municipio;;;;;;;baixa
 SC;CURITIBANOS;municipio;;;;;;;baixa
@@ -3232,8 +3228,8 @@ SE;CRISTINAPOLIS;municipio;;;;35.0;208.0;11.0;baixa
 SE;POÇO VERDE;municipio;11.0;;;;;;baixa
 SE;TOBIAS BARRETO;municipio;;;;;;;baixa
 SE;TOMAR DO GERU;municipio;25.0;;;;;;baixa
-SE;ARACAJU;mesorregiao;;;;287.0;1058.0;;baixa
-SE;LITORAL SUL SERGIPANO;microrregiao;;;;287.0;1058.0;;baixa
+SE;ARACAJU;mesorregiao;;;;287.0;1058.0;;alta
+SE;LITORAL SUL SERGIPANO;microrregiao;;;;287.0;1058.0;;alta
 SE;BARRA DOS COQUEIROS;municipio;;;;;;;baixa
 SE;ESTANCIA;municipio;39.0;158.0;;;;;baixa
 SE;INDIAROBA;municipio;106.0;260.0;12.0;;;;baixa
@@ -3347,10 +3343,10 @@ SE;Couros e peles kg;mesorregiao;;;;;;;baixa
 SE;TOTAL;total;;;9.0;;;;baixa
 SE;de De criação ou recriação;municipio;8.0;11.0;;;;;baixa
 SE;TOTAL;total;;;13.0;;;;baixa
-SE;Comercialização;microrregiao;5.0;;;;;;baixa
-SE;Banco do Sras i;municipio;2.0;22.0;;;;;baixa
-SE;De outras entidades governamentais;municipio;3.0;;;;;;baixa
-SE;De cooperativas;municipio;4.0;;;;;;baixa
+SE;Comercialização;microrregiao;5.0;;;;;;alta
+SE;Banco do Sras i;municipio;2.0;22.0;;;;;alta
+SE;De outras entidades governamentais;municipio;3.0;;;;;;alta
+SE;De cooperativas;municipio;4.0;;;;;;alta
 SE;TOTAL;total;5.0;25.0;;;;;baixa
 SE;De outras fontes;municipio;;;;;;;baixa
 SE;-I CONSUMO NO ANO DE;mesorregiao;;;;1985.0;;;baixa
@@ -3366,7 +3362,7 @@ SP;ALTA ARARAQUARENSE FERNANDOPOLIS;microrregiao;;;;;;;baixa
 SP;FERNANDOPOLIS;municipio;;;;;;;baixa
 SP;SANTA FE DO SUL;municipio;;;;;;;baixa
 SP;ALTA ARARAQUARENSE DE VOTUPORANGA;municipio;;;;;;;baixa
-SP;AMERICO OE CAMPOS;municipio;;;;;;;baixa
+SP;AMERICO DE CAMPOS;municipio;;;;;;;baixa
 SP;CARDOSO;municipio;;;;;;;baixa
 SP;MEDI O SÃO JOSE DOS DOURADOS;municipio;15.0;;;;;;baixa
 SP;AURIFLAMA;municipio;;;;15.0;;;baixa

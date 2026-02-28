@@ -7,6 +7,16 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+### Improved
+- **Censo Agro Municipal 1985** — melhoria de qualidade dos dados OCR municipais (53 tabelas, 22 UFs).
+  Column bleed fix: 525 valores corrigidos (remoção de dígitos vazados de colunas adjacentes).
+  Label D→O fix: `\bOE\b→DE`, `\bOO\b→DO` no OCR (e.g. "PLÁCIDO OE CASTRO" → "DE CASTRO").
+  Tolerância adaptativa no validador: `absolute_tolerance=5.0` para valores pequenos (<100),
+  `sparse_factor=2.0` para tabelas com >60% de células vazias/zero.
+  Thresholds de confiança recalibrados: `_load_stats` 70/40→60/30, `generate_confidence_report`
+  suspect_rate 0/0.3→0.10/0.40. Revalidação per-parent-group (upgrade-only).
+  Distribuição de confiança: alta 5.4%→25.4%, média 62.0%→65.3%, baixa 32.6%→9.3%
+
 ### Security
 - **Snapshots** — proteção contra path traversal em `create_snapshot()`, `load_from_snapshot()`
   e `delete_snapshot()`. Nomes de snapshot validados por regex whitelist + `Path.resolve().is_relative_to()`.
