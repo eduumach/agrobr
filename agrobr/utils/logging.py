@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import re
 import sys
+from collections.abc import MutableMapping
 from pathlib import Path
 from typing import Any
 
@@ -31,8 +32,8 @@ _SENSITIVE_QUERY_RE = re.compile(
 def _scrub_sensitive(
     _logger: Any,
     _method: str,
-    event_dict: dict[str, Any],
-) -> dict[str, Any]:
+    event_dict: MutableMapping[str, Any],
+) -> MutableMapping[str, Any]:
     for key in event_dict:
         if key.lower().replace("-", "_") in _SENSITIVE_KEYS:
             event_dict[key] = "***"
