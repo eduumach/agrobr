@@ -8,6 +8,11 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Unreleased]
 
 ### Security
+- **Snapshots** — proteção contra path traversal em `create_snapshot()`, `load_from_snapshot()`
+  e `delete_snapshot()`. Nomes de snapshot validados por regex whitelist + `Path.resolve().is_relative_to()`.
+  Previne `shutil.rmtree` em diretórios arbitrários via nomes como `../../..`
+- **RateLimiter** — lock `asyncio.Lock()` agora é lazy (criado no primeiro uso, não no import).
+  Evita compartilhamento de primitivas asyncio entre event loops diferentes em testes
 - **SICAR** — removido `check_hostname=False` e `verify_mode=CERT_NONE` do SSLContext.
   Certificado Sectigo validado (chain completa). `@SECLEVEL=1` mantido para compatibilidade
   de ciphers do GeoServer
@@ -28,6 +33,12 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **CEPEA** — `except Exception` restrito a exceções de rede/parse em `indicador()` e `ultimo()`.
   Conversão de indicadores restrita a `(KeyError, ValueError, TypeError)`
 - **SICAR** — validação regex de `criado_apos` (`^\d{4}-\d{2}-\d{2}$`) no filtro CQL
+
+### Fixed
+- **Test isolation** — fixture autouse `_reset_global_state` em conftest.py reseta config,
+  RateLimiter, HistoryManager e todas as flags `_WARNED` (6 módulos) entre testes.
+  Elimina poluição de estado entre testes e garante isolamento correto
+- **HistoryManager** — adicionada `reset_history_manager()` para permitir reset do singleton
 
 ### Added
 - **IBGE PEVS Silvicultura** — nova funcao `ibge.silvicultura()` para producao silvicultural

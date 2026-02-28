@@ -11,6 +11,7 @@ import pytest
 
 from agrobr.snapshots import (
     SnapshotManifest,
+    _validate_path_component,
     delete_snapshot,
     get_snapshot,
     list_snapshots,
@@ -187,3 +188,53 @@ class TestLoadFromSnapshot:
             mock_config.return_value.snapshot_date = None
             with pytest.raises(ValueError, match="No snapshot specified"):
                 load_from_snapshot("cepea", "soja")
+
+
+class TestPathTraversalProtection:
+    TRAVERSAL_PAYLOADS = [
+        "../../etc/passwd",
+        "..\\..\\windows",
+        "../..",
+        "foo/bar",
+        "foo\\bar",
+        "",
+        ".hidden",
+    ]
+
+    def test_validate_path_component_rejects_traversal(self):
+        for payload in self.TRAVERSAL_PAYLOADS:
+            with pytest.raises(ValueError):
+                _validate_path_component(payload, "name")
+
+    def test_validate_path_component_accepts_valid(self):
+        for name in ["2025-01-15", "my_snapshot", "v1.0.0", "test123"]:
+            _validate_path_component(name, "name")
+
+    def test_delete_snapshot_rejects_traversal(self, tmp_path):
+        with patch("agrobr.snapshots.get_snapshots_dir", return_value=tmp_path):
+            for payload in self.TRAVERSAL_PAYLOADS:
+                with pytest.raises(ValueError):
+                    delete_snapshot(payload)
+
+    def test_load_from_snapshot_rejects_traversal(self, tmp_path):
+        with (
+            patch("agrobr.snapshots.get_snapshots_dir", return_value=tmp_path),
+            patch("agrobr.config.get_config") as mock_config,
+        ):
+            mock_config.return_value.snapshot_date = None
+            with pytest.raises(ValueError):
+                load_from_snapshot("../../etc", "passwd", snapshot_name="2025-01-15")
+            with pytest.raises(ValueError):
+                load_from_snapshot("cepea", "../../etc", snapshot_name="2025-01-15")
+            with pytest.raises(ValueError):
+                load_from_snapshot("cepea", "soja", snapshot_name="../../etc")
+
+    @pytest.mark.asyncio
+    async def test_create_snapshot_rejects_traversal(self, tmp_path):
+        from agrobr.snapshots import create_snapshot
+
+        with (
+            patch("agrobr.snapshots.get_snapshots_dir", return_value=tmp_path),
+            pytest.raises(ValueError),
+        ):
+            await create_snapshot(name="../../etc")

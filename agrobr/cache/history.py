@@ -188,3 +188,8 @@ def get_history_manager() -> HistoryManager:
     if _history_manager is None:
         _history_manager = HistoryManager()
     return _history_manager
+
+
+def reset_history_manager() -> None:
+    global _history_manager
+    _history_manager = None

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 from dataclasses import dataclass, field
 from datetime import date, datetime
@@ -13,6 +14,13 @@ import structlog
 from agrobr.config import get_config
 
 logger = structlog.get_logger()
+
+_SAFE_NAME_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_\-\.]*$")
+
+
+def _validate_path_component(value: str, label: str) -> None:
+    if not value or not _SAFE_NAME_RE.match(value):
+        raise ValueError(f"Invalid {label}: {value!r}")
 
 
 @dataclass
@@ -112,11 +120,16 @@ async def create_snapshot(
     if name is None:
         name = date.today().isoformat()
 
+    _validate_path_component(name, "snapshot name")
+
     if sources is None:
         sources = ["cepea", "conab", "ibge"]
 
     snapshots_dir = get_snapshots_dir()
     snapshot_path = snapshots_dir / name
+
+    if not snapshot_path.resolve().is_relative_to(snapshots_dir.resolve()):
+        raise ValueError(f"Invalid snapshot name: {name!r}")
 
     if snapshot_path.exists():
         raise ValueError(f"Snapshot '{name}' already exists")
@@ -240,7 +253,15 @@ def load_from_snapshot(
         else:
             raise ValueError("No snapshot specified and no snapshot_date in config")
 
-    snapshot_path = get_snapshots_dir() / snapshot_name / source / f"{dataset}.parquet"
+    _validate_path_component(snapshot_name, "snapshot name")
+    _validate_path_component(source, "source")
+    _validate_path_component(dataset, "dataset")
+
+    snapshots_dir = get_snapshots_dir()
+    snapshot_path = snapshots_dir / snapshot_name / source / f"{dataset}.parquet"
+
+    if not snapshot_path.resolve().is_relative_to(snapshots_dir.resolve()):
+        raise ValueError(f"Invalid path components: {snapshot_name!r}/{source!r}/{dataset!r}")
 
     if not snapshot_path.exists():
         logger.warning(
@@ -255,7 +276,13 @@ def load_from_snapshot(
 
 
 def delete_snapshot(name: str) -> bool:
-    snapshot_path = get_snapshots_dir() / name
+    _validate_path_component(name, "snapshot name")
+
+    snapshots_dir = get_snapshots_dir()
+    snapshot_path = snapshots_dir / name
+
+    if not snapshot_path.resolve().is_relative_to(snapshots_dir.resolve()):
+        raise ValueError(f"Invalid snapshot name: {name!r}")
 
     if not snapshot_path.exists():
         return False

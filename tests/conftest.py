@@ -11,6 +11,33 @@ CASSETTES_DIR = FIXTURES_DIR / "cassettes"
 GOLDEN_DATA_DIR = FIXTURES_DIR / "golden_data"
 
 
+@pytest.fixture(autouse=True)
+def _reset_global_state():
+    yield
+    from agrobr.cache.history import reset_history_manager
+    from agrobr.config import reset_config
+    from agrobr.http.rate_limiter import RateLimiter
+
+    reset_config()
+    RateLimiter.reset()
+    reset_history_manager()
+
+    import agrobr.abiove.api as _abiove
+    import agrobr.anda.api as _anda
+    import agrobr.b3.api as _b3
+    import agrobr.conab.ceasa.api as _ceasa
+    import agrobr.imea.api as _imea
+    import agrobr.noticias_agricolas.client as _na
+
+    _abiove._WARNED = False
+    _anda._WARNED = False
+    _b3._WARNED_AJUSTES = False
+    _b3._WARNED_POSICOES = False
+    _imea._WARNED = False
+    _na._WARNED = False
+    _ceasa._WARNED = False
+
+
 @pytest.fixture
 def sample_html_cepea() -> str:
     """HTML mínimo para testes de parsing CEPEA."""

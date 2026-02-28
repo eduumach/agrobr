@@ -15,7 +15,13 @@ logger = structlog.get_logger()
 class RateLimiter:
     _semaphores: dict[str, asyncio.Semaphore] = {}
     _last_request: dict[str, float] = {}
-    _lock = asyncio.Lock()
+    _lock: asyncio.Lock | None = None
+
+    @classmethod
+    def _get_lock(cls) -> asyncio.Lock:
+        if cls._lock is None:
+            cls._lock = asyncio.Lock()
+        return cls._lock
 
     @classmethod
     def _get_delay(cls, source: constants.Fonte) -> float:
@@ -42,7 +48,7 @@ class RateLimiter:
     async def acquire(cls, source: constants.Fonte) -> AsyncIterator[None]:
         source_key = source.value
 
-        async with cls._lock:
+        async with cls._get_lock():
             if source_key not in cls._semaphores:
                 cls._semaphores[source_key] = asyncio.Semaphore(1)
 
@@ -70,3 +76,4 @@ class RateLimiter:
     def reset(cls) -> None:
         cls._semaphores.clear()
         cls._last_request.clear()
+        cls._lock = None
