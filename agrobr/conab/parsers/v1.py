@@ -464,11 +464,15 @@ class ConabParserV1:
                 }
 
         if not cols:
-            cols["2025/26"] = {
-                "area": 2,
-                "produtividade": 5,
-                "producao": 8,
-            }
+            logger.warning(
+                "conab_safra_columns_not_detected",
+                header_row=header_row,
+            )
+            raise ParseError(
+                source="conab",
+                parser_version=self.version,
+                reason="Não foi possível detectar colunas de safra no header da planilha",
+            )
 
         return cols
 

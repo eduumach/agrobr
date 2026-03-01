@@ -17,11 +17,15 @@ class RateLimiter:
     _semaphores: dict[str, asyncio.Semaphore] = {}
     _last_request: dict[str, float] = {}
     _lock: asyncio.Lock | None = None
+    _loop_id: int | None = None
 
     @classmethod
     def _get_lock(cls) -> asyncio.Lock:
-        if cls._lock is None:
+        current_loop_id = id(asyncio.get_running_loop())
+        if cls._lock is None or cls._loop_id != current_loop_id:
+            cls._invalidate()
             cls._lock = asyncio.Lock()
+            cls._loop_id = current_loop_id
         return cls._lock
 
     @classmethod
@@ -59,7 +63,12 @@ class RateLimiter:
                 cls._last_request[source_key] = time.monotonic()
 
     @classmethod
-    def reset(cls) -> None:
+    def _invalidate(cls) -> None:
         cls._semaphores.clear()
         cls._last_request.clear()
         cls._lock = None
+        cls._loop_id = None
+
+    @classmethod
+    def reset(cls) -> None:
+        cls._invalidate()

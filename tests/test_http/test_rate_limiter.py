@@ -93,3 +93,26 @@ class TestRateLimiter:
         for fonte in constants.Fonte:
             delay = RateLimiter._get_delay(fonte.value)
             assert delay > 0, f"{fonte} has no delay configured"
+
+
+class TestRateLimiterCrossLoop:
+    def test_survives_loop_change(self):
+        async def use_limiter():
+            async with RateLimiter.acquire("test_source"):
+                pass
+
+        asyncio.run(use_limiter())
+        asyncio.run(use_limiter())
+
+    def test_state_reset_on_loop_change(self):
+        loops: list[asyncio.AbstractEventLoop] = []
+
+        async def use_and_capture():
+            loops.append(asyncio.get_running_loop())
+            async with RateLimiter.acquire("test_source"):
+                pass
+
+        asyncio.run(use_and_capture())
+        assert "test_source" in RateLimiter._semaphores
+        asyncio.run(use_and_capture())
+        assert loops[0] is not loops[1]

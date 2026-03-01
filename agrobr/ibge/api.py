@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-from datetime import datetime
 from typing import Literal, overload
 
 import pandas as pd
@@ -14,6 +13,7 @@ from agrobr.ibge import client
 from agrobr.ibge._helpers import NIVEL_MAP
 from agrobr.models import MetaInfo
 from agrobr.utils.result import finalize_result
+from agrobr.utils.time import utcnow
 
 logger = structlog.get_logger()
 
@@ -76,7 +76,7 @@ async def pam(
         source="ibge_pam",
         source_url="https://sidra.ibge.gov.br",
         source_method="httpx",
-        fetched_at=datetime.now(),
+        fetched_at=utcnow(),
     )
     logger.info(
         "ibge_pam_request",
@@ -227,7 +227,7 @@ async def lspa(
         source="ibge_lspa",
         source_url="https://sidra.ibge.gov.br",
         source_method="httpx",
-        fetched_at=datetime.now(),
+        fetched_at=utcnow(),
     )
     logger.info(
         "ibge_lspa_request",
@@ -336,7 +336,7 @@ async def ppm(
         source="ibge_ppm",
         source_url="https://sidra.ibge.gov.br",
         source_method="httpx",
-        fetched_at=datetime.now(),
+        fetched_at=utcnow(),
     )
     logger.info(
         "ibge_ppm_request",
@@ -487,7 +487,7 @@ async def abate(
         source="ibge_abate",
         source_url="https://sidra.ibge.gov.br",
         source_method="httpx",
-        fetched_at=datetime.now(),
+        fetched_at=utcnow(),
     )
     logger.info(
         "ibge_abate_request",

@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Any
 from pydantic import BaseModel, Field, field_validator
 
 from .constants import Fonte
+from .utils.time import utcnow
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -28,7 +29,7 @@ class Indicador(BaseModel):
     revisao: int = Field(default=0, ge=0)
     meta: dict[str, Any] = Field(default_factory=dict)
 
-    parsed_at: datetime = Field(default_factory=datetime.utcnow)
+    parsed_at: datetime = Field(default_factory=utcnow)
     parser_version: int = Field(default=1)
     anomalies: list[str] = Field(default_factory=list)
 
@@ -54,7 +55,7 @@ class Safra(BaseModel):
     data_publicacao: date
     meta: dict[str, Any] = Field(default_factory=dict)
 
-    parsed_at: datetime = Field(default_factory=datetime.utcnow)
+    parsed_at: datetime = Field(default_factory=utcnow)
     parser_version: int = Field(default=1)
     anomalies: list[str] = Field(default_factory=list)
 
@@ -97,7 +98,7 @@ class MetaInfo:
     source_url: str
     source_method: str
     fetched_at: datetime
-    timestamp: datetime = dataclass_field(default_factory=datetime.now)
+    timestamp: datetime = dataclass_field(default_factory=utcnow)
     fetch_duration_ms: int = 0
     parse_duration_ms: int = 0
     from_cache: bool = False

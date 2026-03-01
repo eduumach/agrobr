@@ -5,6 +5,7 @@ from enum import Enum
 from typing import NamedTuple
 
 from ..constants import Fonte
+from ..utils.time import utcnow
 
 
 class CachePolicy(NamedTuple):
@@ -26,7 +27,8 @@ class TTL(Enum):
     DAYS_90 = 90 * 24 * 60 * 60
 
 
-CEPEA_UPDATE_HOUR = 18
+CEPEA_UPDATE_HOUR_BRT = 18
+CEPEA_UPDATE_HOUR_UTC = 21
 CEPEA_UPDATE_MINUTE = 0
 
 POLICIES: dict[str, CachePolicy] = {
@@ -190,13 +192,12 @@ def get_policy(source: Fonte | str, endpoint: str | None = None) -> CachePolicy:
 
 
 def _get_smart_expiry_time() -> datetime:
-    now = datetime.now()
-    today_expiry = datetime.combine(now.date(), time(CEPEA_UPDATE_HOUR, CEPEA_UPDATE_MINUTE))
+    now = utcnow()
+    today_expiry = datetime.combine(now.date(), time(CEPEA_UPDATE_HOUR_UTC, CEPEA_UPDATE_MINUTE))
 
     if now < today_expiry:
         return today_expiry
-    else:
-        return today_expiry + timedelta(days=1)
+    return today_expiry + timedelta(days=1)
 
 
 def _get_last_expiry_time() -> datetime:
@@ -219,13 +220,13 @@ def is_expired(created_at: datetime, source: Fonte | str, endpoint: str | None =
         return created_at < last_expiry
 
     expires_at = created_at + timedelta(seconds=policy.ttl_seconds)
-    return datetime.now() > expires_at
+    return utcnow() > expires_at
 
 
 def is_stale_acceptable(created_at: datetime, source: Fonte | str) -> bool:
     stale_max = get_stale_max(source)
     max_acceptable = created_at + timedelta(seconds=stale_max)
-    return datetime.now() <= max_acceptable
+    return utcnow() <= max_acceptable
 
 
 def calculate_expiry(source: Fonte | str, endpoint: str | None = None) -> datetime:
@@ -234,7 +235,7 @@ def calculate_expiry(source: Fonte | str, endpoint: str | None = None) -> dateti
     if policy.smart_expiry:
         return _get_smart_expiry_time()
 
-    return datetime.now() + timedelta(seconds=policy.ttl_seconds)
+    return utcnow() + timedelta(seconds=policy.ttl_seconds)
 
 
 class InvalidationReason(Enum):
@@ -283,7 +284,7 @@ def get_next_update_info(source: Fonte | str) -> dict[str, str]:
         return {
             "type": "smart",
             "expires_at": next_expiry.strftime("%Y-%m-%d %H:%M"),
-            "description": f"Expira às {CEPEA_UPDATE_HOUR}h (atualização CEPEA)",
+            "description": f"Expira às {CEPEA_UPDATE_HOUR_BRT}h BRT (atualização CEPEA)",
         }
 
     return {

@@ -21,6 +21,11 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **Test infrastructure** — `tests/helpers.py` com 3 factories (`make_mock_response`, `make_mock_async_client`, `make_alert_settings`). Elimina `_mock_response` duplicado em 18 arquivos e boilerplate `__aenter__`/`__aexit__` em 23 arquivos
 
 ### Fixed
+- **ibge/client** — `sidrapy.get_table()` agora roda via `asyncio.to_thread()`, desbloqueando o event loop em todas as queries IBGE (pam, lspa, ppm, abate, censo, silvicultura, extracao, leite, pib)
+- **http/rate_limiter** — `RateLimiter` detecta troca de event loop e recria Lock/Semaphores automaticamente. Antes crashava em chamadas sequenciais com `asyncio.run()`
+- **cache/policies** — timezone mismatch corrigido: `_get_smart_expiry_time()` e 3 funcoes de expiry agora usam UTC consistente com `duckdb_store.py`. `CEPEA_UPDATE_HOUR` renomeado pra `CEPEA_UPDATE_HOUR_BRT` (18) / `CEPEA_UPDATE_HOUR_UTC` (21)
+- **utcnow migration** — `datetime.utcnow()` (deprecated Python 3.12+) substituido por `utcnow()` helper (naive UTC) em models.py, fingerprint.py, collector.py, duckdb_store.py. 12 sites `fetched_at=datetime.now()` migrados pra UTC em cepea, conab, ibge (api, pesquisas, censo)
+- **conab/parsers/v1** — fallback hardcoded `"2025/26"` removido de `_extract_safra_columns()`. Agora levanta `ParseError` com log estruturado quando nao detecta colunas de safra
 - Blocos `if TYPE_CHECKING: pass` mortos removidos de 4 modulos datasets (producao_anual, estimativa_safra, preco_diario, balanco)
 
 ## [0.12.0] - 2026-02-28

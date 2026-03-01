@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-from datetime import datetime
 from typing import Any, Literal, overload
 
 import pandas as pd
@@ -14,6 +13,7 @@ from agrobr.conab import client
 from agrobr.conab.parsers.v1 import ConabParserV1
 from agrobr.models import MetaInfo
 from agrobr.utils.result import finalize_result
+from agrobr.utils.time import utcnow
 
 logger = structlog.get_logger()
 
@@ -55,7 +55,7 @@ async def safras(
         source="conab",
         source_url="https://www.conab.gov.br/info-agro/safras/graos",
         source_method="httpx",
-        fetched_at=datetime.now(),
+        fetched_at=utcnow(),
     )
 
     logger.info(

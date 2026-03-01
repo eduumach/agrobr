@@ -19,6 +19,7 @@ from agrobr.cepea.parsers.detector import get_parser_with_fallback
 from agrobr.exceptions import ParseError, SourceUnavailableError
 from agrobr.models import Indicador, MetaInfo
 from agrobr.utils.result import finalize_result
+from agrobr.utils.time import utcnow
 from agrobr.validators.sanity import validate_batch
 
 if TYPE_CHECKING:
@@ -78,7 +79,7 @@ async def indicador(
         source="unknown",
         source_url="",
         source_method="unknown",
-        fetched_at=datetime.now(),
+        fetched_at=utcnow(),
     )
     if isinstance(inicio, str):
         inicio = datetime.strptime(inicio, "%Y-%m-%d").date()

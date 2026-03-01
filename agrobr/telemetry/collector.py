@@ -4,7 +4,6 @@ import asyncio
 import hashlib
 import platform
 import uuid
-from datetime import datetime
 from typing import Any
 
 import httpx
@@ -12,6 +11,7 @@ import structlog
 
 from agrobr import __version__
 from agrobr.constants import TelemetrySettings
+from agrobr.utils.time import utcnow
 
 logger = structlog.get_logger()
 
@@ -36,7 +36,7 @@ class TelemetryCollector:
             "python_version": platform.python_version(),
             "os": platform.system(),
             "os_version": platform.release(),
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": utcnow().isoformat(),
         }
 
     @classmethod

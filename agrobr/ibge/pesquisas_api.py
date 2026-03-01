@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-from datetime import datetime
 from typing import Literal, overload
 
 import pandas as pd
@@ -13,6 +12,7 @@ from agrobr.ibge import client
 from agrobr.ibge._helpers import NIVEL_MAP
 from agrobr.models import MetaInfo
 from agrobr.utils.result import finalize_result
+from agrobr.utils.time import utcnow
 
 logger = structlog.get_logger()
 
@@ -62,7 +62,7 @@ async def silvicultura(
         source="ibge_silvicultura",
         source_url="https://sidra.ibge.gov.br",
         source_method="httpx",
-        fetched_at=datetime.now(),
+        fetched_at=utcnow(),
     )
     logger.info(
         "ibge_silvicultura_request",
@@ -234,7 +234,7 @@ async def extracao_vegetal(
         source="ibge_extracao_vegetal",
         source_url="https://sidra.ibge.gov.br",
         source_method="httpx",
-        fetched_at=datetime.now(),
+        fetched_at=utcnow(),
     )
     logger.info(
         "ibge_extracao_vegetal_request",
@@ -380,7 +380,7 @@ async def leite_trimestral(
         source="ibge_leite_trimestral",
         source_url="https://sidra.ibge.gov.br",
         source_method="httpx",
-        fetched_at=datetime.now(),
+        fetched_at=utcnow(),
     )
     logger.info(
         "ibge_leite_trimestral_request",
@@ -528,7 +528,7 @@ async def pib_agro(
         source="ibge_pib",
         source_url="https://sidra.ibge.gov.br",
         source_method="httpx",
-        fetched_at=datetime.now(),
+        fetched_at=utcnow(),
     )
     logger.info(
         "ibge_pib_agro_request",

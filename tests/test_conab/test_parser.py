@@ -10,6 +10,7 @@ import pandas as pd
 import pytest
 
 from agrobr.conab.parsers.v1 import ConabParserV1
+from agrobr.exceptions import ParseError
 
 SAMPLE_FILE = (
     Path(__file__).parent.parent / "golden_data" / "conab" / "safra_sample" / "response.xlsx"
@@ -222,3 +223,15 @@ class TestConabParserEdgeCases:
         sample_xlsx.seek(0)
         result = parser._parse_suprimento_long(sample_xlsx, produto="milho")
         assert isinstance(result, list)
+
+
+class TestExtractSafraColumnsFallback:
+    def test_raises_parse_error_when_no_safra_detected(self, parser):
+        df = pd.DataFrame(
+            [
+                ["REGIAO/UF", "Col1", "Col2", "Col3"],
+                ["Sub", "Sub1", "Sub2", "Sub3"],
+            ]
+        )
+        with pytest.raises(ParseError, match="detectar colunas de safra"):
+            parser._extract_safra_columns(df, 0)

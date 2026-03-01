@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-from datetime import datetime
 from typing import Literal, overload
 
 import pandas as pd
@@ -23,6 +22,7 @@ from agrobr.ibge.censo_tables import (
 )
 from agrobr.models import MetaInfo
 from agrobr.utils.result import finalize_result
+from agrobr.utils.time import utcnow
 
 logger = structlog.get_logger()
 
@@ -331,7 +331,7 @@ async def censo_agro(
         source="ibge_censo_agro",
         source_url="https://sidra.ibge.gov.br",
         source_method="httpx",
-        fetched_at=datetime.now(),
+        fetched_at=utcnow(),
     )
     logger.info(
         "ibge_censo_agro_request",
@@ -519,7 +519,7 @@ async def censo_agro_historico(
         source="ibge_censo_agro_historico",
         source_url="https://sidra.ibge.gov.br",
         source_method="httpx",
-        fetched_at=datetime.now(),
+        fetched_at=utcnow(),
     )
     logger.info(
         "ibge_censo_agro_historico_request",

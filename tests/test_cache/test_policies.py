@@ -14,6 +14,7 @@ from agrobr.cache.policies import (
     should_refresh,
 )
 from agrobr.constants import Fonte
+from agrobr.utils.time import utcnow
 
 
 class TestFormatTTL:
@@ -62,19 +63,19 @@ class TestGetNextUpdateInfo:
 
 class TestShouldRefresh:
     def test_force_true(self):
-        created = datetime.now() - timedelta(minutes=5)
+        created = utcnow() - timedelta(minutes=5)
         refresh, reason = should_refresh(created, Fonte.CEPEA, force=True)
         assert refresh is True
         assert reason == "force_refresh"
 
     def test_expired_entry(self):
-        created = datetime.now() - timedelta(days=10)
+        created = utcnow() - timedelta(days=10)
         refresh, reason = should_refresh(created, Fonte.CONAB)
         assert refresh is True
         assert reason == "expired"
 
     def test_fresh_entry(self):
-        created = datetime.now() - timedelta(minutes=5)
+        created = utcnow() - timedelta(minutes=5)
         refresh, reason = should_refresh(created, Fonte.CONAB)
         assert refresh is False
         assert reason == "fresh"
@@ -104,28 +105,28 @@ class TestGetPolicy:
 
 class TestIsExpired:
     def test_smart_expiry_not_expired(self):
-        created = datetime.now() - timedelta(hours=1)
+        created = utcnow() - timedelta(hours=1)
         assert (
             is_expired(created, "cepea_diario") is False
             or is_expired(created, "cepea_diario") is True
         )
 
     def test_ttl_expired(self):
-        created = datetime.now() - timedelta(days=10)
+        created = utcnow() - timedelta(days=10)
         assert is_expired(created, Fonte.CONAB) is True
 
     def test_ttl_not_expired(self):
-        created = datetime.now() - timedelta(minutes=5)
+        created = utcnow() - timedelta(minutes=5)
         assert is_expired(created, Fonte.CONAB) is False
 
 
 class TestIsStaleAcceptable:
     def test_within_stale_window(self):
-        created = datetime.now() - timedelta(days=1)
+        created = utcnow() - timedelta(days=1)
         assert is_stale_acceptable(created, Fonte.CONAB) is True
 
     def test_beyond_stale_window(self):
-        created = datetime.now() - timedelta(days=365)
+        created = utcnow() - timedelta(days=365)
         assert is_stale_acceptable(created, Fonte.CONAB) is False
 
 
@@ -133,9 +134,9 @@ class TestCalculateExpiry:
     def test_smart_expiry(self):
         expiry = calculate_expiry("cepea_diario")
         assert isinstance(expiry, datetime)
-        assert expiry > datetime.now()
+        assert expiry > utcnow()
 
     def test_ttl_expiry(self):
-        before = datetime.now()
+        before = utcnow()
         expiry = calculate_expiry(Fonte.CONAB)
         assert expiry > before

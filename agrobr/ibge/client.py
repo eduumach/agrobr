@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from typing import Any
 
 import httpx
@@ -650,7 +651,7 @@ async def fetch_sidra(
         from agrobr.http.retry import retry_async
 
         async def _do_fetch() -> pd.DataFrame:
-            df = sidrapy.get_table(**kwargs)
+            df = await asyncio.to_thread(sidrapy.get_table, **kwargs)
             if header == "n" and len(df) > 1:
                 df = df.iloc[1:].reset_index(drop=True)
             return pd.DataFrame(df)

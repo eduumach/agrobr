@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -11,6 +10,7 @@ from bs4 import BeautifulSoup
 
 from agrobr.constants import Fonte
 from agrobr.models import Fingerprint
+from agrobr.utils.time import utcnow
 
 logger = structlog.get_logger()
 
@@ -86,7 +86,7 @@ def extract_fingerprint(
     return Fingerprint(
         source=source,
         url=url,
-        collected_at=datetime.utcnow(),
+        collected_at=utcnow(),
         table_classes=table_classes,
         key_ids=key_ids,
         structure_hash=structure_hash,

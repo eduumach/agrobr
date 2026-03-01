@@ -1,19 +1,16 @@
 from __future__ import annotations
 
 import threading
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 import duckdb
 import structlog
 
 from agrobr import constants
+from agrobr.utils.time import utcnow
 
 logger = structlog.get_logger()
-
-
-def _utcnow() -> datetime:
-    return datetime.now(UTC).replace(tzinfo=None)
 
 
 SCHEMA_CACHE = """
@@ -132,7 +129,7 @@ class DuckDBStore:
 
         with self._lock:
             conn = self._get_conn()
-            now = _utcnow()
+            now = utcnow()
 
             result = conn.execute(
                 "SELECT data, expires_at, stale, key FROM cache_entries WHERE key = ?",
@@ -226,7 +223,7 @@ class DuckDBStore:
     ) -> None:
         with self._lock:
             conn = self._get_conn()
-            now = _utcnow()
+            now = utcnow()
             expires_at = now + timedelta(seconds=ttl_seconds)
 
             conn.execute(
@@ -266,7 +263,7 @@ class DuckDBStore:
                 params.append(source.value)
 
             if older_than_days:
-                cutoff = _utcnow() - timedelta(days=older_than_days)
+                cutoff = utcnow() - timedelta(days=older_than_days)
                 conditions.append("created_at < ?")
                 params.append(cutoff)
 
@@ -292,7 +289,7 @@ class DuckDBStore:
 
         with self._lock:
             conn = self._get_conn()
-            now = _utcnow()
+            now = utcnow()
 
             try:
                 conn.execute(
@@ -418,7 +415,7 @@ class DuckDBStore:
         if not indicadores:
             return 0
 
-        now = _utcnow()
+        now = utcnow()
 
         rows: list[tuple[Any, ...]] = []
         for ind in indicadores:

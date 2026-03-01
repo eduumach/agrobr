@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from unittest.mock import patch
 
 import pandas as pd
@@ -60,6 +61,18 @@ class TestIbgeSidraEmptyResponse:
             result = await client.fetch_sidra(table_code="5457", header="n")
             assert len(result) == 2
             assert result["V"].iloc[0] == "100"
+
+
+class TestSidraAsyncNonBlocking:
+    @pytest.mark.asyncio
+    async def test_sidrapy_runs_in_thread(self):
+        with (
+            patch("agrobr.ibge.client.sidrapy.get_table") as mock_sidra,
+            patch("agrobr.ibge.client.asyncio.to_thread", wraps=asyncio.to_thread) as mock_thread,
+        ):
+            mock_sidra.return_value = pd.DataFrame({"V": ["header", "100"]})
+            await client.fetch_sidra(table_code="1234")
+            mock_thread.assert_called_once()
 
 
 class TestIbgeSidraVariableHandling:
