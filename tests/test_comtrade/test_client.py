@@ -2,32 +2,18 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
-import httpx
 import pytest
 
 from agrobr.comtrade import client
 from agrobr.comtrade.client import _chunk_period
 from agrobr.exceptions import SourceUnavailableError
+from tests.helpers import make_mock_async_client, make_mock_response
 
 RETRY_SLEEP = "agrobr.http.retry.asyncio.sleep"
 
 GOLDEN_DIR = Path(__file__).parent.parent / "golden_data" / "comtrade" / "comercio_sample"
-
-
-def _mock_response(status_code: int = 200, json_data: dict | None = None) -> httpx.Response:
-    resp = MagicMock(spec=httpx.Response)
-    resp.status_code = status_code
-    resp.json.return_value = json_data if json_data is not None else {"data": []}
-    resp.headers = {}
-    resp.url = "https://comtradeapi.un.org/public/v1/preview/C/A/HS"
-    resp.raise_for_status = MagicMock()
-    if status_code >= 400:
-        resp.raise_for_status.side_effect = httpx.HTTPStatusError(
-            f"HTTP {status_code}", request=MagicMock(), response=resp
-        )
-    return resp
 
 
 _FETCH_ARGS = {
@@ -118,11 +104,9 @@ class TestFetchTradeData:
     @pytest.mark.asyncio
     async def test_success_returns_records(self):
         golden = json.loads(GOLDEN_DIR.joinpath("response.json").read_text())
-        resp = _mock_response(200, golden)
-        mock_client = AsyncMock()
+        resp = make_mock_response(200, json_data=golden)
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch("agrobr.comtrade.client.httpx.AsyncClient", return_value=mock_client):
             records, url = await client.fetch_trade_data(
@@ -140,8 +124,8 @@ class TestFetchTradeData:
     @pytest.mark.asyncio
     async def test_auth_401_falls_back_to_guest(self):
         golden = json.loads(GOLDEN_DIR.joinpath("response.json").read_text())
-        resp_401 = _mock_response(401)
-        resp_ok = _mock_response(200, golden)
+        resp_401 = make_mock_response(401, json_data={"data": []})
+        resp_ok = make_mock_response(200, json_data=golden)
 
         call_count = 0
 
@@ -150,10 +134,8 @@ class TestFetchTradeData:
             call_count += 1
             return resp_401 if call_count == 1 else resp_ok
 
-        mock_client = AsyncMock()
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(side_effect=_side)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch("agrobr.comtrade.client.httpx.AsyncClient", return_value=mock_client):
             records, url = await client.fetch_trade_data(**_FETCH_ARGS, api_key="bad-key")
@@ -163,11 +145,9 @@ class TestFetchTradeData:
 
     @pytest.mark.asyncio
     async def test_both_endpoints_401_raises(self):
-        resp_401 = _mock_response(401)
-        mock_client = AsyncMock()
+        resp_401 = make_mock_response(401, json_data={"data": []})
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_401)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.comtrade.client.httpx.AsyncClient", return_value=mock_client),
@@ -177,11 +157,9 @@ class TestFetchTradeData:
 
     @pytest.mark.asyncio
     async def test_guest_no_key_uses_preview(self):
-        resp = _mock_response(200, {"data": []})
-        mock_client = AsyncMock()
+        resp = make_mock_response(200, json_data={"data": []})
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.comtrade.client.httpx.AsyncClient", return_value=mock_client),
@@ -196,11 +174,9 @@ class TestFetchTradeData:
 
     @pytest.mark.asyncio
     async def test_500_retries(self):
-        resp_500 = _mock_response(500)
-        mock_client = AsyncMock()
+        resp_500 = make_mock_response(500, json_data={"data": []})
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_500)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.comtrade.client.httpx.AsyncClient", return_value=mock_client),
@@ -213,11 +189,9 @@ class TestFetchTradeData:
 
     @pytest.mark.asyncio
     async def test_empty_response(self):
-        resp = _mock_response(200, {"data": []})
-        mock_client = AsyncMock()
+        resp = make_mock_response(200, json_data={"data": []})
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch("agrobr.comtrade.client.httpx.AsyncClient", return_value=mock_client):
             records, url = await client.fetch_trade_data(**_FETCH_ARGS)
@@ -227,11 +201,9 @@ class TestFetchTradeData:
     @pytest.mark.asyncio
     async def test_chunked_period_multiple_requests(self):
         golden = json.loads(GOLDEN_DIR.joinpath("response.json").read_text())
-        resp = _mock_response(200, golden)
-        mock_client = AsyncMock()
+        resp = make_mock_response(200, json_data=golden)
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch("agrobr.comtrade.client.httpx.AsyncClient", return_value=mock_client):
             records, url = await client.fetch_trade_data(
@@ -248,11 +220,9 @@ class TestFetchTradeData:
 
     @pytest.mark.asyncio
     async def test_auth_key_uses_data_endpoint(self):
-        resp = _mock_response(200, {"data": []})
-        mock_client = AsyncMock()
+        resp = make_mock_response(200, json_data={"data": []})
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch("agrobr.comtrade.client.httpx.AsyncClient", return_value=mock_client):
             _records, url = await client.fetch_trade_data(**_FETCH_ARGS, api_key="valid-key")

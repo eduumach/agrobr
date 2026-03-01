@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import io
 import zipfile
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pandas as pd
 import pytest
 
 from agrobr.ibge import ftp_client, legacy_parser
+from tests.helpers import make_mock_async_client, make_mock_response
 
 
 def _build_fake_xls(rows: list[list]) -> bytes:
@@ -125,9 +126,7 @@ class TestFtpClientDownload:
     async def test_download_success(self):
         fake_content = b"x" * 600
         fake_zip = _build_fake_zip(fake_content)
-        mock_response = MagicMock()
-        mock_response.content = fake_zip
-        mock_response.raise_for_status = MagicMock()
+        mock_response = make_mock_response(content=fake_zip)
 
         with (
             patch(
@@ -137,8 +136,7 @@ class TestFtpClientDownload:
             ),
             patch("agrobr.ibge.ftp_client.httpx.AsyncClient") as mock_cls,
         ):
-            mock_cls.return_value.__aenter__ = AsyncMock(return_value=AsyncMock())
-            mock_cls.return_value.__aexit__ = AsyncMock(return_value=False)
+            mock_cls.return_value = make_mock_async_client()
 
             result = await ftp_client.download_legacy_zip("Tab_3", uf_dir="Sao_Paulo")
 
@@ -147,9 +145,7 @@ class TestFtpClientDownload:
 
     @pytest.mark.asyncio
     async def test_download_too_small_raises(self):
-        mock_response = MagicMock()
-        mock_response.content = b"tiny"
-        mock_response.raise_for_status = MagicMock()
+        mock_response = make_mock_response(content=b"tiny")
 
         with (
             patch(
@@ -159,8 +155,7 @@ class TestFtpClientDownload:
             ),
             patch("agrobr.ibge.ftp_client.httpx.AsyncClient") as mock_cls,
         ):
-            mock_cls.return_value.__aenter__ = AsyncMock(return_value=AsyncMock())
-            mock_cls.return_value.__aexit__ = AsyncMock(return_value=False)
+            mock_cls.return_value = make_mock_async_client()
 
             from agrobr.exceptions import SourceUnavailableError
 
@@ -170,9 +165,7 @@ class TestFtpClientDownload:
     @pytest.mark.asyncio
     async def test_download_url_format(self):
         fake_zip = _build_fake_zip(b"x" * 600)
-        mock_response = MagicMock()
-        mock_response.content = fake_zip
-        mock_response.raise_for_status = MagicMock()
+        mock_response = make_mock_response(content=fake_zip)
 
         captured_url = None
 
@@ -185,9 +178,8 @@ class TestFtpClientDownload:
             patch("agrobr.ibge.ftp_client.retry_on_status", side_effect=fake_retry),
             patch("agrobr.ibge.ftp_client.httpx.AsyncClient") as mock_cls,
         ):
-            mock_http = AsyncMock()
-            mock_cls.return_value.__aenter__ = AsyncMock(return_value=mock_http)
-            mock_cls.return_value.__aexit__ = AsyncMock(return_value=False)
+            mock_http = make_mock_async_client()
+            mock_cls.return_value = mock_http
 
             await ftp_client.download_legacy_zip("Tab_6", uf_dir="Minas_Gerais")
 
@@ -198,9 +190,7 @@ class TestFtpClientDownload:
     @pytest.mark.asyncio
     async def test_download_brasil_url_no_mn_suffix(self):
         fake_zip = _build_fake_zip(b"x" * 600)
-        mock_response = MagicMock()
-        mock_response.content = fake_zip
-        mock_response.raise_for_status = MagicMock()
+        mock_response = make_mock_response(content=fake_zip)
 
         async def fake_retry(func, **_kwargs):
             await func()
@@ -210,9 +200,8 @@ class TestFtpClientDownload:
             patch("agrobr.ibge.ftp_client.retry_on_status", side_effect=fake_retry),
             patch("agrobr.ibge.ftp_client.httpx.AsyncClient") as mock_cls,
         ):
-            mock_http = AsyncMock()
-            mock_cls.return_value.__aenter__ = AsyncMock(return_value=mock_http)
-            mock_cls.return_value.__aexit__ = AsyncMock(return_value=False)
+            mock_http = make_mock_async_client()
+            mock_cls.return_value = mock_http
 
             await ftp_client.download_legacy_zip("Tab_3", uf_dir="Brasil")
 

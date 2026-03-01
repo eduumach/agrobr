@@ -21,6 +21,32 @@ dist/
 .mypy_cache/
 .ruff_cache/
 
-# Local reference files
+# Coverage
+.coverage
 coverage*.json
+htmlcov/
+
+# Claude / AI tooling
+.claude/
+CLAUDE.md
+
+# Temporary / exploration
+tmp_*/
+/data/
 nul
+
+# External / unrelated
+AgronomiaBR-Reddit/
+
+# Planning docs (local only)
+*_role.md
+*_ecosystem_report.md
+*_implementacao.md
+*_mapping.md
+*_roadmap*.md
+*_extraction.md
+auditoria_*.md
+
+# One-off scripts
+_*.py
+probe_functions.py

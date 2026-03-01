@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
-import httpx
 import pytest
 
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.mapbiomas.client import _build_xlsx_url
+from tests.helpers import make_mock_async_client, make_mock_response
 
 
 class TestBuildXlsxUrl:
@@ -28,15 +28,9 @@ class TestFetchBiomeState:
     async def test_successful_fetch(self):
         from agrobr.mapbiomas.client import fetch_biome_state
 
-        mock_response = MagicMock(spec=httpx.Response)
-        mock_response.status_code = 200
-        mock_response.content = b"x" * 10000
-        mock_response.raise_for_status = MagicMock()
-
-        mock_client = AsyncMock()
+        mock_response = make_mock_response(200, content=b"x" * 10000)
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=mock_response)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.mapbiomas.client.httpx.AsyncClient", return_value=mock_client),
@@ -53,14 +47,9 @@ class TestFetchBiomeState:
     async def test_404_raises(self):
         from agrobr.mapbiomas.client import _fetch_url
 
-        mock_response = MagicMock(spec=httpx.Response)
-        mock_response.status_code = 404
-        mock_response.raise_for_status = MagicMock()
-
-        mock_client = AsyncMock()
+        mock_response = make_mock_response(404)
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=mock_response)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.mapbiomas.client.httpx.AsyncClient", return_value=mock_client),
@@ -77,15 +66,9 @@ class TestFetchBiomeState:
     async def test_too_small_raises(self):
         from agrobr.mapbiomas.client import _fetch_url
 
-        mock_response = MagicMock(spec=httpx.Response)
-        mock_response.status_code = 200
-        mock_response.content = b"tiny"
-        mock_response.raise_for_status = MagicMock()
-
-        mock_client = AsyncMock()
+        mock_response = make_mock_response(200, content=b"tiny")
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=mock_response)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.mapbiomas.client.httpx.AsyncClient", return_value=mock_client),
@@ -104,15 +87,9 @@ class TestFetchBiomeStateMunicipality:
     async def test_successful_fetch(self):
         from agrobr.mapbiomas.client import fetch_biome_state_municipality
 
-        mock_response = MagicMock(spec=httpx.Response)
-        mock_response.status_code = 200
-        mock_response.content = b"x" * 10000
-        mock_response.raise_for_status = MagicMock()
-
-        mock_client = AsyncMock()
+        mock_response = make_mock_response(200, content=b"x" * 10000)
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=mock_response)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.mapbiomas.client.httpx.AsyncClient", return_value=mock_client),

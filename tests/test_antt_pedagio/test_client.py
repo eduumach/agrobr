@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import httpx
 import pytest
@@ -15,6 +15,7 @@ from agrobr.alt.antt_pedagio.client import (
     fetch_trafego,
     fetch_trafego_anos,
 )
+from tests.helpers import make_mock_async_client, make_mock_response
 
 # ============================================================================
 # Resource matching
@@ -102,13 +103,10 @@ class TestDownloadCsv:
     @pytest.mark.asyncio
     async def test_download_200(self):
         content = b"col1;col2\n" + b"val1;val2\n" * 15
-        mock_response = MagicMock(spec=httpx.Response)
-        mock_response.content = content
-        mock_response.status_code = 200
-        mock_response.raise_for_status = MagicMock()
+        mock_response = make_mock_response(200, content=content)
 
         with patch("agrobr.alt.antt_pedagio.client.httpx.AsyncClient") as mock_client_cls:
-            mock_client = AsyncMock()
+            mock_client = make_mock_async_client()
             mock_client_cls.return_value.__aenter__ = AsyncMock(return_value=mock_client)
             mock_client_cls.return_value.__aexit__ = AsyncMock(return_value=False)
 
@@ -122,14 +120,10 @@ class TestDownloadCsv:
 
     @pytest.mark.asyncio
     async def test_download_raises_on_error(self):
-        mock_response = MagicMock(spec=httpx.Response)
-        mock_response.status_code = 500
-        mock_response.raise_for_status = MagicMock(
-            side_effect=httpx.HTTPStatusError("500", request=MagicMock(), response=mock_response)
-        )
+        mock_response = make_mock_response(500)
 
         with patch("agrobr.alt.antt_pedagio.client.httpx.AsyncClient") as mock_client_cls:
-            mock_client = AsyncMock()
+            mock_client = make_mock_async_client()
             mock_client_cls.return_value.__aenter__ = AsyncMock(return_value=mock_client)
             mock_client_cls.return_value.__aexit__ = AsyncMock(return_value=False)
 

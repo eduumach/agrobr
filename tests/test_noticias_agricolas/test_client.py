@@ -9,23 +9,7 @@ import pytest
 
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.noticias_agricolas import client
-
-
-def _mock_response(
-    status_code: int = 200, content: bytes = b"<html>ok</html>", charset: str | None = "utf-8"
-) -> MagicMock:
-    resp = MagicMock(spec=httpx.Response)
-    resp.status_code = status_code
-    resp.content = content
-    resp.charset_encoding = charset
-    resp.headers = {"content-type": f"text/html; charset={charset}" if charset else "text/html"}
-    resp.request = MagicMock()
-    resp.raise_for_status = MagicMock()
-    if status_code >= 400:
-        resp.raise_for_status.side_effect = httpx.HTTPStatusError(
-            f"HTTP {status_code}", request=resp.request, response=resp
-        )
-    return resp
+from tests.helpers import make_mock_response
 
 
 class TestNaTimeout:
@@ -71,7 +55,7 @@ class TestNaEncoding:
     @pytest.mark.asyncio
     async def test_encoding_fallback_charset_wrong(self):
         iso_content = "Cotação soja".encode("iso-8859-1")
-        resp = _mock_response(200, content=iso_content, charset="utf-8")
+        resp = make_mock_response(200, content=iso_content, charset_encoding="utf-8")
         decoded_html = "<html><table>Cotação soja</table></html>"
 
         with patch(
@@ -90,7 +74,8 @@ class TestNaEncoding:
     @pytest.mark.asyncio
     async def test_no_charset_header(self):
         content = "Preço café".encode("iso-8859-1")
-        resp = _mock_response(200, content=content, charset=None)
+        resp = make_mock_response(200, content=content)
+        resp.charset_encoding = None
         decoded_html = "<html><table>Preço café</table></html>"
 
         with patch(
@@ -109,7 +94,7 @@ class TestNaEncoding:
 class TestNaEmptyResponse:
     @pytest.mark.asyncio
     async def test_empty_body_raises_soft_block(self):
-        resp = _mock_response(200, content=b"", charset="utf-8")
+        resp = make_mock_response(200, content=b"", charset_encoding="utf-8")
 
         with patch(
             "agrobr.noticias_agricolas.client.retry_async", new_callable=AsyncMock
@@ -156,7 +141,9 @@ class TestNaContentValidation:
 class TestNaRetry:
     @pytest.mark.asyncio
     async def test_retry_async_called_for_fetch(self):
-        resp = _mock_response(200, content=b"<html><table>data</table></html>")
+        resp = make_mock_response(
+            200, content=b"<html><table>data</table></html>", charset_encoding="utf-8"
+        )
 
         with patch(
             "agrobr.noticias_agricolas.client.retry_async", new_callable=AsyncMock

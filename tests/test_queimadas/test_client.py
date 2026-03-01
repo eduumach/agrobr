@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import io
 import zipfile
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
-import httpx
 import pytest
 
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.queimadas import client
+from tests.helpers import make_mock_response
 
 
 def _make_zip_with_csv(csv_content: bytes, csv_name: str = "focos.csv") -> bytes:
@@ -18,18 +18,6 @@ def _make_zip_with_csv(csv_content: bytes, csv_name: str = "focos.csv") -> bytes
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
         zf.writestr(csv_name, csv_content)
     return buf.getvalue()
-
-
-def _mock_response(status: int, content: bytes = b"") -> httpx.Response:
-    resp = MagicMock(spec=httpx.Response)
-    resp.status_code = status
-    resp.content = content
-    resp.raise_for_status = MagicMock()
-    if status >= 400:
-        resp.raise_for_status.side_effect = httpx.HTTPStatusError(
-            f"HTTP {status}", request=MagicMock(), response=resp
-        )
-    return resp
 
 
 class TestExtractCsvFromZip:
@@ -60,7 +48,7 @@ class TestFetchFocosMensal:
     @pytest.mark.asyncio
     async def test_csv_hit_returns_directly(self):
         csv_data = b"lat,lon,satelite,municipio,estado\n" + b"-15.0,-47.0,AQUA,Brasilia,DF\n" * 3
-        resp_ok = _mock_response(200, csv_data)
+        resp_ok = make_mock_response(200, content=csv_data)
 
         with patch(
             "agrobr.queimadas.client.retry_on_status", new_callable=AsyncMock, return_value=resp_ok
@@ -74,8 +62,8 @@ class TestFetchFocosMensal:
     async def test_csv_404_falls_back_to_zip(self):
         csv_data = b"lat,lon\n-15.0,-47.0"
         zip_bytes = _make_zip_with_csv(csv_data)
-        resp_404 = _mock_response(404)
-        resp_zip = _mock_response(200, zip_bytes)
+        resp_404 = make_mock_response(404, content=b"")
+        resp_zip = make_mock_response(200, content=zip_bytes)
 
         call_count = 0
 
@@ -96,8 +84,8 @@ class TestFetchFocosMensal:
     async def test_csv_and_zip_404_falls_back_to_anual(self):
         csv_data = b"lat,lon\n-15.0,-47.0"
         zip_bytes = _make_zip_with_csv(csv_data, "focos_br_todos-sats_2020.csv")
-        resp_404 = _mock_response(404)
-        resp_anual = _mock_response(200, zip_bytes)
+        resp_404 = make_mock_response(404, content=b"")
+        resp_anual = make_mock_response(200, content=zip_bytes)
 
         call_count = 0
 
@@ -117,7 +105,7 @@ class TestFetchFocosMensal:
 
     @pytest.mark.asyncio
     async def test_all_404_raises(self):
-        resp_404 = _mock_response(404)
+        resp_404 = make_mock_response(404, content=b"")
 
         with (
             patch(

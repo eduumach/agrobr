@@ -7,6 +7,9 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+### Improved
+- **Test infrastructure** — `tests/helpers.py` com 3 factories (`make_mock_response`, `make_mock_async_client`, `make_alert_settings`). Elimina `_mock_response` duplicado em 18 arquivos e boilerplate `__aenter__`/`__aexit__` em 23 arquivos
+
 ## [0.12.0] - 2026-02-28
 
 ### Added

@@ -10,28 +10,14 @@ import pytest
 
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.nasa_power import client
-
-
-def _mock_response(status_code: int = 200, json_data: dict | None = None) -> httpx.Response:
-    resp = MagicMock(spec=httpx.Response)
-    resp.status_code = status_code
-    resp.json.return_value = json_data or {}
-    resp.headers = {}
-    resp.raise_for_status = MagicMock()
-    if status_code >= 400:
-        resp.raise_for_status.side_effect = httpx.HTTPStatusError(
-            f"HTTP {status_code}", request=MagicMock(), response=resp
-        )
-    return resp
+from tests.helpers import make_mock_async_client, make_mock_response
 
 
 class TestNasaPowerTimeout:
     @pytest.mark.asyncio
     async def test_timeout_on_get_json(self):
-        mock_client = AsyncMock()
+        mock_client = make_mock_async_client()
         mock_client.get.side_effect = httpx.TimeoutException("timeout")
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.nasa_power.client.httpx.AsyncClient", return_value=mock_client),
@@ -52,11 +38,9 @@ class TestNasaPowerTimeout:
 class TestNasaPowerHTTPErrors:
     @pytest.mark.asyncio
     async def test_http_500_raises(self):
-        resp_500 = _mock_response(500)
-        mock_client = AsyncMock()
+        resp_500 = make_mock_response(500, json_data={})
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_500)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.nasa_power.client.httpx.AsyncClient", return_value=mock_client),
@@ -66,11 +50,9 @@ class TestNasaPowerHTTPErrors:
 
     @pytest.mark.asyncio
     async def test_http_403_raises(self):
-        resp_403 = _mock_response(403)
-        mock_client = AsyncMock()
+        resp_403 = make_mock_response(403, json_data={})
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_403)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.nasa_power.client.httpx.AsyncClient", return_value=mock_client),
@@ -80,11 +62,9 @@ class TestNasaPowerHTTPErrors:
 
     @pytest.mark.asyncio
     async def test_http_429_raises_after_retries(self):
-        resp_429 = _mock_response(429)
-        mock_client = AsyncMock()
+        resp_429 = make_mock_response(429, json_data={})
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_429)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.nasa_power.client.httpx.AsyncClient", return_value=mock_client),
@@ -96,16 +76,9 @@ class TestNasaPowerHTTPErrors:
 class TestNasaPowerEmptyResponse:
     @pytest.mark.asyncio
     async def test_non_dict_response_returns_empty(self):
-        resp = MagicMock(spec=httpx.Response)
-        resp.status_code = 200
-        resp.json.return_value = "not a dict"
-        resp.headers = {}
-        resp.raise_for_status = MagicMock()
-
-        mock_client = AsyncMock()
+        resp = make_mock_response(200, json_data="not a dict")
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch("agrobr.nasa_power.client.httpx.AsyncClient", return_value=mock_client):
             result = await client._get_json({"test": "1"})
@@ -114,11 +87,9 @@ class TestNasaPowerEmptyResponse:
 
     @pytest.mark.asyncio
     async def test_empty_dict_response(self):
-        resp = _mock_response(200, {})
-        mock_client = AsyncMock()
+        resp = make_mock_response(200, json_data={})
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch("agrobr.nasa_power.client.httpx.AsyncClient", return_value=mock_client):
             result = await client._get_json({"test": "1"})
@@ -160,7 +131,7 @@ class TestNasaPowerChunking:
     @pytest.mark.asyncio
     async def test_retriable_chunk_skipped(self):
         chunk_ok = {"properties": {"parameter": {"T2M": {"20240101": 25.0}}}}
-        resp_502 = _mock_response(502)
+        resp_502 = make_mock_response(502, json_data={})
 
         call_count = 0
 

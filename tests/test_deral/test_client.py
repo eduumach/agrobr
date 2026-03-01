@@ -2,38 +2,23 @@
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import httpx
 import pytest
 
 from agrobr.deral import client
 from agrobr.exceptions import SourceUnavailableError
+from tests.helpers import make_mock_async_client, make_mock_response
 
 RETRY_SLEEP = "agrobr.http.retry.asyncio.sleep"
-
-
-def _mock_response(status_code: int = 200, content: bytes = b"xls-data") -> httpx.Response:
-    resp = MagicMock(spec=httpx.Response)
-    resp.status_code = status_code
-    resp.content = content
-    resp.headers = {}
-    resp.url = "https://test.pr.gov.br/PC.xls"
-    resp.raise_for_status = MagicMock()
-    if status_code >= 400:
-        resp.raise_for_status.side_effect = httpx.HTTPStatusError(
-            f"HTTP {status_code}", request=MagicMock(), response=resp
-        )
-    return resp
 
 
 class TestDeralTimeout:
     @pytest.mark.asyncio
     async def test_timeout_propagates_immediately(self):
-        mock_client = AsyncMock()
+        mock_client = make_mock_async_client()
         mock_client.get.side_effect = httpx.TimeoutException("connect timeout")
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.deral.client.httpx.AsyncClient", return_value=mock_client),
@@ -47,11 +32,9 @@ class TestDeralTimeout:
 class TestDeralHTTPErrors:
     @pytest.mark.asyncio
     async def test_http_404_raises_immediately(self):
-        resp_404 = _mock_response(404)
-        mock_client = AsyncMock()
+        resp_404 = make_mock_response(404, content=b"xls-data", url="https://test.pr.gov.br/PC.xls")
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_404)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.deral.client.httpx.AsyncClient", return_value=mock_client),
@@ -63,11 +46,9 @@ class TestDeralHTTPErrors:
 
     @pytest.mark.asyncio
     async def test_http_500_retries(self):
-        resp_500 = _mock_response(500)
-        mock_client = AsyncMock()
+        resp_500 = make_mock_response(500, content=b"xls-data", url="https://test.pr.gov.br/PC.xls")
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_500)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.deral.client.httpx.AsyncClient", return_value=mock_client),
@@ -81,12 +62,10 @@ class TestDeralHTTPErrors:
     @pytest.mark.asyncio
     async def test_http_429_retries_then_succeeds(self):
         ok_content = b"x" * 1500
-        resp_429 = _mock_response(429)
-        resp_ok = _mock_response(200, ok_content)
-        mock_client = AsyncMock()
+        resp_429 = make_mock_response(429, content=b"xls-data", url="https://test.pr.gov.br/PC.xls")
+        resp_ok = make_mock_response(200, content=ok_content, url="https://test.pr.gov.br/PC.xls")
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(side_effect=[resp_429, resp_ok])
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.deral.client.httpx.AsyncClient", return_value=mock_client),
@@ -98,11 +77,9 @@ class TestDeralHTTPErrors:
 
     @pytest.mark.asyncio
     async def test_http_403_raises_via_raise_for_status(self):
-        resp_403 = _mock_response(403)
-        mock_client = AsyncMock()
+        resp_403 = make_mock_response(403, content=b"xls-data", url="https://test.pr.gov.br/PC.xls")
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_403)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.deral.client.httpx.AsyncClient", return_value=mock_client),
@@ -114,11 +91,9 @@ class TestDeralHTTPErrors:
 class TestDeralEmptyResponse:
     @pytest.mark.asyncio
     async def test_empty_content_raises_source_unavailable(self):
-        resp = _mock_response(200, b"")
-        mock_client = AsyncMock()
+        resp = make_mock_response(200, content=b"", url="https://test.pr.gov.br/PC.xls")
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.deral.client.httpx.AsyncClient", return_value=mock_client),
@@ -130,11 +105,9 @@ class TestDeralEmptyResponse:
 class TestDeralRetryBackoff:
     @pytest.mark.asyncio
     async def test_backoff_exponential(self):
-        resp_500 = _mock_response(500)
-        mock_client = AsyncMock()
+        resp_500 = make_mock_response(500, content=b"xls-data", url="https://test.pr.gov.br/PC.xls")
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_500)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         sleep_calls: list[float] = []
 

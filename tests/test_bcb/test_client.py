@@ -2,38 +2,23 @@
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import httpx
 import pytest
 
 from agrobr.bcb import client
 from agrobr.exceptions import SourceUnavailableError
+from tests.helpers import make_mock_async_client, make_mock_response
 
 RETRY_SLEEP = "agrobr.http.retry.asyncio.sleep"
-
-
-def _mock_response(status_code: int = 200, json_data: dict | None = None) -> httpx.Response:
-    resp = MagicMock(spec=httpx.Response)
-    resp.status_code = status_code
-    resp.json.return_value = json_data or {"value": []}
-    resp.headers = {}
-    resp.url = "https://olinda.bcb.gov.br/test"
-    resp.raise_for_status = MagicMock()
-    if status_code >= 400:
-        resp.raise_for_status.side_effect = httpx.HTTPStatusError(
-            f"HTTP {status_code}", request=MagicMock(), response=resp
-        )
-    return resp
 
 
 class TestBcbTimeout:
     @pytest.mark.asyncio
     async def test_timeout_propagates_immediately(self):
-        mock_client = AsyncMock()
+        mock_client = make_mock_async_client()
         mock_client.get.side_effect = httpx.TimeoutException("read timeout")
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.bcb.client.httpx.AsyncClient", return_value=mock_client),
@@ -47,11 +32,9 @@ class TestBcbTimeout:
 class TestBcbHTTPErrors:
     @pytest.mark.asyncio
     async def test_http_500_retries(self):
-        resp_500 = _mock_response(500)
-        mock_client = AsyncMock()
+        resp_500 = make_mock_response(500, json_data={"value": []})
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_500)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.bcb.client.httpx.AsyncClient", return_value=mock_client),
@@ -64,12 +47,10 @@ class TestBcbHTTPErrors:
 
     @pytest.mark.asyncio
     async def test_http_429_retries(self):
-        resp_429 = _mock_response(429)
-        resp_ok = _mock_response(200, {"value": [{"id": 1}]})
-        mock_client = AsyncMock()
+        resp_429 = make_mock_response(429, json_data={"value": []})
+        resp_ok = make_mock_response(200, json_data={"value": [{"id": 1}]})
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(side_effect=[resp_429, resp_ok])
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.bcb.client.httpx.AsyncClient", return_value=mock_client),
@@ -81,11 +62,9 @@ class TestBcbHTTPErrors:
 
     @pytest.mark.asyncio
     async def test_http_403_raises_via_raise_for_status(self):
-        resp_403 = _mock_response(403)
-        mock_client = AsyncMock()
+        resp_403 = make_mock_response(403, json_data={"value": []})
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_403)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.bcb.client.httpx.AsyncClient", return_value=mock_client),
@@ -97,11 +76,9 @@ class TestBcbHTTPErrors:
 class TestBcbEmptyResponse:
     @pytest.mark.asyncio
     async def test_empty_value_list(self):
-        resp = _mock_response(200, {"value": []})
-        mock_client = AsyncMock()
+        resp = make_mock_response(200, json_data={"value": []})
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch("agrobr.bcb.client.httpx.AsyncClient", return_value=mock_client):
             result = await client.fetch_credito_rural(finalidade="custeio")
@@ -110,11 +87,9 @@ class TestBcbEmptyResponse:
 
     @pytest.mark.asyncio
     async def test_missing_value_key(self):
-        resp = _mock_response(200, {"odata.metadata": "..."})
-        mock_client = AsyncMock()
+        resp = make_mock_response(200, json_data={"odata.metadata": "..."})
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch("agrobr.bcb.client.httpx.AsyncClient", return_value=mock_client):
             result = await client.fetch_credito_rural(finalidade="custeio")
@@ -125,11 +100,9 @@ class TestBcbEmptyResponse:
 class TestBcbRetry:
     @pytest.mark.asyncio
     async def test_backoff_exponential(self):
-        resp_500 = _mock_response(500)
-        mock_client = AsyncMock()
+        resp_500 = make_mock_response(500, json_data={"value": []})
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_500)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         sleep_calls: list[float] = []
 
@@ -160,11 +133,9 @@ class TestBcbFetchCreditoRural:
             {"AnoEmissao": "2023", "nomeProduto": "SOJA", "cdEstado": "51"},
             {"AnoEmissao": "2024", "nomeProduto": "SOJA", "cdEstado": "51"},
         ]
-        resp = _mock_response(200, {"value": records})
-        mock_client = AsyncMock()
+        resp = make_mock_response(200, json_data={"value": records})
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch("agrobr.bcb.client.httpx.AsyncClient", return_value=mock_client):
             result = await client.fetch_credito_rural(finalidade="custeio", safra_sicor="2023/2024")

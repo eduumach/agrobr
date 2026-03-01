@@ -3,35 +3,21 @@
 from __future__ import annotations
 
 from datetime import date
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import httpx
 import pytest
 
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.inmet import client
-
-
-def _mock_response(status_code: int = 200, json_data: list | dict | None = None) -> httpx.Response:
-    resp = MagicMock(spec=httpx.Response)
-    resp.status_code = status_code
-    resp.json.return_value = json_data if json_data is not None else []
-    resp.headers = {}
-    resp.raise_for_status = MagicMock()
-    if status_code >= 400:
-        resp.raise_for_status.side_effect = httpx.HTTPStatusError(
-            f"HTTP {status_code}", request=MagicMock(), response=resp
-        )
-    return resp
+from tests.helpers import make_mock_async_client, make_mock_response
 
 
 class TestInmetTimeout:
     @pytest.mark.asyncio
     async def test_timeout_on_get_json(self):
-        mock_client = AsyncMock()
+        mock_client = make_mock_async_client()
         mock_client.get.side_effect = httpx.TimeoutException("timeout")
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.inmet.client.httpx.AsyncClient", return_value=mock_client),
@@ -41,10 +27,8 @@ class TestInmetTimeout:
 
     @pytest.mark.asyncio
     async def test_timeout_on_fetch_estacoes(self):
-        mock_client = AsyncMock()
+        mock_client = make_mock_async_client()
         mock_client.get.side_effect = httpx.TimeoutException("timeout")
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.inmet.client.httpx.AsyncClient", return_value=mock_client),
@@ -56,11 +40,9 @@ class TestInmetTimeout:
 class TestInmetHTTPErrors:
     @pytest.mark.asyncio
     async def test_http_500_raises(self):
-        resp_500 = _mock_response(500)
-        mock_client = AsyncMock()
+        resp_500 = make_mock_response(500, json_data=[])
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_500)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.inmet.client.httpx.AsyncClient", return_value=mock_client),
@@ -70,11 +52,9 @@ class TestInmetHTTPErrors:
 
     @pytest.mark.asyncio
     async def test_http_403_raises(self):
-        resp_403 = _mock_response(403)
-        mock_client = AsyncMock()
+        resp_403 = make_mock_response(403, json_data=[])
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_403)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.inmet.client.httpx.AsyncClient", return_value=mock_client),
@@ -84,11 +64,9 @@ class TestInmetHTTPErrors:
 
     @pytest.mark.asyncio
     async def test_http_429_raises_after_retries(self):
-        resp_429 = _mock_response(429)
-        mock_client = AsyncMock()
+        resp_429 = make_mock_response(429, json_data=[])
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_429)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch("agrobr.inmet.client.httpx.AsyncClient", return_value=mock_client),
@@ -98,12 +76,10 @@ class TestInmetHTTPErrors:
 
     @pytest.mark.asyncio
     async def test_retriable_status_in_fetch_dados_logged_and_skipped(self):
-        resp_ok = _mock_response(200, [{"data": "d1"}])
-        resp_502 = _mock_response(502)
-        mock_client = AsyncMock()
+        resp_ok = make_mock_response(200, json_data=[{"data": "d1"}])
+        resp_502 = make_mock_response(502, json_data=[])
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(side_effect=[resp_502, resp_ok])
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch("agrobr.inmet.client.httpx.AsyncClient", return_value=mock_client):
             result = await client.fetch_dados_estacao("A001", date(2024, 1, 1), date(2024, 1, 2))
@@ -114,15 +90,9 @@ class TestInmetHTTPErrors:
 class TestInmetHTTP204:
     @pytest.mark.asyncio
     async def test_204_returns_empty_list(self):
-        resp_204 = MagicMock(spec=httpx.Response)
-        resp_204.status_code = 204
-        resp_204.headers = {}
-        resp_204.raise_for_status = MagicMock()
-
-        mock_client = AsyncMock()
+        resp_204 = make_mock_response(204)
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_204)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch("agrobr.inmet.client.httpx.AsyncClient", return_value=mock_client):
             result = await client._get_json("/estacao/A001/2024-01-01/2024-01-10")
@@ -131,15 +101,9 @@ class TestInmetHTTP204:
 
     @pytest.mark.asyncio
     async def test_204_in_fetch_dados_returns_empty(self):
-        resp_204 = MagicMock(spec=httpx.Response)
-        resp_204.status_code = 204
-        resp_204.headers = {}
-        resp_204.raise_for_status = MagicMock()
-
-        mock_client = AsyncMock()
+        resp_204 = make_mock_response(204)
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_204)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch("agrobr.inmet.client.httpx.AsyncClient", return_value=mock_client):
             result = await client.fetch_dados_estacao("A001", date(2024, 1, 1), date(2024, 1, 10))
@@ -171,11 +135,9 @@ class TestInmetToken:
 
     @pytest.mark.asyncio
     async def test_token_sent_in_request_headers(self):
-        resp = _mock_response(200, [{"data": "d1"}])
-        mock_client = AsyncMock()
+        resp = make_mock_response(200, json_data=[{"data": "d1"}])
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch.dict("os.environ", {"AGROBR_INMET_TOKEN": "test-token"}),
@@ -191,11 +153,9 @@ class TestInmetToken:
 class TestInmetEndpointPath:
     @pytest.mark.asyncio
     async def test_fetch_dados_uses_new_path(self):
-        resp = _mock_response(200, [{"data": "d1"}])
-        mock_client = AsyncMock()
+        resp = make_mock_response(200, json_data=[{"data": "d1"}])
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch("agrobr.inmet.client.httpx.AsyncClient", return_value=mock_client):
             await client.fetch_dados_estacao("A001", date(2024, 1, 1), date(2024, 1, 10))
@@ -208,11 +168,9 @@ class TestInmetEndpointPath:
 class TestInmetEmptyResponse:
     @pytest.mark.asyncio
     async def test_non_list_response_returns_empty(self):
-        resp = _mock_response(200, {"error": "unexpected"})
-        mock_client = AsyncMock()
+        resp = make_mock_response(200, json_data={"error": "unexpected"})
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch("agrobr.inmet.client.httpx.AsyncClient", return_value=mock_client):
             result = await client._get_json("/test")
@@ -221,11 +179,9 @@ class TestInmetEmptyResponse:
 
     @pytest.mark.asyncio
     async def test_empty_list_response(self):
-        resp = _mock_response(200, [])
-        mock_client = AsyncMock()
+        resp = make_mock_response(200, json_data=[])
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch("agrobr.inmet.client.httpx.AsyncClient", return_value=mock_client):
             result = await client._get_json("/test")
@@ -248,11 +204,9 @@ class TestInmetValidation:
 class TestInmetFetchDadosEstacaoChunking:
     @pytest.mark.asyncio
     async def test_chunking_respects_max_days(self):
-        resp = _mock_response(200, [{"d": "1"}])
-        mock_client = AsyncMock()
+        resp = make_mock_response(200, json_data=[{"d": "1"}])
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch("agrobr.inmet.client.httpx.AsyncClient", return_value=mock_client):
             result = await client.fetch_dados_estacao("A001", date(2022, 1, 1), date(2024, 1, 1))

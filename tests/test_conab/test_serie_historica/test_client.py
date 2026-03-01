@@ -2,39 +2,34 @@
 
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import httpx
 import pytest
 
 from agrobr.conab.serie_historica import client
 from agrobr.exceptions import SourceUnavailableError
+from tests.helpers import make_mock_async_client, make_mock_response
+
+_URL = "https://www.gov.br/conab/test"
+_HEADERS = {"content-type": "application/vnd.ms-excel"}
 
 
-def _mock_response(
-    status_code: int = 200, content: bytes = b"xls-data", text: str = "<html></html>"
-) -> httpx.Response:
-    resp = MagicMock(spec=httpx.Response)
-    resp.status_code = status_code
-    resp.content = content
-    resp.text = text
-    resp.url = "https://www.gov.br/conab/test"
-    resp.headers = {"content-type": "application/vnd.ms-excel"}
-    resp.raise_for_status = MagicMock()
-    if status_code >= 400:
-        resp.raise_for_status.side_effect = httpx.HTTPStatusError(
-            f"HTTP {status_code}", request=MagicMock(), response=resp
-        )
-    return resp
+def _resp(status_code: int = 200, *, content: bytes = b"xls-data", text: str = "<html></html>"):
+    return make_mock_response(
+        status_code,
+        content=content,
+        text=text,
+        url=_URL,
+        headers=_HEADERS,
+    )
 
 
 class TestConabSerieTimeout:
     @pytest.mark.asyncio
     async def test_timeout_on_download_xls(self):
-        mock_client = AsyncMock()
+        mock_client = make_mock_async_client()
         mock_client.get.side_effect = httpx.TimeoutException("timeout")
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch(
@@ -46,10 +41,8 @@ class TestConabSerieTimeout:
 
     @pytest.mark.asyncio
     async def test_timeout_on_fetch_series_page(self):
-        mock_client = AsyncMock()
+        mock_client = make_mock_async_client()
         mock_client.get.side_effect = httpx.TimeoutException("timeout")
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch(
@@ -63,11 +56,9 @@ class TestConabSerieTimeout:
 class TestConabSerieHTTPErrors:
     @pytest.mark.asyncio
     async def test_http_500_raises(self):
-        resp_500 = _mock_response(500)
-        mock_client = AsyncMock()
+        resp_500 = _resp(500)
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_500)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch(
@@ -79,11 +70,9 @@ class TestConabSerieHTTPErrors:
 
     @pytest.mark.asyncio
     async def test_http_404_raises(self):
-        resp_404 = _mock_response(404)
-        mock_client = AsyncMock()
+        resp_404 = _resp(404)
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_404)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch(
@@ -95,11 +84,9 @@ class TestConabSerieHTTPErrors:
 
     @pytest.mark.asyncio
     async def test_http_429_raises_after_retries(self):
-        resp_429 = _mock_response(429)
-        mock_client = AsyncMock()
+        resp_429 = _resp(429)
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_429)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with (
             patch(
@@ -113,11 +100,9 @@ class TestConabSerieHTTPErrors:
 class TestConabSerieEmptyResponse:
     @pytest.mark.asyncio
     async def test_empty_content_returns_bytesio(self):
-        resp = _mock_response(200, content=b"")
-        mock_client = AsyncMock()
+        resp = _resp(200, content=b"")
+        mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp)
-        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
-        mock_client.__aexit__ = AsyncMock(return_value=False)
 
         with patch(
             "agrobr.conab.serie_historica.client.httpx.AsyncClient", return_value=mock_client
