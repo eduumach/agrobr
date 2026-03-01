@@ -7,6 +7,7 @@ import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
+from agrobr.normalize.numeric import safe_float
 
 from .models import (
     COLUNAS_SAIDA,
@@ -22,21 +23,12 @@ PARSER_VERSION = 1
 SHEET_NAME = "Progresso de safra"
 
 
-def _safe_float(val: object) -> float | None:
-    if val is None:
-        return None
-    if isinstance(val, (int, float)):
-        return float(val)
-    s = str(val).strip().replace(",", ".").rstrip("%").strip()
-    if not s:
-        return None
-    try:
-        v = float(s)
-        if "%" in str(val) and v > 1:
-            return v / 100.0
-        return v
-    except ValueError:
-        return None
+def _parse_pct(val: object) -> float | None:
+    has_pct = isinstance(val, str) and "%" in val
+    v = safe_float(val, strip="%")
+    if v is not None and has_pct and v > 1:
+        return v / 100.0
+    return v
 
 
 def _parse_date(val: object) -> str:
@@ -148,10 +140,10 @@ def parse_progresso_xlsx(data: bytes) -> pd.DataFrame:
             continue
         if "estados" in estado_raw.lower() or "brasil" in estado_raw.lower():
             uf = "BR"
-            pct_ano_ant = _safe_float(vals[2])
-            pct_sem_ant = _safe_float(vals[3])
-            pct_sem_atual = _safe_float(vals[4])
-            pct_media_5 = _safe_float(vals[5])
+            pct_ano_ant = _parse_pct(vals[2])
+            pct_sem_ant = _parse_pct(vals[3])
+            pct_sem_atual = _parse_pct(vals[4])
+            pct_media_5 = _parse_pct(vals[5])
             records.append(
                 {
                     "cultura": cultura_atual,
@@ -174,10 +166,10 @@ def parse_progresso_xlsx(data: bytes) -> pd.DataFrame:
 
         uf = estado_para_uf(estado_raw)
 
-        pct_ano_ant = _safe_float(vals[2])
-        pct_sem_ant = _safe_float(vals[3])
-        pct_sem_atual = _safe_float(vals[4])
-        pct_media_5 = _safe_float(vals[5])
+        pct_ano_ant = _parse_pct(vals[2])
+        pct_sem_ant = _parse_pct(vals[3])
+        pct_sem_atual = _parse_pct(vals[4])
+        pct_media_5 = _parse_pct(vals[5])
 
         records.append(
             {

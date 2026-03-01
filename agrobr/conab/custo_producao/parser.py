@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import re
 from io import BytesIO
-from typing import Any
 
 import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
+from agrobr.normalize.numeric import safe_float
 
 from .models import CustoTotal, ItemCusto, classify_categoria, normalize_cultura
 
@@ -93,22 +93,6 @@ def _identify_columns(headers: list[str]) -> dict[str, int]:
     return mapping
 
 
-def _safe_float(value: Any) -> float | None:
-    if value is None or (isinstance(value, float) and pd.isna(value)):
-        return None
-    if isinstance(value, (int, float)):
-        return float(value)
-    if isinstance(value, str):
-        cleaned = value.strip().replace(",", ".").replace("R$", "").replace("%", "").strip()
-        if not cleaned or cleaned == "-":
-            return None
-        try:
-            return float(cleaned)
-        except ValueError:
-            return None
-    return None
-
-
 def parse_planilha(
     xlsx: BytesIO,
     cultura: str,
@@ -163,7 +147,7 @@ def parse_planilha(
         if not item_name:
             continue
 
-        valor = _safe_float(row.iloc[col_map["valor_ha"]])
+        valor = safe_float(row.iloc[col_map["valor_ha"]], strip=("R$", "%"))
 
         if _COE_PATTERN.search(item_name):
             if valor is not None:
@@ -205,14 +189,14 @@ def parse_planilha(
             unidade=str(row.iloc[col_map["unidade"]]).strip()
             if "unidade" in col_map and pd.notna(row.iloc[col_map["unidade"]])
             else None,
-            quantidade_ha=_safe_float(row.iloc[col_map["quantidade_ha"]])
+            quantidade_ha=safe_float(row.iloc[col_map["quantidade_ha"]], strip=("R$", "%"))
             if "quantidade_ha" in col_map
             else None,
-            preco_unitario=_safe_float(row.iloc[col_map["preco_unitario"]])
+            preco_unitario=safe_float(row.iloc[col_map["preco_unitario"]], strip=("R$", "%"))
             if "preco_unitario" in col_map
             else None,
             valor_ha=valor,
-            participacao_pct=_safe_float(row.iloc[col_map["participacao_pct"]])
+            participacao_pct=safe_float(row.iloc[col_map["participacao_pct"]], strip=("R$", "%"))
             if "participacao_pct" in col_map
             else None,
         )

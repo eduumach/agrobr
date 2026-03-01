@@ -7,9 +7,10 @@ from typing import Any
 import httpx
 import structlog
 
-from agrobr.constants import URLS, Fonte, HTTPSettings
+from agrobr.constants import URLS, Fonte
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.retry import retry_on_status
+from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
 
 logger = structlog.get_logger()
@@ -27,14 +28,7 @@ _TAB_SLUGS = [
     "copy",
 ]
 
-_settings = HTTPSettings()
-
-TIMEOUT = httpx.Timeout(
-    connect=_settings.timeout_connect,
-    read=_settings.timeout_read,
-    write=_settings.timeout_write,
-    pool=_settings.timeout_pool,
-)
+TIMEOUT = get_timeout()
 
 ACCEPT_EXCEL_HTML = (
     "text/html,application/xhtml+xml,application/xml;q=0.9,"

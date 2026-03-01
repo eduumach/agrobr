@@ -12,8 +12,6 @@ B3_CONTRATOS_AGRO: dict[str, str] = {
 
 TICKERS_AGRO: set[str] = set(B3_CONTRATOS_AGRO.values())
 
-TICKER_PARA_CONTRATO: dict[str, str] = {v: k for k, v in B3_CONTRATOS_AGRO.items()}
-
 MONTH_CODES: dict[str, int] = {
     "F": 1,
     "G": 2,

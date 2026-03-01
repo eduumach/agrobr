@@ -7,42 +7,13 @@ import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
+from agrobr.normalize.numeric import safe_float
 
 from .models import MESES_PT, normalize_produto
 
 logger = structlog.get_logger()
 
 PARSER_VERSION = 1
-
-
-def _safe_float(value: Any) -> float | None:
-    if value is None:
-        return None
-
-    if isinstance(value, (int, float)):
-        if pd.isna(value):
-            return None
-        return float(value)
-
-    s = str(value).strip()
-    if not s or s in ("-", "–", "—", "n.d.", "n/d", "...", "nd"):
-        return None
-
-    if "," in s and "." in s:
-        s = s.replace(".", "").replace(",", ".")
-    elif "," in s:
-        s = s.replace(",", ".")
-    elif s.count(".") > 1:
-        s = s.replace(".", "")
-    elif "." in s:
-        parts = s.split(".")
-        if len(parts) == 2 and len(parts[1]) == 3 and parts[1].isdigit():
-            s = s.replace(".", "")
-
-    try:
-        return float(s)
-    except ValueError:
-        return None
 
 
 def _detect_month(text: Any) -> int | None:
@@ -212,7 +183,7 @@ def _parse_meses_rows(
             for col_idx, tipo in data_cols.items():
                 if col_idx >= len(df.columns):
                     continue
-                value = _safe_float(df.iloc[row_idx, col_idx])
+                value = safe_float(df.iloc[row_idx, col_idx])
                 if value is None:
                     continue
                 if tipo == "volume":
@@ -464,7 +435,7 @@ def _extract_tabular_records(
         if mes is None:
             continue
 
-        volume = _safe_float(row.get(vol_col))
+        volume = safe_float(row.get(vol_col))
         if volume is None:
             continue
 
@@ -477,7 +448,7 @@ def _extract_tabular_records(
             "mes": mes,
             "produto": produto,
             "volume_ton": volume,
-            "receita_usd_mil": (_safe_float(row.get(receita_col)) if receita_col else None),
+            "receita_usd_mil": (safe_float(row.get(receita_col)) if receita_col else None),
         }
         records.append(record)
 

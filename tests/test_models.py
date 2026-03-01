@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from datetime import datetime
 
-import pandas as pd
-
 from agrobr.models import MetaInfo
 
 
@@ -85,39 +83,6 @@ class TestMetaInfo:
         assert restored.source == original.source
         assert restored.source_url == original.source_url
         assert restored.records_count == original.records_count
-
-    def test_compute_dataframe_hash(self):
-        meta = MetaInfo(
-            source="test",
-            source_url="https://example.com",
-            source_method="httpx",
-            fetched_at=datetime.now(),
-        )
-
-        df = pd.DataFrame({"a": [1, 2, 3], "b": ["x", "y", "z"]})
-        hash1 = meta.compute_dataframe_hash(df)
-
-        assert hash1.startswith("sha256:")
-        assert len(hash1) > 10
-
-        hash2 = meta.compute_dataframe_hash(df)
-        assert hash1 == hash2
-
-        df2 = pd.DataFrame({"a": [1, 2, 4], "b": ["x", "y", "z"]})
-        hash3 = meta.compute_dataframe_hash(df2)
-        assert hash1 != hash3
-
-    def test_verify_hash_no_hash(self):
-        meta = MetaInfo(
-            source="test",
-            source_url="https://example.com",
-            source_method="httpx",
-            fetched_at=datetime.now(),
-            raw_content_hash=None,
-        )
-
-        df = pd.DataFrame({"a": [1, 2, 3]})
-        assert meta.verify_hash(df) is True
 
     def test_cache_metadata(self):
         meta = MetaInfo(

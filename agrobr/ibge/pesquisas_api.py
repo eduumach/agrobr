@@ -9,7 +9,7 @@ import structlog
 from agrobr.cache.keys import build_cache_key
 from agrobr.cache.policies import calculate_expiry
 from agrobr.ibge import client
-from agrobr.ibge._helpers import NIVEL_MAP
+from agrobr.ibge._helpers import NIVEL_MAP, SIDRA_BASE
 from agrobr.models import MetaInfo
 from agrobr.utils.result import finalize_result
 from agrobr.utils.time import utcnow
@@ -60,7 +60,7 @@ async def silvicultura(
     fetch_start = time.perf_counter()
     meta = MetaInfo(
         source="ibge_silvicultura",
-        source_url="https://sidra.ibge.gov.br",
+        source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
     )
@@ -232,7 +232,7 @@ async def extracao_vegetal(
     fetch_start = time.perf_counter()
     meta = MetaInfo(
         source="ibge_extracao_vegetal",
-        source_url="https://sidra.ibge.gov.br",
+        source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
     )
@@ -378,7 +378,7 @@ async def leite_trimestral(
     fetch_start = time.perf_counter()
     meta = MetaInfo(
         source="ibge_leite_trimestral",
-        source_url="https://sidra.ibge.gov.br",
+        source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
     )
@@ -526,7 +526,7 @@ async def pib_agro(
     fetch_start = time.perf_counter()
     meta = MetaInfo(
         source="ibge_pib",
-        source_url="https://sidra.ibge.gov.br",
+        source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
     )

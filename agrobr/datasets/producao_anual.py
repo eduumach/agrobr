@@ -8,6 +8,7 @@ import structlog
 
 from agrobr.datasets.base import BaseDataset, DatasetInfo, DatasetSource
 from agrobr.datasets.deterministic import get_snapshot
+from agrobr.ibge._helpers import SIDRA_BASE
 from agrobr.models import MetaInfo
 
 logger = structlog.get_logger()
@@ -69,7 +70,7 @@ PRODUCAO_ANUAL_INFO = DatasetInfo(
     contract_version="1.0",
     update_frequency="yearly",
     typical_latency="Y+1",
-    source_url="https://sidra.ibge.gov.br",
+    source_url=SIDRA_BASE,
     source_institution="IBGE",
     min_date="1974-01-01",
     unit="ha / ton / kg/ha",

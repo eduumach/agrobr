@@ -5,16 +5,10 @@ from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
-SHLP_BASE = (
-    "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia"
-    "/precos/precos-revenda-e-de-distribuicao-combustiveis/shlp"
-)
+from agrobr.constants import URLS, Fonte
 
-VENDAS_DIESEL_CSV_URL = (
-    "https://www.gov.br/anp/pt-br/centrais-de-conteudo"
-    "/dados-abertos/arquivos/vdpb/vct"
-    "/vendas-oleo-diesel-tipo-m3-2013-2025.csv"
-)
+SHLP_BASE = URLS[Fonte.ANP_DIESEL]["shlp"]
+VENDAS_DIESEL_CSV_URL = URLS[Fonte.ANP_DIESEL]["vendas_diesel_csv"]
 
 PRECOS_MUNICIPIOS_URLS: dict[str, str] = {
     "2022-2023": f"{SHLP_BASE}/semanal/semanal-municipios-2022_a_2023.xlsx",

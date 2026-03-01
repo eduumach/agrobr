@@ -7,6 +7,7 @@ from agrobr import constants
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.rate_limiter import RateLimiter
 from agrobr.http.retry import retry_async, should_retry_status
+from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
 from agrobr.normalize.encoding import decode_content
 from agrobr.utils.warnings import warn_once
@@ -28,14 +29,7 @@ def _validate_html_has_data(html: str, url: str) -> None:
         )
 
 
-def _get_timeout() -> httpx.Timeout:
-    settings = constants.HTTPSettings()
-    return httpx.Timeout(
-        connect=settings.timeout_connect,
-        read=settings.timeout_read,
-        write=settings.timeout_write,
-        pool=settings.timeout_pool,
-    )
+TIMEOUT = get_timeout()
 
 
 def _get_produto_url(produto: str) -> str:
@@ -72,7 +66,7 @@ async def fetch_indicador_page(produto: str) -> str:
         async with (
             RateLimiter.acquire(constants.Fonte.NOTICIAS_AGRICOLAS),
             httpx.AsyncClient(
-                timeout=_get_timeout(),
+                timeout=TIMEOUT,
                 follow_redirects=True,
             ) as client,
         ):

@@ -8,9 +8,10 @@ from urllib.parse import quote
 import httpx
 import structlog
 
-from agrobr.constants import MIN_WFS_SIZE, HTTPSettings
+from agrobr.constants import MIN_WFS_SIZE
 from agrobr.exceptions import ParseError, SourceUnavailableError
 from agrobr.http.retry import retry_on_status
+from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
 
 from .models import (
@@ -25,14 +26,7 @@ from .models import (
 
 logger = structlog.get_logger()
 
-_settings = HTTPSettings()
-
-TIMEOUT = httpx.Timeout(
-    connect=_settings.timeout_connect,
-    read=180.0,
-    write=_settings.timeout_write,
-    pool=_settings.timeout_pool,
-)
+TIMEOUT = get_timeout(read=180.0)
 
 _ssl_ctx = ssl.create_default_context()
 _ssl_ctx.set_ciphers("DEFAULT:@SECLEVEL=1")

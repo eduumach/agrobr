@@ -57,7 +57,6 @@ URLS = {
     },
     Fonte.BCB: {
         "base": "https://olinda.bcb.gov.br/olinda/servico/SICOR/versao/v2/odata",
-        "dados_abertos": "https://dadosabertos.bcb.gov.br/dataset/sicor",
     },
     Fonte.CEPEA: {
         "base": "https://www.cepea.org.br",
@@ -74,14 +73,11 @@ URLS = {
     },
     Fonte.CONAB: {
         "base": "https://www.gov.br/conab",
-        "safras": "https://www.gov.br/conab/pt-br/atuacao/informacoes-agropecuarias/safras",
         "boletim_graos": "https://www.gov.br/conab/pt-br/atuacao/informacoes-agropecuarias/safras/safra-de-graos/boletim-da-safra-de-graos",
         "ceasa_prohort": "https://pentahoportaldeinformacoes.conab.gov.br/pentaho/plugin/cda/api/doQuery",
     },
     Fonte.DERAL: {
         "base": "https://www.agricultura.pr.gov.br/deral",
-        "safras": "https://www.agricultura.pr.gov.br/deral/safras",
-        "pc_xls": "https://www.agricultura.pr.gov.br/system/files/publico/Safras/PC.xls",
         "downloads": "https://www.agricultura.pr.gov.br/system/files/publico/Safras",
     },
     Fonte.IBGE: {
@@ -116,7 +112,6 @@ URLS = {
     },
     Fonte.MAPBIOMAS: {
         "base": "https://brasil.mapbiomas.org",
-        "estatisticas": "https://brasil.mapbiomas.org/estatisticas/",
         "dataverse": "https://data.mapbiomas.org/api/access/datafile",
         "biome_state_file_id": "457",
         "biome_state_municipality_file_id": "254",
@@ -247,12 +242,8 @@ class CacheSettings(BaseSettings):
     cache_dir: Path = Path.home() / ".agrobr" / "cache"
     db_name: str = "agrobr.duckdb"
 
-    offline_mode: bool = False
     strict_mode: bool = False
     save_to_history: bool = True
-
-    cache_max_age_days: int = 30
-    history_max_age_days: int = 0
 
     model_config = SettingsConfigDict(env_prefix="AGROBR_CACHE_")
 
@@ -320,17 +311,7 @@ class AlertSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="AGROBR_ALERT_")
 
 
-class TelemetrySettings(BaseSettings):
-    enabled: bool = False
-    endpoint: str = "https://telemetry.agrobr.dev/v1/events"
-    batch_size: int = 10
-    flush_interval_seconds: int = 60
-
-    model_config = SettingsConfigDict(env_prefix="AGROBR_TELEMETRY_")
-
-
 CONFIDENCE_HIGH: float = 0.85
-CONFIDENCE_MEDIUM: float = 0.70
 CONFIDENCE_LOW: float = 0.50
 
 RETRIABLE_STATUS_CODES: set[int] = {408, 429, 500, 502, 503, 504}

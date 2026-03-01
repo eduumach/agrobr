@@ -10,22 +10,16 @@ from __future__ import annotations
 import httpx
 import structlog
 
-from agrobr.constants import MIN_CSV_SIZE, URLS, Fonte, HTTPSettings
+from agrobr.constants import MIN_CSV_SIZE, URLS, Fonte
 from agrobr.http.retry import retry_on_status
+from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
 
 logger = structlog.get_logger()
 
 BULK_CSV_BASE = URLS[Fonte.COMEXSTAT]["bulk_csv"]
 
-_settings = HTTPSettings()
-
-TIMEOUT = httpx.Timeout(
-    connect=_settings.timeout_connect,
-    read=120.0,
-    write=_settings.timeout_write,
-    pool=_settings.timeout_pool,
-)
+TIMEOUT = get_timeout(read=120.0)
 
 
 async def download_csv(url: str) -> str:

@@ -7,7 +7,6 @@ from agrobr.b3.models import (
     B3_CONTRATOS_AGRO_INV,
     COLUNAS_OI_SAIDA,
     MONTH_CODES,
-    TICKER_PARA_CONTRATO,
     TICKERS_AGRO,
     TICKERS_AGRO_OI,
     UNIDADES,
@@ -22,10 +21,6 @@ class TestContratosAgro:
 
     def test_tickers_agro_matches_values(self):
         assert set(B3_CONTRATOS_AGRO.values()) == TICKERS_AGRO
-
-    def test_ticker_para_contrato_is_inverse(self):
-        for nome, ticker in B3_CONTRATOS_AGRO.items():
-            assert TICKER_PARA_CONTRATO[ticker] == nome
 
     def test_all_tickers_have_unidades(self):
         for ticker in TICKERS_AGRO:

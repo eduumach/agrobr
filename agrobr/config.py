@@ -18,7 +18,6 @@ class AgrobrConfig:
     cache_path: Path | None = None
 
     network_enabled: bool = True
-    timeout_seconds: int = 30
 
     browser_fallback: bool = False
     alternative_source: bool = True
@@ -75,7 +74,6 @@ def reset_config() -> None:
 def configure(
     cache_enabled: bool | None = None,
     cache_path: str | Path | None = None,
-    timeout_seconds: int | None = None,
     browser_fallback: bool | None = None,
     alternative_source: bool | None = None,
     log_level: str | None = None,
@@ -86,8 +84,6 @@ def configure(
         config.cache_enabled = cache_enabled
     if cache_path is not None:
         config.cache_path = Path(cache_path) if isinstance(cache_path, str) else cache_path
-    if timeout_seconds is not None:
-        config.timeout_seconds = timeout_seconds
     if browser_fallback is not None:
         config.browser_fallback = browser_fallback
     if alternative_source is not None:

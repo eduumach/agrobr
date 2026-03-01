@@ -6,13 +6,14 @@ import zipfile
 import httpx
 import structlog
 
-from agrobr.constants import MIN_ZIP_SIZE, HTTPSettings
+from agrobr.constants import MIN_ZIP_SIZE, URLS, Fonte
 from agrobr.http.retry import retry_on_status
+from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
 
 logger = structlog.get_logger()
 
-FTP_BASE = "https://ftp.ibge.gov.br/Censo_Agropecuario/Censo_Agropecuario_1995_96"
+FTP_BASE = URLS[Fonte.IBGE]["ftp_censo_agro_1996"]
 
 LEGACY_TEMAS: dict[str, str] = {
     "tecnologia": "Tab_3",
@@ -53,14 +54,7 @@ UF_DIRS: dict[str, str] = {
     "TO": "Tocantins",
 }
 
-_settings = HTTPSettings()
-
-TIMEOUT = httpx.Timeout(
-    connect=_settings.timeout_connect,
-    read=180.0,
-    write=_settings.timeout_write,
-    pool=_settings.timeout_pool,
-)
+TIMEOUT = get_timeout(read=180.0)
 
 
 async def download_legacy_zip(filename: str, uf_dir: str = "Brasil") -> bytes:

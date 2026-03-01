@@ -149,24 +149,8 @@ def normalizar_municipio(nome: str) -> str:
     return " ".join(resultado)
 
 
-def extrair_uf_municipio(texto: str) -> tuple[str | None, str | None]:
-    padrao = re.compile(r"^(.+?)[\s]*[-/][\s]*([A-Za-z]{2})$")
-    match = padrao.match(texto.strip())
-
-    if match:
-        municipio = normalizar_municipio(match.group(1))
-        uf = normalizar_uf(match.group(2))
-        return uf, municipio
-
-    return None, None
-
-
 def validar_uf(uf: str) -> bool:
     return uf.upper() in UFS
-
-
-def validar_regiao(regiao: str) -> bool:
-    return regiao in REGIOES
 
 
 PRACAS_CEPEA: dict[str, dict[str, str]] = {

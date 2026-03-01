@@ -3,20 +3,14 @@ from __future__ import annotations
 import httpx
 import structlog
 
-from agrobr.constants import MIN_CSV_SIZE, MIN_XLSX_SIZE, HTTPSettings
+from agrobr.constants import MIN_CSV_SIZE, MIN_XLSX_SIZE
 from agrobr.http.retry import retry_on_status
+from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
 
 logger = structlog.get_logger()
 
-_settings = HTTPSettings()
-
-TIMEOUT = httpx.Timeout(
-    connect=_settings.timeout_connect,
-    read=180.0,
-    write=_settings.timeout_write,
-    pool=_settings.timeout_pool,
-)
+TIMEOUT = get_timeout(read=180.0)
 
 
 async def download_xlsx(url: str) -> bytes:

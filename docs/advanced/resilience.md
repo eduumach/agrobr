@@ -273,26 +273,6 @@ export AGROBR_CACHE_OFFLINE_MODE=true
 
 Usa apenas cache e histórico local.
 
-## Telemetria (Opt-in)
-
-Coleta anônima para melhorar o pacote:
-
-```bash
-export AGROBR_TELEMETRY_ENABLED=true
-```
-
-**O que é coletado:**
-- Fontes mais usadas
-- Produtos mais consultados
-- Taxa de cache hit/miss
-- Erros de parsing (tipo, frequência)
-- Latência de requests
-
-**Nunca coletamos:**
-- IPs ou dados pessoais
-- Conteúdo dos dados
-- Informações identificáveis
-
 ## Comando Doctor
 
 Use o comando `doctor` para diagnosticar saúde do sistema:

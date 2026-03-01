@@ -6,9 +6,10 @@ import zipfile
 import httpx
 import structlog
 
-from agrobr.constants import MIN_WFS_SIZE, URLS, Fonte, HTTPSettings
+from agrobr.constants import MIN_WFS_SIZE, URLS, Fonte
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.retry import retry_on_status
+from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
 
 logger = structlog.get_logger()
@@ -17,14 +18,7 @@ BASE_URL = URLS[Fonte.QUEIMADAS]["dados_abertos"]
 
 ANUAL_URL = f"{BASE_URL}/anual/Brasil_todos_sats"
 
-_settings = HTTPSettings()
-
-TIMEOUT = httpx.Timeout(
-    connect=_settings.timeout_connect,
-    read=60.0,
-    write=_settings.timeout_write,
-    pool=_settings.timeout_pool,
-)
+TIMEOUT = get_timeout(read=60.0)
 
 
 async def _try_fetch(client: httpx.AsyncClient, url: str) -> bytes | None:

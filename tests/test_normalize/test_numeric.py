@@ -4,7 +4,7 @@ import math
 
 import pytest
 
-from agrobr.normalize.numeric import parse_numeric_br
+from agrobr.normalize.numeric import parse_numeric_br, safe_float
 
 
 class TestGuards:
@@ -114,3 +114,110 @@ class TestInvalidos:
 
     def test_formato_us_milhares(self):
         assert parse_numeric_br("1,234,567") is None
+
+
+class TestSafeFloatGuards:
+    def test_none(self):
+        assert safe_float(None) is None
+
+    def test_nan_as_none(self):
+        assert safe_float(float("nan")) is None
+
+    def test_nan_passthrough(self):
+        result = safe_float(float("nan"), nan_as_none=False)
+        assert result is not None
+        assert math.isnan(result)
+
+    def test_int(self):
+        assert safe_float(42) == 42.0
+
+    def test_float(self):
+        assert safe_float(3.14) == 3.14
+
+    def test_empty_string(self):
+        assert safe_float("") is None
+
+    def test_whitespace(self):
+        assert safe_float("   ") is None
+
+
+class TestSafeFloatNullMarkers:
+    @pytest.mark.parametrize(
+        "marker", ["-", "\u2013", "\u2014", "...", "n.d.", "n/d", "nd", "n.d", "*"]
+    )
+    def test_default_markers(self, marker):
+        assert safe_float(marker) is None
+
+    def test_custom_markers(self):
+        assert safe_float("N/A", null_markers=frozenset({"n/a"})) is None
+
+    def test_custom_markers_numeric_sentinel(self):
+        assert safe_float("99", null_markers=frozenset({"99"})) is None
+        assert safe_float("99") == 99.0
+
+
+class TestSafeFloatStrip:
+    def test_strip_percent(self):
+        assert safe_float("85,5%", strip="%") == 85.5
+
+    def test_strip_currency(self):
+        assert safe_float("R$1.234,56", strip=("R$", "%")) == 1234.56
+
+    def test_strip_parens_asterisk(self):
+        assert safe_float("(123,4)*", strip=("(", ")", "*")) == 123.4
+
+    def test_no_strip_default(self):
+        assert safe_float("100") == 100.0
+
+
+class TestSafeFloatZeroAsNone:
+    def test_zero_float(self):
+        assert safe_float(0.0, treat_zero_as_none=True) is None
+
+    def test_zero_int(self):
+        assert safe_float(0, treat_zero_as_none=True) is None
+
+    def test_zero_string(self):
+        assert safe_float("0", treat_zero_as_none=True) is None
+
+    def test_zero_preserved_by_default(self):
+        assert safe_float(0) == 0.0
+        assert safe_float("0") == 0.0
+
+
+class TestSafeFloatBRFormat:
+    def test_comma_and_dot(self):
+        assert safe_float("1.234,56") == 1234.56
+
+    def test_comma_only(self):
+        assert safe_float("1234,56") == 1234.56
+
+    def test_multiple_dots(self):
+        assert safe_float("1.234.567") == 1234567.0
+
+    def test_abiove_3digit_heuristic(self):
+        assert safe_float("150.000") == 150000.0
+        assert safe_float("12.500") == 12500.0
+
+    def test_decimal_passthrough_2digits(self):
+        assert safe_float("3.14") == 3.14
+
+    def test_decimal_passthrough_4digits(self):
+        assert safe_float("3.1416") == 3.1416
+
+    def test_spaces_stripped(self):
+        assert safe_float("  1.234,56  ") == 1234.56
+
+    def test_internal_spaces(self):
+        assert safe_float("1 234,56") == 1234.56
+
+
+class TestSafeFloatInvalid:
+    def test_text(self):
+        assert safe_float("abc") is None
+
+    def test_only_comma(self):
+        assert safe_float(",") is None
+
+    def test_only_dot(self):
+        assert safe_float(".") is None

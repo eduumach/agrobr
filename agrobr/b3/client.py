@@ -3,9 +3,10 @@ from __future__ import annotations
 import httpx
 import structlog
 
-from agrobr.constants import MIN_CSV_SIZE, MIN_HTML_SIZE, URLS, Fonte, HTTPSettings
+from agrobr.constants import MIN_CSV_SIZE, MIN_HTML_SIZE, URLS, Fonte
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.retry import retry_on_status
+from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
 
 logger = structlog.get_logger()
@@ -13,21 +14,8 @@ logger = structlog.get_logger()
 BASE_URL = URLS[Fonte.B3]["ajustes"]
 BASE_URL_ARQUIVOS = URLS[Fonte.B3]["arquivos"]
 
-_settings = HTTPSettings()
-
-TIMEOUT = httpx.Timeout(
-    connect=_settings.timeout_connect,
-    read=_settings.timeout_read,
-    write=_settings.timeout_write,
-    pool=_settings.timeout_pool,
-)
-
-TIMEOUT_DOWNLOAD = httpx.Timeout(
-    connect=_settings.timeout_connect,
-    read=120.0,
-    write=_settings.timeout_write,
-    pool=_settings.timeout_pool,
-)
+TIMEOUT = get_timeout()
+TIMEOUT_DOWNLOAD = get_timeout(read=120.0)
 
 
 async def fetch_ajustes(data: str) -> tuple[str, str]:

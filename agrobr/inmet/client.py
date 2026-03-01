@@ -7,22 +7,16 @@ from typing import Any
 import httpx
 import structlog
 
-from agrobr.constants import RETRIABLE_STATUS_CODES, URLS, Fonte, HTTPSettings
+from agrobr.constants import RETRIABLE_STATUS_CODES, URLS, Fonte
 from agrobr.http.retry import retry_on_status
+from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
 
 logger = structlog.get_logger()
 
 BASE_URL = URLS[Fonte.INMET]["base"]
 
-_settings = HTTPSettings()
-
-TIMEOUT = httpx.Timeout(
-    connect=_settings.timeout_connect,
-    read=_settings.timeout_read,
-    write=_settings.timeout_write,
-    pool=_settings.timeout_pool,
-)
+TIMEOUT = get_timeout()
 
 MAX_DAYS_PER_REQUEST = 365
 

@@ -10,7 +10,7 @@ from agrobr import constants
 from agrobr.cache.keys import build_cache_key
 from agrobr.cache.policies import calculate_expiry
 from agrobr.ibge import client
-from agrobr.ibge._helpers import NIVEL_MAP
+from agrobr.ibge._helpers import NIVEL_MAP, SIDRA_BASE
 from agrobr.models import MetaInfo
 from agrobr.utils.result import finalize_result
 from agrobr.utils.time import utcnow
@@ -74,7 +74,7 @@ async def pam(
     fetch_start = time.perf_counter()
     meta = MetaInfo(
         source="ibge_pam",
-        source_url="https://sidra.ibge.gov.br",
+        source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
     )
@@ -225,7 +225,7 @@ async def lspa(
     fetch_start = time.perf_counter()
     meta = MetaInfo(
         source="ibge_lspa",
-        source_url="https://sidra.ibge.gov.br",
+        source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
     )
@@ -334,7 +334,7 @@ async def ppm(
     fetch_start = time.perf_counter()
     meta = MetaInfo(
         source="ibge_ppm",
-        source_url="https://sidra.ibge.gov.br",
+        source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
     )
@@ -485,7 +485,7 @@ async def abate(
     fetch_start = time.perf_counter()
     meta = MetaInfo(
         source="ibge_abate",
-        source_url="https://sidra.ibge.gov.br",
+        source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
     )

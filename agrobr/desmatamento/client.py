@@ -6,9 +6,10 @@ from urllib.parse import quote
 import httpx
 import structlog
 
-from agrobr.constants import MIN_WFS_SIZE, URLS, Fonte, HTTPSettings
+from agrobr.constants import MIN_WFS_SIZE, URLS, Fonte
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.retry import retry_on_status
+from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
 
 from .models import (
@@ -32,14 +33,7 @@ _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 GEOSERVER_BASE = URLS[Fonte.DESMATAMENTO]["geoserver"]
 
-_settings = HTTPSettings()
-
-TIMEOUT = httpx.Timeout(
-    connect=_settings.timeout_connect,
-    read=120.0,
-    write=_settings.timeout_write,
-    pool=_settings.timeout_pool,
-)
+TIMEOUT = get_timeout(read=120.0)
 
 MAX_FEATURES_PER_REQUEST = 50000
 

@@ -12,11 +12,11 @@ from agrobr.conab.custo_producao.parser import (
     PARSER_VERSION,
     _find_header_row,
     _identify_columns,
-    _safe_float,
     items_to_dataframe,
     parse_planilha,
 )
 from agrobr.exceptions import ParseError
+from agrobr.normalize.numeric import safe_float
 
 
 def _make_xlsx(rows: list[list], sheet_name: str = "Plan1") -> BytesIO:
@@ -86,37 +86,37 @@ def _sample_xlsx(
 
 class TestSafeFloat:
     def test_int(self):
-        assert _safe_float(10) == 10.0
+        assert safe_float(10, strip=("R$", "%")) == 10.0
 
     def test_float(self):
-        assert _safe_float(3.14) == pytest.approx(3.14)
+        assert safe_float(3.14, strip=("R$", "%")) == pytest.approx(3.14)
 
     def test_string_dot(self):
-        assert _safe_float("3.14") == pytest.approx(3.14)
+        assert safe_float("3.14", strip=("R$", "%")) == pytest.approx(3.14)
 
     def test_string_comma(self):
-        assert _safe_float("3,14") == pytest.approx(3.14)
+        assert safe_float("3,14", strip=("R$", "%")) == pytest.approx(3.14)
 
     def test_string_with_currency(self):
-        assert _safe_float("R$ 510.00") == pytest.approx(510.0)
+        assert safe_float("R$ 510.00", strip=("R$", "%")) == pytest.approx(510.0)
 
     def test_string_with_percent(self):
-        assert _safe_float("12.5%") == pytest.approx(12.5)
+        assert safe_float("12.5%", strip=("R$", "%")) == pytest.approx(12.5)
 
     def test_none(self):
-        assert _safe_float(None) is None
+        assert safe_float(None, strip=("R$", "%")) is None
 
     def test_nan(self):
-        assert _safe_float(float("nan")) is None
+        assert safe_float(float("nan"), strip=("R$", "%")) is None
 
     def test_empty_string(self):
-        assert _safe_float("") is None
+        assert safe_float("", strip=("R$", "%")) is None
 
     def test_dash(self):
-        assert _safe_float("-") is None
+        assert safe_float("-", strip=("R$", "%")) is None
 
     def test_garbage(self):
-        assert _safe_float("abc") is None
+        assert safe_float("abc", strip=("R$", "%")) is None
 
 
 class TestFindHeaderRow:

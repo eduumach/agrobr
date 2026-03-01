@@ -11,11 +11,11 @@ from agrobr.abiove.parser import (
     _detect_month,
     _detect_produto_from_header,
     _parse_meses_rows,
-    _safe_float,
     agregar_mensal,
     parse_exportacao_excel,
 )
 from agrobr.exceptions import ParseError
+from agrobr.normalize.numeric import safe_float
 
 
 def _make_excel_bytes(sheets: dict[str, list[list]]) -> bytes:
@@ -46,38 +46,38 @@ def _make_excel_bytes(sheets: dict[str, list[list]]) -> bytes:
 
 class TestSafeFloat:
     def test_integer(self):
-        assert _safe_float(42) == 42.0
+        assert safe_float(42) == 42.0
 
     def test_float(self):
-        assert _safe_float(3.14) == 3.14
+        assert safe_float(3.14) == 3.14
 
     def test_string_br_thousands(self):
-        assert _safe_float("150.000") == 150000.0
+        assert safe_float("150.000") == 150000.0
 
     def test_string_br_decimal(self):
-        assert _safe_float("1.234,56") == 1234.56
+        assert safe_float("1.234,56") == 1234.56
 
     def test_none(self):
-        assert _safe_float(None) is None
+        assert safe_float(None) is None
 
     def test_dash(self):
-        assert _safe_float("-") is None
-        assert _safe_float("–") is None
+        assert safe_float("-") is None
+        assert safe_float("–") is None
 
     def test_empty(self):
-        assert _safe_float("") is None
+        assert safe_float("") is None
 
     def test_nd(self):
-        assert _safe_float("n.d.") is None
+        assert safe_float("n.d.") is None
 
     def test_nan(self):
-        assert _safe_float(float("nan")) is None
+        assert safe_float(float("nan")) is None
 
     def test_multiple_dots_thousands(self):
-        assert _safe_float("1.234.567") == 1234567.0
+        assert safe_float("1.234.567") == 1234567.0
 
     def test_ellipsis(self):
-        assert _safe_float("...") is None
+        assert safe_float("...") is None
 
 
 class TestDetectMonth:

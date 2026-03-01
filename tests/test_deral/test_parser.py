@@ -9,10 +9,10 @@ from agrobr.deral.parser import (
     PARSER_VERSION,
     _extract_condicao_from_sheet,
     _find_data_referencia,
-    _safe_float,
     filter_by_produto,
     parse_pc_xls,
 )
+from agrobr.normalize.numeric import safe_float
 
 
 def _make_xls_bytes(sheets: dict[str, list[list]]) -> bytes:
@@ -35,32 +35,32 @@ def _make_xls_bytes(sheets: dict[str, list[list]]) -> bytes:
 
 class TestSafeFloat:
     def test_integer(self):
-        assert _safe_float(42) == 42.0
+        assert safe_float(42, strip="%") == 42.0
 
     def test_float(self):
-        assert _safe_float(3.14) == 3.14
+        assert safe_float(3.14, strip="%") == 3.14
 
     def test_string(self):
-        assert _safe_float("75.5") == 75.5
+        assert safe_float("75.5", strip="%") == 75.5
 
     def test_br_format(self):
-        assert _safe_float("1.234,56") == 1234.56
+        assert safe_float("1.234,56", strip="%") == 1234.56
 
     def test_percentage(self):
-        assert _safe_float("85%") == 85.0
+        assert safe_float("85%", strip="%") == 85.0
 
     def test_none(self):
-        assert _safe_float(None) is None
+        assert safe_float(None, strip="%") is None
 
     def test_dash(self):
-        assert _safe_float("-") is None
-        assert _safe_float("–") is None
+        assert safe_float("-", strip="%") is None
+        assert safe_float("–", strip="%") is None
 
     def test_empty(self):
-        assert _safe_float("") is None
+        assert safe_float("", strip="%") is None
 
     def test_nd(self):
-        assert _safe_float("n.d.") is None
+        assert safe_float("n.d.", strip="%") is None
 
 
 class TestFindDataReferencia:

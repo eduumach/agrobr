@@ -12,6 +12,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **normalize/encoding** — `detect_encoding_chain` para deteccao rapida de encoding via probe chain (UTF-8, UTF-8-sig, Windows-1252, ISO-8859-1, chardet fallback). Substitui 2 implementacoes duplicadas em `alt/` parsers
 - **utils/result** — `finalize_result` helper com overloads tipados para epilogo polars/return_meta. Substitui ~140 linhas de boilerplate em ibge/ (10x), conab/api.py (3x), cepea/api.py (1x)
 - **utils/warnings** — `warn_once(key, message)` helper para warnings de licenca. Elimina 7 flags `_WARNED` globais e `global _WARNED # noqa: PLW0603` boilerplate em 6 modulos (abiove, anda, b3, conab/ceasa, imea, noticias_agricolas). `warn_once_reset()` para testes
+- **normalize/numeric** — `safe_float` canonico para conversao numerica com suporte a strip chars, null markers configuraveis, nan_as_none, treat_zero_as_none e heuristica ABIOVE (3 digitos apos ponto = milhar). Substitui 5 implementacoes duplicadas `_safe_float` em anda, abiove, deral, conab/serie_historica, conab/custo_producao. `conab/progresso` mantido como wrapper local `_parse_pct`
 
 ### Improved
 - **ibge/ module split** — `ibge/api.py` (2025 linhas) dividido em `censo_api.py`, `pesquisas_api.py`, `censo_tables.py` e `_helpers.py`. API publica inalterada via re-exports em `__init__.py`. Dead branch e `import re` removidos. `NIVEL_MAP` extraido como constante compartilhada
@@ -19,6 +20,9 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **cli.py** — `_output_df` helper extrai 6 blocos identicos de formatacao output (json/csv/table)
 - **CacheSettings** — 32 campos `ttl_*` e `stale_multiplier` removidos (dead code, nunca lidos). `cache/policies.py::POLICIES` e a fonte unica de TTL
 - **Test infrastructure** — `tests/helpers.py` com 3 factories (`make_mock_response`, `make_mock_async_client`, `make_alert_settings`). Elimina `_mock_response` duplicado em 18 arquivos e boilerplate `__aenter__`/`__aexit__` em 23 arquivos
+- **http/settings** — `get_timeout(read=...)` factory com override de read timeout. 26 client modules migrados de inline `httpx.Timeout(...)` + `HTTPSettings()` para `get_timeout()`. Elimina `_settings = HTTPSettings()` e `_get_timeout()` locais
+- **URL dedup** — 6 constantes de URL duplicadas em modules substituidas por referencias a `URLS` central (PENTAHO_BASE, FTP_BASE, WFS_BASE, CKAN_BASE, SHLP_BASE, VENDAS_DIESEL_CSV_URL). `SIDRA_BASE` em `ibge/_helpers.py` substitui 18 hardcoded `"https://sidra.ibge.gov.br"`
+- **Dead code purge** — 5 modulos mortos removidos (stability.py, telemetry/, aliases.py, utils/logging.py). 15+ classes/funcoes mortas removidas (CacheEntry, HistoryEntry, CacheError, 4 dead Warnings, InvalidationReason, Contract.from_json/from_dict, TICKER_PARA_CONTRATO, data_para_safra, mes_para_numero, numero_para_mes, extrair_uf_municipio, validar_regiao, get_rate_limit, get_client_kwargs, cleanup stub). Constantes mortas: TelemetrySettings, CONFIDENCE_MEDIUM, CacheSettings.offline_mode/cache_max_age_days/history_max_age_days, 5 URLs mortas. AgrobrConfig.timeout_seconds removido
 
 ### Fixed
 - **ibge/client** — `sidrapy.get_table()` agora roda via `asyncio.to_thread()`, desbloqueando o event loop em todas as queries IBGE (pam, lspa, ppm, abate, censo, silvicultura, extracao, leite, pib)

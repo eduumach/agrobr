@@ -113,7 +113,6 @@ def get_snapshot(name: str) -> SnapshotInfo | None:
 async def create_snapshot(
     name: str | None = None,
     sources: list[str] | None = None,
-    _include_cache: bool = True,
 ) -> SnapshotInfo:
     import agrobr
 

@@ -8,6 +8,7 @@ import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
+from agrobr.normalize.numeric import safe_float
 
 from .models import REGIOES_BRASIL, UFS_BRASIL, SafraHistorica, normalize_produto
 
@@ -114,33 +115,6 @@ def _classify_row(label: str) -> tuple[str, str | None, str | None]:
     return "unknown", None, None
 
 
-def _safe_float(value: Any) -> float | None:
-    if value is None or (isinstance(value, float) and pd.isna(value)):
-        return None
-    if isinstance(value, (int, float)):
-        v = float(value)
-        if v == 0.0:
-            return None
-        return v
-    if isinstance(value, str):
-        cleaned = (
-            value.strip()
-            .replace(",", ".")
-            .replace(" ", "")
-            .replace("(", "")
-            .replace(")", "")
-            .replace("*", "")
-        )
-        if not cleaned or cleaned == "-" or cleaned == "...":
-            return None
-        try:
-            v = float(cleaned)
-            return v if v != 0.0 else None
-        except ValueError:
-            return None
-    return None
-
-
 def parse_sheet(
     df_raw: pd.DataFrame,
     produto: str,
@@ -206,7 +180,11 @@ def parse_sheet(
             continue
 
         for col_idx, safra in safra_columns:
-            value = _safe_float(row.iloc[col_idx]) if col_idx < len(row) else None
+            value = (
+                safe_float(row.iloc[col_idx], strip=("(", ")", "*"), treat_zero_as_none=True)
+                if col_idx < len(row)
+                else None
+            )
             if value is None:
                 continue
 

@@ -1,21 +1,17 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import sys
 from dataclasses import dataclass
 from dataclasses import field as dataclass_field
 from datetime import date, datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
 from .constants import Fonte
 from .utils.time import utcnow
-
-if TYPE_CHECKING:
-    import pandas as pd
 
 
 class Indicador(BaseModel):
@@ -58,27 +54,6 @@ class Safra(BaseModel):
     parsed_at: datetime = Field(default_factory=utcnow)
     parser_version: int = Field(default=1)
     anomalies: list[str] = Field(default_factory=list)
-
-
-class CacheEntry(BaseModel):
-    key: str
-    data: bytes
-    created_at: datetime
-    expires_at: datetime
-    source: Fonte
-    version: int = 1
-    stale: bool = False
-    hit_count: int = 0
-
-
-class HistoryEntry(BaseModel):
-    key: str
-    data: bytes
-    source: Fonte
-    data_date: date
-    collected_at: datetime
-    parser_version: int
-    fingerprint_hash: str
 
 
 class Fingerprint(BaseModel):
@@ -174,14 +149,3 @@ class MetaInfo:
                 data[key] = datetime.fromisoformat(data[key])
 
         return cls(**data)
-
-    def compute_dataframe_hash(self, df: pd.DataFrame) -> str:
-        csv_bytes = df.to_csv(index=False).encode("utf-8")
-        return f"sha256:{hashlib.sha256(csv_bytes).hexdigest()}"
-
-    def verify_hash(self, df: pd.DataFrame) -> bool:
-        if not self.raw_content_hash:
-            return True
-
-        current_hash = self.compute_dataframe_hash(df)
-        return current_hash == self.raw_content_hash

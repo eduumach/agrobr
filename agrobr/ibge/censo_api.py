@@ -10,7 +10,7 @@ from agrobr import constants
 from agrobr.cache.keys import build_cache_key
 from agrobr.cache.policies import calculate_expiry
 from agrobr.ibge import client
-from agrobr.ibge._helpers import NIVEL_MAP, NIVEL_MAP_HISTORICO
+from agrobr.ibge._helpers import NIVEL_MAP, NIVEL_MAP_HISTORICO, SIDRA_BASE
 from agrobr.ibge.censo_tables import (
     _CENSO_ALL_VAR_IDS,
     _CENSO_CATEGORIA_COL_INDEX,
@@ -329,7 +329,7 @@ async def censo_agro(
     fetch_start = time.perf_counter()
     meta = MetaInfo(
         source="ibge_censo_agro",
-        source_url="https://sidra.ibge.gov.br",
+        source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
     )
@@ -517,7 +517,7 @@ async def censo_agro_historico(
     fetch_start = time.perf_counter()
     meta = MetaInfo(
         source="ibge_censo_agro_historico",
-        source_url="https://sidra.ibge.gov.br",
+        source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
     )

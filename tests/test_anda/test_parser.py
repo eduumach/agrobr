@@ -10,10 +10,10 @@ from agrobr.anda.parser import (
     _parse_indicadores,
     _parse_uf_cols,
     _parse_uf_rows,
-    _safe_float,
     agregar_mensal,
     parse_entregas_table,
 )
+from agrobr.normalize.numeric import safe_float
 
 
 def _uf_rows_table():
@@ -50,29 +50,29 @@ def _generic_table():
 
 class TestSafeFloat:
     def test_integer(self):
-        assert _safe_float(42) == 42.0
+        assert safe_float(42) == 42.0
 
     def test_float(self):
-        assert _safe_float(3.14) == 3.14
+        assert safe_float(3.14) == 3.14
 
     def test_string_br_format(self):
-        assert _safe_float("150.000") == 150000.0
+        assert safe_float("150.000") == 150000.0
 
     def test_string_decimal_comma(self):
-        assert _safe_float("1.234,56") == 1234.56
+        assert safe_float("1.234,56") == 1234.56
 
     def test_none(self):
-        assert _safe_float(None) is None
+        assert safe_float(None) is None
 
     def test_dash(self):
-        assert _safe_float("-") is None
-        assert _safe_float("–") is None
+        assert safe_float("-") is None
+        assert safe_float("–") is None
 
     def test_empty(self):
-        assert _safe_float("") is None
+        assert safe_float("") is None
 
     def test_nd(self):
-        assert _safe_float("n.d.") is None
+        assert safe_float("n.d.") is None
 
 
 class TestDetectMonth:

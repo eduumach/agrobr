@@ -220,37 +220,6 @@ class Contract:
     def to_json(self, indent: int = 2) -> str:
         return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)
 
-    @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> Contract:
-        columns = []
-        for col_data in data.get("columns", []):
-            columns.append(
-                Column(
-                    name=col_data["name"],
-                    type=ColumnType(col_data["type"]),
-                    nullable=col_data.get("nullable", False),
-                    unit=col_data.get("unit"),
-                    description=col_data.get("description", ""),
-                    stable=col_data.get("stable", True),
-                    deprecated=col_data.get("deprecated", False),
-                    min_value=col_data.get("min_value"),
-                    max_value=col_data.get("max_value"),
-                )
-            )
-        return cls(
-            name=data["name"],
-            version=data.get("schema_version", data.get("version", "1.0")),
-            columns=columns,
-            primary_key=data.get("primary_key", []),
-            guarantees=data.get("guarantees", []),
-            breaking_policy=BreakingChangePolicy(data.get("breaking_policy", "major")),
-            effective_from=data.get("effective_from", ""),
-        )
-
-    @classmethod
-    def from_json(cls, json_str: str) -> Contract:
-        return cls.from_dict(json.loads(json_str))
-
 
 _CONTRACT_REGISTRY: dict[str, Contract] = {}
 _CONTRACTS_DISCOVERED = False

@@ -6,9 +6,9 @@ from urllib.parse import urlencode
 import httpx
 import structlog
 
-from agrobr.constants import HTTPSettings
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.retry import retry_on_status
+from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
 
 from .models import (
@@ -22,14 +22,7 @@ from .models import (
 
 logger = structlog.get_logger()
 
-_settings = HTTPSettings()
-
-TIMEOUT = httpx.Timeout(
-    connect=_settings.timeout_connect,
-    read=30.0,
-    write=_settings.timeout_write,
-    pool=_settings.timeout_pool,
-)
+TIMEOUT = get_timeout()
 
 
 def _build_url(cda_path: str, query_id: str) -> str:

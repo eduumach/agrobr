@@ -421,9 +421,6 @@ export AGROBR_HTTP_MAX_RETRIES=3
 # Alertas (opcional)
 export AGROBR_ALERT_SLACK_WEBHOOK=https://hooks.slack.com/...
 export AGROBR_ALERT_DISCORD_WEBHOOK=https://discord.com/api/webhooks/...
-
-# Telemetria (opt-in)
-export AGROBR_TELEMETRY_ENABLED=true
 ```
 
 ### Via Código

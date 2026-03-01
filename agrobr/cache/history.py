@@ -162,23 +162,6 @@ class HistoryManager:
         logger.info("history_exported", path=str(path), count=len(df), format=format)
         return len(df)
 
-    def cleanup(
-        self,
-        older_than_days: int | None = None,
-        source: Fonte | None = None,
-    ) -> int:
-        if older_than_days is None:
-            logger.warning("history_cleanup_skipped", reason="no_age_specified")
-            return 0
-
-        logger.warning(
-            "history_cleanup_starting",
-            older_than_days=older_than_days,
-            source=source.value if source else "all",
-        )
-
-        return 0
-
 
 _history_manager: HistoryManager | None = None
 

@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from datetime import date
 
-CKAN_BASE = "https://dados.antt.gov.br"
+from agrobr.constants import URLS, Fonte
+
+CKAN_BASE = URLS[Fonte.ANTT_PEDAGIO]["base"]
 CKAN_API = f"{CKAN_BASE}/api/3/action"
 
 DATASET_TRAFEGO_SLUG = "volume-trafego-praca-pedagio"

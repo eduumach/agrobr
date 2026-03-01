@@ -104,11 +104,6 @@ class TestConfigure:
         config = get_config()
         assert config.cache_enabled is False
 
-    def test_configure_timeout(self):
-        configure(timeout_seconds=60)
-        config = get_config()
-        assert config.timeout_seconds == 60
-
     def test_configure_browser_fallback(self):
         configure(browser_fallback=True)
         config = get_config()
@@ -132,12 +127,10 @@ class TestConfigure:
     def test_configure_multiple_options(self):
         configure(
             cache_enabled=False,
-            timeout_seconds=45,
             log_level="WARNING",
         )
         config = get_config()
         assert config.cache_enabled is False
-        assert config.timeout_seconds == 45
         assert config.log_level == "WARNING"
 
 

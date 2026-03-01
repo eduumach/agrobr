@@ -8,6 +8,7 @@ import structlog
 
 from agrobr.datasets.base import BaseDataset, DatasetInfo, DatasetSource
 from agrobr.datasets.deterministic import get_snapshot
+from agrobr.ibge._helpers import SIDRA_BASE
 from agrobr.models import MetaInfo
 
 logger = structlog.get_logger()
@@ -52,7 +53,7 @@ CENSO_AGROPECUARIO_INFO = DatasetInfo(
     contract_version="1.0",
     update_frequency="decennial",
     typical_latency="Y+2 anos",
-    source_url="https://sidra.ibge.gov.br",
+    source_url=SIDRA_BASE,
     source_institution="IBGE",
     min_date="1995-01-01",
     unit="cabeças / hectares / toneladas",

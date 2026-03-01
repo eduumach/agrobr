@@ -8,6 +8,7 @@ import structlog
 
 from agrobr.datasets.base import BaseDataset, DatasetInfo, DatasetSource
 from agrobr.datasets.deterministic import get_snapshot
+from agrobr.ibge._helpers import SIDRA_BASE
 from agrobr.models import MetaInfo
 
 logger = structlog.get_logger()
@@ -45,7 +46,7 @@ ABATE_TRIMESTRAL_INFO = DatasetInfo(
     contract_version="1.0",
     update_frequency="quarterly",
     typical_latency="T+2 meses",
-    source_url="https://sidra.ibge.gov.br",
+    source_url=SIDRA_BASE,
     source_institution="IBGE",
     min_date="1997-01-01",
     unit="cabeças / kg",

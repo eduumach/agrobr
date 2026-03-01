@@ -6,22 +6,16 @@ import zipfile
 import httpx
 import structlog
 
-from agrobr.constants import MIN_ZIP_SIZE, URLS, Fonte, HTTPSettings
+from agrobr.constants import MIN_ZIP_SIZE, URLS, Fonte
 from agrobr.http.retry import retry_on_status
+from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
 
 logger = structlog.get_logger()
 
 BULK_TXT_BASE = URLS[Fonte.ANTAQ]["bulk_txt"]
 
-_settings = HTTPSettings()
-
-TIMEOUT = httpx.Timeout(
-    connect=_settings.timeout_connect,
-    read=180.0,
-    write=_settings.timeout_write,
-    pool=_settings.timeout_pool,
-)
+TIMEOUT = get_timeout(read=180.0)
 
 
 async def _download_zip(url: str) -> bytes:

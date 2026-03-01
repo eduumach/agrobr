@@ -13,12 +13,12 @@ from agrobr.conab.serie_historica.parser import (
     _classify_row,
     _find_header_row,
     _normalize_safra_header,
-    _safe_float,
     parse_serie_historica,
     parse_sheet,
     records_to_dataframe,
 )
 from agrobr.exceptions import ParseError
+from agrobr.normalize.numeric import safe_float
 
 
 def _make_xls(sheets: dict[str, list[list]]) -> BytesIO:
@@ -116,41 +116,51 @@ def _sample_xls() -> BytesIO:
 
 class TestSafeFloat:
     def test_int(self):
-        assert _safe_float(10) == 10.0
+        assert safe_float(10, strip=("(", ")", "*"), treat_zero_as_none=True) == 10.0
 
     def test_float(self):
-        assert _safe_float(3.14) == pytest.approx(3.14)
+        assert safe_float(3.14, strip=("(", ")", "*"), treat_zero_as_none=True) == pytest.approx(
+            3.14
+        )
 
     def test_string_dot(self):
-        assert _safe_float("3.14") == pytest.approx(3.14)
+        assert safe_float("3.14", strip=("(", ")", "*"), treat_zero_as_none=True) == pytest.approx(
+            3.14
+        )
 
     def test_string_comma(self):
-        assert _safe_float("3,14") == pytest.approx(3.14)
+        assert safe_float("3,14", strip=("(", ")", "*"), treat_zero_as_none=True) == pytest.approx(
+            3.14
+        )
 
     def test_none(self):
-        assert _safe_float(None) is None
+        assert safe_float(None, strip=("(", ")", "*"), treat_zero_as_none=True) is None
 
     def test_nan(self):
-        assert _safe_float(float("nan")) is None
+        assert safe_float(float("nan"), strip=("(", ")", "*"), treat_zero_as_none=True) is None
 
     def test_empty_string(self):
-        assert _safe_float("") is None
+        assert safe_float("", strip=("(", ")", "*"), treat_zero_as_none=True) is None
 
     def test_dash(self):
-        assert _safe_float("-") is None
+        assert safe_float("-", strip=("(", ")", "*"), treat_zero_as_none=True) is None
 
     def test_ellipsis(self):
-        assert _safe_float("...") is None
+        assert safe_float("...", strip=("(", ")", "*"), treat_zero_as_none=True) is None
 
     def test_zero_returns_none(self):
-        assert _safe_float(0.0) is None
-        assert _safe_float(0) is None
+        assert safe_float(0.0, strip=("(", ")", "*"), treat_zero_as_none=True) is None
+        assert safe_float(0, strip=("(", ")", "*"), treat_zero_as_none=True) is None
 
     def test_string_with_parens(self):
-        assert _safe_float("(1234.5)") == pytest.approx(1234.5)
+        assert safe_float(
+            "(1234.5)", strip=("(", ")", "*"), treat_zero_as_none=True
+        ) == pytest.approx(1234.5)
 
     def test_string_with_asterisk(self):
-        assert _safe_float("1234.5*") == pytest.approx(1234.5)
+        assert safe_float(
+            "1234.5*", strip=("(", ")", "*"), treat_zero_as_none=True
+        ) == pytest.approx(1234.5)
 
 
 class TestNormalizeSafraHeader:

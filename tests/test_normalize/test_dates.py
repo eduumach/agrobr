@@ -6,11 +6,8 @@ import pytest
 
 from agrobr.normalize.dates import (
     anos_para_safra,
-    data_para_safra,
     lista_safras,
-    mes_para_numero,
     normalizar_safra,
-    numero_para_mes,
     periodo_safra,
     safra_anterior,
     safra_atual,
@@ -134,54 +131,3 @@ class TestPeriodoSafra:
 
         assert inicio == date(2024, 7, 1)
         assert fim == date(2025, 6, 30)
-
-
-class TestDataParaSafra:
-    def test_data_segundo_semestre(self):
-        assert data_para_safra(date(2024, 10, 1)) == "2024/25"
-
-    def test_data_primeiro_semestre(self):
-        assert data_para_safra(date(2025, 3, 1)) == "2024/25"
-
-
-class TestMesParaNumero:
-    @pytest.mark.parametrize(
-        "mes,numero",
-        [
-            ("jan", 1),
-            ("fev", 2),
-            ("mar", 3),
-            ("abr", 4),
-            ("mai", 5),
-            ("jun", 6),
-            ("jul", 7),
-            ("ago", 8),
-            ("set", 9),
-            ("out", 10),
-            ("nov", 11),
-            ("dez", 12),
-        ],
-    )
-    def test_todos_meses(self, mes, numero):
-        assert mes_para_numero(mes) == numero
-
-    def test_case_insensitive(self):
-        assert mes_para_numero("JAN") == 1
-        assert mes_para_numero("Jan") == 1
-
-    def test_invalido_raises(self):
-        with pytest.raises(KeyError):
-            mes_para_numero("xyz")
-
-
-class TestNumeroParaMes:
-    def test_todos_numeros(self):
-        assert numero_para_mes(1) == "jan"
-        assert numero_para_mes(12) == "dez"
-
-    def test_zero_wraps_to_last(self):
-        assert numero_para_mes(0) == "dez"
-
-    def test_13_raises(self):
-        with pytest.raises(IndexError):
-            numero_para_mes(13)

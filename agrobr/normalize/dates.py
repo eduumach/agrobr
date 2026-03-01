@@ -2,11 +2,6 @@ from __future__ import annotations
 
 import re
 from datetime import date
-from typing import Literal
-
-MesSafra = Literal[
-    "jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"
-]
 
 REGEX_SAFRA_COMPLETA = re.compile(r"^(\d{4})/(\d{2})$")
 REGEX_SAFRA_CURTA = re.compile(r"^(\d{2})/(\d{2})$")
@@ -99,10 +94,6 @@ def lista_safras(inicio: str, fim: str) -> list[str]:
     return [anos_para_safra(ano) for ano in range(ano_inicio, ano_fim + 1)]
 
 
-def data_para_safra(data: date) -> str:
-    return safra_atual(data)
-
-
 def periodo_safra(safra: str) -> tuple[date, date]:
     ano_inicio, ano_fim = safra_para_anos(safra)
 
@@ -110,26 +101,3 @@ def periodo_safra(safra: str) -> tuple[date, date]:
     data_fim = date(ano_fim, 6, 30)
 
     return data_inicio, data_fim
-
-
-def mes_para_numero(mes: str | MesSafra) -> int:
-    meses = {
-        "jan": 1,
-        "fev": 2,
-        "mar": 3,
-        "abr": 4,
-        "mai": 5,
-        "jun": 6,
-        "jul": 7,
-        "ago": 8,
-        "set": 9,
-        "out": 10,
-        "nov": 11,
-        "dez": 12,
-    }
-    return meses[mes.lower()[:3]]
-
-
-def numero_para_mes(numero: int) -> str:
-    meses = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
-    return meses[numero - 1]

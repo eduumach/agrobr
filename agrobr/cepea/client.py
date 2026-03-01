@@ -11,6 +11,7 @@ from agrobr.constants import MIN_HTML_PAGE_SIZE
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.rate_limiter import RateLimiter
 from agrobr.http.retry import retry_async, should_retry_status
+from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
 from agrobr.normalize.encoding import decode_content
 
@@ -42,14 +43,7 @@ def set_use_alternative_source(enabled: bool) -> None:
     logger.info("cepea_alternative_source_mode", enabled=enabled)
 
 
-def _get_timeout() -> httpx.Timeout:
-    settings = constants.HTTPSettings()
-    return httpx.Timeout(
-        connect=settings.timeout_connect,
-        read=settings.timeout_read,
-        write=settings.timeout_write,
-        pool=settings.timeout_pool,
-    )
+TIMEOUT = get_timeout()
 
 
 def _is_circuit_open() -> bool:
@@ -86,7 +80,7 @@ async def _fetch_with_httpx(url: str, headers: dict[str, str]) -> FetchResult:
         async with (
             RateLimiter.acquire(constants.Fonte.CEPEA),
             httpx.AsyncClient(
-                timeout=_get_timeout(),
+                timeout=TIMEOUT,
                 follow_redirects=True,
             ) as client,
         ):
@@ -236,7 +230,7 @@ async def fetch_series_historica(produto: str, anos: int = 5) -> str:
         async with (
             RateLimiter.acquire(constants.Fonte.CEPEA),
             httpx.AsyncClient(
-                timeout=_get_timeout(),
+                timeout=TIMEOUT,
                 follow_redirects=True,
             ) as client,
         ):

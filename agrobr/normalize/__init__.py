@@ -23,7 +23,7 @@ from .municipalities import (
     municipio_para_ibge,
     total_municipios,
 )
-from .numeric import parse_numeric_br
+from .numeric import parse_numeric_br, safe_float
 from .regions import (
     ibge_para_uf,
     listar_regioes,
@@ -64,6 +64,7 @@ __all__: list[str] = [
     "normalizar_safra",
     "normalizar_uf",
     "parse_numeric_br",
+    "safe_float",
     "periodo_safra",
     "preco_saca_para_tonelada",
     "preco_tonelada_para_saca",

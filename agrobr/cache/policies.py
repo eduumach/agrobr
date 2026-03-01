@@ -238,15 +238,6 @@ def calculate_expiry(source: Fonte | str, endpoint: str | None = None) -> dateti
     return utcnow() + timedelta(seconds=policy.ttl_seconds)
 
 
-class InvalidationReason(Enum):
-    EXPIRED = "expired"
-    MANUAL = "manual"
-    SOURCE_UPDATE = "source_update"
-    PARSE_ERROR = "parse_error"
-    VALIDATION_ERROR = "validation_error"
-    FINGERPRINT_CHANGE = "fingerprint_change"
-
-
 def should_refresh(
     created_at: datetime,
     source: Fonte | str,

@@ -7,9 +7,10 @@ import httpx
 import structlog
 from bs4 import BeautifulSoup
 
-from agrobr.constants import MIN_XLSX_SIZE, URLS, Fonte, HTTPSettings
+from agrobr.constants import MIN_XLSX_SIZE, URLS, Fonte
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.retry import retry_on_status
+from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
 
 from .models import BASE_URL
@@ -18,14 +19,7 @@ _CONAB_BASE = URLS[Fonte.CONAB]["base"]
 
 logger = structlog.get_logger()
 
-_settings = HTTPSettings()
-
-TIMEOUT = httpx.Timeout(
-    connect=_settings.timeout_connect,
-    read=60.0,
-    write=_settings.timeout_write,
-    pool=_settings.timeout_pool,
-)
+TIMEOUT = get_timeout(read=60.0)
 
 PAGE_SIZE = 20
 

@@ -3,7 +3,9 @@ from __future__ import annotations
 import os
 import re
 
-PENTAHO_BASE = "https://pentahoportaldeinformacoes.conab.gov.br/pentaho/plugin/cda/api/doQuery"
+from agrobr.constants import URLS, Fonte
+
+PENTAHO_BASE = URLS[Fonte.CONAB]["ceasa_prohort"]
 
 PENTAHO_AUTH = {
     "userid": os.environ.get("AGROBR_CONAB_CEASA_USER", "pentaho"),

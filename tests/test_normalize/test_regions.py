@@ -5,7 +5,6 @@ import pytest
 from agrobr.normalize.regions import (
     REGIOES,
     UFS,
-    extrair_uf_municipio,
     ibge_para_uf,
     listar_regioes,
     listar_ufs,
@@ -16,7 +15,6 @@ from agrobr.normalize.regions import (
     uf_para_ibge,
     uf_para_nome,
     uf_para_regiao,
-    validar_regiao,
     validar_uf,
 )
 
@@ -137,37 +135,12 @@ class TestNormalizarMunicipio:
         assert normalizar_municipio("  rio   de   janeiro  ") == "Rio de Janeiro"
 
 
-class TestExtrairUfMunicipio:
-    def test_formato_hifen(self):
-        uf, mun = extrair_uf_municipio("São Paulo - SP")
-        assert uf == "SP"
-        assert mun == "São Paulo"
-
-    def test_formato_barra(self):
-        uf, mun = extrair_uf_municipio("Campinas/SP")
-        assert uf == "SP"
-        assert mun == "Campinas"
-
-    def test_invalido(self):
-        uf, mun = extrair_uf_municipio("texto qualquer")
-        assert uf is None
-        assert mun is None
-
-
 class TestValidarUf:
     def test_valida(self):
         assert validar_uf("SP") is True
 
     def test_invalida(self):
         assert validar_uf("XX") is False
-
-
-class TestValidarRegiao:
-    def test_valida(self):
-        assert validar_regiao("Sudeste") is True
-
-    def test_invalida(self):
-        assert validar_regiao("Inexistente") is False
 
 
 class TestRemoverAcentos:

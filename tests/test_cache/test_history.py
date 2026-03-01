@@ -175,22 +175,6 @@ class TestHistoryCount:
         assert mgr.count(source=Fonte.CEPEA) == 1
 
 
-class TestHistoryCleanup:
-    def test_cleanup_without_age_returns_zero(self):
-        store = _make_mock_store()
-        mgr = HistoryManager(store=store)
-
-        assert mgr.cleanup() == 0
-
-    def test_cleanup_with_age(self):
-        store = _make_mock_store()
-        mgr = HistoryManager(store=store)
-
-        result = mgr.cleanup(older_than_days=90, source=Fonte.CEPEA)
-
-        assert result == 0
-
-
 class TestHistoryGetDates:
     def test_get_dates_extracts_dates(self):
         store = _make_mock_store()

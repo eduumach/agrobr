@@ -7,30 +7,13 @@ from typing import Any
 import pandas as pd
 import structlog
 
+from agrobr.normalize.numeric import safe_float
+
 from .models import DERAL_PRODUTOS, normalize_condicao, normalize_produto
 
 logger = structlog.get_logger()
 
 PARSER_VERSION = 1
-
-
-def _safe_float(val: Any) -> float | None:
-    if val is None:
-        return None
-    if isinstance(val, (int, float)):
-        if pd.isna(val):
-            return None
-        return float(val)
-    s = str(val).strip()
-    if not s or s in ("-", "–", "...", "n.d.", "n.d", "*"):
-        return None
-    s = s.replace("%", "").strip()
-    if "," in s:
-        s = s.replace(".", "").replace(",", ".")
-    try:
-        return float(s)
-    except (ValueError, TypeError):
-        return None
 
 
 def _detect_produto_from_sheet(sheet_name: str) -> str | None:
@@ -162,7 +145,7 @@ def _extract_multi_produto_sheet(
         ]:
             if col_idx < 0 or col_idx >= len(df.columns):
                 continue
-            pct = _safe_float(df.iloc[row_idx, col_idx])
+            pct = safe_float(df.iloc[row_idx, col_idx], strip="%")
             records.append(
                 {
                     "produto": normalize_produto(produto),
@@ -170,10 +153,14 @@ def _extract_multi_produto_sheet(
                     "condicao": condicao,
                     "pct": pct,
                     "plantio_pct": (
-                        _safe_float(df.iloc[row_idx, col_plantada]) if col_plantada >= 0 else None
+                        safe_float(df.iloc[row_idx, col_plantada], strip="%")
+                        if col_plantada >= 0
+                        else None
                     ),
                     "colheita_pct": (
-                        _safe_float(df.iloc[row_idx, col_colhida]) if col_colhida >= 0 else None
+                        safe_float(df.iloc[row_idx, col_colhida], strip="%")
+                        if col_colhida >= 0
+                        else None
                     ),
                 }
             )
@@ -277,7 +264,7 @@ def _find_pct_near(row: pd.Series, col_idx: int) -> float | None:
     for offset in [1, -1, 2, -2]:
         idx = col_idx + offset
         if 0 <= idx < len(row):
-            val = _safe_float(row.iloc[idx])
+            val = safe_float(row.iloc[idx], strip="%")
             if val is not None and 0 <= val <= 100:
                 return val
     return None
@@ -287,7 +274,7 @@ def _find_pct_in_row(row: pd.Series) -> float | None:
     for val in row:
         if pd.isna(val):
             continue
-        num = _safe_float(val)
+        num = safe_float(val, strip="%")
         if num is not None and 0 <= num <= 100:
             return num
     return None

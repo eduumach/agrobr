@@ -31,7 +31,6 @@ class StructuralValidationResult:
 def validate_structure(
     current: Fingerprint,
     baseline: Fingerprint,
-    _threshold: float = THRESHOLD_HIGH,
 ) -> StructuralValidationResult:
     similarity, differences = compare_fingerprints(current, baseline)
 
@@ -198,7 +197,6 @@ def save_baseline(
 def validate_against_baseline(
     current: Fingerprint,
     baselines_dir: str | Path = ".structures",
-    threshold: float = THRESHOLD_HIGH,
 ) -> StructuralValidationResult:
     baseline = load_baseline(current.source, baselines_dir)
 
@@ -214,7 +212,7 @@ def validate_against_baseline(
             message="No baseline found - treating as valid",
         )
 
-    return validate_structure(current, baseline, threshold)
+    return validate_structure(current, baseline)
 
 
 class StructuralMonitor:

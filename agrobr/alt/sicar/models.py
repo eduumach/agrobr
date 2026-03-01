@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-WFS_BASE = "https://geoserver.car.gov.br/geoserver/sicar/wfs"
+from agrobr.constants import URLS, Fonte
+
+WFS_BASE = URLS[Fonte.SICAR]["geoserver"]
 WFS_VERSION = "2.0.0"
 
 PAGE_SIZE = 10_000

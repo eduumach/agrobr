@@ -81,10 +81,6 @@ class ValidationError(AgrobrError):
         super().__init__(f"Validation failed: {field}={value} - {reason}")
 
 
-class CacheError(AgrobrError):
-    pass
-
-
 class FingerprintMismatchError(AgrobrError):
     def __init__(self, source: str, similarity: float, threshold: float) -> None:
         self.source = source
@@ -97,20 +93,4 @@ class FingerprintMismatchError(AgrobrError):
 
 
 class StaleDataWarning(UserWarning):
-    pass
-
-
-class PartialDataWarning(UserWarning):
-    pass
-
-
-class LayoutChangeWarning(UserWarning):
-    pass
-
-
-class AnomalyDetectedWarning(UserWarning):
-    pass
-
-
-class ParserFallbackWarning(UserWarning):
     pass

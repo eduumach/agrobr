@@ -8,6 +8,7 @@ import structlog
 
 from agrobr.anda.models import ANDA_UFS, normalize_fertilizante
 from agrobr.exceptions import ParseError
+from agrobr.normalize.numeric import safe_float
 
 logger = structlog.get_logger()
 
@@ -56,24 +57,6 @@ def _check_pdfplumber() -> Any:
             "pdfplumber é necessário para processar PDFs ANDA. "
             "Instale com: pip install agrobr[pdf] ou pip install pdfplumber"
         ) from None
-
-
-def _safe_float(value: Any) -> float | None:
-    if value is None:
-        return None
-    if isinstance(value, (int, float)):
-        return float(value)
-
-    s = str(value).strip()
-    if not s or s in ("-", "–", "—", "...", "n.d.", "n/d"):
-        return None
-
-    s = s.replace(".", "").replace(",", ".")
-
-    try:
-        return float(s)
-    except ValueError:
-        return None
 
 
 def _detect_month(text: str) -> int | None:
@@ -208,7 +191,7 @@ def _parse_uf_rows(
         for col_idx, mes in month_cols.items():
             if col_idx >= len(row):
                 continue
-            vol = _safe_float(row[col_idx])
+            vol = safe_float(row[col_idx])
             if vol is not None and vol > 0:
                 records.append(
                     {
@@ -249,7 +232,7 @@ def _parse_uf_cols(
         for col_idx, uf in uf_cols.items():
             if col_idx >= len(row):
                 continue
-            vol = _safe_float(row[col_idx])
+            vol = safe_float(row[col_idx])
             if vol is not None and vol > 0:
                 records.append(
                     {
@@ -300,7 +283,7 @@ def _parse_generic(
             detected = _detect_month(row[mes_col])
             mes_val = detected if detected is not None else 0
 
-        vol = _safe_float(row[vol_col]) if vol_col is not None else None
+        vol = safe_float(row[vol_col]) if vol_col is not None else None
         if vol is not None and vol > 0:
             record: dict[str, Any] = {
                 "ano": ano,
@@ -364,7 +347,7 @@ def _parse_indicadores(
         if mes is None:
             continue
 
-        vol = _safe_float(row[ano_col_idx])
+        vol = safe_float(row[ano_col_idx])
         if vol is not None and vol > 0:
             records.append(
                 {

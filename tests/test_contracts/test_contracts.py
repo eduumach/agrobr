@@ -339,59 +339,6 @@ class TestContract:
         assert data["name"] == "test"
         assert data["schema_version"] == "1.0"
 
-    def test_contract_from_json_roundtrip(self):
-        original = Contract(
-            name="roundtrip",
-            version="2.0",
-            primary_key=["data", "produto"],
-            columns=[
-                Column(name="data", type=ColumnType.DATE, nullable=False),
-                Column(name="produto", type=ColumnType.STRING, nullable=False),
-                Column(name="valor", type=ColumnType.FLOAT, min_value=0, unit="BRL"),
-            ],
-            guarantees=["Test guarantee"],
-            breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
-            effective_from="0.10.0",
-        )
-        json_str = original.to_json()
-        restored = Contract.from_json(json_str)
-
-        assert restored.name == original.name
-        assert restored.version == original.version
-        assert restored.primary_key == original.primary_key
-        assert len(restored.columns) == len(original.columns)
-        assert restored.columns[2].min_value == 0
-        assert restored.columns[2].unit == "BRL"
-        assert restored.guarantees == original.guarantees
-        assert restored.breaking_policy == original.breaking_policy
-        assert restored.effective_from == original.effective_from
-
-    def test_contract_from_dict(self):
-        data = {
-            "name": "test",
-            "schema_version": "1.0",
-            "primary_key": ["id"],
-            "columns": [
-                {"name": "id", "type": "int", "nullable": False, "stable": True},
-            ],
-            "guarantees": ["IDs unique"],
-        }
-        contract = Contract.from_dict(data)
-        assert contract.name == "test"
-        assert contract.version == "1.0"
-        assert contract.primary_key == ["id"]
-        assert len(contract.columns) == 1
-
-    def test_contract_from_json_file(self):
-        original = Contract(
-            name="file_test",
-            version="1.0",
-            columns=[Column(name="x", type=ColumnType.FLOAT)],
-        )
-        json_str = original.to_json()
-        restored = Contract.from_json(json_str)
-        assert restored.name == "file_test"
-
 
 class TestContractRegistry:
     def test_all_datasets_registered(self):
@@ -525,16 +472,6 @@ class TestGenerateJsonSchemas:
                 assert "constraints" in data
                 assert "required_columns" in data
                 assert "dtypes" in data
-
-    def test_generated_schema_loadable(self):
-        with tempfile.TemporaryDirectory() as tmpdir:
-            generate_json_schemas(tmpdir)
-            schema_path = Path(tmpdir) / "preco_diario.json"
-            data = json.loads(schema_path.read_text(encoding="utf-8"))
-            contract = Contract.from_dict(data)
-            assert contract.name == "cepea.indicador"
-            assert contract.version == "1.0"
-            assert contract.primary_key == ["data", "produto"]
 
 
 class TestCEPEAContract:
