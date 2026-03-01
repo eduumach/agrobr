@@ -106,7 +106,7 @@ Mesmas colunas de `sinistros`, mais:
 
 1. Resolve periodos necessarios (2006-2015, 2016-2024, 2025) com base nos filtros de ano
 2. Download CSV bulk do portal dados.agricultura.gov.br (3 arquivos, encoding variavel)
-3. Detecta encoding (UTF-8 → ISO-8859-1 → chardet) e separador (`;` ou `,`)
+3. Detecta encoding (UTF-8 → UTF-8-sig → Windows-1252 → ISO-8859-1 → chardet) e separador (`;` ou `,`)
 4. Remove colunas PII (NM_SEGURADO, NR_DOCUMENTO_SEGURADO) e geolocalizacao
 5. Normaliza nomes de colunas (snake_case padronizado)
 6. Converte tipos (float64 para monetarios, int para ano)

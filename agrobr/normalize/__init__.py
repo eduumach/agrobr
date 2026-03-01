@@ -16,13 +16,14 @@ from .dates import (
     safra_posterior,
     validar_safra,
 )
-from .encoding import decode_content, detect_encoding
+from .encoding import decode_content, detect_encoding, detect_encoding_chain
 from .municipalities import (
     buscar_municipios,
     ibge_para_municipio,
     municipio_para_ibge,
     total_municipios,
 )
+from .numeric import parse_numeric_br
 from .regions import (
     ibge_para_uf,
     listar_regioes,
@@ -48,6 +49,7 @@ __all__: list[str] = [
     "converter",
     "decode_content",
     "detect_encoding",
+    "detect_encoding_chain",
     "ibge_para_municipio",
     "ibge_para_uf",
     "is_cultura_valida",
@@ -61,6 +63,7 @@ __all__: list[str] = [
     "normalizar_praca",
     "normalizar_safra",
     "normalizar_uf",
+    "parse_numeric_br",
     "periodo_safra",
     "preco_saca_para_tonelada",
     "preco_tonelada_para_saca",

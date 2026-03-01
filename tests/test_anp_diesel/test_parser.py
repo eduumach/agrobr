@@ -9,6 +9,7 @@ import pytest
 
 from agrobr.alt.anp_diesel import parser
 from agrobr.exceptions import ParseError
+from agrobr.normalize.numeric import parse_numeric_br
 
 
 def _make_precos_xlsx(
@@ -558,10 +559,10 @@ class TestHelpers:
         assert parser._resolve_mes("") is None
 
     def test_parse_numeric_br(self):
-        assert parser._parse_numeric_br("3517,6") == 3517.6
-        assert parser._parse_numeric_br("1.234,5") == 1234.5
-        assert parser._parse_numeric_br("-") is None
-        assert parser._parse_numeric_br("") is None
+        assert parse_numeric_br("3517,6") == 3517.6
+        assert parse_numeric_br("1.234,5") == 1234.5
+        assert parse_numeric_br("-") is None
+        assert parse_numeric_br("") is None
 
     def test_normalize_columns(self):
         df = pd.DataFrame({"  produto  ": [1], "Estado - Sigla": [2]})

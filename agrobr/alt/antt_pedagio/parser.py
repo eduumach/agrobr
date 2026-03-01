@@ -3,11 +3,12 @@ from __future__ import annotations
 import io
 from datetime import date
 
-import chardet
 import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
+from agrobr.normalize.encoding import detect_encoding_chain
+from agrobr.normalize.numeric import parse_numeric_br
 
 from .models import (
     ANO_INICIO_V2,
@@ -20,34 +21,6 @@ from .models import (
 logger = structlog.get_logger()
 
 PARSER_VERSION = 1
-
-
-def _detect_encoding(content: bytes) -> str:
-    for enc in ("utf-8", "utf-8-sig", "windows-1252", "iso-8859-1"):
-        try:
-            content[:4096].decode(enc)
-            return enc
-        except (UnicodeDecodeError, LookupError):
-            continue
-
-    detected = chardet.detect(content[:8192])
-    return detected.get("encoding") or "utf-8"
-
-
-def _parse_numeric(v: object) -> float | None:
-    if v is None or (isinstance(v, str) and v.strip() in ("", "-")):
-        return None
-    if isinstance(v, (int, float)):
-        return float(v)
-    try:
-        raw = str(v).strip().replace(" ", "")
-        if "," in raw and "." in raw:
-            raw = raw.replace(".", "").replace(",", ".")
-        elif "," in raw:
-            raw = raw.replace(",", ".")
-        return float(raw)
-    except (ValueError, TypeError):
-        return None
 
 
 def _parse_date_v1(val: str) -> date | None:
@@ -84,7 +57,7 @@ def _has_header(text: str) -> bool:
 
 
 def parse_trafego_v1(content: bytes) -> pd.DataFrame:
-    encoding = _detect_encoding(content)
+    encoding = detect_encoding_chain(content)
     try:
         text = content.decode(encoding)
     except (UnicodeDecodeError, LookupError) as e:
@@ -142,7 +115,7 @@ def parse_trafego_v1(content: bytes) -> pd.DataFrame:
             vol_col = candidate
             break
     if vol_col:
-        df["volume"] = df[vol_col].apply(_parse_numeric).fillna(0).astype(int)
+        df["volume"] = df[vol_col].apply(parse_numeric_br).fillna(0).astype(int)
     else:
         df["volume"] = 0
 
@@ -170,7 +143,7 @@ def parse_trafego_v1(content: bytes) -> pd.DataFrame:
 
 
 def parse_trafego_v2(content: bytes) -> pd.DataFrame:
-    encoding = _detect_encoding(content)
+    encoding = detect_encoding_chain(content)
     try:
         text = content.decode(encoding)
     except (UnicodeDecodeError, LookupError) as e:
@@ -257,7 +230,7 @@ def parse_trafego_v2(content: bytes) -> pd.DataFrame:
             vol_col = candidate
             break
     if vol_col:
-        df["volume"] = df[vol_col].apply(_parse_numeric).fillna(0).astype(int)
+        df["volume"] = df[vol_col].apply(parse_numeric_br).fillna(0).astype(int)
     else:
         df["volume"] = 0
 
@@ -291,7 +264,7 @@ def parse_trafego(content: bytes, ano: int) -> pd.DataFrame:
 
 
 def parse_pracas(content: bytes) -> pd.DataFrame:
-    encoding = _detect_encoding(content)
+    encoding = detect_encoding_chain(content)
     try:
         text = content.decode(encoding)
     except (UnicodeDecodeError, LookupError) as e:
@@ -342,7 +315,7 @@ def parse_pracas(content: bytes) -> pd.DataFrame:
 
     for col in ("lat", "lon"):
         if col in df.columns:
-            df[col] = df[col].apply(_parse_numeric)
+            df[col] = df[col].apply(parse_numeric_br)
 
     logger.debug(
         "antt_pedagio_parse_pracas_ok",

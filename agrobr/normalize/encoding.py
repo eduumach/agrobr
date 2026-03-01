@@ -81,3 +81,14 @@ def decode_content(
 def detect_encoding(content: bytes) -> tuple[str, float]:
     result = chardet.detect(content)
     return result["encoding"] or "utf-8", result["confidence"] or 0.0
+
+
+def detect_encoding_chain(content: bytes) -> str:
+    for enc in ("utf-8", "utf-8-sig", "windows-1252", "iso-8859-1"):
+        try:
+            content[:4096].decode(enc)
+            return enc
+        except (UnicodeDecodeError, LookupError):
+            continue
+    detected = chardet.detect(content[:8192])
+    return detected.get("encoding") or "utf-8"

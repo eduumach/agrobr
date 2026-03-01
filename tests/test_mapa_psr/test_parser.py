@@ -6,13 +6,13 @@ import pytest
 
 from agrobr.alt.mapa_psr.parser import (
     PARSER_VERSION,
-    _detect_encoding,
     _detect_separator,
-    _parse_numeric,
     parse_apolices,
     parse_sinistros,
 )
 from agrobr.exceptions import ParseError
+from agrobr.normalize.encoding import detect_encoding_chain
+from agrobr.normalize.numeric import parse_numeric_br
 
 
 def _make_csv(
@@ -108,16 +108,16 @@ def _make_csv(
 class TestDetectEncoding:
     def test_utf8(self):
         content = b"ANO;UF\n2023;MT\n"
-        assert _detect_encoding(content) == "utf-8"
+        assert detect_encoding_chain(content) == "utf-8"
 
     def test_iso_8859_1(self):
         content = "ANO;MUNICÍPIO\n2023;LONDRINA\n".encode("iso-8859-1")
-        enc = _detect_encoding(content)
-        assert enc in ("utf-8", "iso-8859-1")
+        enc = detect_encoding_chain(content)
+        assert enc in ("utf-8", "windows-1252", "iso-8859-1")
 
     def test_utf8_bom(self):
         content = b"\xef\xbb\xbfANO;UF\n2023;MT\n"
-        enc = _detect_encoding(content)
+        enc = detect_encoding_chain(content)
         assert enc in ("utf-8", "utf-8-sig")
 
 
@@ -134,31 +134,31 @@ class TestDetectSeparator:
 
 class TestParseNumeric:
     def test_inteiro(self):
-        assert _parse_numeric("1234") == 1234.0
+        assert parse_numeric_br("1234") == 1234.0
 
     def test_decimal_ponto(self):
-        assert _parse_numeric("1234.56") == 1234.56
+        assert parse_numeric_br("1234.56") == 1234.56
 
     def test_decimal_virgula(self):
-        assert _parse_numeric("1234,56") == 1234.56
+        assert parse_numeric_br("1234,56") == 1234.56
 
     def test_milhar_virgula_decimal(self):
-        assert _parse_numeric("1.234,56") == 1234.56
+        assert parse_numeric_br("1.234,56") == 1234.56
 
     def test_vazio(self):
-        assert _parse_numeric("") is None
+        assert parse_numeric_br("") is None
 
     def test_traco(self):
-        assert _parse_numeric("-") is None
+        assert parse_numeric_br("-") is None
 
     def test_none(self):
-        assert _parse_numeric(None) is None
+        assert parse_numeric_br(None) is None
 
     def test_float_passthrough(self):
-        assert _parse_numeric(42.5) == 42.5
+        assert parse_numeric_br(42.5) == 42.5
 
     def test_invalido(self):
-        assert _parse_numeric("abc") is None
+        assert parse_numeric_br("abc") is None
 
 
 class TestParseApolices:

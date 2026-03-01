@@ -9,6 +9,7 @@ import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
+from agrobr.normalize.numeric import parse_numeric_br
 
 logger = structlog.get_logger()
 
@@ -237,20 +238,6 @@ _MONTH_MAP: dict[str, int] = {
 }
 
 
-def _parse_numeric_br(val: object) -> float | None:
-    if val is None or (isinstance(val, str) and val.strip() in ("", "-")):
-        return None
-    try:
-        raw = str(val).replace(" ", "")
-        if "," in raw and "." in raw:
-            raw = raw.replace(".", "").replace(",", ".")
-        elif "," in raw:
-            raw = raw.replace(",", ".")
-        return float(raw)
-    except (ValueError, TypeError):
-        return None
-
-
 def _resolve_mes(val: str) -> int | None:
     key = val.strip().upper()[:3]
     mes = _MONTH_MAP.get(key)
@@ -355,7 +342,7 @@ def _build_vendas_df(
         if mes is None:
             continue
 
-        volume = _parse_numeric_br(row.get(col_vol))
+        volume = parse_numeric_br(row.get(col_vol))
         if volume is None:
             continue
 

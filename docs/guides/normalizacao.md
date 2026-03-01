@@ -1,6 +1,6 @@
 # Normalização
 
-O módulo `agrobr.normalize` padroniza dados agrícolas brasileiros para garantir cruzamento entre fontes diferentes. São 34 funções organizadas em 5 sub-módulos.
+O módulo `agrobr.normalize` padroniza dados agrícolas brasileiros para garantir cruzamento entre fontes diferentes. São 37 funções organizadas em 7 sub-módulos.
 
 ## Municípios IBGE
 
@@ -144,13 +144,34 @@ toneladas_para_sacas(60)                # 1000.0
 Detecção e decodificação de encoding para HTML/CSV de fontes brasileiras (ISO-8859-1, Windows-1252, UTF-8).
 
 ```python
-from agrobr.normalize import detect_encoding, decode_content
+from agrobr.normalize import detect_encoding, decode_content, detect_encoding_chain
 
-# Detectar encoding de bytes
-encoding = detect_encoding(raw_bytes)   # "iso-8859-1"
+# Detectar encoding de bytes (chardet)
+encoding, confidence = detect_encoding(raw_bytes)   # ("iso-8859-1", 0.95)
 
-# Decodificar com fallback
-text = decode_content(raw_bytes)        # str em UTF-8
+# Decodificar com fallback chain completa
+text, enc = decode_content(raw_bytes)               # (str, "utf-8")
+
+# Chain rápida sem chardet (UTF-8 → UTF-8-sig → Windows-1252 → ISO-8859-1)
+enc = detect_encoding_chain(raw_bytes)              # "windows-1252"
+```
+
+`detect_encoding_chain` usa probe de 4KB na ordem UTF-8, UTF-8-sig, Windows-1252, ISO-8859-1 — com chardet como fallback final. Usada internamente pelos parsers `alt/` para CSVs de governo.
+
+## Numérico BR
+
+Parsing de valores numéricos no formato brasileiro (ponto como milhar, vírgula como decimal).
+
+```python
+from agrobr.normalize import parse_numeric_br
+
+parse_numeric_br("1.234,56")     # 1234.56
+parse_numeric_br("1234,56")      # 1234.56
+parse_numeric_br("500.000,50")   # 500000.5
+parse_numeric_br(42)             # 42.0 (passthrough int/float)
+parse_numeric_br("-")            # None (marcador de dado ausente)
+parse_numeric_br(None)           # None
+parse_numeric_br("abc")          # None (inválido retorna None)
 ```
 
 ## Referência Rápida
@@ -162,4 +183,5 @@ text = decode_content(raw_bytes)        # str em UTF-8
 | `regions` | `normalizar_uf`, `validar_uf`, `uf_para_nome`, `uf_para_regiao`, `uf_para_ibge`, `ibge_para_uf`, `listar_ufs`, `listar_regioes`, `normalizar_municipio`, `normalizar_praca` | 27 UFs |
 | `dates` | `safra_atual`, `normalizar_safra`, `validar_safra`, `safra_para_anos`, `anos_para_safra`, `safra_anterior`, `safra_posterior`, `periodo_safra`, `lista_safras` | Safras Jul-Jun |
 | `units` | `converter`, `sacas_para_toneladas`, `toneladas_para_sacas`, `preco_saca_para_tonelada`, `preco_tonelada_para_saca` | sc, ton, bu, @, ha |
-| `encoding` | `detect_encoding`, `decode_content` | ISO-8859-1, CP1252, UTF-8 |
+| `encoding` | `detect_encoding`, `decode_content`, `detect_encoding_chain` | ISO-8859-1, CP1252, UTF-8 |
+| `numeric` | `parse_numeric_br` | Formato BR (1.234,56) |

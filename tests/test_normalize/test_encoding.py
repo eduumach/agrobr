@@ -2,7 +2,12 @@ from __future__ import annotations
 
 from unittest import mock
 
-from agrobr.normalize.encoding import ENCODING_CHAIN, decode_content, detect_encoding
+from agrobr.normalize.encoding import (
+    ENCODING_CHAIN,
+    decode_content,
+    detect_encoding,
+    detect_encoding_chain,
+)
 
 
 class TestDecodeContentUTF8:
@@ -155,3 +160,81 @@ class TestDetectEncoding:
 
         assert isinstance(enc, str)
         assert isinstance(conf, float)
+
+
+class TestDetectEncodingChain:
+    def test_ascii(self):
+        assert detect_encoding_chain(b"hello world") == "utf-8"
+
+    def test_utf8_bom(self):
+        content = b"\xef\xbb\xbfANO;UF;VALOR\n2023;MT;100\n"
+        enc = detect_encoding_chain(content)
+        assert enc in ("utf-8", "utf-8-sig")
+
+    def test_empty(self):
+        assert detect_encoding_chain(b"") == "utf-8"
+
+    def test_pt_accented_iso(self):
+        content = "produção de açúcar".encode("iso-8859-1")
+        enc = detect_encoding_chain(content)
+        assert enc in ("windows-1252", "iso-8859-1")
+
+    def test_windows_1252_specific_bytes(self):
+        content = bytes([0x80, 0x93, 0x94])
+        enc = detect_encoding_chain(content)
+        assert enc == "windows-1252"
+
+    def test_br_names(self):
+        content = "Conceição".encode("windows-1252")
+        enc = detect_encoding_chain(content)
+        assert enc in ("windows-1252", "iso-8859-1")
+
+    def test_pure_ascii(self):
+        assert detect_encoding_chain(b"just ascii text") == "utf-8"
+
+    def test_returns_string(self):
+        enc = detect_encoding_chain(bytes(range(128)))
+        assert isinstance(enc, str)
+
+    def test_boundary_4096(self):
+        content = b"A" * 4096 + bytes([0x80, 0x81])
+        assert detect_encoding_chain(content) == "utf-8"
+
+
+class TestDetectEncodingChainStress:
+    def test_multibyte_utf8(self):
+        content = "价格数据".encode()
+        assert detect_encoding_chain(content) == "utf-8"
+
+    def test_emoji_utf8(self):
+        content = "teste 🌾".encode()
+        assert detect_encoding_chain(content) == "utf-8"
+
+    def test_cedilla_tilde_iso(self):
+        content = "Conceição São".encode("iso-8859-1")
+        enc = detect_encoding_chain(content)
+        assert enc in ("windows-1252", "iso-8859-1")
+
+    def test_euro_sign_w1252(self):
+        content = b"pre\x80o"
+        assert detect_encoding_chain(content) == "windows-1252"
+
+    def test_smart_quotes_office(self):
+        content = b"\x93quoted\x94"
+        assert detect_encoding_chain(content) == "windows-1252"
+
+    def test_en_em_dash(self):
+        content = b"\x96\x97"
+        assert detect_encoding_chain(content) == "windows-1252"
+
+    def test_all_256_bytes(self):
+        content = bytes(range(256))
+        enc = detect_encoding_chain(content)
+        assert enc in ("windows-1252", "iso-8859-1")
+
+    def test_round_trip_cross_encoding(self):
+        text = "São Paulo café"
+        for encoding in ("utf-8", "iso-8859-1", "windows-1252"):
+            content = text.encode(encoding)
+            enc = detect_encoding_chain(content)
+            assert isinstance(enc, str)

@@ -9,11 +9,9 @@ import pytest
 
 from agrobr.alt.antt_pedagio.parser import (
     PARSER_VERSION,
-    _detect_encoding,
     _has_header,
     _parse_date_v1,
     _parse_date_v2,
-    _parse_numeric,
     join_fluxo_pracas,
     parse_pracas,
     parse_trafego,
@@ -21,6 +19,8 @@ from agrobr.alt.antt_pedagio.parser import (
     parse_trafego_v2,
 )
 from agrobr.exceptions import ParseError
+from agrobr.normalize.encoding import detect_encoding_chain
+from agrobr.normalize.numeric import parse_numeric_br
 
 # ============================================================================
 # Sample CSV data
@@ -63,39 +63,39 @@ PRACAS_CSV = (
 
 class TestDetectEncoding:
     def test_utf8(self):
-        assert _detect_encoding(b"hello world") == "utf-8"
+        assert detect_encoding_chain(b"hello world") == "utf-8"
 
     def test_windows_1252(self):
         content = "Conceição".encode("windows-1252")
-        enc = _detect_encoding(content)
+        enc = detect_encoding_chain(content)
         assert enc in ("windows-1252", "iso-8859-1")
 
     def test_empty(self):
-        enc = _detect_encoding(b"")
+        enc = detect_encoding_chain(b"")
         assert enc == "utf-8"
 
 
 class TestParseNumeric:
     def test_integer(self):
-        assert _parse_numeric("50000") == 50000.0
+        assert parse_numeric_br("50000") == 50000.0
 
     def test_float_comma(self):
-        assert _parse_numeric("1.234,56") == 1234.56
+        assert parse_numeric_br("1.234,56") == 1234.56
 
     def test_float_dot(self):
-        assert _parse_numeric("1234.56") == 1234.56
+        assert parse_numeric_br("1234.56") == 1234.56
 
     def test_none(self):
-        assert _parse_numeric(None) is None
+        assert parse_numeric_br(None) is None
 
     def test_empty(self):
-        assert _parse_numeric("") is None
+        assert parse_numeric_br("") is None
 
     def test_dash(self):
-        assert _parse_numeric("-") is None
+        assert parse_numeric_br("-") is None
 
     def test_int_passthrough(self):
-        assert _parse_numeric(42) == 42.0
+        assert parse_numeric_br(42) == 42.0
 
 
 class TestParseDateV1:

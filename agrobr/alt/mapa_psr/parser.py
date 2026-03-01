@@ -2,27 +2,16 @@ from __future__ import annotations
 
 import io
 
-import chardet
 import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
+from agrobr.normalize.encoding import detect_encoding_chain
+from agrobr.normalize.numeric import parse_numeric_br
 
 logger = structlog.get_logger()
 
 PARSER_VERSION = 1
-
-
-def _detect_encoding(content: bytes) -> str:
-    for enc in ("utf-8", "utf-8-sig", "iso-8859-1", "windows-1252"):
-        try:
-            content[:4096].decode(enc)
-            return enc
-        except (UnicodeDecodeError, LookupError):
-            continue
-
-    detected = chardet.detect(content[:8192])
-    return detected.get("encoding") or "utf-8"
 
 
 def _detect_separator(text: str) -> str:
@@ -49,7 +38,7 @@ def parse_apolices(
         COLUNAS_FLOAT,
     )
 
-    encoding = _detect_encoding(content)
+    encoding = detect_encoding_chain(content)
     try:
         text = content.decode(encoding)
     except (UnicodeDecodeError, LookupError) as e:
@@ -124,7 +113,7 @@ def parse_apolices(
 
     for col in COLUNAS_FLOAT:
         if col in df.columns:
-            df[col] = df[col].apply(_parse_numeric)
+            df[col] = df[col].apply(parse_numeric_br)
 
     if "uf" in df.columns:
         df["uf"] = df["uf"].str.strip().str.upper()
@@ -217,19 +206,3 @@ def parse_sinistros(
     )
 
     return df
-
-
-def _parse_numeric(v: object) -> float | None:
-    if v is None or (isinstance(v, str) and v.strip() in ("", "-")):
-        return None
-    if isinstance(v, (int, float)):
-        return float(v)
-    try:
-        raw = str(v).strip().replace(" ", "")
-        if "," in raw and "." in raw:
-            raw = raw.replace(".", "").replace(",", ".")
-        elif "," in raw:
-            raw = raw.replace(",", ".")
-        return float(raw)
-    except (ValueError, TypeError):
-        return None
