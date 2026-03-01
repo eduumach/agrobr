@@ -13,6 +13,7 @@ from agrobr.cache.keys import build_cache_key
 from agrobr.cache.policies import calculate_expiry
 from agrobr.ibge import client
 from agrobr.models import MetaInfo
+from agrobr.utils.result import finalize_result
 
 logger = structlog.get_logger()
 
@@ -185,26 +186,13 @@ async def pam(
     )
     meta.cache_expires_at = calculate_expiry(constants.Fonte.IBGE, "pam")
 
-    if as_polars:
-        try:
-            import polars as pl
-
-            result_df = pl.from_pandas(df)
-            if return_meta:
-                return result_df, meta  # type: ignore[return-value,no-any-return]
-            return result_df  # type: ignore[return-value,no-any-return]
-        except ImportError:
-            logger.warning("polars_not_installed", fallback="pandas")
-
     logger.info(
         "ibge_pam_success",
         produto=produto,
         records=len(df),
     )
 
-    if return_meta:
-        return df, meta
-    return df
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 @overload
@@ -299,26 +287,13 @@ async def lspa(
     )
     meta.cache_expires_at = calculate_expiry(constants.Fonte.IBGE, "lspa")
 
-    if as_polars:
-        try:
-            import polars as pl
-
-            result_df = pl.from_pandas(df)
-            if return_meta:
-                return result_df, meta  # type: ignore[return-value,no-any-return]
-            return result_df  # type: ignore[return-value,no-any-return]
-        except ImportError:
-            logger.warning("polars_not_installed", fallback="pandas")
-
     logger.info(
         "ibge_lspa_success",
         produto=produto,
         records=len(df),
     )
 
-    if return_meta:
-        return df, meta
-    return df
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 async def produtos_pam() -> list[str]:
@@ -479,26 +454,13 @@ async def ppm(
     )
     meta.cache_expires_at = calculate_expiry(constants.Fonte.IBGE, "ppm")
 
-    if as_polars:
-        try:
-            import polars as pl
-
-            result_df = pl.from_pandas(df)
-            if return_meta:
-                return result_df, meta  # type: ignore[return-value,no-any-return]
-            return result_df  # type: ignore[return-value,no-any-return]
-        except ImportError:
-            logger.warning("polars_not_installed", fallback="pandas")
-
     logger.info(
         "ibge_ppm_success",
         especie=especie,
         records=len(df),
     )
 
-    if return_meta:
-        return df, meta
-    return df
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 @overload
@@ -681,26 +643,13 @@ async def abate(
     )
     meta.cache_expires_at = calculate_expiry(constants.Fonte.IBGE, "abate")
 
-    if as_polars:
-        try:
-            import polars as pl
-
-            result_df = pl.from_pandas(df)
-            if return_meta:
-                return result_df, meta  # type: ignore[return-value,no-any-return]
-            return result_df  # type: ignore[return-value,no-any-return]
-        except ImportError:
-            logger.warning("polars_not_installed", fallback="pandas")
-
     logger.info(
         "ibge_abate_success",
         especie=especie,
         records=len(df),
     )
 
-    if return_meta:
-        return df, meta
-    return df
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 async def especies_abate() -> list[str]:
@@ -1241,26 +1190,13 @@ async def censo_agro(
     )
     meta.cache_expires_at = calculate_expiry(constants.Fonte.IBGE, "censo_agro")
 
-    if as_polars:
-        try:
-            import polars as pl
-
-            result_df = pl.from_pandas(df)
-            if return_meta:
-                return result_df, meta  # type: ignore[return-value,no-any-return]
-            return result_df  # type: ignore[return-value,no-any-return]
-        except ImportError:
-            logger.warning("polars_not_installed", fallback="pandas")
-
     logger.info(
         "ibge_censo_agro_success",
         tema=tema,
         records=len(df),
     )
 
-    if return_meta:
-        return df, meta
-    return df
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 async def temas_censo_agro() -> list[str]:
@@ -1460,26 +1396,13 @@ async def censo_agro_historico(
     )
     meta.cache_expires_at = calculate_expiry(constants.Fonte.IBGE, "censo_agro")
 
-    if as_polars:
-        try:
-            import polars as pl
-
-            result_df = pl.from_pandas(df)
-            if return_meta:
-                return result_df, meta  # type: ignore[return-value,no-any-return]
-            return result_df  # type: ignore[return-value,no-any-return]
-        except ImportError:
-            logger.warning("polars_not_installed", fallback="pandas")
-
     logger.info(
         "ibge_censo_agro_historico_success",
         tema=tema,
         records=len(df),
     )
 
-    if return_meta:
-        return df, meta
-    return df
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 async def temas_censo_agro_historico() -> list[str]:
@@ -1650,22 +1573,9 @@ async def silvicultura(
     )
     meta.cache_expires_at = calculate_expiry("ibge_silvicultura")
 
-    if as_polars:
-        try:
-            import polars as pl
-
-            result_df = pl.from_pandas(df)
-            if return_meta:
-                return result_df, meta  # type: ignore[return-value,no-any-return]
-            return result_df  # type: ignore[return-value,no-any-return]
-        except ImportError:
-            logger.warning("polars_not_installed", fallback="pandas")
-
     logger.info("ibge_silvicultura_success", produto=produto, records=len(df))
 
-    if return_meta:
-        return df, meta
-    return df
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 async def produtos_silvicultura() -> list[str]:
@@ -1823,22 +1733,9 @@ async def extracao_vegetal(
     )
     meta.cache_expires_at = calculate_expiry("ibge_extracao_vegetal")
 
-    if as_polars:
-        try:
-            import polars as pl
-
-            result_df = pl.from_pandas(df)
-            if return_meta:
-                return result_df, meta  # type: ignore[return-value,no-any-return]
-            return result_df  # type: ignore[return-value,no-any-return]
-        except ImportError:
-            logger.warning("polars_not_installed", fallback="pandas")
-
     logger.info("ibge_extracao_vegetal_success", produto=produto, records=len(df))
 
-    if return_meta:
-        return df, meta
-    return df
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 async def produtos_extracao_vegetal() -> list[str]:
@@ -1987,22 +1884,9 @@ async def leite_trimestral(
     )
     meta.cache_expires_at = calculate_expiry("ibge_leite_trimestral")
 
-    if as_polars:
-        try:
-            import polars as pl
-
-            result_df = pl.from_pandas(df)
-            if return_meta:
-                return result_df, meta  # type: ignore[return-value,no-any-return]
-            return result_df  # type: ignore[return-value,no-any-return]
-        except ImportError:
-            logger.warning("polars_not_installed", fallback="pandas")
-
     logger.info("ibge_leite_trimestral_success", records=len(df))
 
-    if return_meta:
-        return df, meta
-    return df
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 # ---------------------------------------------------------------------------
@@ -2136,19 +2020,6 @@ async def pib_agro(
     )
     meta.cache_expires_at = calculate_expiry("ibge_pib")
 
-    if as_polars:
-        try:
-            import polars as pl
-
-            result_df = pl.from_pandas(df)
-            if return_meta:
-                return result_df, meta  # type: ignore[return-value,no-any-return]
-            return result_df  # type: ignore[return-value,no-any-return]
-        except ImportError:
-            logger.warning("polars_not_installed", fallback="pandas")
-
     logger.info("ibge_pib_agro_success", records=len(df))
 
-    if return_meta:
-        return df, meta
-    return df
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)

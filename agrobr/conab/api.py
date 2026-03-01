@@ -13,6 +13,7 @@ from agrobr.cache.policies import calculate_expiry
 from agrobr.conab import client
 from agrobr.conab.parsers.v1 import ConabParserV1
 from agrobr.models import MetaInfo
+from agrobr.utils.result import finalize_result
 
 logger = structlog.get_logger()
 
@@ -139,26 +140,13 @@ async def safras(
     )
     meta.cache_expires_at = calculate_expiry(constants.Fonte.CONAB)
 
-    if as_polars:
-        try:
-            import polars as pl
-
-            result_df = pl.from_pandas(df)
-            if return_meta:
-                return result_df, meta  # type: ignore[return-value,no-any-return]
-            return result_df  # type: ignore[return-value,no-any-return]
-        except ImportError:
-            logger.warning("polars_not_installed", fallback="pandas")
-
     logger.info(
         "conab_safras_success",
         produto=produto,
         records=len(df),
     )
 
-    if return_meta:
-        return df, meta
-    return df
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 async def balanco(
@@ -201,21 +189,13 @@ async def balanco(
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
-    if as_polars:
-        try:
-            import polars as pl
-
-            return pl.from_pandas(df)  # type: ignore[no-any-return]
-        except ImportError:
-            logger.warning("polars_not_installed", fallback="pandas")
-
     logger.info(
         "conab_balanco_success",
         produto=produto,
         records=len(df),
     )
 
-    return df
+    return finalize_result(df, as_polars=as_polars)
 
 
 async def brasil_total(
@@ -238,20 +218,12 @@ async def brasil_total(
 
     df = pd.DataFrame(totais)
 
-    if as_polars:
-        try:
-            import polars as pl
-
-            return pl.from_pandas(df)  # type: ignore[no-any-return]
-        except ImportError:
-            logger.warning("polars_not_installed", fallback="pandas")
-
     logger.info(
         "conab_brasil_total_success",
         records=len(df),
     )
 
-    return df
+    return finalize_result(df, as_polars=as_polars)
 
 
 async def levantamentos() -> list[dict[str, Any]]:

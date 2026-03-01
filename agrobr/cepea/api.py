@@ -18,6 +18,7 @@ from agrobr.cepea import client
 from agrobr.cepea.parsers.detector import get_parser_with_fallback
 from agrobr.exceptions import ParseError, SourceUnavailableError
 from agrobr.models import Indicador, MetaInfo
+from agrobr.utils.result import finalize_result
 from agrobr.validators.sanity import validate_batch
 
 if TYPE_CHECKING:
@@ -249,20 +250,7 @@ async def indicador(
     )
     meta.cache_expires_at = calculate_expiry(constants.Fonte.CEPEA)
 
-    if as_polars:
-        try:
-            import polars as pl
-
-            result_df = pl.from_pandas(df)
-            if return_meta:
-                return result_df, meta
-            return result_df
-        except ImportError:
-            logger.warning("polars_not_installed", fallback="pandas")
-
-    if return_meta:
-        return df, meta
-    return df
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 def _dicts_to_indicadores(dicts: list[dict[str, Any]]) -> list[Indicador]:
