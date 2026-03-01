@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import UTC, date, datetime
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import pandas as pd
 import structlog
@@ -9,9 +9,6 @@ import structlog
 from agrobr.datasets.base import BaseDataset, DatasetInfo, DatasetSource
 from agrobr.datasets.deterministic import get_snapshot, is_deterministic
 from agrobr.models import MetaInfo
-
-if TYPE_CHECKING:
-    pass
 
 logger = structlog.get_logger()
 

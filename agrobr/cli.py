@@ -7,6 +7,16 @@ import typer
 
 from agrobr import __version__, constants
 
+
+def _output_df(df: Any, formato: str) -> None:
+    if formato == "json":
+        typer.echo(df.to_json(orient="records", indent=2))
+    elif formato == "csv":
+        typer.echo(df.to_csv(index=False))
+    else:
+        typer.echo(df.to_string(index=False))
+
+
 app = typer.Typer(
     name="agrobr",
     help="Dados agricolas brasileiros em uma linha de codigo",
@@ -150,12 +160,7 @@ def conab_safras(
             typer.echo("Nenhum dado encontrado")
             return
 
-        if formato == "json":
-            typer.echo(df.to_json(orient="records", indent=2))
-        elif formato == "csv":
-            typer.echo(df.to_csv(index=False))
-        else:
-            typer.echo(df.to_string(index=False))
+        _output_df(df, formato)
 
     except Exception as e:
         typer.echo(f"Erro: {e}", err=True)
@@ -180,12 +185,7 @@ def conab_balanco(
             typer.echo("Nenhum dado encontrado")
             return
 
-        if formato == "json":
-            typer.echo(df.to_json(orient="records", indent=2))
-        elif formato == "csv":
-            typer.echo(df.to_csv(index=False))
-        else:
-            typer.echo(df.to_string(index=False))
+        _output_df(df, formato)
 
     except Exception as e:
         typer.echo(f"Erro: {e}", err=True)
@@ -258,12 +258,7 @@ def ibge_pam(
             typer.echo("Nenhum dado encontrado")
             return
 
-        if formato == "json":
-            typer.echo(df.to_json(orient="records", indent=2))
-        elif formato == "csv":
-            typer.echo(df.to_csv(index=False))
-        else:
-            typer.echo(df.to_string(index=False))
+        _output_df(df, formato)
 
     except Exception as e:
         typer.echo(f"Erro: {e}", err=True)
@@ -291,12 +286,7 @@ def ibge_lspa(
             typer.echo("Nenhum dado encontrado")
             return
 
-        if formato == "json":
-            typer.echo(df.to_json(orient="records", indent=2))
-        elif formato == "csv":
-            typer.echo(df.to_csv(index=False))
-        else:
-            typer.echo(df.to_string(index=False))
+        _output_df(df, formato)
 
     except Exception as e:
         typer.echo(f"Erro: {e}", err=True)
@@ -333,12 +323,7 @@ def ibge_censo_historico(
             typer.echo("Nenhum dado encontrado")
             return
 
-        if formato == "json":
-            typer.echo(df.to_json(orient="records", indent=2))
-        elif formato == "csv":
-            typer.echo(df.to_csv(index=False))
-        else:
-            typer.echo(df.to_string(index=False))
+        _output_df(df, formato)
 
     except Exception as e:
         typer.echo(f"Erro: {e}", err=True)
@@ -379,12 +364,7 @@ def ibge_censo_municipal_1985(
             typer.echo("Nenhum dado encontrado")
             return
 
-        if formato == "json":
-            typer.echo(df.to_json(orient="records", indent=2))
-        elif formato == "csv":
-            typer.echo(df.to_csv(index=False))
-        else:
-            typer.echo(df.to_string(index=False))
+        _output_df(df, formato)
 
     except Exception as e:
         typer.echo(f"Erro: {e}", err=True)
@@ -435,7 +415,6 @@ def config_show() -> None:
     settings = constants.CacheSettings()
     typer.echo(f"  cache_dir: {settings.cache_dir}")
     typer.echo(f"  db_name: {settings.db_name}")
-    typer.echo(f"  ttl_cepea_diario: {settings.ttl_cepea_diario}s")
 
     typer.echo("\n=== HTTP Settings ===")
     http = constants.HTTPSettings()

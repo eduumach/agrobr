@@ -11,11 +11,17 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **normalize/numeric** — `parse_numeric_br` canonica para parsing numerico formato BR (ponto=milhar, virgula=decimal). Substitui 3 implementacoes duplicadas em `alt/` parsers
 - **normalize/encoding** — `detect_encoding_chain` para deteccao rapida de encoding via probe chain (UTF-8, UTF-8-sig, Windows-1252, ISO-8859-1, chardet fallback). Substitui 2 implementacoes duplicadas em `alt/` parsers
 - **utils/result** — `finalize_result` helper com overloads tipados para epilogo polars/return_meta. Substitui ~140 linhas de boilerplate em ibge/ (10x), conab/api.py (3x), cepea/api.py (1x)
+- **utils/warnings** — `warn_once(key, message)` helper para warnings de licenca. Elimina 7 flags `_WARNED` globais e `global _WARNED # noqa: PLW0603` boilerplate em 6 modulos (abiove, anda, b3, conab/ceasa, imea, noticias_agricolas). `warn_once_reset()` para testes
 
 ### Improved
 - **ibge/ module split** — `ibge/api.py` (2025 linhas) dividido em `censo_api.py`, `pesquisas_api.py`, `censo_tables.py` e `_helpers.py`. API publica inalterada via re-exports em `__init__.py`. Dead branch e `import re` removidos. `NIVEL_MAP` extraido como constante compartilhada
 - **sync.py** — 23 subclasses stub vazias de `_SyncModule` removidas (258→123 linhas). `_MODULE_CLASSES` dict eliminado, `__getattr__` e `_SyncAlt` instanciam `_SyncModule` diretamente. API publica inalterada
+- **cli.py** — `_output_df` helper extrai 6 blocos identicos de formatacao output (json/csv/table)
+- **CacheSettings** — 32 campos `ttl_*` e `stale_multiplier` removidos (dead code, nunca lidos). `cache/policies.py::POLICIES` e a fonte unica de TTL
 - **Test infrastructure** — `tests/helpers.py` com 3 factories (`make_mock_response`, `make_mock_async_client`, `make_alert_settings`). Elimina `_mock_response` duplicado em 18 arquivos e boilerplate `__aenter__`/`__aexit__` em 23 arquivos
+
+### Fixed
+- Blocos `if TYPE_CHECKING: pass` mortos removidos de 4 modulos datasets (producao_anual, estimativa_safra, preco_diario, balanco)
 
 ## [0.12.0] - 2026-02-28
 

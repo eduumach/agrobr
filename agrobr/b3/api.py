@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import time
-import warnings
 from datetime import UTC, date, datetime, timedelta
 from typing import Any, Literal, overload
 
@@ -12,6 +11,7 @@ import structlog
 
 from agrobr.exceptions import ParseError, SourceUnavailableError
 from agrobr.models import MetaInfo
+from agrobr.utils.warnings import warn_once
 
 from . import client, parser
 from .models import (
@@ -21,9 +21,6 @@ from .models import (
     TICKERS_AGRO,
     TICKERS_AGRO_OI,
 )
-
-_WARNED_AJUSTES = False
-_WARNED_POSICOES = False
 
 logger = structlog.get_logger()
 
@@ -53,16 +50,12 @@ async def ajustes(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    global _WARNED_AJUSTES  # noqa: PLW0603
-    if not _WARNED_AJUSTES:
-        warnings.warn(
-            "agrobr.b3: dados da B3 (empresa privada). Ajustes diarios publicados "
-            "sem autenticacao, mas termos de uso para acesso programatico nao sao "
-            "claros. Classificacao: zona_cinza. Veja docs/licenses.md.",
-            UserWarning,
-            stacklevel=2,
-        )
-        _WARNED_AJUSTES = True
+    warn_once(
+        "b3_ajustes",
+        "agrobr.b3: dados da B3 (empresa privada). Ajustes diarios publicados "
+        "sem autenticacao, mas termos de uso para acesso programatico nao sao "
+        "claros. Classificacao: zona_cinza. Veja docs/licenses.md.",
+    )
 
     logger.info("b3_ajustes", data=str(data), contrato=contrato)
 
@@ -223,16 +216,12 @@ async def posicoes_abertas(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    global _WARNED_POSICOES  # noqa: PLW0603
-    if not _WARNED_POSICOES:
-        warnings.warn(
-            "agrobr.b3: dados da B3 (empresa privada). Posicoes em aberto publicadas "
-            "sem autenticacao, mas termos de uso para acesso programatico nao sao "
-            "claros. Classificacao: zona_cinza. Veja docs/licenses.md.",
-            UserWarning,
-            stacklevel=2,
-        )
-        _WARNED_POSICOES = True
+    warn_once(
+        "b3_posicoes",
+        "agrobr.b3: dados da B3 (empresa privada). Posicoes em aberto publicadas "
+        "sem autenticacao, mas termos de uso para acesso programatico nao sao "
+        "claros. Classificacao: zona_cinza. Veja docs/licenses.md.",
+    )
 
     logger.info("b3_posicoes_abertas", data=str(data), contrato=contrato, tipo=tipo)
 

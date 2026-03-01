@@ -106,13 +106,15 @@ class TestPrecos:
         assert meta.columns == COLUNAS_SAIDA
 
     async def test_zona_cinza_warning(self, mock_fetch) -> None:  # noqa: ARG002
-        api._WARNED = False
         with pytest.warns(UserWarning, match="zona_cinza"):
             await api.precos()
 
     async def test_no_double_warning(self, mock_fetch) -> None:  # noqa: ARG002
-        api._WARNED = True
         import warnings
+
+        from agrobr.utils.warnings import warn_once
+
+        warn_once("conab_ceasa", "dummy")
 
         with warnings.catch_warnings():
             warnings.simplefilter("error")

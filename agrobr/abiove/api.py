@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-import warnings
 from datetime import UTC, datetime
 from typing import Any, Literal, overload
 
@@ -9,13 +8,12 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.warnings import warn_once
 
 from . import client, parser
 from .models import normalize_produto
 
 logger = structlog.get_logger()
-
-_WARNED = False
 
 
 @overload
@@ -49,16 +47,12 @@ async def exportacao(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    global _WARNED  # noqa: PLW0603
-    if not _WARNED:
-        warnings.warn(
-            "ABIOVE: termos de uso não encontrados publicamente. "
-            "Autorização solicitada em fev/2026. Classificação: zona_cinza. "
-            "Veja docs/licenses.md para detalhes.",
-            UserWarning,
-            stacklevel=2,
-        )
-        _WARNED = True
+    warn_once(
+        "abiove",
+        "ABIOVE: termos de uso não encontrados publicamente. "
+        "Autorização solicitada em fev/2026. Classificação: zona_cinza. "
+        "Veja docs/licenses.md para detalhes.",
+    )
 
     logger.info(
         "abiove_exportacao",

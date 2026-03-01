@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import warnings
-
 import httpx
 import structlog
 
@@ -11,10 +9,9 @@ from agrobr.http.rate_limiter import RateLimiter
 from agrobr.http.retry import retry_async, should_retry_status
 from agrobr.http.user_agents import UserAgentRotator
 from agrobr.normalize.encoding import decode_content
+from agrobr.utils.warnings import warn_once
 
 logger = structlog.get_logger()
-
-_WARNED = False
 
 _SOFT_BLOCK_SIZE_THRESHOLD = 20_000
 
@@ -53,16 +50,12 @@ def _get_produto_url(produto: str) -> str:
 
 
 async def fetch_indicador_page(produto: str) -> str:
-    global _WARNED  # noqa: PLW0603
-    if not _WARNED:
-        warnings.warn(
-            "Notícias Agrícolas: fallback temporário do CEPEA, pendente "
-            "deprecação. Dados originários do CEPEA (CC BY-NC 4.0). "
-            "Redistribuição sujeita a restrições.",
-            UserWarning,
-            stacklevel=2,
-        )
-        _WARNED = True
+    warn_once(
+        "noticias_agricolas",
+        "Notícias Agrícolas: fallback temporário do CEPEA, pendente "
+        "deprecação. Dados originários do CEPEA (CC BY-NC 4.0). "
+        "Redistribuição sujeita a restrições.",
+    )
 
     url = _get_produto_url(produto)
     headers = UserAgentRotator.get_headers(source="noticias_agricolas")

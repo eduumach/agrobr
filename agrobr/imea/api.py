@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-import warnings
 from datetime import UTC, datetime
 from typing import Any, Literal, overload
 
@@ -9,11 +8,10 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.warnings import warn_once
 
 from . import client, parser
 from .models import resolve_cadeia_id
-
-_WARNED = False
 
 logger = structlog.get_logger()
 
@@ -46,16 +44,12 @@ async def cotacoes(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    global _WARNED  # noqa: PLW0603
-    if not _WARNED:
-        warnings.warn(
-            "IMEA: termos de uso proíbem redistribuição de dados sem "
-            "autorização escrita. Uso pessoal/educacional apenas. "
-            "Ref: https://imea.com.br/imea-site/termo-de-uso.html",
-            UserWarning,
-            stacklevel=2,
-        )
-        _WARNED = True
+    warn_once(
+        "imea",
+        "IMEA: termos de uso proíbem redistribuição de dados sem "
+        "autorização escrita. Uso pessoal/educacional apenas. "
+        "Ref: https://imea.com.br/imea-site/termo-de-uso.html",
+    )
 
     cadeia_id = resolve_cadeia_id(cadeia)
 

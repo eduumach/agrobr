@@ -247,41 +247,6 @@ class CacheSettings(BaseSettings):
     cache_dir: Path = Path.home() / ".agrobr" / "cache"
     db_name: str = "agrobr.duckdb"
 
-    ttl_cepea_diario: int = 4 * 3600
-    ttl_cepea_semanal: int = 24 * 3600
-    ttl_conab: int = 24 * 3600
-    ttl_ibge_pam: int = 168 * 3600
-    ttl_ibge_lspa: int = 24 * 3600
-    ttl_ibge_ppm: int = 7 * 24 * 3600
-    ttl_ibge_abate: int = 7 * 24 * 3600
-    ttl_ibge_censo_agro: int = 30 * 24 * 3600
-    ttl_ibge_censo_agro_legado: int = 90 * 24 * 3600
-    ttl_ibge_silvicultura: int = 7 * 24 * 3600
-    ttl_ibge_extracao_vegetal: int = 7 * 24 * 3600
-    ttl_ibge_leite_trimestral: int = 7 * 24 * 3600
-    ttl_ibge_pib: int = 7 * 24 * 3600
-    ttl_abiove: int = 7 * 24 * 3600
-    ttl_anda: int = 7 * 24 * 3600
-    ttl_deral: int = 24 * 3600
-    ttl_imea: int = 12 * 3600
-    ttl_inmet: int = 24 * 3600
-    ttl_bcb: int = 24 * 3600
-    ttl_comexstat: int = 24 * 3600
-    ttl_nasa_power: int = 7 * 24 * 3600
-    ttl_desmatamento: int = 24 * 3600
-    ttl_mapbiomas: int = 7 * 24 * 3600
-    ttl_conab_progresso: int = 12 * 3600
-    ttl_queimadas: int = 12 * 3600
-    ttl_usda: int = 24 * 3600
-    ttl_b3: int = 4 * 3600
-    ttl_anp_diesel: int = 7 * 24 * 3600
-    ttl_antaq: int = 7 * 24 * 3600
-    ttl_antt_pedagio: int = 7 * 24 * 3600
-    ttl_sicar: int = 7 * 24 * 3600
-    ttl_conab_ceasa: int = 4 * 3600
-
-    stale_multiplier: float = 12.0
-
     offline_mode: bool = False
     strict_mode: bool = False
     save_to_history: bool = True
@@ -345,6 +310,7 @@ class AlertSettings(BaseSettings):
     alert_on_layout_change: bool = True
     alert_on_source_down: bool = True
     alert_on_anomaly: bool = True
+    alert_on_soft_block: bool = True
 
     consecutive_failures_warning: int = 2
     consecutive_failures_critical: int = 3

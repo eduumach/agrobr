@@ -33,20 +33,9 @@ def _reset_global_state():
     RateLimiter.reset()
     reset_history_manager()
 
-    import agrobr.abiove.api as _abiove
-    import agrobr.anda.api as _anda
-    import agrobr.b3.api as _b3
-    import agrobr.conab.ceasa.api as _ceasa
-    import agrobr.imea.api as _imea
-    import agrobr.noticias_agricolas.client as _na
+    from agrobr.utils.warnings import warn_once_reset
 
-    _abiove._WARNED = False
-    _anda._WARNED = False
-    _b3._WARNED_AJUSTES = False
-    _b3._WARNED_POSICOES = False
-    _imea._WARNED = False
-    _na._WARNED = False
-    _ceasa._WARNED = False
+    warn_once_reset()
 
 
 @pytest.fixture

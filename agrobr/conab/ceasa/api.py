@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import time
-import warnings
 from datetime import UTC, datetime
 from typing import Any, Literal, overload
 
@@ -10,11 +9,10 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.warnings import warn_once
 
 from . import client, parser
 from .models import CATEGORIAS, CEASA_UF_MAP, PRODUTOS_PROHORT
-
-_WARNED = False
 
 logger = structlog.get_logger()
 
@@ -44,17 +42,13 @@ async def precos(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    global _WARNED  # noqa: PLW0603
-    if not _WARNED:
-        warnings.warn(
-            "agrobr.conab.ceasa: dados CONAB/PROHORT via Pentaho CDA. "
-            "Credenciais publicas embutidas no frontend, mas API nao e "
-            "oficialmente documentada. Classificacao: zona_cinza. "
-            "Veja docs/licenses.md.",
-            UserWarning,
-            stacklevel=2,
-        )
-        _WARNED = True
+    warn_once(
+        "conab_ceasa",
+        "agrobr.conab.ceasa: dados CONAB/PROHORT via Pentaho CDA. "
+        "Credenciais publicas embutidas no frontend, mas API nao e "
+        "oficialmente documentada. Classificacao: zona_cinza. "
+        "Veja docs/licenses.md.",
+    )
 
     logger.info("conab_ceasa_precos", produto=produto, ceasa=ceasa)
 
