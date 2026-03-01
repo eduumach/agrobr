@@ -49,4 +49,5 @@ auditoria_*.md
 
 # One-off scripts
 _*.py
+!agrobr/**/_*.py
 probe_functions.py

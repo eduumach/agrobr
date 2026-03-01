@@ -70,13 +70,13 @@ class TestUnidadesExtracaoVegetal:
 
 class TestExtracaoVegetalValidation:
     async def test_produto_invalido(self):
-        from agrobr.ibge.api import extracao_vegetal
+        from agrobr.ibge import extracao_vegetal
 
         with pytest.raises(ValueError, match="Produto não suportado"):
             await extracao_vegetal("banana_inexistente")
 
     async def test_variavel_invalida(self):
-        from agrobr.ibge.api import extracao_vegetal
+        from agrobr.ibge import extracao_vegetal
 
         with pytest.raises(ValueError, match="Variável não suportada"):
             await extracao_vegetal("acai", variavel="peso")
@@ -118,7 +118,7 @@ def _build_mock_df(n_ufs=3):
 
 class TestExtracaoVegetalMocked:
     async def test_returns_dataframe(self):
-        from agrobr.ibge.api import extracao_vegetal
+        from agrobr.ibge import extracao_vegetal
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -127,7 +127,7 @@ class TestExtracaoVegetalMocked:
             assert len(df) > 0
 
     async def test_output_columns(self):
-        from agrobr.ibge.api import extracao_vegetal
+        from agrobr.ibge import extracao_vegetal
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -144,7 +144,7 @@ class TestExtracaoVegetalMocked:
             assert list(df.columns) == expected
 
     async def test_produto_enrichment(self):
-        from agrobr.ibge.api import extracao_vegetal
+        from agrobr.ibge import extracao_vegetal
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -152,7 +152,7 @@ class TestExtracaoVegetalMocked:
             assert (df["produto"] == "acai").all()
 
     async def test_unidade_toneladas(self):
-        from agrobr.ibge.api import extracao_vegetal
+        from agrobr.ibge import extracao_vegetal
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -160,7 +160,7 @@ class TestExtracaoVegetalMocked:
             assert (df["unidade"] == "Toneladas").all()
 
     async def test_fonte(self):
-        from agrobr.ibge.api import extracao_vegetal
+        from agrobr.ibge import extracao_vegetal
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -168,7 +168,7 @@ class TestExtracaoVegetalMocked:
             assert (df["fonte"] == "ibge_extracao_vegetal").all()
 
     async def test_fetch_sidra_table_code(self):
-        from agrobr.ibge.api import extracao_vegetal
+        from agrobr.ibge import extracao_vegetal
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -177,7 +177,7 @@ class TestExtracaoVegetalMocked:
             assert call_kwargs["table_code"] == "289"
 
     async def test_fetch_sidra_classification_c193(self):
-        from agrobr.ibge.api import extracao_vegetal
+        from agrobr.ibge import extracao_vegetal
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -187,7 +187,7 @@ class TestExtracaoVegetalMocked:
             assert call_kwargs["classifications"]["193"] == "3403"
 
     async def test_periodo_list(self):
-        from agrobr.ibge.api import extracao_vegetal
+        from agrobr.ibge import extracao_vegetal
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -196,7 +196,7 @@ class TestExtracaoVegetalMocked:
             assert call_kwargs["period"] == "2021,2022,2023"
 
     async def test_uf_filter(self):
-        from agrobr.ibge.api import extracao_vegetal
+        from agrobr.ibge import extracao_vegetal
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df(1)
@@ -205,7 +205,7 @@ class TestExtracaoVegetalMocked:
             assert call_kwargs["ibge_territorial_code"] == "15"
 
     async def test_municipio_filter(self):
-        from agrobr.ibge.api import extracao_vegetal
+        from agrobr.ibge import extracao_vegetal
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df(1)
@@ -214,7 +214,7 @@ class TestExtracaoVegetalMocked:
             assert call_kwargs["territorial_level"] == "6"
 
     async def test_return_meta(self):
-        from agrobr.ibge.api import extracao_vegetal
+        from agrobr.ibge import extracao_vegetal
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -226,7 +226,7 @@ class TestExtracaoVegetalMocked:
 
     async def test_polars(self):
         pytest.importorskip("polars")
-        from agrobr.ibge.api import extracao_vegetal
+        from agrobr.ibge import extracao_vegetal
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -236,7 +236,7 @@ class TestExtracaoVegetalMocked:
             assert isinstance(df, pl.DataFrame)
 
     async def test_lenha_unidade_metros_cubicos(self):
-        from agrobr.ibge.api import extracao_vegetal
+        from agrobr.ibge import extracao_vegetal
 
         mock_df = _build_mock_df(1)
         mock_df["D4C"] = "3434"
@@ -407,7 +407,7 @@ class TestExtracaoVegetalCachePolicy:
 
 class TestProdutosExtracaoVegetalFunc:
     async def test_returns_list(self):
-        from agrobr.ibge.api import produtos_extracao_vegetal
+        from agrobr.ibge import produtos_extracao_vegetal
 
         result = await produtos_extracao_vegetal()
         assert isinstance(result, list)
@@ -423,7 +423,7 @@ class TestProdutosExtracaoVegetalFunc:
 @pytest.mark.integration
 class TestExtracaoVegetalIntegration:
     async def test_extracao_acai_real(self):
-        from agrobr.ibge.api import extracao_vegetal
+        from agrobr.ibge import extracao_vegetal
 
         df = await extracao_vegetal("acai", ano=2022, nivel="brasil")
         assert isinstance(df, pd.DataFrame)

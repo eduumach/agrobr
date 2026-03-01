@@ -76,7 +76,7 @@ def _build_mock_df(n_ufs=3):
 
 class TestLeiteMocked:
     async def test_returns_dataframe(self):
-        from agrobr.ibge.api import leite_trimestral
+        from agrobr.ibge import leite_trimestral
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -85,7 +85,7 @@ class TestLeiteMocked:
             assert len(df) > 0
 
     async def test_pivot_wide(self):
-        from agrobr.ibge.api import leite_trimestral
+        from agrobr.ibge import leite_trimestral
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -95,7 +95,7 @@ class TestLeiteMocked:
             assert "preco_medio" in df.columns
 
     async def test_columns_after_pivot(self):
-        from agrobr.ibge.api import leite_trimestral
+        from agrobr.ibge import leite_trimestral
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -112,7 +112,7 @@ class TestLeiteMocked:
             assert list(df.columns) == expected
 
     async def test_trimestre_format(self):
-        from agrobr.ibge.api import leite_trimestral
+        from agrobr.ibge import leite_trimestral
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -120,7 +120,7 @@ class TestLeiteMocked:
             assert (df["trimestre"] == "202503").all()
 
     async def test_uf_filter(self):
-        from agrobr.ibge.api import leite_trimestral
+        from agrobr.ibge import leite_trimestral
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df(1)
@@ -129,7 +129,7 @@ class TestLeiteMocked:
             assert call_kwargs["ibge_territorial_code"] == "31"
 
     async def test_list_of_trimestres(self):
-        from agrobr.ibge.api import leite_trimestral
+        from agrobr.ibge import leite_trimestral
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -138,7 +138,7 @@ class TestLeiteMocked:
             assert call_kwargs["period"] == "202501,202502,202503"
 
     async def test_no_trimestre_uses_last(self):
-        from agrobr.ibge.api import leite_trimestral
+        from agrobr.ibge import leite_trimestral
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -147,7 +147,7 @@ class TestLeiteMocked:
             assert call_kwargs["period"] == "last"
 
     async def test_return_meta(self):
-        from agrobr.ibge.api import leite_trimestral
+        from agrobr.ibge import leite_trimestral
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -159,7 +159,7 @@ class TestLeiteMocked:
 
     async def test_polars(self):
         pytest.importorskip("polars")
-        from agrobr.ibge.api import leite_trimestral
+        from agrobr.ibge import leite_trimestral
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -169,7 +169,7 @@ class TestLeiteMocked:
             assert isinstance(df, pl.DataFrame)
 
     async def test_preco_medio_numeric(self):
-        from agrobr.ibge.api import leite_trimestral
+        from agrobr.ibge import leite_trimestral
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -177,7 +177,7 @@ class TestLeiteMocked:
             assert pd.api.types.is_numeric_dtype(df["preco_medio"])
 
     async def test_fonte(self):
-        from agrobr.ibge.api import leite_trimestral
+        from agrobr.ibge import leite_trimestral
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -324,7 +324,7 @@ class TestLeiteCachePolicy:
 @pytest.mark.integration
 class TestLeiteIntegration:
     async def test_leite_trimestral_real(self):
-        from agrobr.ibge.api import leite_trimestral
+        from agrobr.ibge import leite_trimestral
 
         df = await leite_trimestral(trimestre="202303")
         assert isinstance(df, pd.DataFrame)

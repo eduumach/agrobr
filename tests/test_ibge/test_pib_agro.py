@@ -57,13 +57,13 @@ class TestConstantesPib:
 
 class TestPibValidation:
     async def test_setor_invalido(self):
-        from agrobr.ibge.api import pib_agro
+        from agrobr.ibge import pib_agro
 
         with pytest.raises(ValueError, match="Setor não suportado"):
             await pib_agro(setor="energia")
 
     async def test_precos_invalido(self):
-        from agrobr.ibge.api import pib_agro
+        from agrobr.ibge import pib_agro
 
         with pytest.raises(ValueError, match="Tipo de preços não suportado"):
             await pib_agro(precos="constante_2020")
@@ -110,7 +110,7 @@ def _build_mock_df(n_trimestres=4):
 
 class TestPibMocked:
     async def test_returns_dataframe(self):
-        from agrobr.ibge.api import pib_agro
+        from agrobr.ibge import pib_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -119,7 +119,7 @@ class TestPibMocked:
             assert len(df) > 0
 
     async def test_table_corrente(self):
-        from agrobr.ibge.api import pib_agro
+        from agrobr.ibge import pib_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df(1)
@@ -128,7 +128,7 @@ class TestPibMocked:
             assert call_kwargs["table_code"] == "1846"
 
     async def test_table_real(self):
-        from agrobr.ibge.api import pib_agro
+        from agrobr.ibge import pib_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df(1)
@@ -137,7 +137,7 @@ class TestPibMocked:
             assert call_kwargs["table_code"] == "6612"
 
     async def test_setor_classification(self):
-        from agrobr.ibge.api import pib_agro
+        from agrobr.ibge import pib_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df(1)
@@ -147,7 +147,7 @@ class TestPibMocked:
             assert call_kwargs["classifications"]["11255"] == "90687"
 
     async def test_output_columns(self):
-        from agrobr.ibge.api import pib_agro
+        from agrobr.ibge import pib_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -156,7 +156,7 @@ class TestPibMocked:
             assert list(df.columns) == expected
 
     async def test_fonte(self):
-        from agrobr.ibge.api import pib_agro
+        from agrobr.ibge import pib_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -164,7 +164,7 @@ class TestPibMocked:
             assert (df["fonte"] == "ibge_pib").all()
 
     async def test_setor_column(self):
-        from agrobr.ibge.api import pib_agro
+        from agrobr.ibge import pib_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -172,7 +172,7 @@ class TestPibMocked:
             assert (df["setor"] == "industria").all()
 
     async def test_return_meta(self):
-        from agrobr.ibge.api import pib_agro
+        from agrobr.ibge import pib_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -184,7 +184,7 @@ class TestPibMocked:
 
     async def test_polars(self):
         pytest.importorskip("polars")
-        from agrobr.ibge.api import pib_agro
+        from agrobr.ibge import pib_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -194,7 +194,7 @@ class TestPibMocked:
             assert isinstance(df, pl.DataFrame)
 
     async def test_list_of_trimestres(self):
-        from agrobr.ibge.api import pib_agro
+        from agrobr.ibge import pib_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -203,7 +203,7 @@ class TestPibMocked:
             assert call_kwargs["period"] == "202501,202502"
 
     async def test_no_trimestre_uses_last(self):
-        from agrobr.ibge.api import pib_agro
+        from agrobr.ibge import pib_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -212,7 +212,7 @@ class TestPibMocked:
             assert call_kwargs["period"] == "last"
 
     async def test_brasil_level(self):
-        from agrobr.ibge.api import pib_agro
+        from agrobr.ibge import pib_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -282,7 +282,7 @@ class TestPibCachePolicy:
 @pytest.mark.integration
 class TestPibIntegration:
     async def test_pib_agro_corrente_real(self):
-        from agrobr.ibge.api import pib_agro
+        from agrobr.ibge import pib_agro
 
         df = await pib_agro(precos="corrente")
         assert isinstance(df, pd.DataFrame)

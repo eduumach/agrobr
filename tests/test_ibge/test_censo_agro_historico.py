@@ -11,7 +11,7 @@ from agrobr.datasets.censo_agropecuario_historico import (
     CENSO_AGROPECUARIO_HISTORICO_INFO,
 )
 from agrobr.ibge import client
-from agrobr.ibge.api import (
+from agrobr.ibge.censo_api import (
     _parse_censo_historico_raw,
     censo_agro_historico,
     temas_censo_agro_historico,

@@ -147,14 +147,14 @@ class TestTemasCensoAgro:
 class TestCensoAgroValidation:
     @pytest.mark.asyncio
     async def test_tema_invalido(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with pytest.raises(ValueError, match="Tema não suportado"):
             await censo_agro("tema_inexistente")
 
     @pytest.mark.asyncio
     async def test_ano_invalido(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with pytest.raises(ValueError, match="Ano .* não disponível"):
             await censo_agro("preparo_solo", ano=2020)
@@ -691,7 +691,7 @@ def _build_mock_lavoura_temp_1995_area(n_ufs=2):
 class TestCensoAgro1995Mocked:
     @pytest.mark.asyncio
     async def test_efetivo_1995_single_variable(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo_1995()
@@ -700,7 +700,7 @@ class TestCensoAgro1995Mocked:
 
     @pytest.mark.asyncio
     async def test_efetivo_1995_ano_value(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo_1995()
@@ -709,7 +709,7 @@ class TestCensoAgro1995Mocked:
 
     @pytest.mark.asyncio
     async def test_efetivo_1995_categorias(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo_1995()
@@ -720,7 +720,7 @@ class TestCensoAgro1995Mocked:
 
     @pytest.mark.asyncio
     async def test_efetivo_1995_unidade(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo_1995()
@@ -729,7 +729,7 @@ class TestCensoAgro1995Mocked:
 
     @pytest.mark.asyncio
     async def test_uso_terra_1995_multi_table(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.side_effect = [
@@ -744,7 +744,7 @@ class TestCensoAgro1995Mocked:
 
     @pytest.mark.asyncio
     async def test_lavoura_temp_1995_multi_table(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.side_effect = [
@@ -762,7 +762,7 @@ class TestCensoAgro1995Mocked:
 
     @pytest.mark.asyncio
     async def test_1995_output_columns(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo_1995()
@@ -782,7 +782,7 @@ class TestCensoAgro1995Mocked:
 
     @pytest.mark.asyncio
     async def test_1995_multi_year_default(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.side_effect = [
@@ -794,7 +794,7 @@ class TestCensoAgro1995Mocked:
 
     @pytest.mark.asyncio
     async def test_1995_valor_numerico(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo_1995()
@@ -804,7 +804,7 @@ class TestCensoAgro1995Mocked:
 
     @pytest.mark.asyncio
     async def test_1995_localidade_cod_inteiro(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo_1995()
@@ -813,7 +813,7 @@ class TestCensoAgro1995Mocked:
 
     @pytest.mark.asyncio
     async def test_1995_tema_and_fonte(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo_1995()
@@ -825,7 +825,7 @@ class TestCensoAgro1995Mocked:
 class TestCensoAgroMocked:
     @pytest.mark.asyncio
     async def test_efetivo_returns_dataframe(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo()
@@ -835,7 +835,7 @@ class TestCensoAgroMocked:
 
     @pytest.mark.asyncio
     async def test_efetivo_output_columns(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo()
@@ -855,7 +855,7 @@ class TestCensoAgroMocked:
 
     @pytest.mark.asyncio
     async def test_efetivo_tema_value(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo()
@@ -864,7 +864,7 @@ class TestCensoAgroMocked:
 
     @pytest.mark.asyncio
     async def test_efetivo_fonte_value(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo()
@@ -873,7 +873,7 @@ class TestCensoAgroMocked:
 
     @pytest.mark.asyncio
     async def test_efetivo_ano_2017(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo()
@@ -882,7 +882,7 @@ class TestCensoAgroMocked:
 
     @pytest.mark.asyncio
     async def test_efetivo_categorias(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo()
@@ -893,7 +893,7 @@ class TestCensoAgroMocked:
 
     @pytest.mark.asyncio
     async def test_efetivo_variaveis(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo()
@@ -904,7 +904,7 @@ class TestCensoAgroMocked:
 
     @pytest.mark.asyncio
     async def test_efetivo_unidades(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo()
@@ -916,7 +916,7 @@ class TestCensoAgroMocked:
 
     @pytest.mark.asyncio
     async def test_efetivo_valor_numerico(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo()
@@ -926,7 +926,7 @@ class TestCensoAgroMocked:
 
     @pytest.mark.asyncio
     async def test_efetivo_localidade_cod_inteiro(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo()
@@ -935,7 +935,7 @@ class TestCensoAgroMocked:
 
     @pytest.mark.asyncio
     async def test_efetivo_return_meta(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo()
@@ -947,7 +947,7 @@ class TestCensoAgroMocked:
 
     @pytest.mark.asyncio
     async def test_efetivo_uf_filter(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo(n_ufs=1)
@@ -959,7 +959,7 @@ class TestCensoAgroMocked:
 
     @pytest.mark.asyncio
     async def test_uso_terra_returns_dataframe(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_uso_terra()
@@ -970,7 +970,7 @@ class TestCensoAgroMocked:
 
     @pytest.mark.asyncio
     async def test_uso_terra_variaveis(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_uso_terra()
@@ -981,7 +981,7 @@ class TestCensoAgroMocked:
 
     @pytest.mark.asyncio
     async def test_uso_terra_unidade_area(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_uso_terra()
@@ -991,7 +991,7 @@ class TestCensoAgroMocked:
 
     @pytest.mark.asyncio
     async def test_empty_response(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = pd.DataFrame()
@@ -1001,7 +1001,7 @@ class TestCensoAgroMocked:
 
     @pytest.mark.asyncio
     async def test_total_filtered_out(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         mock_df = _build_mock_efetivo(n_ufs=1)
         total_row = mock_df.iloc[0:1].copy()
@@ -1018,7 +1018,7 @@ class TestCensoAgroMocked:
 class TestCensoAgroNewThemesMocked:
     @pytest.mark.asyncio
     async def test_preparo_solo_2006(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_preparo_solo_2006()
@@ -1032,7 +1032,7 @@ class TestCensoAgroNewThemesMocked:
 
     @pytest.mark.asyncio
     async def test_preparo_solo_2017_var_as_category(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_preparo_solo_2017()
@@ -1047,7 +1047,7 @@ class TestCensoAgroNewThemesMocked:
 
     @pytest.mark.asyncio
     async def test_preparo_solo_2017_columns(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_preparo_solo_2017()
@@ -1067,7 +1067,7 @@ class TestCensoAgroNewThemesMocked:
 
     @pytest.mark.asyncio
     async def test_preparo_solo_multi_year(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.side_effect = [
@@ -1080,7 +1080,7 @@ class TestCensoAgroNewThemesMocked:
 
     @pytest.mark.asyncio
     async def test_adubacao_2006(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_adubacao_2006()
@@ -1094,7 +1094,7 @@ class TestCensoAgroNewThemesMocked:
 
     @pytest.mark.asyncio
     async def test_adubacao_2017(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_adubacao_2017()
@@ -1105,7 +1105,7 @@ class TestCensoAgroNewThemesMocked:
 
     @pytest.mark.asyncio
     async def test_calagem_2006(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_calagem_2006()
@@ -1118,7 +1118,7 @@ class TestCensoAgroNewThemesMocked:
 
     @pytest.mark.asyncio
     async def test_calagem_2017(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_calagem_2017()
@@ -1129,7 +1129,7 @@ class TestCensoAgroNewThemesMocked:
 
     @pytest.mark.asyncio
     async def test_agrotoxicos_2006(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_agrotoxicos_2006()
@@ -1142,7 +1142,7 @@ class TestCensoAgroNewThemesMocked:
 
     @pytest.mark.asyncio
     async def test_agrotoxicos_2017(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_agrotoxicos_2017()
@@ -1153,7 +1153,7 @@ class TestCensoAgroNewThemesMocked:
 
     @pytest.mark.asyncio
     async def test_praticas_agricolas_2006(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_praticas_agricolas_2006()
@@ -1166,7 +1166,7 @@ class TestCensoAgroNewThemesMocked:
 
     @pytest.mark.asyncio
     async def test_praticas_agricolas_2017(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_praticas_agricolas_2017()
@@ -1177,7 +1177,7 @@ class TestCensoAgroNewThemesMocked:
 
     @pytest.mark.asyncio
     async def test_irrigacao_2006(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_irrigacao_2006()
@@ -1190,7 +1190,7 @@ class TestCensoAgroNewThemesMocked:
 
     @pytest.mark.asyncio
     async def test_irrigacao_2017(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_irrigacao_2017()
@@ -1203,7 +1203,7 @@ class TestCensoAgroNewThemesMocked:
 
     @pytest.mark.asyncio
     async def test_ano_filter_single(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_adubacao_2017()
@@ -1213,7 +1213,7 @@ class TestCensoAgroNewThemesMocked:
 
     @pytest.mark.asyncio
     async def test_valor_numerico(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_irrigacao_2006()
@@ -1222,7 +1222,7 @@ class TestCensoAgroNewThemesMocked:
 
     @pytest.mark.asyncio
     async def test_localidade_cod_inteiro(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_calagem_2017()
@@ -1233,7 +1233,7 @@ class TestCensoAgroNewThemesMocked:
 class TestCensoAgro2006ReversedColumns:
     @pytest.mark.asyncio
     async def test_preparo_solo_2006_reversed_has_subcategorias(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_preparo_solo_2006_reversed()
@@ -1246,7 +1246,7 @@ class TestCensoAgro2006ReversedColumns:
 
     @pytest.mark.asyncio
     async def test_preparo_solo_2006_reversed_variavel_ok(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_preparo_solo_2006_reversed()
@@ -1255,7 +1255,7 @@ class TestCensoAgro2006ReversedColumns:
 
     @pytest.mark.asyncio
     async def test_preparo_solo_2006_reversed_no_duplicate_pk(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_preparo_solo_2006_reversed()
@@ -1266,7 +1266,7 @@ class TestCensoAgro2006ReversedColumns:
 
     @pytest.mark.asyncio
     async def test_adubacao_2006_reversed_has_subcategorias(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         reversed_data = _build_mock_classif_2006_reversed(
             [("113227", "Usam adubação"), ("113228", "Químico nitrogenado")]
@@ -1280,7 +1280,7 @@ class TestCensoAgro2006ReversedColumns:
 
     @pytest.mark.asyncio
     async def test_irrigacao_2006_reversed_has_subcategorias(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         reversed_data = _build_mock_classif_2006_reversed(
             [("113515", "Inundação"), ("113517", "Pivô central")]
@@ -1294,7 +1294,7 @@ class TestCensoAgro2006ReversedColumns:
 
     @pytest.mark.asyncio
     async def test_original_order_still_works(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_preparo_solo_2006()
@@ -1307,7 +1307,7 @@ class TestCensoAgro2006ReversedColumns:
 class TestCensoAgroRetrocompat:
     @pytest.mark.asyncio
     async def test_efetivo_rebanho_still_works(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo()
@@ -1318,7 +1318,7 @@ class TestCensoAgroRetrocompat:
 
     @pytest.mark.asyncio
     async def test_uso_terra_still_works(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_uso_terra()
@@ -1329,7 +1329,7 @@ class TestCensoAgroRetrocompat:
 
     @pytest.mark.asyncio
     async def test_efetivo_with_uf_keyword(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo(n_ufs=1)
@@ -1338,7 +1338,7 @@ class TestCensoAgroRetrocompat:
 
     @pytest.mark.asyncio
     async def test_efetivo_with_ano_none(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo()
@@ -1350,7 +1350,7 @@ class TestCensoAgroRetrocompat:
 class TestTemasCensoAgroFunc:
     @pytest.mark.asyncio
     async def test_returns_list(self):
-        from agrobr.ibge.api import temas_censo_agro
+        from agrobr.ibge import temas_censo_agro
 
         result = await temas_censo_agro()
         assert isinstance(result, list)
@@ -1358,7 +1358,7 @@ class TestTemasCensoAgroFunc:
 
     @pytest.mark.asyncio
     async def test_contains_all_themes(self):
-        from agrobr.ibge.api import temas_censo_agro
+        from agrobr.ibge import temas_censo_agro
 
         result = await temas_censo_agro()
         assert "efetivo_rebanho" in result
@@ -1379,7 +1379,7 @@ class TestCensoAgroPolarsSupport:
         pytest.importorskip("polars")
         import polars as pl
 
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo(n_ufs=1)
@@ -1391,7 +1391,7 @@ class TestCensoAgroPolarsSupport:
         pytest.importorskip("polars")
         import polars as pl
 
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_efetivo(n_ufs=1)
@@ -1530,7 +1530,7 @@ class TestCensoAgroIntegration:
     @pytest.mark.asyncio
     @pytest.mark.integration
     async def test_efetivo_rebanho_real_api(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         df = await censo_agro("efetivo_rebanho", uf="SP", nivel="uf")
         assert isinstance(df, pd.DataFrame)
@@ -1542,7 +1542,7 @@ class TestCensoAgroIntegration:
     @pytest.mark.asyncio
     @pytest.mark.integration
     async def test_uso_terra_real_api(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         df = await censo_agro("uso_terra", ano=2017, uf="MT", nivel="uf")
         assert isinstance(df, pd.DataFrame)
@@ -1552,7 +1552,7 @@ class TestCensoAgroIntegration:
     @pytest.mark.asyncio
     @pytest.mark.integration
     async def test_efetivo_rebanho_1995_real_api(self):
-        from agrobr.ibge.api import censo_agro
+        from agrobr.ibge import censo_agro
 
         df = await censo_agro("efetivo_rebanho", ano=1995, uf="SP", nivel="uf")
         assert len(df) > 0

@@ -106,19 +106,19 @@ class TestUnidadesSilvicultura:
 
 class TestSilviculturaValidation:
     async def test_produto_invalido(self):
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         with pytest.raises(ValueError, match="Produto não suportado"):
             await silvicultura("banana_inexistente")
 
     async def test_variavel_invalida(self):
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         with pytest.raises(ValueError, match="Variável não suportada"):
             await silvicultura("carvao", variavel="peso")
 
     async def test_especie_invalida_para_area(self):
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         with pytest.raises(ValueError, match="Espécie não suportada para área"):
             await silvicultura("carvao", variavel="area")
@@ -184,7 +184,7 @@ def _build_mock_area_df(n_ufs=3):
 
 class TestSilviculturaMocked:
     async def test_returns_dataframe(self):
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -193,7 +193,7 @@ class TestSilviculturaMocked:
             assert len(df) > 0
 
     async def test_output_columns(self):
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -210,7 +210,7 @@ class TestSilviculturaMocked:
             assert list(df.columns) == expected
 
     async def test_produto_enrichment(self):
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -218,7 +218,7 @@ class TestSilviculturaMocked:
             assert (df["produto"] == "carvao").all()
 
     async def test_unidade(self):
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -226,7 +226,7 @@ class TestSilviculturaMocked:
             assert (df["unidade"] == "Toneladas").all()
 
     async def test_fonte(self):
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -234,7 +234,7 @@ class TestSilviculturaMocked:
             assert (df["fonte"] == "ibge_silvicultura").all()
 
     async def test_fetch_sidra_table_code_producao(self):
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -243,7 +243,7 @@ class TestSilviculturaMocked:
             assert call_kwargs["table_code"] == "291"
 
     async def test_fetch_sidra_table_code_area(self):
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_area_df()
@@ -252,7 +252,7 @@ class TestSilviculturaMocked:
             assert call_kwargs["table_code"] == "5930"
 
     async def test_fetch_sidra_classification_c194(self):
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -262,7 +262,7 @@ class TestSilviculturaMocked:
             assert call_kwargs["classifications"]["194"] == "3455"
 
     async def test_fetch_sidra_classification_c734(self):
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_area_df()
@@ -272,7 +272,7 @@ class TestSilviculturaMocked:
             assert call_kwargs["classifications"]["734"] == "39326"
 
     async def test_periodo_list(self):
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -281,7 +281,7 @@ class TestSilviculturaMocked:
             assert call_kwargs["period"] == "2021,2022,2023"
 
     async def test_uf_filter(self):
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df(1)
@@ -290,7 +290,7 @@ class TestSilviculturaMocked:
             assert call_kwargs["ibge_territorial_code"] == "31"
 
     async def test_municipio_filter(self):
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df(1)
@@ -300,7 +300,7 @@ class TestSilviculturaMocked:
             assert call_kwargs["ibge_territorial_code"] == "in N3 31"
 
     async def test_return_meta(self):
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -312,7 +312,7 @@ class TestSilviculturaMocked:
 
     async def test_polars(self):
         pytest.importorskip("polars")
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_df()
@@ -322,7 +322,7 @@ class TestSilviculturaMocked:
             assert isinstance(df, pl.DataFrame)
 
     async def test_variavel_area(self):
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         with patch("agrobr.ibge.client.fetch_sidra", new_callable=AsyncMock) as mock:
             mock.return_value = _build_mock_area_df()
@@ -494,7 +494,7 @@ class TestSilviculturaCachePolicy:
 
 class TestProdutosSilviculturaFunc:
     async def test_returns_list(self):
-        from agrobr.ibge.api import produtos_silvicultura
+        from agrobr.ibge import produtos_silvicultura
 
         result = await produtos_silvicultura()
         assert isinstance(result, list)
@@ -504,7 +504,7 @@ class TestProdutosSilviculturaFunc:
 
 class TestEspeciesSilviculturaAreaFunc:
     async def test_returns_list(self):
-        from agrobr.ibge.api import especies_silvicultura_area
+        from agrobr.ibge import especies_silvicultura_area
 
         result = await especies_silvicultura_area()
         assert isinstance(result, list)
@@ -520,7 +520,7 @@ class TestEspeciesSilviculturaAreaFunc:
 @pytest.mark.integration
 class TestSilviculturaIntegration:
     async def test_silvicultura_carvao_real(self):
-        from agrobr.ibge.api import silvicultura
+        from agrobr.ibge import silvicultura
 
         df = await silvicultura("carvao", ano=2022, nivel="brasil")
         assert isinstance(df, pd.DataFrame)
