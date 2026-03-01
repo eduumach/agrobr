@@ -14,6 +14,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ### Improved
 - **ibge/ module split** — `ibge/api.py` (2025 linhas) dividido em `censo_api.py`, `pesquisas_api.py`, `censo_tables.py` e `_helpers.py`. API publica inalterada via re-exports em `__init__.py`. Dead branch e `import re` removidos. `NIVEL_MAP` extraido como constante compartilhada
+- **sync.py** — 23 subclasses stub vazias de `_SyncModule` removidas (258→123 linhas). `_MODULE_CLASSES` dict eliminado, `__getattr__` e `_SyncAlt` instanciam `_SyncModule` diretamente. API publica inalterada
 - **Test infrastructure** — `tests/helpers.py` com 3 factories (`make_mock_response`, `make_mock_async_client`, `make_alert_settings`). Elimina `_mock_response` duplicado em 18 arquivos e boilerplate `__aenter__`/`__aexit__` em 23 arquivos
 
 ## [0.12.0] - 2026-02-28
