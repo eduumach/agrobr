@@ -84,9 +84,10 @@ def detect_encoding(content: bytes) -> tuple[str, float]:
 
 
 def detect_encoding_chain(content: bytes) -> str:
+    sample = content[:4096]
     for enc in ("utf-8", "utf-8-sig", "windows-1252", "iso-8859-1"):
         try:
-            content[:4096].decode(enc)
+            sample.decode(enc)
             return enc
         except (UnicodeDecodeError, LookupError):
             continue
