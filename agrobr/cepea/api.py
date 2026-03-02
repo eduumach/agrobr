@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import hashlib
 import time
+import warnings
 from datetime import date, datetime, timedelta
 from decimal import Decimal
-from typing import TYPE_CHECKING, Any, Literal, overload
+from typing import TYPE_CHECKING, Any, Literal, NamedTuple, overload
 
 import httpx
 import pandas as pd
@@ -16,7 +17,7 @@ from agrobr.cache.keys import build_cache_key
 from agrobr.cache.policies import calculate_expiry
 from agrobr.cepea import client
 from agrobr.cepea.parsers.detector import get_parser_with_fallback
-from agrobr.exceptions import ParseError, SourceUnavailableError
+from agrobr.exceptions import ParseError, SourceUnavailableError, StaleDataWarning
 from agrobr.models import Indicador, MetaInfo
 from agrobr.utils.result import finalize_result
 from agrobr.utils.time import utcnow
@@ -28,6 +29,95 @@ if TYPE_CHECKING:
 logger = structlog.get_logger()
 
 SOURCE_WINDOW_DAYS = 10
+
+
+def _normalize_dates(
+    inicio: str | date | None,
+    fim: str | date | None,
+) -> tuple[date, date]:
+    if isinstance(inicio, str):
+        inicio = datetime.strptime(inicio, "%Y-%m-%d").date()
+    if isinstance(fim, str):
+        fim = datetime.strptime(fim, "%Y-%m-%d").date()
+    if fim is None:
+        fim = date.today()
+    if inicio is None:
+        inicio = fim - timedelta(days=365)
+    return inicio, fim
+
+
+def _needs_fetch(
+    indicadores: list[Indicador],
+    inicio: date,
+    fim: date,
+    force_refresh: bool,
+    offline: bool,
+) -> bool:
+    if offline:
+        return False
+    if force_refresh:
+        return True
+    today = date.today()
+    recent_start = today - timedelta(days=SOURCE_WINDOW_DAYS)
+    if fim < recent_start:
+        return False
+    existing_dates = {ind.data for ind in indicadores}
+    for i in range(min(SOURCE_WINDOW_DAYS, (fim - max(inicio, recent_start)).days + 1)):
+        check_date = fim - timedelta(days=i)
+        if check_date.weekday() < 5 and check_date not in existing_dates:
+            return True
+    return False
+
+
+def _warn_stale(message: str, meta: MetaInfo) -> None:
+    warnings.warn(message, StaleDataWarning, stacklevel=3)
+    meta.validation_warnings.append("stale_data: using cache after empty fetch")
+
+
+class _FetchResult(NamedTuple):
+    indicadores: list[Indicador]
+    source_name: str
+    source_url: str
+    parser_version: int
+    raw_hash: str
+    raw_size: int
+    parse_ms: int
+
+
+async def _fetch_and_parse(produto: str) -> _FetchResult:
+    parse_start = time.perf_counter()
+    fetch_result = await client.fetch_indicador_page(produto)
+    html = fetch_result.html
+    source_name = fetch_result.source
+    raw_size = len(html.encode("utf-8"))
+    raw_hash = f"sha256:{hashlib.sha256(html.encode('utf-8')).hexdigest()[:16]}"
+
+    if source_name == "noticias_agricolas":
+        from agrobr.noticias_agricolas.parser import parse_indicador as na_parse
+
+        new_indicadores = na_parse(html, produto)
+        source_url = f"https://www.noticiasagricolas.com.br/cotacoes/{produto}"
+        parser_version = 1
+        logger.info(
+            "parse_success",
+            source="noticias_agricolas",
+            records_count=len(new_indicadores),
+        )
+    else:
+        parser, new_indicadores = await get_parser_with_fallback(html, produto)
+        source_url = f"https://www.cepea.esalq.usp.br/br/indicador/{produto}.aspx"
+        parser_version = parser.version
+
+    parse_ms = int((time.perf_counter() - parse_start) * 1000)
+    return _FetchResult(
+        indicadores=new_indicadores,
+        source_name=source_name,
+        source_url=source_url,
+        parser_version=parser_version,
+        raw_hash=raw_hash,
+        raw_size=raw_size,
+        parse_ms=parse_ms,
+    )
 
 
 @overload
@@ -81,21 +171,10 @@ async def indicador(
         source_method="unknown",
         fetched_at=utcnow(),
     )
-    if isinstance(inicio, str):
-        inicio = datetime.strptime(inicio, "%Y-%m-%d").date()
-    if isinstance(fim, str):
-        fim = datetime.strptime(fim, "%Y-%m-%d").date()
-
-    if fim is None:
-        fim = date.today()
-    if inicio is None:
-        inicio = fim - timedelta(days=365)
+    inicio, fim = _normalize_dates(inicio, fim)
 
     store = get_store()
     indicadores: list[Indicador] = []
-
-    source_url = ""
-    parser_version = 1
 
     if not force_refresh:
         cached_data = store.indicadores_query(
@@ -120,86 +199,43 @@ async def indicador(
             cached_count=len(indicadores),
         )
 
-    needs_fetch = False
-    if not offline:
-        if force_refresh:
-            needs_fetch = True
-        else:
-            today = date.today()
-            recent_start = today - timedelta(days=SOURCE_WINDOW_DAYS)
-
-            if fim >= recent_start:
-                existing_dates = {ind.data for ind in indicadores}
-                for i in range(min(SOURCE_WINDOW_DAYS, (fim - max(inicio, recent_start)).days + 1)):
-                    check_date = fim - timedelta(days=i)
-                    if check_date.weekday() < 5 and check_date not in existing_dates:
-                        needs_fetch = True
-                        break
-
-    if needs_fetch:
+    if _needs_fetch(indicadores, inicio, fim, force_refresh, offline):
         logger.info("fetching_from_source", produto=produto)
 
         try:
-            parse_start = time.perf_counter()
-            fetch_result = await client.fetch_indicador_page(produto)
-            html = fetch_result.html
-            source_name = fetch_result.source
-            raw_content_size = len(html.encode("utf-8"))
-            raw_content_hash = f"sha256:{hashlib.sha256(html.encode('utf-8')).hexdigest()[:16]}"
+            result = await _fetch_and_parse(produto)
 
-            if source_name == "noticias_agricolas":
-                from agrobr.noticias_agricolas.parser import parse_indicador as na_parse
-
-                new_indicadores = na_parse(html, produto)
-                source_url = f"https://www.noticiasagricolas.com.br/cotacoes/{produto}"
-                meta.source = "noticias_agricolas"
-                meta.source_method = "httpx"
-                logger.info(
-                    "parse_success",
-                    source="noticias_agricolas",
-                    records_count=len(new_indicadores),
-                )
-            else:
-                parser, new_indicadores = await get_parser_with_fallback(html, produto)
-                source_url = f"https://www.cepea.esalq.usp.br/br/indicador/{produto}.aspx"
-                meta.source = "cepea"
-                meta.source_method = "httpx"
-                parser_version = parser.version
-
-            parse_duration_ms = int((time.perf_counter() - parse_start) * 1000)
-            meta.parse_duration_ms = parse_duration_ms
-            meta.source_url = source_url
-            meta.raw_content_hash = raw_content_hash
-            meta.raw_content_size = raw_content_size
-            meta.parser_version = parser_version
+            meta.source = (
+                "noticias_agricolas" if result.source_name == "noticias_agricolas" else "cepea"
+            )
+            meta.source_method = "httpx"
+            meta.parse_duration_ms = result.parse_ms
+            meta.source_url = result.source_url
+            meta.raw_content_hash = result.raw_hash
+            meta.raw_content_size = result.raw_size
+            meta.parser_version = result.parser_version
             meta.from_cache = False
 
-            if new_indicadores:
-                new_dicts = _indicadores_to_dicts(new_indicadores)
+            if result.indicadores:
+                new_dicts = _indicadores_to_dicts(result.indicadores)
                 saved_count = store.indicadores_upsert(new_dicts)
 
                 logger.info(
                     "new_data_saved",
                     produto=produto,
-                    fetched=len(new_indicadores),
+                    fetched=len(result.indicadores),
                     saved=saved_count,
                 )
 
                 existing_dates = {ind.data for ind in indicadores}
-                for ind in new_indicadores:
+                for ind in result.indicadores:
                     if ind.data not in existing_dates:
                         indicadores.append(ind)
             elif indicadores:
-                import warnings
-
-                from agrobr.exceptions import StaleDataWarning
-
-                warnings.warn(
+                _warn_stale(
                     f"Fresh fetch for '{produto}' returned no data. Using cached data.",
-                    StaleDataWarning,
-                    stacklevel=2,
+                    meta,
                 )
-                meta.validation_warnings.append("stale_data: using cache after empty fetch")
 
         except (httpx.HTTPError, SourceUnavailableError, ParseError, OSError) as e:
             logger.warning(
@@ -216,15 +252,10 @@ async def indicador(
                     praca=praca,
                 )
                 if cached_fallback:
-                    import warnings
-
-                    from agrobr.exceptions import StaleDataWarning
-
                     indicadores = _dicts_to_indicadores(cached_fallback)
-                    warnings.warn(
+                    _warn_stale(
                         f"All sources failed for '{produto}'. Using stale cache ({len(indicadores)} records).",
-                        StaleDataWarning,
-                        stacklevel=2,
+                        meta,
                     )
                     meta.from_cache = True
                     meta.source = "cache_fallback"

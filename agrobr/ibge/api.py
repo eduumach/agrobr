@@ -424,6 +424,83 @@ async def ppm(
     return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
+def _detect_abate_columns(df: pd.DataFrame) -> dict[str, str]:
+    col_map = {
+        "NC": "nivel_cod",
+        "NN": "nivel",
+        "MC": "unidade_cod",
+        "MN": "unidade",
+        "V": "valor",
+        "D1C": "localidade_cod",
+        "D1N": "localidade",
+    }
+
+    var_ids = {"284", "285", "1000284", "1000285", "151", "1000151"}
+    for dc in ["D2C", "D3C"]:
+        if dc not in df.columns or len(df) == 0:
+            continue
+        sample_str = str(df[dc].iloc[0])
+        name_col = dc[:-1] + "N"
+        if sample_str in var_ids:
+            col_map[dc] = "variavel_cod"
+            col_map[name_col] = "variavel_nome"
+        elif len(sample_str) == 6 and sample_str[:4].isdigit():
+            col_map[dc] = "trimestre_cod"
+            col_map[name_col] = "trimestre_nome"
+
+    return {k: v for k, v in col_map.items() if k in df.columns}
+
+
+def _merge_cabecas_peso(df: pd.DataFrame, especie_lower: str) -> pd.DataFrame:
+    cabecas = df[df["variavel_cod"].astype(str) == "284"].copy()
+    peso = df[df["variavel_cod"].astype(str) == "285"].copy()
+
+    merge_keys = [c for c in ["trimestre", "localidade", "localidade_cod"] if c in cabecas.columns]
+
+    if not cabecas.empty and not peso.empty and merge_keys:
+        cabecas = cabecas.rename(columns={"valor": "animais_abatidos"})
+        peso = peso.rename(columns={"valor": "peso_carcacas"})
+        result = cabecas[merge_keys + ["animais_abatidos"]].merge(
+            peso[merge_keys + ["peso_carcacas"]],
+            on=merge_keys,
+            how="outer",
+        )
+    elif not cabecas.empty:
+        result = cabecas.rename(columns={"valor": "animais_abatidos"})
+        result["peso_carcacas"] = pd.NA
+    else:
+        return pd.DataFrame()
+
+    if "localidade_cod" in result.columns:
+        result["localidade_cod"] = pd.to_numeric(result["localidade_cod"], errors="coerce").astype(
+            "Int64"
+        )
+
+    result["especie"] = especie_lower
+    result["fonte"] = "ibge_abate"
+
+    output_cols = [
+        c
+        for c in [
+            "trimestre",
+            "localidade",
+            "localidade_cod",
+            "especie",
+            "animais_abatidos",
+            "peso_carcacas",
+            "fonte",
+        ]
+        if c in result.columns
+    ]
+    result = result[output_cols].reset_index(drop=True)
+
+    for col in ["animais_abatidos", "peso_carcacas"]:
+        if col in result.columns:
+            result[col] = pd.to_numeric(result[col], errors="coerce")
+
+    return result
+
+
 @overload
 async def abate(
     especie: str,
@@ -497,41 +574,7 @@ async def abate(
         classifications=classifications,
     )
 
-    col_map = {
-        "NC": "nivel_cod",
-        "NN": "nivel",
-        "MC": "unidade_cod",
-        "MN": "unidade",
-        "V": "valor",
-        "D1C": "localidade_cod",
-        "D1N": "localidade",
-    }
-
-    trimestre_col = None
-    variavel_col = None
-    variavel_name_col = ""
-    trimestre_name_col = ""
-    var_ids = {"284", "285", "1000284", "1000285", "151", "1000151"}
-    for dc in ["D2C", "D3C"]:
-        if dc not in df.columns or len(df) == 0:
-            continue
-        sample_str = str(df[dc].iloc[0])
-        name_col = dc[:-1] + "N"
-        if sample_str in var_ids:
-            variavel_col = dc
-            variavel_name_col = name_col
-        elif len(sample_str) == 6 and sample_str[:4].isdigit():
-            trimestre_col = dc
-            trimestre_name_col = name_col
-
-    if variavel_col:
-        col_map[variavel_col] = "variavel_cod"
-        col_map[variavel_name_col] = "variavel_nome"
-    if trimestre_col:
-        col_map[trimestre_col] = "trimestre_cod"
-        col_map[trimestre_name_col] = "trimestre_nome"
-
-    rename_map = {k: v for k, v in col_map.items() if k in df.columns}
+    rename_map = _detect_abate_columns(df)
     df = df.rename(columns=rename_map)
 
     if "valor" in df.columns:
@@ -540,54 +583,7 @@ async def abate(
     if "trimestre_cod" in df.columns:
         df["trimestre"] = df["trimestre_cod"].astype(str)
 
-    cabecas = df[df["variavel_cod"].astype(str) == "284"].copy()
-    peso = df[df["variavel_cod"].astype(str) == "285"].copy()
-
-    merge_keys = [c for c in ["trimestre", "localidade", "localidade_cod"] if c in cabecas.columns]
-
-    if not cabecas.empty and not peso.empty and merge_keys:
-        cabecas = cabecas.rename(columns={"valor": "animais_abatidos"})
-        peso = peso.rename(columns={"valor": "peso_carcacas"})
-        result = cabecas[merge_keys + ["animais_abatidos"]].merge(
-            peso[merge_keys + ["peso_carcacas"]],
-            on=merge_keys,
-            how="outer",
-        )
-    elif not cabecas.empty:
-        result = cabecas.rename(columns={"valor": "animais_abatidos"})
-        result["peso_carcacas"] = pd.NA
-    else:
-        result = pd.DataFrame()
-
-    if not result.empty:
-        if "localidade_cod" in result.columns:
-            result["localidade_cod"] = pd.to_numeric(
-                result["localidade_cod"], errors="coerce"
-            ).astype("Int64")
-
-        result["especie"] = especie_lower
-        result["fonte"] = "ibge_abate"
-
-        output_cols = [
-            c
-            for c in [
-                "trimestre",
-                "localidade",
-                "localidade_cod",
-                "especie",
-                "animais_abatidos",
-                "peso_carcacas",
-                "fonte",
-            ]
-            if c in result.columns
-        ]
-        result = result[output_cols].reset_index(drop=True)
-
-        for col in ["animais_abatidos", "peso_carcacas"]:
-            if col in result.columns:
-                result[col] = pd.to_numeric(result[col], errors="coerce")
-
-    df = result
+    df = _merge_cabecas_peso(df, especie_lower)
 
     meta.fetch_duration_ms = int((time.perf_counter() - fetch_start) * 1000)
     meta.records_count = len(df)

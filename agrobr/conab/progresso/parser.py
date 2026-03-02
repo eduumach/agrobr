@@ -39,7 +39,7 @@ def _parse_date(val: object) -> str:
     return str(val).strip()
 
 
-def parse_progresso_xlsx(data: bytes) -> pd.DataFrame:
+def _read_xlsx_sheet(data: bytes) -> pd.DataFrame:
     try:
         wb_sheets = pd.ExcelFile(io.BytesIO(data), engine="openpyxl").sheet_names
     except Exception as e:
@@ -85,6 +85,33 @@ def parse_progresso_xlsx(data: bytes) -> pd.DataFrame:
             parser_version=PARSER_VERSION,
             reason="Sheet vazia",
         )
+
+    return df_raw
+
+
+def _build_record(
+    cultura: str,
+    safra: str | None,
+    operacao: str,
+    uf: str,
+    semana: str,
+    vals: list[object],
+) -> dict[str, object]:
+    return {
+        "cultura": cultura,
+        "safra": safra,
+        "operacao": operacao,
+        "estado": uf,
+        "semana_atual": semana,
+        "pct_ano_anterior": _parse_pct(vals[2]),
+        "pct_semana_anterior": _parse_pct(vals[3]),
+        "pct_semana_atual": _parse_pct(vals[4]),
+        "pct_media_5_anos": _parse_pct(vals[5]),
+    }
+
+
+def parse_progresso_xlsx(data: bytes) -> pd.DataFrame:
+    df_raw = _read_xlsx_sheet(data)
 
     records: list[dict[str, object]] = []
     cultura_atual: str | None = None
@@ -139,23 +166,8 @@ def parse_progresso_xlsx(data: bytes) -> pd.DataFrame:
         if estado_raw.startswith("*") or estado_raw.startswith("("):
             continue
         if "estados" in estado_raw.lower() or "brasil" in estado_raw.lower():
-            uf = "BR"
-            pct_ano_ant = _parse_pct(vals[2])
-            pct_sem_ant = _parse_pct(vals[3])
-            pct_sem_atual = _parse_pct(vals[4])
-            pct_media_5 = _parse_pct(vals[5])
             records.append(
-                {
-                    "cultura": cultura_atual,
-                    "safra": safra_atual,
-                    "operacao": operacao_atual,
-                    "estado": uf,
-                    "semana_atual": semana_atual,
-                    "pct_ano_anterior": pct_ano_ant,
-                    "pct_semana_anterior": pct_sem_ant,
-                    "pct_semana_atual": pct_sem_atual,
-                    "pct_media_5_anos": pct_media_5,
-                }
+                _build_record(cultura_atual, safra_atual, operacao_atual, "BR", semana_atual, vals)
             )
             continue
         if estado_raw.lower().startswith("valores") or estado_raw.lower().startswith("percentual"):
@@ -165,24 +177,8 @@ def parse_progresso_xlsx(data: bytes) -> pd.DataFrame:
             continue
 
         uf = estado_para_uf(estado_raw)
-
-        pct_ano_ant = _parse_pct(vals[2])
-        pct_sem_ant = _parse_pct(vals[3])
-        pct_sem_atual = _parse_pct(vals[4])
-        pct_media_5 = _parse_pct(vals[5])
-
         records.append(
-            {
-                "cultura": cultura_atual,
-                "safra": safra_atual,
-                "operacao": operacao_atual,
-                "estado": uf,
-                "semana_atual": semana_atual,
-                "pct_ano_anterior": pct_ano_ant,
-                "pct_semana_anterior": pct_sem_ant,
-                "pct_semana_atual": pct_sem_atual,
-                "pct_media_5_anos": pct_media_5,
-            }
+            _build_record(cultura_atual, safra_atual, operacao_atual, uf, semana_atual, vals)
         )
 
     if not records:
