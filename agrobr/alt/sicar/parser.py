@@ -24,12 +24,13 @@ def _normalize_columns(df: pd.DataFrame, output_cols: list[str]) -> pd.DataFrame
         df.get("data_atualizacao", pd.Series(dtype=str)), errors="coerce"
     )
 
-    df["area_ha"] = pd.to_numeric(df["area_ha"], errors="coerce")
+    df["area_ha"] = pd.to_numeric(df["area_ha"].astype(str).str.replace(",", "."), errors="coerce")
     df["cod_municipio_ibge"] = pd.to_numeric(
         df.get("cod_municipio_ibge", pd.Series(dtype=str)), errors="coerce"
     ).astype("Int64")
     df["modulos_fiscais"] = pd.to_numeric(
-        df.get("modulos_fiscais", pd.Series(dtype=str)), errors="coerce"
+        df.get("modulos_fiscais", pd.Series(dtype=str)).astype(str).str.replace(",", "."),
+        errors="coerce",
     )
 
     df["uf"] = df["uf"].fillna("").str.strip().str.upper()

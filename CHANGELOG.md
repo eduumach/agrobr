@@ -70,6 +70,9 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **utcnow migration** — `datetime.utcnow()` (deprecated Python 3.12+) substituido por `utcnow()` helper (naive UTC) em models.py, fingerprint.py, collector.py, duckdb_store.py. 12 sites `fetched_at=datetime.now()` migrados pra UTC em cepea, conab, ibge (api, pesquisas, censo)
 - **conab/parsers/v1** — fallback hardcoded `"2025/26"` removido de `_extract_safra_columns()`. Agora levanta `ParseError` com log estruturado quando nao detecta colunas de safra
 - Blocos `if TYPE_CHECKING: pass` mortos removidos de 4 modulos datasets (producao_anual, estimativa_safra, preco_diario, balanco)
+- **conab/custo_producao** — URL da pagina de custos tinha path duplicado (`/conab/conab/pt-br/...`) resultando em 404. `BASE_URL` ja continha `/conab`, path literal repetia. Corrigido para `{BASE_URL}/pt-br/...`
+- **alt/sicar** — `area_ha` e `modulos_fiscais` falhavam contract validation quando WFS GeoServer retornava valores com formato BR (virgula decimal). `pd.to_numeric` nao parseia `"120,5"` → coerce para NaN → `ContractViolationError`. Fix: `.str.replace(",", ".")` antes de `pd.to_numeric` (vectorizado)
+- **normalize/encoding** — `detect_encoding_chain` validava encoding apenas contra sample de 4096 bytes. Bytes invalidos alem do sample (ex: 0x81 na posicao 17.6M do CSV PSR) passavam como windows-1252 no sample mas falhavam no decode completo. Fix: valida encoding contra conteudo completo, windows-1252 cai para iso-8859-1 quando necessario
 
 ## [0.12.0] - 2026-02-28
 

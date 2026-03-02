@@ -19,7 +19,7 @@ logger = structlog.get_logger()
 BASE_URL = URLS[Fonte.CONAB]["base"]
 
 CUSTOS_PAGE = (
-    f"{BASE_URL}/conab/pt-br/atuacao/informacoes-agropecuarias"
+    f"{BASE_URL}/pt-br/atuacao/informacoes-agropecuarias"
     "/custos-de-producao/planilhas-de-custos-de-producao"
 )
 
@@ -77,8 +77,6 @@ async def fetch_custos_page() -> str:
 
 
 async def download_xlsx(url: str) -> BytesIO:
-    from agrobr.http.retry import retry_on_status
-
     if not url.startswith("http"):
         url = f"{BASE_URL}{url}"
 

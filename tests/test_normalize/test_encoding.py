@@ -198,7 +198,13 @@ class TestDetectEncodingChain:
 
     def test_boundary_4096(self):
         content = b"A" * 4096 + bytes([0x80, 0x81])
-        assert detect_encoding_chain(content) == "utf-8"
+        assert detect_encoding_chain(content) == "iso-8859-1"
+
+    def test_0x81_beyond_sample_falls_to_latin1(self):
+        content = b"A" * 20000 + bytes([0x81]) + b"A" * 100
+        enc = detect_encoding_chain(content)
+        assert enc == "iso-8859-1"
+        content.decode(enc)
 
 
 class TestDetectEncodingChainStress:
