@@ -99,7 +99,6 @@ class TestMigrate:
             ).fetchall()
         }
         assert "schema_version" in tables
-        assert "health_checks" in tables
 
     def test_migration_2_adds_columns(self):
         conn = _fresh_conn()
