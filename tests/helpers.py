@@ -1,8 +1,21 @@
 from __future__ import annotations
 
+from collections.abc import Callable, Coroutine
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock
 
 import httpx
+
+RETRY_SLEEP = "agrobr.http.retry.asyncio.sleep"
+
+
+def make_sleep_tracker() -> tuple[list[float], Callable[[float], Coroutine[Any, Any, None]]]:
+    sleep_calls: list[float] = []
+
+    async def track_sleep(delay: float) -> None:
+        sleep_calls.append(delay)
+
+    return sleep_calls, track_sleep
 
 
 def make_mock_response(

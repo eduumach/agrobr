@@ -9,9 +9,12 @@ import pytest
 
 from agrobr.abiove import client
 from agrobr.exceptions import SourceUnavailableError
-from tests.helpers import make_mock_async_client, make_mock_response
-
-RETRY_SLEEP = "agrobr.http.retry.asyncio.sleep"
+from tests.helpers import (
+    RETRY_SLEEP,
+    make_mock_async_client,
+    make_mock_response,
+    make_sleep_tracker,
+)
 
 
 class TestAbioveTimeout:
@@ -119,10 +122,7 @@ class TestAbioveRetry:
         mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_500)
 
-        sleep_calls: list[float] = []
-
-        async def track_sleep(delay: float) -> None:
-            sleep_calls.append(delay)
+        sleep_calls, track_sleep = make_sleep_tracker()
 
         with (
             patch("agrobr.abiove.client.httpx.AsyncClient", return_value=mock_client),

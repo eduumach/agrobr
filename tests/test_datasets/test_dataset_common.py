@@ -4,19 +4,7 @@ import pytest
 
 from agrobr.datasets import registry
 
-ALL_DATASETS = [
-    "balanco",
-    "credito_rural",
-    "custo_producao",
-    "estimativa_safra",
-    "exportacao",
-    "extrativismo_vegetal",
-    "fertilizante",
-    "leite_industrial",
-    "preco_diario",
-    "producao_anual",
-    "silvicultura",
-]
+ALL_DATASETS = sorted(registry.list_datasets())
 
 
 @pytest.mark.parametrize("dataset_name", ALL_DATASETS)
@@ -45,7 +33,15 @@ class TestDatasetInfo:
 
     def test_info_update_frequency(self, dataset_name):
         ds = registry.get_dataset(dataset_name)
-        assert ds.info.update_frequency in {"daily", "monthly", "yearly", "quarterly"}
+        assert ds.info.update_frequency in {
+            "daily",
+            "monthly",
+            "yearly",
+            "quarterly",
+            "continuous",
+            "decennial",
+            "never",
+        }
 
     def test_info_to_dict(self, dataset_name):
         ds = registry.get_dataset(dataset_name)

@@ -11,16 +11,6 @@ T = TypeVar("T")
 def _get_or_create_event_loop() -> asyncio.AbstractEventLoop:
     try:
         loop = asyncio.get_running_loop()
-        try:
-            import nest_asyncio
-
-            nest_asyncio.apply()
-            return loop
-        except ImportError:
-            raise RuntimeError(
-                "Event loop already running. Install nest_asyncio for Jupyter support: "
-                "pip install nest_asyncio"
-            ) from None
     except RuntimeError:
         try:
             return asyncio.get_event_loop()
@@ -28,6 +18,17 @@ def _get_or_create_event_loop() -> asyncio.AbstractEventLoop:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             return loop
+
+    try:
+        import nest_asyncio
+
+        nest_asyncio.apply()
+        return loop
+    except ImportError:
+        raise RuntimeError(
+            "Event loop already running. Install nest_asyncio for Jupyter support: "
+            "pip install nest_asyncio"
+        ) from None
 
 
 def run_sync(coro: Awaitable[T]) -> T:
