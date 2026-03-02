@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock, patch
 
+import httpx
 import pandas as pd
 import pytest
 
@@ -174,7 +175,7 @@ class TestFluxoPedagio:
     async def test_pracas_fetch_failure_graceful(self):
         with patch("agrobr.alt.antt_pedagio.api.client") as mock_client:
             mock_client.fetch_trafego_anos = AsyncMock(return_value=[(2023, V1_CSV)])
-            mock_client.fetch_pracas = AsyncMock(side_effect=Exception("network error"))
+            mock_client.fetch_pracas = AsyncMock(side_effect=httpx.ConnectError("network error"))
             mock_client.DATASET_TRAFEGO_SLUG = "test-slug"
 
             df = await fluxo_pedagio(ano=2023)

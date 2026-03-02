@@ -24,6 +24,7 @@ from agrobr import (
     inmet,
     mapbiomas,
     nasa_power,
+    noticias_agricolas,
     queimadas,
     usda,
 )
@@ -50,6 +51,7 @@ __all__ = [
     "inmet",
     "mapbiomas",
     "nasa_power",
+    "noticias_agricolas",
     "queimadas",
     "usda",
     "MetaInfo",

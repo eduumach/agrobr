@@ -9,6 +9,8 @@ from typing import TYPE_CHECKING, Any
 
 import structlog
 
+from agrobr import __version__
+
 if TYPE_CHECKING:
     import pandas as pd
 
@@ -32,7 +34,7 @@ def export_parquet(
     table = pa.Table.from_pandas(df)
 
     metadata = {
-        b"agrobr_version": _get_version().encode(),
+        b"agrobr_version": __version__.encode(),
         b"export_timestamp": datetime.now().isoformat().encode(),
         b"row_count": str(len(df)).encode(),
     }
@@ -105,7 +107,7 @@ def _create_sidecar(df: pd.DataFrame, meta: MetaInfo | None = None) -> dict[str,
     content_hash = hashlib.sha256(csv_bytes).hexdigest()
 
     sidecar: dict[str, Any] = {
-        "agrobr_version": _get_version(),
+        "agrobr_version": __version__,
         "export_timestamp": datetime.now().isoformat(),
         "file_info": {
             "row_count": len(df),
@@ -180,15 +182,6 @@ def verify_export(path: str | Path, expected_hash: str | None = None) -> dict[st
         result["hash_match"] = result["computed_hash"] == expected_hash
 
     return result
-
-
-def _get_version() -> str:
-    try:
-        import agrobr
-
-        return getattr(agrobr, "__version__", "unknown")
-    except ImportError:
-        return "unknown"
 
 
 __all__ = [

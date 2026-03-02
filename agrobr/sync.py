@@ -108,6 +108,7 @@ _modules: dict[str, _SyncModule | None] = {
     "inmet": None,
     "mapbiomas": None,
     "nasa_power": None,
+    "noticias_agricolas": None,
     "queimadas": None,
     "usda": None,
 }

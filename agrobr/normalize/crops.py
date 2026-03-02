@@ -157,6 +157,8 @@ CULTURAS: dict[str, str] = {
 
 CANONICAL_CROPS: set[str] = set(CULTURAS.values())
 
+_CULTURAS_SEM_ACENTO: dict[str, str] = {_remover_acentos(k): v for k, v in CULTURAS.items()}
+
 
 def normalizar_cultura(nome: str) -> str:
     key = nome.strip().lower()
@@ -164,12 +166,9 @@ def normalizar_cultura(nome: str) -> str:
         return CULTURAS[key]
 
     key_sem_acento = _remover_acentos(key)
-    if key_sem_acento in CULTURAS:
-        return CULTURAS[key_sem_acento]
-
-    for variante, canonico in CULTURAS.items():
-        if _remover_acentos(variante) == key_sem_acento:
-            return canonico
+    result = _CULTURAS_SEM_ACENTO.get(key_sem_acento)
+    if result is not None:
+        return result
 
     return key.replace(" ", "_")
 

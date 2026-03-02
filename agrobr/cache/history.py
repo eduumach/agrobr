@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -118,7 +118,7 @@ class HistoryManager:
         while current <= end_date:
             if current.weekday() < 5:
                 all_dates.append(current)
-            current = current + __import__("datetime").timedelta(days=1)
+            current = current + timedelta(days=1)
 
         return [d for d in all_dates if d not in available]
 

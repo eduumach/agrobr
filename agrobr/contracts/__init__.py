@@ -295,7 +295,6 @@ __all__ = [
     "Column",
     "ColumnType",
     "Contract",
-    "_auto_discover_contracts",
     "generate_json_schemas",
     "get_contract",
     "has_contract",

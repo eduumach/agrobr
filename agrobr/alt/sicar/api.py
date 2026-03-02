@@ -5,6 +5,7 @@ import time
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, Literal, overload
 
+import httpx
 import pandas as pd
 import structlog
 
@@ -153,7 +154,7 @@ async def imoveis(
                     threshold=MAX_FEATURES_WARNING,
                     hint="Considere filtrar por municipio para reduzir volume",
                 )
-        except Exception:
+        except httpx.HTTPError:
             logger.warning("sicar_hit_count_check_failed", uf=uf_upper, exc_info=True)
 
     t0 = time.monotonic()

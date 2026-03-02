@@ -9,7 +9,7 @@ import structlog
 from agrobr.cache.keys import build_cache_key
 from agrobr.cache.policies import calculate_expiry
 from agrobr.ibge import client
-from agrobr.ibge._helpers import NIVEL_MAP, SIDRA_BASE
+from agrobr.ibge._helpers import SIDRA_BASE, resolve_ibge_code, resolve_period
 from agrobr.models import MetaInfo
 from agrobr.utils.result import finalize_result
 from agrobr.utils.time import utcnow
@@ -102,22 +102,8 @@ async def silvicultura(
             f"Disponíveis: ['quantidade_produzida', 'valor_producao', 'area']"
         )
 
-    territorial_level = NIVEL_MAP.get(nivel, "3")
-
-    ibge_code = "all"
-    if uf:
-        uf_ibge = client.uf_to_ibge_code(uf)
-        if nivel == "municipio":
-            ibge_code = f"in N3 {uf_ibge}"
-        elif nivel == "uf":
-            ibge_code = uf_ibge
-
-    if ano is None:
-        period = "last"
-    elif isinstance(ano, list):
-        period = ",".join(str(a) for a in ano)
-    else:
-        period = str(ano)
+    territorial_level, ibge_code = resolve_ibge_code(uf, nivel)
+    period = resolve_period(ano)
 
     classifications: dict[str, str | list[str]] = {classification_key: classification_val}
 
@@ -264,22 +250,8 @@ async def extracao_vegetal(
     var_code = client.VARIAVEIS_EXTRACAO_VEGETAL[variavel_lower]
     produto_cod = client.PRODUTOS_EXTRACAO_VEGETAL[produto_lower]
 
-    territorial_level = NIVEL_MAP.get(nivel, "3")
-
-    ibge_code = "all"
-    if uf:
-        uf_ibge = client.uf_to_ibge_code(uf)
-        if nivel == "municipio":
-            ibge_code = f"in N3 {uf_ibge}"
-        elif nivel == "uf":
-            ibge_code = uf_ibge
-
-    if ano is None:
-        period = "last"
-    elif isinstance(ano, list):
-        period = ",".join(str(a) for a in ano)
-    else:
-        period = str(ano)
+    territorial_level, ibge_code = resolve_ibge_code(uf, nivel)
+    period = resolve_period(ano)
 
     classifications: dict[str, str | list[str]] = {"193": produto_cod}
 
@@ -396,12 +368,7 @@ async def leite_trimestral(
     if uf:
         ibge_code = client.uf_to_ibge_code(uf)
 
-    if trimestre is None:
-        period = "last"
-    elif isinstance(trimestre, list):
-        period = ",".join(str(t) for t in trimestre)
-    else:
-        period = str(trimestre)
+    period = resolve_period(trimestre)
 
     df = await client.fetch_sidra(
         table_code=table_code,
@@ -559,12 +526,7 @@ async def pib_agro(
     var_code = client.VARIAVEIS_PIB[precos_lower]
     setor_cod = client.SETORES_PIB[setor_lower]
 
-    if trimestre is None:
-        period = "last"
-    elif isinstance(trimestre, list):
-        period = ",".join(str(t) for t in trimestre)
-    else:
-        period = str(trimestre)
+    period = resolve_period(trimestre)
 
     classifications: dict[str, str | list[str]] = {"11255": setor_cod}
 

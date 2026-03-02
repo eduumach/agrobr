@@ -15,6 +15,16 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **normalize/numeric** — `safe_float` canonico para conversao numerica com suporte a strip chars, null markers configuraveis, nan_as_none, treat_zero_as_none e heuristica ABIOVE (3 digitos apos ponto = milhar). Substitui 5 implementacoes duplicadas `_safe_float` em anda, abiove, deral, conab/serie_historica, conab/custo_producao. `conab/progresso` mantido como wrapper local `_parse_pct`
 
 ### Improved
+- **ibge/ helpers** — `resolve_ibge_code()` e `resolve_period()` em `_helpers.py` substituem 13 blocos duplicados (6 ibge_code + 7 period) em api.py, pesquisas_api.py, censo_api.py. `calculate_expiry` padronizado para flat strings em 6 call sites (api.py, censo_api.py). `_UF_CODES` promovido a constante module-level em client.py
+- **noticias_agricolas** — adicionado a `sync.py` e `__init__.py` (antes ausente do namespace publico e da API sync)
+- **conab/api.py** — early returns de `safras()`, `balanco()` e `brasil_total()` agora passam por `finalize_result()`, respeitando `as_polars` e populando MetaInfo completo em resultados vazios
+- **contracts/__init__.py** — `_auto_discover_contracts` removido de `__all__` (funcao privada)
+- **export.py** — `_get_version()` substituido por `from agrobr import __version__` direto (elimina funcao wrapper)
+- **cache/history.py** — `__import__("datetime").timedelta(days=1)` substituido por import direto de `timedelta`
+- **normalize/crops.py** — `_CULTURAS_SEM_ACENTO` dict pre-construido no module level: `normalizar_cultura()` de O(n) loop para O(1) lookup
+- **alt/antt_pedagio** — `except Exception:` substituido por `except httpx.HTTPError:` (fetch) e `except (ParseError, KeyError, ValueError):` (parse/join)
+- **alt/sicar** — `except Exception:` substituido por `except httpx.HTTPError:` no pre-flight hit count
+- **conab/parsers/v1.py** — `except (ParseError, Exception)` simplificado para `except Exception` (ParseError ja e subclasse)
 - **ibge/ module split** — `ibge/api.py` (2025 linhas) dividido em `censo_api.py`, `pesquisas_api.py`, `censo_tables.py` e `_helpers.py`. API publica inalterada via re-exports em `__init__.py`. Dead branch e `import re` removidos. `NIVEL_MAP` extraido como constante compartilhada
 - **sync.py** — 23 subclasses stub vazias de `_SyncModule` removidas (258→123 linhas). `_MODULE_CLASSES` dict eliminado, `__getattr__` e `_SyncAlt` instanciam `_SyncModule` diretamente. API publica inalterada
 - **cli.py** — `_output_df` helper extrai 6 blocos identicos de formatacao output (json/csv/table)

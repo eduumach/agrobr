@@ -6,11 +6,10 @@ from typing import Literal, overload
 import pandas as pd
 import structlog
 
-from agrobr import constants
 from agrobr.cache.keys import build_cache_key
 from agrobr.cache.policies import calculate_expiry
 from agrobr.ibge import client
-from agrobr.ibge._helpers import NIVEL_MAP, SIDRA_BASE
+from agrobr.ibge._helpers import SIDRA_BASE, resolve_ibge_code, resolve_period
 from agrobr.models import MetaInfo
 from agrobr.utils.result import finalize_result
 from agrobr.utils.time import utcnow
@@ -104,22 +103,8 @@ async def pam(
         else:
             logger.warning(f"Variável desconhecida: {var}")
 
-    territorial_level = NIVEL_MAP.get(nivel, "3")
-
-    ibge_code = "all"
-    if uf:
-        uf_ibge = client.uf_to_ibge_code(uf)
-        if nivel == "municipio":
-            ibge_code = f"in N3 {uf_ibge}"
-        elif nivel == "uf":
-            ibge_code = uf_ibge
-
-    if ano is None:
-        period = "last"
-    elif isinstance(ano, list):
-        period = ",".join(str(a) for a in ano)
-    else:
-        period = str(ano)
+    territorial_level, ibge_code = resolve_ibge_code(uf, nivel)
+    period = resolve_period(ano)
 
     df = await client.fetch_sidra(
         table_code=client.TABELAS["pam_nova"],
@@ -179,7 +164,7 @@ async def pam(
         {"produto": produto, "ano": ano},
         schema_version=meta.schema_version,
     )
-    meta.cache_expires_at = calculate_expiry(constants.Fonte.IBGE, "pam")
+    meta.cache_expires_at = calculate_expiry("ibge_pam")
 
     logger.info(
         "ibge_pam_success",
@@ -280,7 +265,7 @@ async def lspa(
         {"produto": produto, "ano": ano, "mes": mes},
         schema_version=meta.schema_version,
     )
-    meta.cache_expires_at = calculate_expiry(constants.Fonte.IBGE, "lspa")
+    meta.cache_expires_at = calculate_expiry("ibge_lspa")
 
     logger.info(
         "ibge_lspa_success",
@@ -357,22 +342,8 @@ async def ppm(
     if not is_rebanho and not is_producao:
         raise ValueError(f"Espécie/produto não suportado: {especie}. Disponíveis: {all_valid}")
 
-    territorial_level = NIVEL_MAP.get(nivel, "3")
-
-    ibge_code = "all"
-    if uf:
-        uf_ibge = client.uf_to_ibge_code(uf)
-        if nivel == "municipio":
-            ibge_code = f"in N3 {uf_ibge}"
-        elif nivel == "uf":
-            ibge_code = uf_ibge
-
-    if ano is None:
-        period = "last"
-    elif isinstance(ano, list):
-        period = ",".join(str(a) for a in ano)
-    else:
-        period = str(ano)
+    territorial_level, ibge_code = resolve_ibge_code(uf, nivel)
+    period = resolve_period(ano)
 
     classifications: dict[str, str | list[str]] = {}
     if is_rebanho:
@@ -442,7 +413,7 @@ async def ppm(
         {"especie": especie, "ano": ano},
         schema_version=meta.schema_version,
     )
-    meta.cache_expires_at = calculate_expiry(constants.Fonte.IBGE, "ppm")
+    meta.cache_expires_at = calculate_expiry("ibge_ppm")
 
     logger.info(
         "ibge_ppm_success",
@@ -508,12 +479,7 @@ async def abate(
     if uf:
         ibge_code = client.uf_to_ibge_code(uf)
 
-    if trimestre is None:
-        period = "last"
-    elif isinstance(trimestre, list):
-        period = ",".join(str(t) for t in trimestre)
-    else:
-        period = str(trimestre)
+    period = resolve_period(trimestre)
 
     classifications: dict[str, str | list[str]] = {
         "12716": "115236",
@@ -631,7 +597,7 @@ async def abate(
         {"especie": especie, "trimestre": trimestre},
         schema_version=meta.schema_version,
     )
-    meta.cache_expires_at = calculate_expiry(constants.Fonte.IBGE, "abate")
+    meta.cache_expires_at = calculate_expiry("ibge_abate")
 
     logger.info(
         "ibge_abate_success",

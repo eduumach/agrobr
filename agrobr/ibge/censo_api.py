@@ -6,11 +6,10 @@ from typing import Literal, overload
 import pandas as pd
 import structlog
 
-from agrobr import constants
 from agrobr.cache.keys import build_cache_key
 from agrobr.cache.policies import calculate_expiry
 from agrobr.ibge import client
-from agrobr.ibge._helpers import NIVEL_MAP, NIVEL_MAP_HISTORICO, SIDRA_BASE
+from agrobr.ibge._helpers import NIVEL_MAP_HISTORICO, SIDRA_BASE, resolve_ibge_code
 from agrobr.ibge.censo_tables import (
     _CENSO_ALL_VAR_IDS,
     _CENSO_CATEGORIA_COL_INDEX,
@@ -357,15 +356,7 @@ async def censo_agro(
     else:
         anos_fetch = anos_disponiveis
 
-    territorial_level = NIVEL_MAP.get(nivel, "3")
-
-    ibge_code = "all"
-    if uf:
-        uf_ibge = client.uf_to_ibge_code(uf)
-        if nivel == "municipio":
-            ibge_code = f"in N3 {uf_ibge}"
-        elif nivel == "uf":
-            ibge_code = uf_ibge
+    territorial_level, ibge_code = resolve_ibge_code(uf, nivel)
 
     frames: list[pd.DataFrame] = []
     for ano_key in anos_fetch:
@@ -386,7 +377,7 @@ async def censo_agro(
         {"tema": tema, "ano": ano, "uf": uf},
         schema_version=meta.schema_version,
     )
-    meta.cache_expires_at = calculate_expiry(constants.Fonte.IBGE, "censo_agro")
+    meta.cache_expires_at = calculate_expiry("ibge_censo_agro")
 
     logger.info(
         "ibge_censo_agro_success",
@@ -557,11 +548,7 @@ async def censo_agro_historico(
                 )
         anos = ano
 
-    territorial_level = NIVEL_MAP_HISTORICO[nivel]
-
-    ibge_code = "all"
-    if uf and nivel == "uf":
-        ibge_code = client.uf_to_ibge_code(uf)
+    territorial_level, ibge_code = resolve_ibge_code(uf, nivel, nivel_map=NIVEL_MAP_HISTORICO)
 
     period = ",".join(str(a) for a in anos)
     variable = ",".join(client.VARIAVEIS_CENSO_HISTORICO[tema_lower].values())
@@ -591,7 +578,7 @@ async def censo_agro_historico(
         {"tema": tema, "ano": ano, "uf": uf},
         schema_version=meta.schema_version,
     )
-    meta.cache_expires_at = calculate_expiry(constants.Fonte.IBGE, "censo_agro")
+    meta.cache_expires_at = calculate_expiry("ibge_censo_agro")
 
     logger.info(
         "ibge_censo_agro_historico_success",

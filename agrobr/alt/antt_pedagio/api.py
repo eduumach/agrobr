@@ -3,9 +3,11 @@ from __future__ import annotations
 import time
 from datetime import UTC, datetime
 
+import httpx
 import pandas as pd
 import structlog
 
+from agrobr.exceptions import ParseError
 from agrobr.models import MetaInfo
 
 from . import client, parser
@@ -42,7 +44,7 @@ async def fluxo_pedagio(
 
     try:
         pracas_raw = await client.fetch_pracas()
-    except Exception:
+    except httpx.HTTPError:
         logger.warning("antt_pedagio_pracas_fallback", reason="fetch failed")
         pracas_raw = b""
 
@@ -60,7 +62,7 @@ async def fluxo_pedagio(
         try:
             df_pracas = parser.parse_pracas(pracas_raw)
             df_out = parser.join_fluxo_pracas(df_out, df_pracas)
-        except Exception:
+        except (ParseError, KeyError, ValueError):
             logger.warning("antt_pedagio_join_fallback", reason="parse/join failed")
             for col in ("rodovia", "uf", "municipio"):
                 if col not in df_out.columns:

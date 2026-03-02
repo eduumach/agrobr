@@ -144,7 +144,7 @@ class ConabParserV1:
                         records=len(result),
                     )
                     return result
-            except (ParseError, Exception) as e:
+            except Exception as e:
                 logger.warning(
                     "conab_suprimento_wide_fallback",
                     produto=produto,

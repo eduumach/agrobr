@@ -101,11 +101,16 @@ async def safras(
             uf=uf,
         )
         df = pd.DataFrame()
-        if return_meta:
-            meta.records_count = 0
-            meta.fetch_duration_ms = int((time.perf_counter() - fetch_start) * 1000)
-            return df, meta
-        return df
+        meta.records_count = 0
+        meta.columns = []
+        meta.fetch_duration_ms = int((time.perf_counter() - fetch_start) * 1000)
+        meta.cache_key = build_cache_key(
+            "conab:safras",
+            {"produto": produto, "safra": safra or "latest"},
+            schema_version=meta.schema_version,
+        )
+        meta.cache_expires_at = calculate_expiry(constants.Fonte.CONAB)
+        return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
     df = pd.DataFrame([s.model_dump() for s in safra_list])
 
@@ -170,7 +175,7 @@ async def balanco(
             "conab_balanco_empty",
             produto=produto,
         )
-        return pd.DataFrame()
+        return finalize_result(pd.DataFrame(), as_polars=as_polars)
 
     df = pd.DataFrame(suprimentos)
 
@@ -214,7 +219,7 @@ async def brasil_total(
 
     if not totais:
         logger.warning("conab_brasil_total_empty", safra=safra)
-        return pd.DataFrame()
+        return finalize_result(pd.DataFrame(), as_polars=as_polars)
 
     df = pd.DataFrame(totais)
 
