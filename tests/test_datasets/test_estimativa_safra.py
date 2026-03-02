@@ -1,6 +1,32 @@
-"""Testes específicos para o dataset estimativa_safra."""
+from unittest.mock import AsyncMock
 
-from agrobr.datasets.estimativa_safra import ESTIMATIVA_SAFRA_INFO
+import httpx
+import pandas as pd
+import pytest
+
+from agrobr.datasets.estimativa_safra import ESTIMATIVA_SAFRA_INFO, EstimativaSafraDataset
+from agrobr.exceptions import SourceUnavailableError
+
+from .conftest import make_source
+
+
+def _mock_df():
+    return pd.DataFrame(
+        [
+            {
+                "fonte": "conab",
+                "produto": "soja",
+                "safra": "2024/25",
+                "uf": "MT",
+                "area_plantada": 12500.0,
+                "area_colhida": 12400.0,
+                "produtividade": 3400.0,
+                "producao": 42500.0,
+                "levantamento": 3,
+                "data_publicacao": pd.Timestamp("2025-01-15"),
+            },
+        ]
+    )
 
 
 class TestEstimativaSafraSpecific:
@@ -8,3 +34,71 @@ class TestEstimativaSafraSpecific:
         conab_source = next(s for s in ESTIMATIVA_SAFRA_INFO.sources if s.name == "conab")
         lspa_source = next(s for s in ESTIMATIVA_SAFRA_INFO.sources if s.name == "ibge_lspa")
         assert conab_source.priority < lspa_source.priority
+
+
+class TestEstimativaSafraFetch:
+    @pytest.mark.asyncio
+    async def test_fetch_returns_dataframe(self):
+        dataset = EstimativaSafraDataset()
+        dataset.info.sources[0].fetch_fn = make_source(_mock_df())
+
+        df = await dataset.fetch("soja")
+
+        assert len(df) == 1
+        assert "produtividade" in df.columns
+        assert "levantamento" in df.columns
+
+    @pytest.mark.asyncio
+    async def test_fetch_return_meta(self):
+        dataset = EstimativaSafraDataset()
+        dataset.info.sources[0].fetch_fn = make_source(_mock_df())
+
+        df, meta = await dataset.fetch("soja", return_meta=True)
+
+        assert meta.dataset == "estimativa_safra"
+        assert meta.contract_version == "1.0"
+        assert meta.attempted_sources == ["conab"]
+        assert meta.selected_source == "conab"
+        assert meta.records_count == len(df)
+
+    @pytest.mark.asyncio
+    async def test_fetch_invalid_produto(self):
+        dataset = EstimativaSafraDataset()
+        with pytest.raises(ValueError, match="não suportado"):
+            await dataset.fetch("aveia")
+
+
+class TestEstimativaSafraNormalize:
+    @pytest.mark.asyncio
+    async def test_normalize_adds_produto_fonte(self):
+        df = _mock_df().drop(columns=["produto", "fonte"])
+        dataset = EstimativaSafraDataset()
+        dataset.info.sources[0].fetch_fn = make_source(df)
+
+        result = await dataset.fetch("soja")
+
+        assert result["produto"].iloc[0] == "soja"
+        assert result["fonte"].iloc[0] == "conab"
+
+
+class TestEstimativaSafraFallback:
+    @pytest.mark.asyncio
+    async def test_conab_fails_falls_back_to_lspa(self):
+        dataset = EstimativaSafraDataset()
+        dataset.info.sources[0].fetch_fn = AsyncMock(side_effect=httpx.ConnectError("test"))
+        dataset.info.sources[1].fetch_fn = make_source(_mock_df())
+
+        df, meta = await dataset.fetch("soja", return_meta=True)
+
+        assert len(df) == 1
+        assert meta.attempted_sources == ["conab", "ibge_lspa"]
+        assert meta.selected_source == "ibge_lspa"
+
+    @pytest.mark.asyncio
+    async def test_all_sources_fail(self):
+        dataset = EstimativaSafraDataset()
+        dataset.info.sources[0].fetch_fn = AsyncMock(side_effect=httpx.ConnectError("test"))
+        dataset.info.sources[1].fetch_fn = AsyncMock(side_effect=httpx.ConnectError("test"))
+
+        with pytest.raises(SourceUnavailableError):
+            await dataset.fetch("soja")
