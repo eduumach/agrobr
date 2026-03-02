@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 from datetime import date, timedelta
 from typing import Any
 
@@ -18,17 +17,17 @@ BASE_URL = URLS[Fonte.NASA_POWER]["daily"]
 
 TIMEOUT = get_timeout(read=60.0)
 
-RATE_LIMIT_DELAY = 1.0
-
 MAX_DAYS_PER_REQUEST = 365
 
 
-async def _get_json(params: dict[str, Any]) -> dict[str, Any]:
-    async with httpx.AsyncClient(
-        timeout=TIMEOUT, headers=UserAgentRotator.get_bot_headers(), follow_redirects=True
-    ) as client:
+async def _get_json(
+    params: dict[str, Any],
+    *,
+    http: httpx.AsyncClient | None = None,
+) -> dict[str, Any]:
+    async def _do_request(c: httpx.AsyncClient) -> dict[str, Any]:
         response = await retry_on_status(
-            lambda: client.get(BASE_URL, params=params),
+            lambda: c.get(BASE_URL, params=params),
             source="nasa_power",
         )
         response.raise_for_status()
@@ -36,6 +35,14 @@ async def _get_json(params: dict[str, Any]) -> dict[str, Any]:
         if not isinstance(data, dict):
             return {}
         return data
+
+    if http is not None:
+        return await _do_request(http)
+
+    async with httpx.AsyncClient(
+        timeout=TIMEOUT, headers=UserAgentRotator.get_bot_headers(), follow_redirects=True
+    ) as c:
+        return await _do_request(c)
 
 
 async def fetch_daily(
@@ -78,52 +85,52 @@ async def fetch_daily(
     merged: dict[str, Any] = {}
     chunk_start = start
 
-    while chunk_start <= end:
-        chunk_end = min(chunk_start + timedelta(days=MAX_DAYS_PER_REQUEST - 1), end)
+    async with httpx.AsyncClient(
+        timeout=TIMEOUT, headers=UserAgentRotator.get_bot_headers(), follow_redirects=True
+    ) as http:
+        while chunk_start <= end:
+            chunk_end = min(chunk_start + timedelta(days=MAX_DAYS_PER_REQUEST - 1), end)
 
-        params = {
-            "parameters": ",".join(parameters),
-            "community": "AG",
-            "longitude": lon,
-            "latitude": lat,
-            "start": chunk_start.strftime("%Y%m%d"),
-            "end": chunk_end.strftime("%Y%m%d"),
-            "format": "JSON",
-        }
+            params = {
+                "parameters": ",".join(parameters),
+                "community": "AG",
+                "longitude": lon,
+                "latitude": lat,
+                "start": chunk_start.strftime("%Y%m%d"),
+                "end": chunk_end.strftime("%Y%m%d"),
+                "format": "JSON",
+            }
 
-        try:
-            chunk_data = await _get_json(params)
+            try:
+                chunk_data = await _get_json(params, http=http)
 
-            chunk_params = chunk_data.get("properties", {}).get("parameter", {})
-            if not merged:
-                merged = chunk_data
-            else:
-                existing = merged.get("properties", {}).get("parameter", {})
-                for param_name, daily_values in chunk_params.items():
-                    if param_name in existing:
-                        existing[param_name].update(daily_values)
-                    else:
-                        existing[param_name] = daily_values
+                chunk_params = chunk_data.get("properties", {}).get("parameter", {})
+                if not merged:
+                    merged = chunk_data
+                else:
+                    existing = merged.get("properties", {}).get("parameter", {})
+                    for param_name, daily_values in chunk_params.items():
+                        if param_name in existing:
+                            existing[param_name].update(daily_values)
+                        else:
+                            existing[param_name] = daily_values
 
-            logger.debug(
-                "nasa_power_chunk_ok",
-                chunk_start=str(chunk_start),
-                chunk_end=str(chunk_end),
-            )
-
-        except httpx.HTTPStatusError as e:
-            if e.response.status_code in RETRIABLE_STATUS_CODES:
-                logger.warning(
-                    "nasa_power_chunk_retriable",
-                    status=e.response.status_code,
+                logger.debug(
+                    "nasa_power_chunk_ok",
                     chunk_start=str(chunk_start),
+                    chunk_end=str(chunk_end),
                 )
-            else:
-                raise
 
-        chunk_start = chunk_end + timedelta(days=1)
+            except httpx.HTTPStatusError as e:
+                if e.response.status_code in RETRIABLE_STATUS_CODES:
+                    logger.warning(
+                        "nasa_power_chunk_retriable",
+                        status=e.response.status_code,
+                        chunk_start=str(chunk_start),
+                    )
+                else:
+                    raise
 
-        if chunk_start <= end:
-            await asyncio.sleep(RATE_LIMIT_DELAY)
+            chunk_start = chunk_end + timedelta(days=1)
 
     return merged

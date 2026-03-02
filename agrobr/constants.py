@@ -284,6 +284,10 @@ class HTTPSettings(BaseSettings):
     rate_limit_conab_ceasa: float = 2.0
     rate_limit_default: float = 1.0
 
+    max_concurrent_default: int = 1
+    max_concurrent_b3: int = 3
+    max_concurrent_ibge: int = 3
+
     model_config = SettingsConfigDict(env_prefix="AGROBR_HTTP_")
 
 

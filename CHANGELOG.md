@@ -8,6 +8,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Unreleased]
 
 ### Added
+- **constants** — `HTTPSettings.max_concurrent_default`, `max_concurrent_b3`, `max_concurrent_ibge` para concorrencia configuravel por fonte no RateLimiter (default 1 = sem mudanca de comportamento)
 - **normalize/numeric** — `parse_numeric_br` canonica para parsing numerico formato BR (ponto=milhar, virgula=decimal). Substitui 3 implementacoes duplicadas em `alt/` parsers
 - **normalize/encoding** — `detect_encoding_chain` para deteccao rapida de encoding via probe chain (UTF-8, UTF-8-sig, Windows-1252, ISO-8859-1, chardet fallback). Substitui 2 implementacoes duplicadas em `alt/` parsers
 - **utils/result** — `finalize_result` helper com overloads tipados para epilogo polars/return_meta. Substitui ~140 linhas de boilerplate em ibge/ (10x), conab/api.py (3x), cepea/api.py (1x)
@@ -21,6 +22,12 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **utils/html** — `parse_links_from_html()` canonico para extracao de links HTML com filtro regex, dedup e base_url. Substitui 3 implementacoes em anda/client, conab/serie_historica/client, conab/custo_producao/client (~120 linhas)
 
 ### Improved
+- **http/rate_limiter** — `RateLimiter` com concorrencia configuravel via `HTTPSettings.max_concurrent_{source}`. `Semaphore(1)` hardcoded substituido por `Semaphore(config)`. Pattern "burst then pause": N requests simultaneos seguidos de pausa de rate_limit delay. Default 1 (zero mudanca de comportamento para fontes nao configuradas). B3 e IBGE configurados com concorrencia 3
+- **b3/api** — `historico()` e `oi_historico()` migrados de while-loop sequencial + `asyncio.sleep(1.0)` para `asyncio.gather()` com lista de weekdays. Rate limiting delegado ao RateLimiter (Semaphore(3) para B3). ~4.4x speedup esperado (22 dias: ~44s → ~10s)
+- **inmet/client** — `_get_json()` e `fetch_dados_estacao()` aceitam `http: AsyncClient | None` para reuso de conexao. `fetch_dados_estacoes_uf()` cria shared client para todas as estacoes. Elimina criacao de novo AsyncClient por request
+- **nasa_power/client** — `_get_json()` aceita `http: AsyncClient | None`. `fetch_daily()` cria shared client para chunking loop. `RATE_LIMIT_DELAY` e `asyncio.sleep()` removidos (RateLimiter ja enforce delay entre requests)
+- **ibge/api** — `lspa()` migrado de for-loop sequencial para `asyncio.gather()` (max 3 sub-produtos em paralelo). ~3x speedup para feijao (3 sub-products)
+- **ibge/censo_api** — `censo_agro()` e `_fetch_censo_multi_table()` migrados de for-loops sequenciais para `asyncio.gather()` (2-3 fetches em paralelo)
 - **ibge/ helpers** — `resolve_ibge_code()` e `resolve_period()` em `_helpers.py` substituem 13 blocos duplicados (6 ibge_code + 7 period) em api.py, pesquisas_api.py, censo_api.py. `calculate_expiry` padronizado para flat strings em 6 call sites (api.py, censo_api.py). `_UF_CODES` promovido a constante module-level em client.py
 - **noticias_agricolas** — adicionado a `sync.py` e `__init__.py` (antes ausente do namespace publico e da API sync)
 - **conab/api.py** — early returns de `safras()`, `balanco()` e `brasil_total()` agora passam por `finalize_result()`, respeitando `as_polars` e populando MetaInfo completo em resultados vazios

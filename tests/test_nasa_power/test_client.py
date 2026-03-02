@@ -119,10 +119,7 @@ class TestNasaPowerChunking:
     async def test_long_range_multiple_chunks(self):
         chunk_data = {"properties": {"parameter": {"T2M": {"20240101": 25.0}}}}
 
-        with (
-            patch("agrobr.nasa_power.client._get_json", new_callable=AsyncMock) as mock_get,
-            patch("agrobr.nasa_power.client.asyncio.sleep", new_callable=AsyncMock),
-        ):
+        with patch("agrobr.nasa_power.client._get_json", new_callable=AsyncMock) as mock_get:
             mock_get.return_value = chunk_data
             await client.fetch_daily(-15.0, -47.0, date(2022, 1, 1), date(2024, 1, 1))
 
@@ -135,17 +132,14 @@ class TestNasaPowerChunking:
 
         call_count = 0
 
-        async def side_effect(_params):
+        async def side_effect(_params, **_kw):
             nonlocal call_count
             call_count += 1
             if call_count == 1:
                 raise httpx.HTTPStatusError("502", request=MagicMock(), response=resp_502)
             return chunk_ok
 
-        with (
-            patch("agrobr.nasa_power.client._get_json", new_callable=AsyncMock) as mock_get,
-            patch("agrobr.nasa_power.client.asyncio.sleep", new_callable=AsyncMock),
-        ):
+        with patch("agrobr.nasa_power.client._get_json", new_callable=AsyncMock) as mock_get:
             mock_get.side_effect = side_effect
             result = await client.fetch_daily(-15.0, -47.0, date(2023, 1, 1), date(2024, 12, 31))
 

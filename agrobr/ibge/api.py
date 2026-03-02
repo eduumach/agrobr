@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import time
 from typing import Literal, overload
 
@@ -235,8 +236,7 @@ async def lspa(
     territorial_level = "3" if uf else "1"
     ibge_code = client.uf_to_ibge_code(uf) if uf else "all"
 
-    frames: list[pd.DataFrame] = []
-    for sub_nome, sub_cod in sub_produtos:
+    async def _fetch_sub(sub_nome: str, sub_cod: str) -> pd.DataFrame:
         sub_df = await client.fetch_sidra(
             table_code=client.TABELAS["lspa"],
             territorial_level=territorial_level,
@@ -244,16 +244,16 @@ async def lspa(
             period=period,
             classifications={"48": sub_cod},
         )
-
         sub_df = client.parse_sidra_response(sub_df)
-
         sub_df["ano"] = ano
         if mes:
             sub_df["mes"] = mes
-
         sub_df["produto"] = sub_nome
         sub_df["fonte"] = "ibge_lspa"
-        frames.append(sub_df)
+        return sub_df
+
+    results = await asyncio.gather(*[_fetch_sub(n, c) for n, c in sub_produtos])
+    frames = [df for df in results if not df.empty]
 
     df = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
 

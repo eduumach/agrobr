@@ -125,68 +125,62 @@ class TestHistorico:
 
     @pytest.mark.asyncio
     async def test_returns_dataframe(self, mock_ajustes):  # noqa: ARG002
-        with patch("agrobr.b3.api.asyncio.sleep", new_callable=AsyncMock):
-            df = await api.historico(
-                contrato="boi",
-                inicio=date(2025, 2, 13),
-                fim=date(2025, 2, 13),
-            )
+        df = await api.historico(
+            contrato="boi",
+            inicio=date(2025, 2, 13),
+            fim=date(2025, 2, 13),
+        )
         assert isinstance(df, pd.DataFrame)
         assert len(df) > 0
 
     @pytest.mark.asyncio
     async def test_accepts_string_dates(self, mock_ajustes):  # noqa: ARG002
-        with patch("agrobr.b3.api.asyncio.sleep", new_callable=AsyncMock):
-            df = await api.historico(
-                contrato="boi",
-                inicio="2025-02-13",
-                fim="2025-02-13",
-            )
+        df = await api.historico(
+            contrato="boi",
+            inicio="2025-02-13",
+            fim="2025-02-13",
+        )
         assert isinstance(df, pd.DataFrame)
         assert len(df) > 0
 
     @pytest.mark.asyncio
     async def test_skips_weekends(self, mock_ajustes):
-        with patch("agrobr.b3.api.asyncio.sleep", new_callable=AsyncMock):
-            await api.historico(
-                contrato="boi",
-                inicio=date(2025, 2, 8),
-                fim=date(2025, 2, 9),
-            )
+        await api.historico(
+            contrato="boi",
+            inicio=date(2025, 2, 8),
+            fim=date(2025, 2, 9),
+        )
         assert mock_ajustes.call_count == 0
 
     @pytest.mark.asyncio
     async def test_multiple_days(self, mock_ajustes):
-        with patch("agrobr.b3.api.asyncio.sleep", new_callable=AsyncMock):
-            df = await api.historico(
-                contrato="boi",
-                inicio=date(2025, 2, 10),
-                fim=date(2025, 2, 14),
-            )
+        df = await api.historico(
+            contrato="boi",
+            inicio=date(2025, 2, 10),
+            fim=date(2025, 2, 14),
+        )
         assert mock_ajustes.call_count == 5
         assert len(df) > 0
 
     @pytest.mark.asyncio
     async def test_filter_vencimento(self, mock_ajustes):  # noqa: ARG002
-        with patch("agrobr.b3.api.asyncio.sleep", new_callable=AsyncMock):
-            df = await api.historico(
-                contrato="boi",
-                inicio=date(2025, 2, 13),
-                fim=date(2025, 2, 13),
-                vencimento="G25",
-            )
+        df = await api.historico(
+            contrato="boi",
+            inicio=date(2025, 2, 13),
+            fim=date(2025, 2, 13),
+            vencimento="G25",
+        )
         assert len(df) > 0
         assert (df["vencimento_codigo"] == "G25").all()
 
     @pytest.mark.asyncio
     async def test_return_meta(self, mock_ajustes):  # noqa: ARG002
-        with patch("agrobr.b3.api.asyncio.sleep", new_callable=AsyncMock):
-            result = await api.historico(
-                contrato="boi",
-                inicio=date(2025, 2, 13),
-                fim=date(2025, 2, 13),
-                return_meta=True,
-            )
+        result = await api.historico(
+            contrato="boi",
+            inicio=date(2025, 2, 13),
+            fim=date(2025, 2, 13),
+            return_meta=True,
+        )
         assert isinstance(result, tuple)
         df, meta = result
         assert isinstance(meta, MetaInfo)
@@ -194,12 +188,11 @@ class TestHistorico:
 
     @pytest.mark.asyncio
     async def test_empty_range_returns_empty(self, mock_ajustes):  # noqa: ARG002
-        with patch("agrobr.b3.api.asyncio.sleep", new_callable=AsyncMock):
-            df = await api.historico(
-                contrato="boi",
-                inicio=date(2025, 2, 15),
-                fim=date(2025, 2, 14),
-            )
+        df = await api.historico(
+            contrato="boi",
+            inicio=date(2025, 2, 15),
+            fim=date(2025, 2, 14),
+        )
         assert isinstance(df, pd.DataFrame)
         assert len(df) == 0
 
@@ -323,80 +316,73 @@ class TestOiHistorico:
 
     @pytest.mark.asyncio
     async def test_returns_dataframe(self, mock_fetch_oi):  # noqa: ARG002
-        with patch("agrobr.b3.api.asyncio.sleep", new_callable=AsyncMock):
-            df = await api.oi_historico(
-                contrato="boi",
-                inicio=date(2025, 12, 19),
-                fim=date(2025, 12, 19),
-            )
+        df = await api.oi_historico(
+            contrato="boi",
+            inicio=date(2025, 12, 19),
+            fim=date(2025, 12, 19),
+        )
         assert isinstance(df, pd.DataFrame)
         assert len(df) > 0
 
     @pytest.mark.asyncio
     async def test_accepts_string_dates(self, mock_fetch_oi):  # noqa: ARG002
-        with patch("agrobr.b3.api.asyncio.sleep", new_callable=AsyncMock):
-            df = await api.oi_historico(
-                contrato="boi",
-                inicio="2025-12-19",
-                fim="2025-12-19",
-            )
+        df = await api.oi_historico(
+            contrato="boi",
+            inicio="2025-12-19",
+            fim="2025-12-19",
+        )
         assert isinstance(df, pd.DataFrame)
         assert len(df) > 0
 
     @pytest.mark.asyncio
     async def test_skips_weekends(self, mock_fetch_oi):
-        with patch("agrobr.b3.api.asyncio.sleep", new_callable=AsyncMock):
-            await api.oi_historico(
-                contrato="boi",
-                inicio=date(2025, 12, 20),
-                fim=date(2025, 12, 21),
-            )
+        await api.oi_historico(
+            contrato="boi",
+            inicio=date(2025, 12, 20),
+            fim=date(2025, 12, 21),
+        )
         assert mock_fetch_oi.call_count == 0
 
     @pytest.mark.asyncio
     async def test_multiple_days(self, mock_fetch_oi):
-        with patch("agrobr.b3.api.asyncio.sleep", new_callable=AsyncMock):
-            df = await api.oi_historico(
-                contrato="boi",
-                inicio=date(2025, 12, 15),
-                fim=date(2025, 12, 19),
-            )
+        df = await api.oi_historico(
+            contrato="boi",
+            inicio=date(2025, 12, 15),
+            fim=date(2025, 12, 19),
+        )
         assert mock_fetch_oi.call_count == 5
         assert len(df) > 0
 
     @pytest.mark.asyncio
     async def test_filter_vencimento(self, mock_fetch_oi):  # noqa: ARG002
-        with patch("agrobr.b3.api.asyncio.sleep", new_callable=AsyncMock):
-            df = await api.oi_historico(
-                contrato="boi",
-                inicio=date(2025, 12, 19),
-                fim=date(2025, 12, 19),
-                vencimento="F26",
-            )
+        df = await api.oi_historico(
+            contrato="boi",
+            inicio=date(2025, 12, 19),
+            fim=date(2025, 12, 19),
+            vencimento="F26",
+        )
         assert len(df) > 0
         assert (df["vencimento_codigo"] == "F26").all()
 
     @pytest.mark.asyncio
     async def test_filter_tipo(self, mock_fetch_oi):  # noqa: ARG002
-        with patch("agrobr.b3.api.asyncio.sleep", new_callable=AsyncMock):
-            df = await api.oi_historico(
-                contrato="boi",
-                inicio=date(2025, 12, 19),
-                fim=date(2025, 12, 19),
-                tipo="futuro",
-            )
+        df = await api.oi_historico(
+            contrato="boi",
+            inicio=date(2025, 12, 19),
+            fim=date(2025, 12, 19),
+            tipo="futuro",
+        )
         assert len(df) > 0
         assert (df["tipo"] == "futuro").all()
 
     @pytest.mark.asyncio
     async def test_return_meta(self, mock_fetch_oi):  # noqa: ARG002
-        with patch("agrobr.b3.api.asyncio.sleep", new_callable=AsyncMock):
-            result = await api.oi_historico(
-                contrato="boi",
-                inicio=date(2025, 12, 19),
-                fim=date(2025, 12, 19),
-                return_meta=True,
-            )
+        result = await api.oi_historico(
+            contrato="boi",
+            inicio=date(2025, 12, 19),
+            fim=date(2025, 12, 19),
+            return_meta=True,
+        )
         assert isinstance(result, tuple)
         df, meta = result
         assert isinstance(meta, MetaInfo)
@@ -404,11 +390,10 @@ class TestOiHistorico:
 
     @pytest.mark.asyncio
     async def test_empty_range_returns_empty(self, mock_fetch_oi):  # noqa: ARG002
-        with patch("agrobr.b3.api.asyncio.sleep", new_callable=AsyncMock):
-            df = await api.oi_historico(
-                contrato="boi",
-                inicio=date(2025, 12, 20),
-                fim=date(2025, 12, 19),
-            )
+        df = await api.oi_historico(
+            contrato="boi",
+            inicio=date(2025, 12, 20),
+            fim=date(2025, 12, 19),
+        )
         assert isinstance(df, pd.DataFrame)
         assert len(df) == 0

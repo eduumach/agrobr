@@ -40,7 +40,13 @@ class RateLimiter:
 
         async with cls._get_lock():
             if source_key not in cls._semaphores:
-                cls._semaphores[source_key] = asyncio.Semaphore(1)
+                settings = constants.HTTPSettings()
+                max_conc = getattr(
+                    settings,
+                    f"max_concurrent_{source_key}",
+                    settings.max_concurrent_default,
+                )
+                cls._semaphores[source_key] = asyncio.Semaphore(max_conc)
 
         async with cls._semaphores[source_key]:
             now = time.monotonic()

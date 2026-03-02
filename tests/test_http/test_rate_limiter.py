@@ -95,6 +95,59 @@ class TestRateLimiter:
             assert delay > 0, f"{fonte} has no delay configured"
 
 
+class TestRateLimiterConcurrency:
+    @pytest.mark.asyncio
+    async def test_concurrent_requests_burst(self):
+        timestamps: list[float] = []
+
+        async def task() -> None:
+            async with RateLimiter.acquire("b3"):
+                timestamps.append(time.monotonic())
+                await asyncio.sleep(0.05)
+
+        start = time.monotonic()
+        await asyncio.gather(task(), task(), task())
+        total = time.monotonic() - start
+
+        assert total < 1.5
+        spread = max(timestamps) - min(timestamps)
+        assert spread < 0.5
+
+    @pytest.mark.asyncio
+    async def test_default_concurrent_is_one(self):
+        order: list[int] = []
+
+        async def task(n: int) -> None:
+            async with RateLimiter.acquire("usda"):
+                order.append(n)
+                await asyncio.sleep(0.01)
+
+        await asyncio.gather(task(1), task(2), task(3))
+        assert len(order) == 3
+
+    @pytest.mark.asyncio
+    async def test_burst_then_pause_pattern(self):
+        settings = constants.HTTPSettings()
+        delay = settings.rate_limit_b3
+
+        timestamps: list[float] = []
+
+        async def task() -> None:
+            async with RateLimiter.acquire("b3"):
+                timestamps.append(time.monotonic())
+                await asyncio.sleep(0.02)
+
+        await asyncio.gather(*[task() for _ in range(6)])
+
+        assert len(timestamps) == 6
+        timestamps.sort()
+        burst1 = timestamps[:3]
+        burst2 = timestamps[3:]
+        assert max(burst1) - min(burst1) < 0.5
+        gap = min(burst2) - max(burst1)
+        assert gap >= delay * 0.7
+
+
 class TestRateLimiterCrossLoop:
     def test_survives_loop_change(self):
         async def use_limiter():

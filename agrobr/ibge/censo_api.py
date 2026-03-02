@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import time
 from typing import Literal, overload
 
@@ -155,12 +156,11 @@ async def _fetch_censo_multi_table(
 ) -> pd.DataFrame:
     key = (tema, ano_key)
     classifications: dict[str, str | list[str]] = dict(_CLASSIFICACOES_CENSO_AGRO.get(key, {}))
-    frames: list[pd.DataFrame] = []
 
-    for table_code, var_map in table_specs:
-        var_codes = ",".join(var_map.values())
+    async def _fetch_one_table(tc: str, vm: dict[str, str]) -> pd.DataFrame:
+        var_codes = ",".join(vm.values())
         df = await client.fetch_sidra(
-            table_code=table_code,
+            table_code=tc,
             territorial_level=territorial_level,
             ibge_territorial_code=ibge_code,
             variable=var_codes,
@@ -168,10 +168,11 @@ async def _fetch_censo_multi_table(
             classifications=classifications,
         )
         if df.empty:
-            continue
-        parsed = _parse_censo_raw(df, tema, ano_key, var_map=var_map)
-        if not parsed.empty:
-            frames.append(parsed)
+            return pd.DataFrame()
+        return _parse_censo_raw(df, tema, ano_key, var_map=vm)
+
+    results = await asyncio.gather(*[_fetch_one_table(tc, vm) for tc, vm in table_specs])
+    frames = [df for df in results if not df.empty]
 
     if not frames:
         return _empty_censo_df()
@@ -358,11 +359,10 @@ async def censo_agro(
 
     territorial_level, ibge_code = resolve_ibge_code(uf, nivel)
 
-    frames: list[pd.DataFrame] = []
-    for ano_key in anos_fetch:
-        sub_df = await _fetch_censo_single(tema_lower, ano_key, territorial_level, ibge_code)
-        if not sub_df.empty:
-            frames.append(sub_df)
+    results = await asyncio.gather(
+        *[_fetch_censo_single(tema_lower, ak, territorial_level, ibge_code) for ak in anos_fetch]
+    )
+    frames = [df for df in results if not df.empty]
 
     df = pd.concat(frames, ignore_index=True) if frames else _empty_censo_df()
 

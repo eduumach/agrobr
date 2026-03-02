@@ -129,26 +129,28 @@ async def historico(
     fim_dt = datetime.strptime(fim, "%Y-%m-%d").date() if isinstance(fim, str) else fim
 
     t0 = time.monotonic()
-    frames: list[pd.DataFrame] = []
-    current = inicio_dt
 
-    while current <= fim_dt:
-        if current.weekday() < 5:
-            try:
-                df_dia = await ajustes(data=current, contrato=contrato)
-                if not df_dia.empty:
-                    frames.append(df_dia)
-                else:
-                    logger.debug("b3_historico_empty", data=str(current), contrato=contrato)
-            except (httpx.HTTPError, SourceUnavailableError, ParseError) as exc:
-                logger.warning(
-                    "b3_historico_skip",
-                    data=str(current),
-                    contrato=contrato,
-                    error=str(exc)[:200],
-                )
-            await asyncio.sleep(1.0)
-        current += timedelta(days=1)
+    weekdays = [
+        inicio_dt + timedelta(days=i)
+        for i in range((fim_dt - inicio_dt).days + 1)
+        if (inicio_dt + timedelta(days=i)).weekday() < 5
+    ]
+
+    async def _fetch_day(d: date) -> pd.DataFrame | None:
+        try:
+            df_dia = await ajustes(data=d, contrato=contrato)
+            return df_dia if not df_dia.empty else None
+        except (httpx.HTTPError, SourceUnavailableError, ParseError) as exc:
+            logger.warning(
+                "b3_historico_skip",
+                data=str(d),
+                contrato=contrato,
+                error=str(exc)[:200],
+            )
+            return None
+
+    results = await asyncio.gather(*[_fetch_day(d) for d in weekdays])
+    frames = [df for df in results if df is not None]
 
     fetch_ms = int((time.monotonic() - t0) * 1000)
 
@@ -289,26 +291,28 @@ async def oi_historico(
     fim_dt = datetime.strptime(fim, "%Y-%m-%d").date() if isinstance(fim, str) else fim
 
     t0 = time.monotonic()
-    frames: list[pd.DataFrame] = []
-    current = inicio_dt
 
-    while current <= fim_dt:
-        if current.weekday() < 5:
-            try:
-                df_dia = await posicoes_abertas(data=current, contrato=contrato, tipo=tipo)
-                if not df_dia.empty:
-                    frames.append(df_dia)
-                else:
-                    logger.debug("b3_oi_historico_empty", data=str(current), contrato=contrato)
-            except (httpx.HTTPError, SourceUnavailableError, ParseError) as exc:
-                logger.warning(
-                    "b3_oi_historico_skip",
-                    data=str(current),
-                    contrato=contrato,
-                    error=str(exc)[:200],
-                )
-            await asyncio.sleep(1.0)
-        current += timedelta(days=1)
+    weekdays = [
+        inicio_dt + timedelta(days=i)
+        for i in range((fim_dt - inicio_dt).days + 1)
+        if (inicio_dt + timedelta(days=i)).weekday() < 5
+    ]
+
+    async def _fetch_day(d: date) -> pd.DataFrame | None:
+        try:
+            df_dia = await posicoes_abertas(data=d, contrato=contrato, tipo=tipo)
+            return df_dia if not df_dia.empty else None
+        except (httpx.HTTPError, SourceUnavailableError, ParseError) as exc:
+            logger.warning(
+                "b3_oi_historico_skip",
+                data=str(d),
+                contrato=contrato,
+                error=str(exc)[:200],
+            )
+            return None
+
+    results = await asyncio.gather(*[_fetch_day(d) for d in weekdays])
+    frames = [df for df in results if df is not None]
 
     fetch_ms = int((time.monotonic() - t0) * 1000)
 
