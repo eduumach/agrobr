@@ -7,7 +7,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
-from agrobr.utils.result import build_source_meta
+from agrobr.utils.result import build_source_meta, finalize_result
 from agrobr.utils.warnings import warn_once
 
 from . import client, parser
@@ -22,6 +22,7 @@ async def entregas(
     uf: str | None = None,
     produto: str = "total",
     agregacao: str = "detalhado",
+    as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -33,6 +34,7 @@ async def entregas(
     uf: str | None = None,
     produto: str = "total",
     agregacao: str = "detalhado",
+    as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -43,6 +45,7 @@ async def entregas(
     uf: str | None = None,
     produto: str = "total",
     agregacao: str = "detalhado",
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -70,16 +73,13 @@ async def entregas(
     if agregacao == "mensal":
         df = parser.agregar_mensal(df)
 
-    if return_meta:
-        meta = build_source_meta(
-            "anda",
-            client.ESTATISTICAS_URL,
-            "httpx+pdfplumber",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION,
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "anda",
+        client.ESTATISTICAS_URL,
+        "httpx+pdfplumber",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)

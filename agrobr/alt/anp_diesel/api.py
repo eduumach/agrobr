@@ -7,7 +7,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
-from agrobr.utils.result import build_source_meta
+from agrobr.utils.result import build_source_meta, finalize_result
 from agrobr.utils.validation import validate_year_uf
 
 from . import client, parser
@@ -37,6 +37,7 @@ async def precos_diesel(
     fim: str | date | None = None,
     agregacao: str = AGREGACAO_SEMANAL,
     nivel: str = NIVEL_MUNICIPIO,
+    as_polars: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
     if agregacao not in AGREGACOES_VALIDAS:
@@ -75,25 +76,23 @@ async def precos_diesel(
 
     df = df.reset_index(drop=True)
 
-    if return_meta:
-        meta = build_source_meta(
-            "anp_diesel",
-            _get_source_url(nivel),
-            "httpx",
-            fetch_parse_ms,
-            0,
-            df,
-            parser.PARSER_VERSION,
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "anp_diesel",
+        _get_source_url(nivel),
+        "httpx",
+        fetch_parse_ms,
+        0,
+        df,
+        parser.PARSER_VERSION,
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 async def vendas_diesel(
     uf: str | None = None,
     inicio: str | date | None = None,
     fim: str | date | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
     validate_year_uf(uf=uf)
@@ -118,19 +117,16 @@ async def vendas_diesel(
 
     df = df.reset_index(drop=True)
 
-    if return_meta:
-        meta = build_source_meta(
-            "anp_diesel",
-            VENDAS_DIESEL_CSV_URL,
-            "httpx",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION,
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "anp_diesel",
+        VENDAS_DIESEL_CSV_URL,
+        "httpx",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 async def _fetch_and_parse_municipios(

@@ -6,7 +6,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
-from agrobr.utils.result import build_source_meta
+from agrobr.utils.result import build_source_meta, finalize_result
 from agrobr.utils.validation import validate_year_uf
 
 from . import client, parser
@@ -29,6 +29,7 @@ async def sinistros(
     ano_fim: int | None = None,
     municipio: str | None = None,
     evento: str | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
     validate_year_uf(uf=uf, ano=ano, ano_inicio=ano_inicio, ano_fim=ano_fim, ano_min=ANO_INICIO_PSR)
@@ -66,20 +67,17 @@ async def sinistros(
     df_out = df_out.sort_values("ano_apolice").reset_index(drop=True)
     parse_ms = int((time.monotonic() - t1) * 1000)
 
-    if return_meta:
-        source_url = get_csv_url(periodos[0]) if periodos else ""
-        meta = build_source_meta(
-            "mapa_psr",
-            source_url,
-            "httpx",
-            fetch_ms,
-            parse_ms,
-            df_out,
-            parser.PARSER_VERSION,
-        )
-        return df_out, meta
-
-    return df_out
+    source_url = get_csv_url(periodos[0]) if periodos else ""
+    meta = build_source_meta(
+        "mapa_psr",
+        source_url,
+        "httpx",
+        fetch_ms,
+        parse_ms,
+        df_out,
+        parser.PARSER_VERSION,
+    )
+    return finalize_result(df_out, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 async def apolices(
@@ -89,6 +87,7 @@ async def apolices(
     ano_inicio: int | None = None,
     ano_fim: int | None = None,
     municipio: str | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
     validate_year_uf(uf=uf, ano=ano, ano_inicio=ano_inicio, ano_fim=ano_fim, ano_min=ANO_INICIO_PSR)
@@ -125,20 +124,17 @@ async def apolices(
     df_out = df_out.sort_values("ano_apolice").reset_index(drop=True)
     parse_ms = int((time.monotonic() - t1) * 1000)
 
-    if return_meta:
-        source_url = get_csv_url(periodos[0]) if periodos else ""
-        meta = build_source_meta(
-            "mapa_psr",
-            source_url,
-            "httpx",
-            fetch_ms,
-            parse_ms,
-            df_out,
-            parser.PARSER_VERSION,
-        )
-        return df_out, meta
-
-    return df_out
+    source_url = get_csv_url(periodos[0]) if periodos else ""
+    meta = build_source_meta(
+        "mapa_psr",
+        source_url,
+        "httpx",
+        fetch_ms,
+        parse_ms,
+        df_out,
+        parser.PARSER_VERSION,
+    )
+    return finalize_result(df_out, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 def _resolve_range(

@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import asyncio
 import time
-from datetime import UTC, datetime
 from typing import Any, Literal, overload
 
 import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta, finalize_result
 from agrobr.utils.warnings import warn_once
 
 from . import client, parser
@@ -22,6 +22,7 @@ async def precos(
     *,
     produto: str | None = None,
     ceasa: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -31,6 +32,7 @@ async def precos(
     *,
     produto: str | None = None,
     ceasa: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -39,6 +41,7 @@ async def precos(
     *,
     produto: str | None = None,
     ceasa: str | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -73,25 +76,18 @@ async def precos(
             drop=True
         )
 
-    if return_meta:
-        meta = MetaInfo(
-            source="conab_ceasa",
-            source_url=source_url,
-            source_method="httpx+json",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["conab_prohort"],
-            selected_source="conab_prohort",
-            fetch_timestamp=datetime.now(UTC),
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "conab_ceasa",
+        source_url,
+        "httpx+json",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+        attempted_sources=["conab_prohort"],
+        selected_source="conab_prohort",
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 def produtos() -> list[str]:

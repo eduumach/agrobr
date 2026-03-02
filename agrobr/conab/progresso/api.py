@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import time
-from datetime import UTC, datetime
 from typing import Any, Literal, overload
 
 import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta, finalize_result
 
 from . import client, parser
 from .models import CULTURAS_VALIDAS, normalizar_cultura
@@ -22,6 +22,7 @@ async def progresso_safra(
     estado: str | None = None,
     operacao: str | None = None,
     semana_url: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -33,6 +34,7 @@ async def progresso_safra(
     estado: str | None = None,
     operacao: str | None = None,
     semana_url: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -43,6 +45,7 @@ async def progresso_safra(
     estado: str | None = None,
     operacao: str | None = None,
     semana_url: str | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -80,25 +83,18 @@ async def progresso_safra(
         op_title = operacao.strip().title()
         df = df[df["operacao"] == op_title].reset_index(drop=True)
 
-    if return_meta:
-        meta = MetaInfo(
-            source="conab_progresso",
-            source_url=source_url,
-            source_method="httpx+xlsx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["conab_govbr"],
-            selected_source="conab_govbr",
-            fetch_timestamp=datetime.now(UTC),
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "conab_progresso",
+        source_url,
+        "httpx+xlsx",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+        attempted_sources=["conab_govbr"],
+        selected_source="conab_govbr",
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 async def semanas_disponiveis(max_pages: int = 4) -> list[dict[str, str]]:

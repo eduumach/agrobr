@@ -7,7 +7,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
-from agrobr.utils.result import build_source_meta
+from agrobr.utils.result import build_source_meta, finalize_result
 
 from . import client, parser
 
@@ -23,6 +23,7 @@ async def prodes(
     bioma: str = "Cerrado",
     ano: int | None = None,
     uf: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -33,6 +34,7 @@ async def prodes(
     bioma: str = "Cerrado",
     ano: int | None = None,
     uf: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -42,6 +44,7 @@ async def prodes(
     bioma: str = "Cerrado",
     ano: int | None = None,
     uf: str | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -59,21 +62,18 @@ async def prodes(
         uf_upper = uf.strip().upper()
         df = df[df["uf"] == uf_upper].reset_index(drop=True)
 
-    if return_meta:
-        meta = build_source_meta(
-            "desmatamento",
-            source_url,
-            "httpx+wfs+csv",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION,
-            attempted_sources=["terrabrasilis_prodes"],
-            selected_source="terrabrasilis_prodes",
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "desmatamento",
+        source_url,
+        "httpx+wfs+csv",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+        attempted_sources=["terrabrasilis_prodes"],
+        selected_source="terrabrasilis_prodes",
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 @overload
@@ -143,6 +143,7 @@ async def deter(
     data_inicio: str | None = None,
     data_fim: str | None = None,
     classe: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -155,6 +156,7 @@ async def deter(
     data_inicio: str | None = None,
     data_fim: str | None = None,
     classe: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -166,6 +168,7 @@ async def deter(
     data_inicio: str | None = None,
     data_fim: str | None = None,
     classe: str | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -191,21 +194,18 @@ async def deter(
     if classe is not None:
         df = df[df["classe"] == classe].reset_index(drop=True)
 
-    if return_meta:
-        meta = build_source_meta(
-            "desmatamento",
-            source_url,
-            "httpx+wfs+csv",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION,
-            attempted_sources=["terrabrasilis_deter"],
-            selected_source="terrabrasilis_deter",
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "desmatamento",
+        source_url,
+        "httpx+wfs+csv",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+        attempted_sources=["terrabrasilis_deter"],
+        selected_source="terrabrasilis_deter",
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 @overload

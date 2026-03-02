@@ -8,7 +8,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
-from agrobr.utils.result import build_source_meta
+from agrobr.utils.result import build_source_meta, finalize_result
 
 from . import client, parser
 
@@ -61,6 +61,7 @@ async def estacao(
     inicio: str | date,
     fim: str | date,
     agregacao: str = "horario",
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -80,24 +81,22 @@ async def estacao(
     if agregacao == "diario":
         df = parser.agregar_diario(df)
 
-    if return_meta:
-        meta = build_source_meta(
-            "inmet",
-            f"{client.BASE_URL}/estacao/dados/{codigo}/{inicio}/{fim}",
-            "httpx",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION,
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "inmet",
+        f"{client.BASE_URL}/estacao/dados/{codigo}/{inicio}/{fim}",
+        "httpx",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 async def clima_uf(
     uf: str,
     ano: int,
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -114,16 +113,13 @@ async def clima_uf(
     df_mensal = parser.agregar_mensal_uf(df_diario)
     parse_ms = int((time.monotonic() - t1) * 1000)
 
-    if return_meta:
-        meta = build_source_meta(
-            "inmet",
-            f"{client.BASE_URL}/estacoes/T",
-            "httpx",
-            fetch_ms,
-            parse_ms,
-            df_mensal,
-            parser.PARSER_VERSION,
-        )
-        return df_mensal, meta
-
-    return df_mensal
+    meta = build_source_meta(
+        "inmet",
+        f"{client.BASE_URL}/estacoes/T",
+        "httpx",
+        fetch_ms,
+        parse_ms,
+        df_mensal,
+        parser.PARSER_VERSION,
+    )
+    return finalize_result(df_mensal, meta, as_polars=as_polars, return_meta=return_meta)

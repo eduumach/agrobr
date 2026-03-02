@@ -143,3 +143,18 @@ class TestFocos:
             df = await api.focos(ano=2024, mes=9, uf="XX")
 
         assert len(df) == 0
+
+
+class TestFocosAsPolars:
+    @pytest.mark.asyncio
+    async def test_as_polars(self):
+        pl = pytest.importorskip("polars")
+        csv_bytes = _golden_csv_bytes()
+        with patch.object(
+            api.client,
+            "fetch_focos_mensal",
+            new_callable=AsyncMock,
+            return_value=(csv_bytes, "https://example.com/focos.csv"),
+        ):
+            result = await api.focos(ano=2024, mes=9, as_polars=True)
+        assert isinstance(result, pl.DataFrame)

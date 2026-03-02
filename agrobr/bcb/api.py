@@ -7,7 +7,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
-from agrobr.utils.result import build_source_meta
+from agrobr.utils.result import build_source_meta, finalize_result
 
 from . import client
 from .models import UF_CODES, normalize_safra_sicor, resolve_produto_sicor
@@ -25,6 +25,7 @@ async def credito_rural(
     agregacao: str = "municipio",
     programa: str | None = None,
     tipo_seguro: str | None = None,
+    as_polars: bool = False,
     *,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
@@ -39,6 +40,7 @@ async def credito_rural(
     agregacao: str = "municipio",
     programa: str | None = None,
     tipo_seguro: str | None = None,
+    as_polars: bool = False,
     *,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
@@ -52,6 +54,7 @@ async def credito_rural(
     agregacao: str = "municipio",
     programa: str | None = None,
     tipo_seguro: str | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
     t0 = time.monotonic()
@@ -114,19 +117,16 @@ async def credito_rural(
         source_used=source_used,
     )
 
-    if return_meta:
-        meta = build_source_meta(
-            "bcb",
-            f"{client.BASE_URL}/{client.ENDPOINT_MAP.get(finalidade.lower(), 'CusteioMunicipio')}",
-            source_method,
-            fetch_ms,
-            parse_ms,
-            df,
-            PARSER_VERSION,
-            schema_version="1.1",
-            attempted_sources=attempted_sources,
-            selected_source=f"bcb_{source_used}",
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "bcb",
+        f"{client.BASE_URL}/{client.ENDPOINT_MAP.get(finalidade.lower(), 'CusteioMunicipio')}",
+        source_method,
+        fetch_ms,
+        parse_ms,
+        df,
+        PARSER_VERSION,
+        schema_version="1.1",
+        attempted_sources=attempted_sources,
+        selected_source=f"bcb_{source_used}",
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)

@@ -8,6 +8,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta, finalize_result
 
 from . import client
 from .parser import PARSER_VERSION, items_to_dataframe, parse_planilha
@@ -21,6 +22,7 @@ async def custo_producao(
     uf: str | None = None,
     safra: str | None = None,
     tecnologia: str = "alta",
+    as_polars: bool = False,
     *,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
@@ -32,6 +34,7 @@ async def custo_producao(
     uf: str | None = None,
     safra: str | None = None,
     tecnologia: str = "alta",
+    as_polars: bool = False,
     *,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
@@ -42,6 +45,7 @@ async def custo_producao(
     uf: str | None = None,
     safra: str | None = None,
     tecnologia: str = "alta",
+    as_polars: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
     t0 = time.monotonic()
@@ -85,25 +89,18 @@ async def custo_producao(
         coe=custo_total.coe_ha if custo_total else None,
     )
 
-    if return_meta:
-        meta = MetaInfo(
-            source="conab_custo",
-            source_url=metadata.get("url", client.CUSTOS_PAGE),
-            source_method="httpx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["conab_custo"],
-            selected_source="conab_custo",
-            fetch_timestamp=datetime.now(UTC),
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "conab_custo",
+        metadata.get("url", client.CUSTOS_PAGE),
+        "httpx",
+        fetch_ms,
+        parse_ms,
+        df,
+        PARSER_VERSION,
+        attempted_sources=["conab_custo"],
+        selected_source="conab_custo",
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 @overload

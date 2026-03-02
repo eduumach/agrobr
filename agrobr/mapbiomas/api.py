@@ -7,7 +7,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
-from agrobr.utils.result import build_source_meta
+from agrobr.utils.result import build_source_meta, finalize_result
 
 from . import client, parser
 from .models import BIOMAS_VALIDOS, normalizar_bioma
@@ -25,6 +25,7 @@ async def cobertura(
     nivel: Literal["estado", "municipio"] = "estado",
     municipio: str | None = None,
     colecao: int | None = None,
+    as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -39,6 +40,7 @@ async def cobertura(
     nivel: Literal["estado", "municipio"] = "estado",
     municipio: str | None = None,
     colecao: int | None = None,
+    as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -52,6 +54,7 @@ async def cobertura(
     nivel: Literal["estado", "municipio"] = "estado",
     municipio: str | None = None,
     colecao: int | None = None,  # noqa: ARG001
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -100,21 +103,18 @@ async def cobertura(
     if classe_id is not None:
         df = df[df["classe_id"] == classe_id].reset_index(drop=True)
 
-    if return_meta:
-        meta = build_source_meta(
-            "mapbiomas",
-            source_url,
-            "httpx+xlsx",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION,
-            attempted_sources=["mapbiomas_dataverse"],
-            selected_source="mapbiomas_dataverse",
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "mapbiomas",
+        source_url,
+        "httpx+xlsx",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+        attempted_sources=["mapbiomas_dataverse"],
+        selected_source="mapbiomas_dataverse",
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 @overload
@@ -126,6 +126,7 @@ async def transicao(
     classe_de_id: int | None = None,
     classe_para_id: int | None = None,
     colecao: int | None = None,
+    as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -139,6 +140,7 @@ async def transicao(
     classe_de_id: int | None = None,
     classe_para_id: int | None = None,
     colecao: int | None = None,
+    as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -151,6 +153,7 @@ async def transicao(
     classe_de_id: int | None = None,
     classe_para_id: int | None = None,
     colecao: int | None = None,  # noqa: ARG001
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -184,18 +187,15 @@ async def transicao(
     if classe_para_id is not None:
         df = df[df["classe_para_id"] == classe_para_id].reset_index(drop=True)
 
-    if return_meta:
-        meta = build_source_meta(
-            "mapbiomas",
-            source_url,
-            "httpx+xlsx",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION,
-            attempted_sources=["mapbiomas_dataverse"],
-            selected_source="mapbiomas_dataverse",
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "mapbiomas",
+        source_url,
+        "httpx+xlsx",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+        attempted_sources=["mapbiomas_dataverse"],
+        selected_source="mapbiomas_dataverse",
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)

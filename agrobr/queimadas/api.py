@@ -7,7 +7,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
-from agrobr.utils.result import build_source_meta
+from agrobr.utils.result import build_source_meta, finalize_result
 
 from . import client, parser
 from .models import BIOMAS_VALIDOS
@@ -24,6 +24,7 @@ async def focos(
     uf: str | None = None,
     bioma: str | None = None,
     satelite: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -37,6 +38,7 @@ async def focos(
     uf: str | None = None,
     bioma: str | None = None,
     satelite: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -49,6 +51,7 @@ async def focos(
     uf: str | None = None,
     bioma: str | None = None,
     satelite: str | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -93,16 +96,13 @@ async def focos(
     if satelite is not None:
         df = df[df["satelite"] == satelite].reset_index(drop=True)
 
-    if return_meta:
-        meta = build_source_meta(
-            "queimadas",
-            source_url,
-            "httpx+csv",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION,
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "queimadas",
+        source_url,
+        "httpx+csv",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)

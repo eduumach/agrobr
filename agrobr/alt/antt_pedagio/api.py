@@ -8,7 +8,7 @@ import structlog
 
 from agrobr.exceptions import ParseError
 from agrobr.models import MetaInfo
-from agrobr.utils.result import build_source_meta
+from agrobr.utils.result import build_source_meta, finalize_result
 from agrobr.utils.validation import validate_year_uf
 
 from . import client, parser
@@ -33,6 +33,7 @@ async def fluxo_pedagio(
     praca: str | None = None,
     tipo_veiculo: str | None = None,
     apenas_pesados: bool = False,
+    as_polars: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
     validate_year_uf(uf=uf, ano=ano, ano_inicio=ano_inicio, ano_fim=ano_fim, ano_min=ANO_INICIO)
@@ -103,25 +104,23 @@ async def fluxo_pedagio(
 
     parse_ms = int((time.monotonic() - t1) * 1000)
 
-    if return_meta:
-        meta = build_source_meta(
-            "antt_pedagio",
-            f"https://dados.antt.gov.br/dataset/{DATASET_TRAFEGO_SLUG}",
-            "httpx",
-            fetch_ms,
-            parse_ms,
-            df_out,
-            parser.PARSER_VERSION,
-        )
-        return df_out, meta
-
-    return df_out
+    meta = build_source_meta(
+        "antt_pedagio",
+        f"https://dados.antt.gov.br/dataset/{DATASET_TRAFEGO_SLUG}",
+        "httpx",
+        fetch_ms,
+        parse_ms,
+        df_out,
+        parser.PARSER_VERSION,
+    )
+    return finalize_result(df_out, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 async def pracas_pedagio(
     uf: str | None = None,
     rodovia: str | None = None,
     situacao: str | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
     validate_year_uf(uf=uf)
@@ -147,16 +146,13 @@ async def pracas_pedagio(
     df = df.reset_index(drop=True)
     parse_ms = int((time.monotonic() - t1) * 1000)
 
-    if return_meta:
-        meta = build_source_meta(
-            "antt_pedagio",
-            f"https://dados.antt.gov.br/dataset/{DATASET_PRACAS_SLUG}",
-            "httpx",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION,
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "antt_pedagio",
+        f"https://dados.antt.gov.br/dataset/{DATASET_PRACAS_SLUG}",
+        "httpx",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)

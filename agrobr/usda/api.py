@@ -8,7 +8,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
-from agrobr.utils.result import build_source_meta
+from agrobr.utils.result import build_source_meta, finalize_result
 
 from . import client, parser
 from .models import resolve_commodity_code, resolve_country_code
@@ -25,6 +25,7 @@ async def psd(
     attributes: list[str] | None = None,
     pivot: bool = False,
     api_key: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -38,6 +39,7 @@ async def psd(
     attributes: list[str] | None = None,
     pivot: bool = False,
     api_key: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -50,6 +52,7 @@ async def psd(
     attributes: list[str] | None = None,
     pivot: bool = False,
     api_key: str | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -89,18 +92,15 @@ async def psd(
 
     parse_ms = int((time.monotonic() - t1) * 1000)
 
-    if return_meta:
-        meta = build_source_meta(
-            "usda",
-            source_url,
-            "httpx",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION,
-            attempted_sources=["usda_psd"],
-            selected_source="usda_psd",
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "usda",
+        source_url,
+        "httpx",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+        attempted_sources=["usda_psd"],
+        selected_source="usda_psd",
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)

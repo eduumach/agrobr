@@ -9,7 +9,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
-from agrobr.utils.result import build_source_meta
+from agrobr.utils.result import build_source_meta, finalize_result
 from agrobr.utils.validation import validate_year_uf
 
 from . import client, parser
@@ -77,6 +77,7 @@ async def imoveis(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -92,6 +93,7 @@ async def imoveis(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -106,6 +108,7 @@ async def imoveis(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -176,21 +179,18 @@ async def imoveis(
         if len(df) < before:
             logger.info("sicar_dedup", removed=before - len(df), remaining=len(df))
 
-    if return_meta:
-        meta = build_source_meta(
-            "sicar",
-            source_url,
-            "httpx+wfs+csv",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION,
-            attempted_sources=["sicar_wfs"],
-            selected_source="sicar_wfs",
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "sicar",
+        source_url,
+        "httpx+wfs+csv",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+        attempted_sources=["sicar_wfs"],
+        selected_source="sicar_wfs",
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 @overload
@@ -312,6 +312,7 @@ async def resumo(
     *,
     municipio: str | None = None,
     cod_municipio: int | None = None,
+    as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -322,6 +323,7 @@ async def resumo(
     *,
     municipio: str | None = None,
     cod_municipio: int | None = None,
+    as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -331,6 +333,7 @@ async def resumo(
     *,
     municipio: str | None = None,
     cod_municipio: int | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -378,18 +381,15 @@ async def resumo(
         df = parser.agregar_resumo(df_raw)
         parse_ms = int((time.monotonic() - t1) * 1000)
 
-    if return_meta:
-        meta = build_source_meta(
-            "sicar",
-            source_url,
-            "httpx+wfs+csv",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION,
-            attempted_sources=["sicar_wfs"],
-            selected_source="sicar_wfs",
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "sicar",
+        source_url,
+        "httpx+wfs+csv",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+        attempted_sources=["sicar_wfs"],
+        selected_source="sicar_wfs",
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)

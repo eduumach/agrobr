@@ -15,7 +15,7 @@ from agrobr.antaq.models import (
     resolve_tipo_navegacao,
 )
 from agrobr.models import MetaInfo
-from agrobr.utils.result import build_source_meta
+from agrobr.utils.result import build_source_meta, finalize_result
 
 logger = structlog.get_logger()
 
@@ -30,6 +30,7 @@ async def movimentacao(
     porto: str | None = ...,
     uf: str | None = ...,
     sentido: str | None = ...,
+    as_polars: bool = ...,
     return_meta: Literal[False] = ...,
 ) -> pd.DataFrame: ...
 
@@ -44,6 +45,7 @@ async def movimentacao(
     porto: str | None = ...,
     uf: str | None = ...,
     sentido: str | None = ...,
+    as_polars: bool = ...,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -57,6 +59,7 @@ async def movimentacao(
     porto: str | None = None,
     uf: str | None = None,
     sentido: str | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
     if ano < MIN_ANO or ano > MAX_ANO_DEFAULT:
@@ -127,18 +130,15 @@ async def movimentacao(
         parse_ms=parse_ms,
     )
 
-    if return_meta:
-        meta = build_source_meta(
-            "antaq",
-            source_url,
-            "httpx",
-            fetch_ms,
-            parse_ms,
-            df,
-            PARSER_VERSION,
-            attempted_sources=["antaq_ea"],
-            selected_source="antaq_ea",
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "antaq",
+        source_url,
+        "httpx",
+        fetch_ms,
+        parse_ms,
+        df,
+        PARSER_VERSION,
+        attempted_sources=["antaq_ea"],
+        selected_source="antaq_ea",
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)

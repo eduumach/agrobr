@@ -347,3 +347,17 @@ class TestCreditoRuralFallback:
             await api.client.fetch_credito_rural_with_fallback(
                 finalidade="custeio",
             )
+
+
+class TestCreditoRuralAsPolars:
+    @pytest.mark.asyncio
+    async def test_as_polars(self):
+        pl = pytest.importorskip("polars")
+        with patch.object(
+            api.client,
+            "fetch_credito_rural_with_fallback",
+            new_callable=AsyncMock,
+            return_value=(_mock_sicor_data(), "odata"),
+        ):
+            result = await api.credito_rural("soja", safra="2023/24", as_polars=True)
+        assert isinstance(result, pl.DataFrame)

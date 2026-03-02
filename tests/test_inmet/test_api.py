@@ -168,3 +168,15 @@ class TestClimaUf:
         assert meta.attempted_sources == ["inmet"]
         assert meta.selected_source == "inmet"
         assert len(df) > 0
+
+
+class TestEstacaoAsPolars:
+    @pytest.mark.asyncio
+    async def test_as_polars(self):
+        pl = pytest.importorskip("polars")
+        mock_data = [_mock_obs(hora="1200 UTC"), _mock_obs(hora="1300 UTC")]
+        with patch.object(
+            api.client, "fetch_dados_estacao", new_callable=AsyncMock, return_value=mock_data
+        ):
+            result = await api.estacao("A001", "2024-01-15", "2024-01-15", as_polars=True)
+        assert isinstance(result, pl.DataFrame)

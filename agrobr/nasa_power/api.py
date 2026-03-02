@@ -8,7 +8,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
-from agrobr.utils.result import build_source_meta
+from agrobr.utils.result import build_source_meta, finalize_result
 
 from . import client, parser
 from .models import UF_COORDS
@@ -22,6 +22,7 @@ async def clima_ponto(
     inicio: str | date,
     fim: str | date,
     agregacao: str = "diario",
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -40,29 +41,27 @@ async def clima_ponto(
         df = parser.agregar_mensal(df)
     parse_ms = int((time.monotonic() - t1) * 1000)
 
-    if return_meta:
-        source_url = (
-            f"{client.BASE_URL}?latitude={lat}&longitude={lon}"
-            f"&start={inicio.strftime('%Y%m%d')}&end={fim.strftime('%Y%m%d')}"
-        )
-        meta = build_source_meta(
-            "nasa_power",
-            source_url,
-            "httpx",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION,
-        )
-        return df, meta
-
-    return df
+    source_url = (
+        f"{client.BASE_URL}?latitude={lat}&longitude={lon}"
+        f"&start={inicio.strftime('%Y%m%d')}&end={fim.strftime('%Y%m%d')}"
+    )
+    meta = build_source_meta(
+        "nasa_power",
+        source_url,
+        "httpx",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 async def clima_uf(
     uf: str,
     ano: int,
     agregacao: str = "mensal",
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -86,20 +85,17 @@ async def clima_uf(
         df = parser.agregar_mensal(df)
     parse_ms = int((time.monotonic() - t1) * 1000)
 
-    if return_meta:
-        source_url = (
-            f"{client.BASE_URL}?latitude={lat}&longitude={lon}"
-            f"&start={inicio.strftime('%Y%m%d')}&end={fim.strftime('%Y%m%d')}"
-        )
-        meta = build_source_meta(
-            "nasa_power",
-            source_url,
-            "httpx",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION,
-        )
-        return df, meta
-
-    return df
+    source_url = (
+        f"{client.BASE_URL}?latitude={lat}&longitude={lon}"
+        f"&start={inicio.strftime('%Y%m%d')}&end={fim.strftime('%Y%m%d')}"
+    )
+    meta = build_source_meta(
+        "nasa_power",
+        source_url,
+        "httpx",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)

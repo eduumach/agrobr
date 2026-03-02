@@ -454,10 +454,13 @@ df = alt.sicar.resumo("MT", municipio="Sorriso")
 ### Suporte Polars
 
 ```python
-# Retorna polars.DataFrame em vez de pandas
+# Retorna polars.DataFrame em vez de pandas — suportado em todas as source APIs
 df = await cepea.indicador('soja', as_polars=True)
 df = await conab.safras('milho', as_polars=True)
 df = await ibge.pam('soja', ano=2023, as_polars=True)
+df = await b3.ajustes(data="13/02/2025", as_polars=True)
+df = await bcb.credito_rural('soja', safra='2023/24', as_polars=True)
+df = await inmet.estacao('A001', '2024-01-01', '2024-01-31', as_polars=True)
 ```
 
 ### CLI

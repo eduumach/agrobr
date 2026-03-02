@@ -8,7 +8,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
-from agrobr.utils.result import build_source_meta
+from agrobr.utils.result import build_source_meta, finalize_result
 
 from . import client, parser
 from .models import (
@@ -31,6 +31,7 @@ async def comercio(
     periodo: str | int | None = None,
     freq: str = "A",
     api_key: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -45,6 +46,7 @@ async def comercio(
     periodo: str | int | None = None,
     freq: str = "A",
     api_key: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -58,6 +60,7 @@ async def comercio(
     periodo: str | int | None = None,
     freq: str = "A",
     api_key: str | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -98,19 +101,16 @@ async def comercio(
     df = parser.parse_trade_data(records)
     parse_ms = int((time.monotonic() - t1) * 1000)
 
-    if return_meta:
-        meta = build_source_meta(
-            "comtrade",
-            source_url,
-            "httpx",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION,
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "comtrade",
+        source_url,
+        "httpx",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 @overload
@@ -122,6 +122,7 @@ async def trade_mirror(
     periodo: str | int | None = None,
     freq: str = "A",
     api_key: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -135,6 +136,7 @@ async def trade_mirror(
     periodo: str | int | None = None,
     freq: str = "A",
     api_key: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -147,6 +149,7 @@ async def trade_mirror(
     periodo: str | int | None = None,
     freq: str = "A",
     api_key: str | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -192,21 +195,18 @@ async def trade_mirror(
     df = parser.parse_mirror(df_export, df_import, reporter_iso, partner_iso)
     parse_ms = int((time.monotonic() - t1) * 1000)
 
-    if return_meta:
-        meta = build_source_meta(
-            "comtrade_mirror",
-            client.BASE_URL_AUTH,
-            "httpx",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION,
-            attempted_sources=["comtrade_export", "comtrade_import"],
-            selected_source="comtrade_mirror",
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "comtrade_mirror",
+        client.BASE_URL_AUTH,
+        "httpx",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+        attempted_sources=["comtrade_export", "comtrade_import"],
+        selected_source="comtrade_mirror",
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 def paises() -> list[str]:

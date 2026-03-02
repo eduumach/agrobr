@@ -7,7 +7,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
-from agrobr.utils.result import build_source_meta
+from agrobr.utils.result import build_source_meta, finalize_result
 from agrobr.utils.warnings import warn_once
 
 from . import client, parser
@@ -23,6 +23,7 @@ async def exportacao(
     mes: int | None = None,
     produto: str | None = None,
     agregacao: str = "detalhado",
+    as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -34,6 +35,7 @@ async def exportacao(
     mes: int | None = None,
     produto: str | None = None,
     agregacao: str = "detalhado",
+    as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -44,6 +46,7 @@ async def exportacao(
     mes: int | None = None,
     produto: str | None = None,
     agregacao: str = "detalhado",
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -80,16 +83,13 @@ async def exportacao(
     if agregacao == "mensal":
         df = parser.agregar_mensal(df)
 
-    if return_meta:
-        meta = build_source_meta(
-            "abiove",
-            source_url,
-            "httpx+openpyxl",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION,
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "abiove",
+        source_url,
+        "httpx+openpyxl",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)

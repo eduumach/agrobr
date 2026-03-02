@@ -397,3 +397,18 @@ class TestOiHistorico:
         )
         assert isinstance(df, pd.DataFrame)
         assert len(df) == 0
+
+
+class TestAjustesAsPolars:
+    @pytest.mark.asyncio
+    async def test_as_polars(self):
+        pl = pytest.importorskip("polars")
+        html = _golden_html()
+        with patch.object(
+            client,
+            "fetch_ajustes",
+            new_callable=AsyncMock,
+            return_value=(html, "https://www2.bmf.com.br/test?txtData=13/02/2025"),
+        ):
+            result = await api.ajustes(data="13/02/2025", as_polars=True)
+        assert isinstance(result, pl.DataFrame)

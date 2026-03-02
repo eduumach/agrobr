@@ -289,3 +289,14 @@ class TestSyncWrapper:
         ad = sync.alt.anp_diesel
         assert hasattr(ad, "precos_diesel")
         assert hasattr(ad, "vendas_diesel")
+
+
+class TestPrecosDieselAsPolars:
+    @pytest.mark.asyncio
+    async def test_as_polars(self):
+        pl = pytest.importorskip("polars")
+        xlsx = _make_precos_xlsx_bytes()
+        with patch.object(api.client, "fetch_precos_estados", new_callable=AsyncMock) as mock:
+            mock.return_value = xlsx
+            result = await api.precos_diesel(nivel="uf", as_polars=True)
+        assert isinstance(result, pl.DataFrame)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
+import time
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Literal, overload
@@ -9,6 +9,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta, finalize_result
 
 logger = structlog.get_logger()
 
@@ -195,6 +196,7 @@ async def censo_agro_municipal_1985(
     *,
     uf: str | None = ...,
     nivel: str | None = ...,
+    as_polars: bool = ...,
     return_meta: Literal[False] = ...,
 ) -> pd.DataFrame: ...
 
@@ -205,6 +207,7 @@ async def censo_agro_municipal_1985(
     *,
     uf: str | None = ...,
     nivel: str | None = ...,
+    as_polars: bool = ...,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -214,10 +217,12 @@ async def censo_agro_municipal_1985(
     *,
     uf: str | None = None,
     nivel: str | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
     from agrobr.ibge.client import get_uf_codes
 
+    t0 = time.perf_counter()
     tema_lower = tema.lower().strip()
     if tema_lower not in TEMAS_CENSO_MUNICIPAL_1985:
         raise ValueError(f"Tema '{tema}' inválido. Temas disponíveis: {TEMAS_DISPONIVEIS}")
@@ -264,6 +269,8 @@ async def censo_agro_municipal_1985(
         ]
     ].reset_index(drop=True)
 
+    parse_ms = int((time.perf_counter() - t0) * 1000)
+
     logger.info(
         "censo_municipal_1985_loaded",
         tema=tema_lower,
@@ -272,20 +279,17 @@ async def censo_agro_municipal_1985(
         rows=len(df),
     )
 
-    if return_meta:
-        meta = MetaInfo(
-            source="ibge.censo_agro_municipal_1985",
-            source_url="https://biblioteca.ibge.gov.br/index.php/biblioteca-catalogo?view=detalhes&id=768",
-            source_method="local_csv",
-            fetched_at=datetime.now(UTC),
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            from_cache=True,
-            parser_version=1,
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "ibge.censo_agro_municipal_1985",
+        "https://biblioteca.ibge.gov.br/index.php/biblioteca-catalogo?view=detalhes&id=768",
+        "local_csv",
+        0,
+        parse_ms,
+        df,
+        1,
+    )
+    meta.from_cache = True
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 async def temas_censo_agro_municipal_1985() -> list[str]:

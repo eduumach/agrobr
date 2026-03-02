@@ -11,7 +11,7 @@ import structlog
 
 from agrobr.exceptions import ParseError, SourceUnavailableError
 from agrobr.models import MetaInfo
-from agrobr.utils.result import build_source_meta
+from agrobr.utils.result import build_source_meta, finalize_result
 from agrobr.utils.warnings import warn_once
 
 from . import client, parser
@@ -31,6 +31,7 @@ async def ajustes(
     *,
     data: str | date,
     contrato: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -40,6 +41,7 @@ async def ajustes(
     *,
     data: str | date,
     contrato: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -48,6 +50,7 @@ async def ajustes(
     *,
     data: str | date,
     contrato: str | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -77,19 +80,16 @@ async def ajustes(
         else:
             df = df[df["ticker"] == contrato.upper()].reset_index(drop=True)
 
-    if return_meta:
-        meta = build_source_meta(
-            "b3",
-            source_url,
-            "httpx+html",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION,
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "b3",
+        source_url,
+        "httpx+html",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 @overload
@@ -99,6 +99,7 @@ async def historico(
     inicio: str | date,
     fim: str | date,
     vencimento: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -110,6 +111,7 @@ async def historico(
     inicio: str | date,
     fim: str | date,
     vencimento: str | None = None,
+    as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -120,6 +122,7 @@ async def historico(
     inicio: str | date,
     fim: str | date,
     vencimento: str | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -160,19 +163,16 @@ async def historico(
         vct_upper = vencimento.strip().upper()
         df = df[df["vencimento_codigo"] == vct_upper].reset_index(drop=True)
 
-    if return_meta:
-        meta = build_source_meta(
-            "b3",
-            client.BASE_URL,
-            "httpx+html",
-            fetch_ms,
-            0,
-            df,
-            parser.PARSER_VERSION,
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "b3",
+        client.BASE_URL,
+        "httpx+html",
+        fetch_ms,
+        0,
+        df,
+        parser.PARSER_VERSION,
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 def contratos() -> list[str]:
@@ -185,6 +185,7 @@ async def posicoes_abertas(
     data: str | date,
     contrato: str | None = None,
     tipo: Literal["futuro", "opcao"] | None = None,
+    as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -195,6 +196,7 @@ async def posicoes_abertas(
     data: str | date,
     contrato: str | None = None,
     tipo: Literal["futuro", "opcao"] | None = None,
+    as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -204,6 +206,7 @@ async def posicoes_abertas(
     data: str | date,
     contrato: str | None = None,
     tipo: Literal["futuro", "opcao"] | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -236,19 +239,16 @@ async def posicoes_abertas(
     if tipo is not None:
         df = df[df["tipo"] == tipo].reset_index(drop=True)
 
-    if return_meta:
-        meta = build_source_meta(
-            "b3",
-            source_url,
-            "httpx+csv",
-            fetch_ms,
-            parse_ms,
-            df,
-            parser.PARSER_VERSION_OI,
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "b3",
+        source_url,
+        "httpx+csv",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION_OI,
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 @overload
@@ -259,6 +259,7 @@ async def oi_historico(
     fim: str | date,
     vencimento: str | None = None,
     tipo: Literal["futuro", "opcao"] | None = None,
+    as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
@@ -271,6 +272,7 @@ async def oi_historico(
     fim: str | date,
     vencimento: str | None = None,
     tipo: Literal["futuro", "opcao"] | None = None,
+    as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
 
@@ -282,6 +284,7 @@ async def oi_historico(
     fim: str | date,
     vencimento: str | None = None,
     tipo: Literal["futuro", "opcao"] | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
@@ -322,16 +325,13 @@ async def oi_historico(
         vct_upper = vencimento.strip().upper()
         df = df[df["vencimento_codigo"] == vct_upper].reset_index(drop=True)
 
-    if return_meta:
-        meta = build_source_meta(
-            "b3",
-            client.BASE_URL_ARQUIVOS,
-            "httpx+csv",
-            fetch_ms,
-            0,
-            df,
-            parser.PARSER_VERSION_OI,
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "b3",
+        client.BASE_URL_ARQUIVOS,
+        "httpx+csv",
+        fetch_ms,
+        0,
+        df,
+        parser.PARSER_VERSION_OI,
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import time
-from datetime import UTC, datetime
 from typing import Literal, overload
 
 import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta, finalize_result
 
 from . import client
 from .parser import PARSER_VERSION, parse_serie_historica, records_to_dataframe
@@ -21,6 +21,7 @@ async def serie_historica(
     inicio: int | None = None,
     fim: int | None = None,
     uf: str | None = None,
+    as_polars: bool = False,
     *,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
@@ -32,6 +33,7 @@ async def serie_historica(
     inicio: int | None = None,
     fim: int | None = None,
     uf: str | None = None,
+    as_polars: bool = False,
     *,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
@@ -42,6 +44,7 @@ async def serie_historica(
     inicio: int | None = None,
     fim: int | None = None,
     uf: str | None = None,
+    as_polars: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
     t0 = time.monotonic()
@@ -77,25 +80,18 @@ async def serie_historica(
         ufs=len(df["uf"].dropna().unique()) if not df.empty else 0,
     )
 
-    if return_meta:
-        meta = MetaInfo(
-            source="conab_serie_historica",
-            source_url=metadata.get("url", client.SERIES_HISTORICAS_URL),
-            source_method="httpx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["conab_serie_historica"],
-            selected_source="conab_serie_historica",
-            fetch_timestamp=datetime.now(UTC),
-        )
-        return df, meta
-
-    return df
+    meta = build_source_meta(
+        "conab_serie_historica",
+        metadata.get("url", client.SERIES_HISTORICAS_URL),
+        "httpx",
+        fetch_ms,
+        parse_ms,
+        df,
+        PARSER_VERSION,
+        attempted_sources=["conab_serie_historica"],
+        selected_source="conab_serie_historica",
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 def produtos_disponiveis() -> list[dict[str, str]]:
