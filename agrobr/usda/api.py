@@ -8,6 +8,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta
 
 from . import client, parser
 from .models import resolve_commodity_code, resolve_country_code
@@ -89,20 +90,16 @@ async def psd(
     parse_ms = int((time.monotonic() - t1) * 1000)
 
     if return_meta:
-        meta = MetaInfo(
-            source="usda",
-            source_url=source_url,
-            source_method="httpx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
+        meta = build_source_meta(
+            "usda",
+            source_url,
+            "httpx",
+            fetch_ms,
+            parse_ms,
+            df,
+            parser.PARSER_VERSION,
             attempted_sources=["usda_psd"],
             selected_source="usda_psd",
-            fetch_timestamp=datetime.now(UTC),
         )
         return df, meta
 

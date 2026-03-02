@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import time
-from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta
 
 from . import client, parser
 
@@ -60,20 +60,16 @@ async def prodes(
         df = df[df["uf"] == uf_upper].reset_index(drop=True)
 
     if return_meta:
-        meta = MetaInfo(
-            source="desmatamento",
-            source_url=source_url,
-            source_method="httpx+wfs+csv",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
+        meta = build_source_meta(
+            "desmatamento",
+            source_url,
+            "httpx+wfs+csv",
+            fetch_ms,
+            parse_ms,
+            df,
+            parser.PARSER_VERSION,
             attempted_sources=["terrabrasilis_prodes"],
             selected_source="terrabrasilis_prodes",
-            fetch_timestamp=datetime.now(UTC),
         )
         return df, meta
 
@@ -123,20 +119,16 @@ async def prodes_geo(
         gdf = gdf[gdf["uf"] == uf_upper].reset_index(drop=True)
 
     if return_meta:
-        meta = MetaInfo(
-            source="desmatamento",
-            source_url=source_url,
-            source_method="httpx+wfs+geojson",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(gdf),
-            columns=gdf.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
+        meta = build_source_meta(
+            "desmatamento",
+            source_url,
+            "httpx+wfs+geojson",
+            fetch_ms,
+            parse_ms,
+            gdf,
+            parser.PARSER_VERSION,
             attempted_sources=["terrabrasilis_prodes_geo"],
             selected_source="terrabrasilis_prodes_geo",
-            fetch_timestamp=datetime.now(UTC),
         )
         return gdf, meta
 
@@ -200,20 +192,16 @@ async def deter(
         df = df[df["classe"] == classe].reset_index(drop=True)
 
     if return_meta:
-        meta = MetaInfo(
-            source="desmatamento",
-            source_url=source_url,
-            source_method="httpx+wfs+csv",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
+        meta = build_source_meta(
+            "desmatamento",
+            source_url,
+            "httpx+wfs+csv",
+            fetch_ms,
+            parse_ms,
+            df,
+            parser.PARSER_VERSION,
             attempted_sources=["terrabrasilis_deter"],
             selected_source="terrabrasilis_deter",
-            fetch_timestamp=datetime.now(UTC),
         )
         return df, meta
 
@@ -277,20 +265,16 @@ async def deter_geo(
         gdf = gdf[gdf["classe"] == classe].reset_index(drop=True)
 
     if return_meta:
-        meta = MetaInfo(
-            source="desmatamento",
-            source_url=source_url,
-            source_method="httpx+wfs+geojson",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(gdf),
-            columns=gdf.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
+        meta = build_source_meta(
+            "desmatamento",
+            source_url,
+            "httpx+wfs+geojson",
+            fetch_ms,
+            parse_ms,
+            gdf,
+            parser.PARSER_VERSION,
             attempted_sources=["terrabrasilis_deter_geo"],
             selected_source="terrabrasilis_deter_geo",
-            fetch_timestamp=datetime.now(UTC),
         )
         return gdf, meta
 

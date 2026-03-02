@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import time
-from datetime import UTC, datetime
 from typing import Any, Literal, overload
 
 import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta
 from agrobr.utils.warnings import warn_once
 
 from . import client, parser
@@ -81,20 +81,14 @@ async def exportacao(
         df = parser.agregar_mensal(df)
 
     if return_meta:
-        meta = MetaInfo(
-            source="abiove",
-            source_url=source_url,
-            source_method="httpx+openpyxl",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["abiove"],
-            selected_source="abiove",
-            fetch_timestamp=datetime.now(UTC),
+        meta = build_source_meta(
+            "abiove",
+            source_url,
+            "httpx+openpyxl",
+            fetch_ms,
+            parse_ms,
+            df,
+            parser.PARSER_VERSION,
         )
         return df, meta
 

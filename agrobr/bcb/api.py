@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import time
-from datetime import UTC, datetime
 from typing import Literal, overload
 
 import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta
 
 from . import client
 from .models import UF_CODES, normalize_safra_sicor, resolve_produto_sicor
@@ -115,20 +115,17 @@ async def credito_rural(
     )
 
     if return_meta:
-        meta = MetaInfo(
-            source="bcb",
-            source_url=f"{client.BASE_URL}/{client.ENDPOINT_MAP.get(finalidade.lower(), 'CusteioMunicipio')}",
-            source_method=source_method,
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=PARSER_VERSION,
+        meta = build_source_meta(
+            "bcb",
+            f"{client.BASE_URL}/{client.ENDPOINT_MAP.get(finalidade.lower(), 'CusteioMunicipio')}",
+            source_method,
+            fetch_ms,
+            parse_ms,
+            df,
+            PARSER_VERSION,
             schema_version="1.1",
             attempted_sources=attempted_sources,
             selected_source=f"bcb_{source_used}",
-            fetch_timestamp=datetime.now(UTC),
         )
         return df, meta
 

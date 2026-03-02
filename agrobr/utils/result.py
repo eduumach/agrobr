@@ -7,7 +7,43 @@ import structlog
 if TYPE_CHECKING:
     import pandas as pd
 
+    from agrobr.models import MetaInfo
+
 logger = structlog.get_logger(__name__)
+
+
+def build_source_meta(
+    source: str,
+    source_url: str,
+    source_method: str,
+    fetch_ms: int,
+    parse_ms: int,
+    df: pd.DataFrame,
+    parser_version: int,
+    *,
+    schema_version: str = "1.0",
+    attempted_sources: list[str] | None = None,
+    selected_source: str | None = None,
+) -> MetaInfo:
+    from agrobr.models import MetaInfo
+    from agrobr.utils.time import utcnow
+
+    now = utcnow()
+    return MetaInfo(
+        source=source,
+        source_url=source_url,
+        source_method=source_method,
+        fetched_at=now,
+        fetch_duration_ms=fetch_ms,
+        parse_duration_ms=parse_ms,
+        records_count=len(df),
+        columns=df.columns.tolist(),
+        parser_version=parser_version,
+        schema_version=schema_version,
+        attempted_sources=attempted_sources if attempted_sources is not None else [source],
+        selected_source=selected_source if selected_source is not None else source,
+        fetch_timestamp=now,
+    )
 
 
 @overload

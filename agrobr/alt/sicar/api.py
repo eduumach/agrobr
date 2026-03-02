@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import re
 import time
-from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 import httpx
@@ -10,6 +9,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta
 
 from . import client, parser
 from .models import (
@@ -178,20 +178,16 @@ async def imoveis(
             logger.info("sicar_dedup", removed=before - len(df), remaining=len(df))
 
     if return_meta:
-        meta = MetaInfo(
-            source="sicar",
-            source_url=source_url,
-            source_method="httpx+wfs+csv",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
+        meta = build_source_meta(
+            "sicar",
+            source_url,
+            "httpx+wfs+csv",
+            fetch_ms,
+            parse_ms,
+            df,
+            parser.PARSER_VERSION,
             attempted_sources=["sicar_wfs"],
             selected_source="sicar_wfs",
-            fetch_timestamp=datetime.now(UTC),
         )
         return df, meta
 
@@ -296,20 +292,16 @@ async def imoveis_geo(
             logger.info("sicar_geo_dedup", removed=before - len(gdf), remaining=len(gdf))
 
     if return_meta:
-        meta = MetaInfo(
-            source="sicar",
-            source_url=source_url,
-            source_method="httpx+wfs+geojson",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(gdf),
-            columns=gdf.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
+        meta = build_source_meta(
+            "sicar",
+            source_url,
+            "httpx+wfs+geojson",
+            fetch_ms,
+            parse_ms,
+            gdf,
+            parser.PARSER_VERSION,
             attempted_sources=["sicar_wfs_geo"],
             selected_source="sicar_wfs_geo",
-            fetch_timestamp=datetime.now(UTC),
         )
         return gdf, meta
 
@@ -390,20 +382,16 @@ async def resumo(
         parse_ms = int((time.monotonic() - t1) * 1000)
 
     if return_meta:
-        meta = MetaInfo(
-            source="sicar",
-            source_url=source_url,
-            source_method="httpx+wfs+csv",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
+        meta = build_source_meta(
+            "sicar",
+            source_url,
+            "httpx+wfs+csv",
+            fetch_ms,
+            parse_ms,
+            df,
+            parser.PARSER_VERSION,
             attempted_sources=["sicar_wfs"],
             selected_source="sicar_wfs",
-            fetch_timestamp=datetime.now(UTC),
         )
         return df, meta
 

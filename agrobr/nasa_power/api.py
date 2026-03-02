@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import time
-from datetime import UTC, date, datetime
+from datetime import date
 from typing import Any
 
 import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta
 
 from . import client, parser
 from .models import UF_COORDS
@@ -40,23 +41,18 @@ async def clima_ponto(
     parse_ms = int((time.monotonic() - t1) * 1000)
 
     if return_meta:
-        meta = MetaInfo(
-            source="nasa_power",
-            source_url=(
-                f"{client.BASE_URL}?latitude={lat}&longitude={lon}"
-                f"&start={inicio.strftime('%Y%m%d')}&end={fim.strftime('%Y%m%d')}"
-            ),
-            source_method="httpx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["nasa_power"],
-            selected_source="nasa_power",
-            fetch_timestamp=datetime.now(UTC),
+        source_url = (
+            f"{client.BASE_URL}?latitude={lat}&longitude={lon}"
+            f"&start={inicio.strftime('%Y%m%d')}&end={fim.strftime('%Y%m%d')}"
+        )
+        meta = build_source_meta(
+            "nasa_power",
+            source_url,
+            "httpx",
+            fetch_ms,
+            parse_ms,
+            df,
+            parser.PARSER_VERSION,
         )
         return df, meta
 
@@ -91,23 +87,18 @@ async def clima_uf(
     parse_ms = int((time.monotonic() - t1) * 1000)
 
     if return_meta:
-        meta = MetaInfo(
-            source="nasa_power",
-            source_url=(
-                f"{client.BASE_URL}?latitude={lat}&longitude={lon}"
-                f"&start={inicio.strftime('%Y%m%d')}&end={fim.strftime('%Y%m%d')}"
-            ),
-            source_method="httpx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["nasa_power"],
-            selected_source="nasa_power",
-            fetch_timestamp=datetime.now(UTC),
+        source_url = (
+            f"{client.BASE_URL}?latitude={lat}&longitude={lon}"
+            f"&start={inicio.strftime('%Y%m%d')}&end={fim.strftime('%Y%m%d')}"
+        )
+        meta = build_source_meta(
+            "nasa_power",
+            source_url,
+            "httpx",
+            fetch_ms,
+            parse_ms,
+            df,
+            parser.PARSER_VERSION,
         )
         return df, meta
 

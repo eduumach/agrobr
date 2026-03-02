@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import time
-from datetime import UTC, datetime
 from typing import Any, Literal, overload
 
 import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta
 
 from . import client, parser
 from .models import BIOMAS_VALIDOS, normalizar_bioma
@@ -101,20 +101,16 @@ async def cobertura(
         df = df[df["classe_id"] == classe_id].reset_index(drop=True)
 
     if return_meta:
-        meta = MetaInfo(
-            source="mapbiomas",
-            source_url=source_url,
-            source_method="httpx+xlsx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
+        meta = build_source_meta(
+            "mapbiomas",
+            source_url,
+            "httpx+xlsx",
+            fetch_ms,
+            parse_ms,
+            df,
+            parser.PARSER_VERSION,
             attempted_sources=["mapbiomas_dataverse"],
             selected_source="mapbiomas_dataverse",
-            fetch_timestamp=datetime.now(UTC),
         )
         return df, meta
 
@@ -189,20 +185,16 @@ async def transicao(
         df = df[df["classe_para_id"] == classe_para_id].reset_index(drop=True)
 
     if return_meta:
-        meta = MetaInfo(
-            source="mapbiomas",
-            source_url=source_url,
-            source_method="httpx+xlsx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
+        meta = build_source_meta(
+            "mapbiomas",
+            source_url,
+            "httpx+xlsx",
+            fetch_ms,
+            parse_ms,
+            df,
+            parser.PARSER_VERSION,
             attempted_sources=["mapbiomas_dataverse"],
             selected_source="mapbiomas_dataverse",
-            fetch_timestamp=datetime.now(UTC),
         )
         return df, meta
 

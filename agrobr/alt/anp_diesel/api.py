@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import time
-from datetime import UTC, date, datetime
+from datetime import date, datetime
 
 import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta
 
 from . import client, parser
 from .models import (
@@ -76,21 +77,14 @@ async def precos_diesel(
     df = df.reset_index(drop=True)
 
     if return_meta:
-        source_url = _get_source_url(nivel)
-        meta = MetaInfo(
-            source="anp_diesel",
-            source_url=source_url,
-            source_method="httpx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_parse_ms,
-            parse_duration_ms=0,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["anp_diesel"],
-            selected_source="anp_diesel",
-            fetch_timestamp=datetime.now(UTC),
+        meta = build_source_meta(
+            "anp_diesel",
+            _get_source_url(nivel),
+            "httpx",
+            fetch_parse_ms,
+            0,
+            df,
+            parser.PARSER_VERSION,
         )
         return df, meta
 
@@ -127,20 +121,14 @@ async def vendas_diesel(
     df = df.reset_index(drop=True)
 
     if return_meta:
-        meta = MetaInfo(
-            source="anp_diesel",
-            source_url=VENDAS_DIESEL_CSV_URL,
-            source_method="httpx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["anp_diesel"],
-            selected_source="anp_diesel",
-            fetch_timestamp=datetime.now(UTC),
+        meta = build_source_meta(
+            "anp_diesel",
+            VENDAS_DIESEL_CSV_URL,
+            "httpx",
+            fetch_ms,
+            parse_ms,
+            df,
+            parser.PARSER_VERSION,
         )
         return df, meta
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import time
-from datetime import UTC, date, datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Any, Literal, overload
 
 import httpx
@@ -11,6 +11,7 @@ import structlog
 
 from agrobr.exceptions import ParseError, SourceUnavailableError
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta
 from agrobr.utils.warnings import warn_once
 
 from . import client, parser
@@ -77,20 +78,14 @@ async def ajustes(
             df = df[df["ticker"] == contrato.upper()].reset_index(drop=True)
 
     if return_meta:
-        meta = MetaInfo(
-            source="b3",
-            source_url=source_url,
-            source_method="httpx+html",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["b3"],
-            selected_source="b3",
-            fetch_timestamp=datetime.now(UTC),
+        meta = build_source_meta(
+            "b3",
+            source_url,
+            "httpx+html",
+            fetch_ms,
+            parse_ms,
+            df,
+            parser.PARSER_VERSION,
         )
         return df, meta
 
@@ -164,20 +159,14 @@ async def historico(
         df = df[df["vencimento_codigo"] == vct_upper].reset_index(drop=True)
 
     if return_meta:
-        meta = MetaInfo(
-            source="b3",
-            source_url=client.BASE_URL,
-            source_method="httpx+html",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=0,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["b3"],
-            selected_source="b3",
-            fetch_timestamp=datetime.now(UTC),
+        meta = build_source_meta(
+            "b3",
+            client.BASE_URL,
+            "httpx+html",
+            fetch_ms,
+            0,
+            df,
+            parser.PARSER_VERSION,
         )
         return df, meta
 
@@ -246,20 +235,14 @@ async def posicoes_abertas(
         df = df[df["tipo"] == tipo].reset_index(drop=True)
 
     if return_meta:
-        meta = MetaInfo(
-            source="b3",
-            source_url=source_url,
-            source_method="httpx+csv",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION_OI,
-            schema_version="1.0",
-            attempted_sources=["b3"],
-            selected_source="b3",
-            fetch_timestamp=datetime.now(UTC),
+        meta = build_source_meta(
+            "b3",
+            source_url,
+            "httpx+csv",
+            fetch_ms,
+            parse_ms,
+            df,
+            parser.PARSER_VERSION_OI,
         )
         return df, meta
 
@@ -336,20 +319,14 @@ async def oi_historico(
         df = df[df["vencimento_codigo"] == vct_upper].reset_index(drop=True)
 
     if return_meta:
-        meta = MetaInfo(
-            source="b3",
-            source_url=client.BASE_URL_ARQUIVOS,
-            source_method="httpx+csv",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=0,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION_OI,
-            schema_version="1.0",
-            attempted_sources=["b3"],
-            selected_source="b3",
-            fetch_timestamp=datetime.now(UTC),
+        meta = build_source_meta(
+            "b3",
+            client.BASE_URL_ARQUIVOS,
+            "httpx+csv",
+            fetch_ms,
+            0,
+            df,
+            parser.PARSER_VERSION_OI,
         )
         return df, meta
 

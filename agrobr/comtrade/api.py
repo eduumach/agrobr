@@ -8,6 +8,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta
 
 from . import client, parser
 from .models import (
@@ -98,20 +99,14 @@ async def comercio(
     parse_ms = int((time.monotonic() - t1) * 1000)
 
     if return_meta:
-        meta = MetaInfo(
-            source="comtrade",
-            source_url=source_url,
-            source_method="httpx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["comtrade"],
-            selected_source="comtrade",
-            fetch_timestamp=datetime.now(UTC),
+        meta = build_source_meta(
+            "comtrade",
+            source_url,
+            "httpx",
+            fetch_ms,
+            parse_ms,
+            df,
+            parser.PARSER_VERSION,
         )
         return df, meta
 
@@ -198,20 +193,16 @@ async def trade_mirror(
     parse_ms = int((time.monotonic() - t1) * 1000)
 
     if return_meta:
-        meta = MetaInfo(
-            source="comtrade_mirror",
-            source_url=client.BASE_URL_AUTH,
-            source_method="httpx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
+        meta = build_source_meta(
+            "comtrade_mirror",
+            client.BASE_URL_AUTH,
+            "httpx",
+            fetch_ms,
+            parse_ms,
+            df,
+            parser.PARSER_VERSION,
             attempted_sources=["comtrade_export", "comtrade_import"],
             selected_source="comtrade_mirror",
-            fetch_timestamp=datetime.now(UTC),
         )
         return df, meta
 

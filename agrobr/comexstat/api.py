@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import time
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Literal, overload
 
 import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta
 
 from . import client
 from .models import resolve_ncm
@@ -80,20 +81,14 @@ async def exportacao(
     )
 
     if return_meta:
-        meta = MetaInfo(
-            source="comexstat",
-            source_url=f"{client.BULK_CSV_BASE}/EXP_{ano}.csv",
-            source_method="httpx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["comexstat"],
-            selected_source="comexstat",
-            fetch_timestamp=datetime.now(UTC),
+        meta = build_source_meta(
+            "comexstat",
+            f"{client.BULK_CSV_BASE}/EXP_{ano}.csv",
+            "httpx",
+            fetch_ms,
+            parse_ms,
+            df,
+            PARSER_VERSION,
         )
         return df, meta
 

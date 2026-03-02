@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-from datetime import UTC, datetime
 from typing import Literal, overload
 
 import pandas as pd
@@ -16,6 +15,7 @@ from agrobr.antaq.models import (
     resolve_tipo_navegacao,
 )
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta
 
 logger = structlog.get_logger()
 
@@ -128,20 +128,16 @@ async def movimentacao(
     )
 
     if return_meta:
-        meta = MetaInfo(
-            source="antaq",
-            source_url=source_url,
-            source_method="httpx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=PARSER_VERSION,
-            schema_version="1.0",
+        meta = build_source_meta(
+            "antaq",
+            source_url,
+            "httpx",
+            fetch_ms,
+            parse_ms,
+            df,
+            PARSER_VERSION,
             attempted_sources=["antaq_ea"],
             selected_source="antaq_ea",
-            fetch_timestamp=datetime.now(UTC),
         )
         return df, meta
 

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import time
-from datetime import UTC, datetime
 from typing import Any, Literal, overload
 
 import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta
 from agrobr.utils.warnings import warn_once
 
 from . import client, parser
@@ -77,20 +77,14 @@ async def cotacoes(
     parse_ms = int((time.monotonic() - t1) * 1000)
 
     if return_meta:
-        meta = MetaInfo(
-            source="imea",
-            source_url=f"{client.BASE_URL}/v2/mobile/cadeias/{cadeia_id}/cotacoes",
-            source_method="httpx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["imea"],
-            selected_source="imea",
-            fetch_timestamp=datetime.now(UTC),
+        meta = build_source_meta(
+            "imea",
+            f"{client.BASE_URL}/v2/mobile/cadeias/{cadeia_id}/cotacoes",
+            "httpx",
+            fetch_ms,
+            parse_ms,
+            df,
+            parser.PARSER_VERSION,
         )
         return df, meta
 

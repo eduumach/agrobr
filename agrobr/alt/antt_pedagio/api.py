@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from datetime import UTC, datetime
+from datetime import datetime
 
 import httpx
 import pandas as pd
@@ -9,6 +9,7 @@ import structlog
 
 from agrobr.exceptions import ParseError
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta
 
 from . import client, parser
 from .models import (
@@ -104,20 +105,14 @@ async def fluxo_pedagio(
     parse_ms = int((time.monotonic() - t1) * 1000)
 
     if return_meta:
-        meta = MetaInfo(
-            source="antt_pedagio",
-            source_url=f"https://dados.antt.gov.br/dataset/{DATASET_TRAFEGO_SLUG}",
-            source_method="httpx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df_out),
-            columns=df_out.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["antt_pedagio"],
-            selected_source="antt_pedagio",
-            fetch_timestamp=datetime.now(UTC),
+        meta = build_source_meta(
+            "antt_pedagio",
+            f"https://dados.antt.gov.br/dataset/{DATASET_TRAFEGO_SLUG}",
+            "httpx",
+            fetch_ms,
+            parse_ms,
+            df_out,
+            parser.PARSER_VERSION,
         )
         return df_out, meta
 
@@ -155,20 +150,14 @@ async def pracas_pedagio(
     parse_ms = int((time.monotonic() - t1) * 1000)
 
     if return_meta:
-        meta = MetaInfo(
-            source="antt_pedagio",
-            source_url=f"https://dados.antt.gov.br/dataset/{DATASET_PRACAS_SLUG}",
-            source_method="httpx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["antt_pedagio"],
-            selected_source="antt_pedagio",
-            fetch_timestamp=datetime.now(UTC),
+        meta = build_source_meta(
+            "antt_pedagio",
+            f"https://dados.antt.gov.br/dataset/{DATASET_PRACAS_SLUG}",
+            "httpx",
+            fetch_ms,
+            parse_ms,
+            df,
+            parser.PARSER_VERSION,
         )
         return df, meta
 

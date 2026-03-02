@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import time
-from datetime import UTC, datetime
+from datetime import datetime
 
 import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta
 
 from . import client, parser
 from .models import (
@@ -68,20 +69,14 @@ async def sinistros(
 
     if return_meta:
         source_url = get_csv_url(periodos[0]) if periodos else ""
-        meta = MetaInfo(
-            source="mapa_psr",
-            source_url=source_url,
-            source_method="httpx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df_out),
-            columns=df_out.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["mapa_psr"],
-            selected_source="mapa_psr",
-            fetch_timestamp=datetime.now(UTC),
+        meta = build_source_meta(
+            "mapa_psr",
+            source_url,
+            "httpx",
+            fetch_ms,
+            parse_ms,
+            df_out,
+            parser.PARSER_VERSION,
         )
         return df_out, meta
 
@@ -133,20 +128,14 @@ async def apolices(
 
     if return_meta:
         source_url = get_csv_url(periodos[0]) if periodos else ""
-        meta = MetaInfo(
-            source="mapa_psr",
-            source_url=source_url,
-            source_method="httpx",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df_out),
-            columns=df_out.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["mapa_psr"],
-            selected_source="mapa_psr",
-            fetch_timestamp=datetime.now(UTC),
+        meta = build_source_meta(
+            "mapa_psr",
+            source_url,
+            "httpx",
+            fetch_ms,
+            parse_ms,
+            df_out,
+            parser.PARSER_VERSION,
         )
         return df_out, meta
 

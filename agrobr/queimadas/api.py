@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import time
-from datetime import UTC, datetime
 from typing import Any, Literal, overload
 
 import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.result import build_source_meta
 
 from . import client, parser
 from .models import BIOMAS_VALIDOS
@@ -94,20 +94,14 @@ async def focos(
         df = df[df["satelite"] == satelite].reset_index(drop=True)
 
     if return_meta:
-        meta = MetaInfo(
-            source="queimadas",
-            source_url=source_url,
-            source_method="httpx+csv",
-            fetched_at=datetime.now(UTC),
-            fetch_duration_ms=fetch_ms,
-            parse_duration_ms=parse_ms,
-            records_count=len(df),
-            columns=df.columns.tolist(),
-            parser_version=parser.PARSER_VERSION,
-            schema_version="1.0",
-            attempted_sources=["queimadas"],
-            selected_source="queimadas",
-            fetch_timestamp=datetime.now(UTC),
+        meta = build_source_meta(
+            "queimadas",
+            source_url,
+            "httpx+csv",
+            fetch_ms,
+            parse_ms,
+            df,
+            parser.PARSER_VERSION,
         )
         return df, meta
 
