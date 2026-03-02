@@ -16,7 +16,6 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import gc
-import os
 import pickle
 import statistics
 import time
@@ -97,10 +96,6 @@ def _generate_na_html(num_rows: int) -> str:
     </table>
     </body></html>
     """
-
-
-def _generate_cache_data(size_bytes: int = 1024) -> bytes:
-    return os.urandom(size_bytes)
 
 
 def _generate_indicadores(n: int) -> list[dict[str, Any]]:
@@ -184,29 +179,6 @@ class TestMemoryProfiling:
             f"\n  [MEM] NA parse 1000 rows: delta={_mb(delta):.2f} MB, peak={_mb(peak):.2f} MB, records={len(results)}"
         )
         assert delta < 100 * 1024 * 1024
-
-    def test_duckdb_cache_memory(self, tmp_path):
-        settings = CacheSettings(cache_dir=tmp_path, db_name="bench.duckdb")
-        store = DuckDBStore(settings)
-
-        gc.collect()
-        tracemalloc.start()
-        snap_before = tracemalloc.take_snapshot()
-
-        for i in range(1000):
-            store.cache_set(f"key_{i}", _generate_cache_data(512), Fonte.CEPEA, ttl_seconds=3600)
-
-        snap_after = tracemalloc.take_snapshot()
-        peak = tracemalloc.get_traced_memory()[1]
-        tracemalloc.stop()
-
-        stats = snap_after.compare_to(snap_before, "lineno")
-        delta = sum(s.size_diff for s in stats if s.size_diff > 0)
-        print(
-            f"\n  [MEM] DuckDB 1000 cache writes: delta={_mb(delta):.2f} MB, peak={_mb(peak):.2f} MB"
-        )
-        store.close()
-        assert delta < 200 * 1024 * 1024
 
     def test_memory_release_after_parse(self):
         from agrobr.cepea.parsers.v1 import CepeaParserV1
@@ -396,47 +368,6 @@ class TestCacheStress:
         yield s
         s.close()
 
-    def test_sequential_writes_10k(self, store):
-        start = time.perf_counter()
-        for i in range(10_000):
-            store.cache_set(f"key_{i}", _generate_cache_data(256), Fonte.CEPEA, ttl_seconds=3600)
-        elapsed = (time.perf_counter() - start) * 1000
-
-        flag = " *** FLAG" if elapsed > 10_000 else ""
-        print(f"\n  [CACHE] 10k sequential writes: {_fmt(elapsed)}{flag}")
-        assert elapsed < 60_000
-
-    def test_sequential_reads_10k(self, store):
-        for i in range(10_000):
-            store.cache_set(f"key_{i}", _generate_cache_data(256), Fonte.CEPEA, ttl_seconds=3600)
-
-        start = time.perf_counter()
-        hits = 0
-        for i in range(10_000):
-            data, stale = store.cache_get(f"key_{i}")
-            if data:
-                hits += 1
-        elapsed = (time.perf_counter() - start) * 1000
-
-        print(f"\n  [CACHE] 10k sequential reads: {_fmt(elapsed)}, hits={hits}")
-        assert hits == 10_000
-        assert elapsed < 30_000
-
-    def test_mixed_read_write(self, store):
-        for i in range(5000):
-            store.cache_set(f"key_{i}", _generate_cache_data(256), Fonte.CEPEA, ttl_seconds=3600)
-
-        start = time.perf_counter()
-        for i in range(5000):
-            store.cache_get(f"key_{i}")
-            store.cache_set(
-                f"key_{i + 5000}", _generate_cache_data(256), Fonte.CONAB, ttl_seconds=3600
-            )
-        elapsed = (time.perf_counter() - start) * 1000
-
-        print(f"\n  [CACHE] 5k mixed read/write: {_fmt(elapsed)}")
-        assert elapsed < 60_000
-
     @pytest.mark.parametrize("n_records", [10_000, 50_000])
     def test_indicadores_upsert_scaling(self, store, n_records):
         indicadores = _generate_indicadores(n_records)
@@ -461,58 +392,6 @@ class TestCacheStress:
         print(f"\n  [CACHE] query 50k indicadores: {_fmt(elapsed)}, returned={len(results)}")
         assert len(results) == 50_000
         assert elapsed < 5_000
-
-    def test_ttl_check_scaling(self, store):
-        for i in range(10_000):
-            ttl = 1 if i % 2 == 0 else 3600
-            store.cache_set(f"key_{i}", _generate_cache_data(128), Fonte.CEPEA, ttl_seconds=ttl)
-
-        conn = store._get_conn()
-        past = datetime.utcnow() - timedelta(hours=1)
-        conn.execute(
-            "UPDATE cache_entries SET expires_at = ? WHERE key LIKE 'key_%' AND CAST(REPLACE(key, 'key_', '') AS INT) % 2 = 0",
-            [past],
-        )
-
-        start = time.perf_counter()
-        stale_count = 0
-        for i in range(10_000):
-            data, stale = store.cache_get(f"key_{i}")
-            if stale:
-                stale_count += 1
-        elapsed = (time.perf_counter() - start) * 1000
-
-        print(f"\n  [CACHE] TTL check 10k entries: {_fmt(elapsed)}, stale={stale_count}")
-        assert stale_count == 5000
-        assert elapsed < 30_000
-
-    def test_db_file_size_scaling(self, tmp_path):
-        settings = CacheSettings(cache_dir=tmp_path, db_name="size_test.duckdb")
-        store = DuckDBStore(settings)
-
-        sizes = {}
-        for target in [1000, 5000, 10_000]:
-            for i in range(sizes.get("last_i", 0), target):
-                store.cache_set(
-                    f"key_{i}", _generate_cache_data(512), Fonte.CEPEA, ttl_seconds=3600
-                )
-            sizes["last_i"] = target
-
-            db_path = tmp_path / "size_test.duckdb"
-            if db_path.exists():
-                sizes[target] = db_path.stat().st_size
-
-        store.close()
-
-        for n, size in sizes.items():
-            if n == "last_i":
-                continue
-            print(f"\n  [CACHE] DB size at {n} entries: {_mb(size):.2f} MB")
-
-        if 1000 in sizes and 10_000 in sizes:
-            ratio = sizes[10_000] / sizes[1000]
-            print(f"  [CACHE] Size ratio 10k/1k: {ratio:.1f}x (ideal~10x)")
-            assert ratio < 15, f"DB size scales poorly: {ratio:.1f}x for 10x data"
 
 
 # ============================================================================

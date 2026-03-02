@@ -204,31 +204,6 @@ def _get_last_expiry_time() -> datetime:
     return _get_smart_expiry_time() - timedelta(days=1)
 
 
-def get_ttl(source: Fonte | str, endpoint: str | None = None) -> int:
-    return get_policy(source, endpoint).ttl_seconds
-
-
-def get_stale_max(source: Fonte | str, endpoint: str | None = None) -> int:
-    return get_policy(source, endpoint).stale_max_seconds
-
-
-def is_expired(created_at: datetime, source: Fonte | str, endpoint: str | None = None) -> bool:
-    policy = get_policy(source, endpoint)
-
-    if policy.smart_expiry:
-        last_expiry = _get_last_expiry_time()
-        return created_at < last_expiry
-
-    expires_at = created_at + timedelta(seconds=policy.ttl_seconds)
-    return utcnow() > expires_at
-
-
-def is_stale_acceptable(created_at: datetime, source: Fonte | str) -> bool:
-    stale_max = get_stale_max(source)
-    max_acceptable = created_at + timedelta(seconds=stale_max)
-    return utcnow() <= max_acceptable
-
-
 def calculate_expiry(source: Fonte | str, endpoint: str | None = None) -> datetime:
     policy = get_policy(source, endpoint)
 
@@ -236,21 +211,6 @@ def calculate_expiry(source: Fonte | str, endpoint: str | None = None) -> dateti
         return _get_smart_expiry_time()
 
     return utcnow() + timedelta(seconds=policy.ttl_seconds)
-
-
-def should_refresh(
-    created_at: datetime,
-    source: Fonte | str,
-    force: bool = False,
-    endpoint: str | None = None,
-) -> tuple[bool, str]:
-    if force:
-        return True, "force_refresh"
-
-    if is_expired(created_at, source, endpoint):
-        return True, "expired"
-
-    return False, "fresh"
 
 
 def format_ttl(seconds: int) -> str:

@@ -19,13 +19,11 @@ def _fast_retry(monkeypatch):
 @pytest.fixture(autouse=True)
 def _reset_global_state():
     yield
-    from agrobr.cache.history import reset_history_manager
     from agrobr.config import reset_config
     from agrobr.http.rate_limiter import RateLimiter
 
     reset_config()
     RateLimiter.reset()
-    reset_history_manager()
 
     from agrobr.utils.warnings import warn_once_reset
 

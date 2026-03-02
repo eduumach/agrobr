@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from agrobr.cache.policies import (
     POLICIES,
@@ -9,9 +9,6 @@ from agrobr.cache.policies import (
     format_ttl,
     get_next_update_info,
     get_policy,
-    is_expired,
-    is_stale_acceptable,
-    should_refresh,
 )
 from agrobr.constants import Fonte
 from agrobr.utils.time import utcnow
@@ -61,26 +58,6 @@ class TestGetNextUpdateInfo:
         assert info["type"] == "smart"
 
 
-class TestShouldRefresh:
-    def test_force_true(self):
-        created = utcnow() - timedelta(minutes=5)
-        refresh, reason = should_refresh(created, Fonte.CEPEA, force=True)
-        assert refresh is True
-        assert reason == "force_refresh"
-
-    def test_expired_entry(self):
-        created = utcnow() - timedelta(days=10)
-        refresh, reason = should_refresh(created, Fonte.CONAB)
-        assert refresh is True
-        assert reason == "expired"
-
-    def test_fresh_entry(self):
-        created = utcnow() - timedelta(minutes=5)
-        refresh, reason = should_refresh(created, Fonte.CONAB)
-        assert refresh is False
-        assert reason == "fresh"
-
-
 class TestGetPolicy:
     def test_string_key_direct(self):
         policy = get_policy("cepea_diario")
@@ -101,33 +78,6 @@ class TestGetPolicy:
     def test_with_endpoint(self):
         policy = get_policy(Fonte.CONAB, endpoint="safras")
         assert isinstance(policy, CachePolicy)
-
-
-class TestIsExpired:
-    def test_smart_expiry_not_expired(self):
-        created = utcnow() - timedelta(hours=1)
-        assert (
-            is_expired(created, "cepea_diario") is False
-            or is_expired(created, "cepea_diario") is True
-        )
-
-    def test_ttl_expired(self):
-        created = utcnow() - timedelta(days=10)
-        assert is_expired(created, Fonte.CONAB) is True
-
-    def test_ttl_not_expired(self):
-        created = utcnow() - timedelta(minutes=5)
-        assert is_expired(created, Fonte.CONAB) is False
-
-
-class TestIsStaleAcceptable:
-    def test_within_stale_window(self):
-        created = utcnow() - timedelta(days=1)
-        assert is_stale_acceptable(created, Fonte.CONAB) is True
-
-    def test_beyond_stale_window(self):
-        created = utcnow() - timedelta(days=365)
-        assert is_stale_acceptable(created, Fonte.CONAB) is False
 
 
 class TestCalculateExpiry:

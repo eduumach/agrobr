@@ -242,9 +242,6 @@ class CacheSettings(BaseSettings):
     cache_dir: Path = Path.home() / ".agrobr" / "cache"
     db_name: str = "agrobr.duckdb"
 
-    strict_mode: bool = False
-    save_to_history: bool = True
-
     model_config = SettingsConfigDict(env_prefix="AGROBR_CACHE_")
 
 

@@ -130,13 +130,7 @@ pip install --upgrade agrobr
    ```bash
    agrobr cache clear
    ```
-2. Ou via código:
-   ```python
-   from agrobr.cache.duckdb_store import get_store
-   store = get_store()
-   store.cache_clear()
-   ```
-3. Se persistir, delete o arquivo:
+2. Se persistir, delete o arquivo:
    ```bash
    rm ~/.agrobr/cache/agrobr.duckdb
    ```
@@ -149,16 +143,6 @@ pip install --upgrade agrobr
 ```python
 df = await cepea.indicador('soja', force_refresh=True)
 ```
-
-### Cache Strict Mode
-
-Se você quer garantir que o cache sempre corresponda à versão atual do agrobr:
-
-```bash
-export AGROBR_CACHE_STRICT=1
-```
-
-Com strict mode ativo, qualquer entrada de cache gravada por uma versão diferente do agrobr é ignorada (cache miss). Útil em ambientes de produção onde consistência é mais importante que performance.
 
 ## Problemas com Polars
 
