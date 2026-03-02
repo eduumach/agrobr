@@ -116,7 +116,9 @@ def _assert_dataframe_golden(df: pd.DataFrame, expected: dict[str, Any]) -> None
         first = df.iloc[0]
         for key, val in expected["first_row"].items():
             actual = first[key]
-            if isinstance(val, float):
+            if val is None or (isinstance(val, float) and pd.isna(val)):
+                assert pd.isna(actual), f"first_row[{key}]: expected NA/None, got {actual!r}"
+            elif isinstance(val, float):
                 assert actual == pytest.approx(val, rel=1e-4), (
                     f"first_row[{key}]: expected {val}, got {actual}"
                 )
@@ -129,7 +131,9 @@ def _assert_dataframe_golden(df: pd.DataFrame, expected: dict[str, Any]) -> None
         last = df.iloc[-1]
         for key, val in expected["last_row"].items():
             actual = last[key]
-            if isinstance(val, float):
+            if val is None or (isinstance(val, float) and pd.isna(val)):
+                assert pd.isna(actual), f"last_row[{key}]: expected NA/None, got {actual!r}"
+            elif isinstance(val, float):
                 assert actual == pytest.approx(val, rel=1e-4), (
                     f"last_row[{key}]: expected {val}, got {actual}"
                 )
@@ -900,3 +904,314 @@ def test_mapa_psr_golden_parsing(_name: str, path: Path):
         assert df["ano_apolice"].dtype in ("int64", "int32"), "ano_apolice should be int"
     if expected.get("checks", {}).get("area_total_is_float"):
         assert df["area_total"].dtype == "float64", "area_total should be float64"
+
+
+# ============================================================================
+# B3 Golden Tests
+# ============================================================================
+
+
+def _get_b3_cases() -> list[tuple[str, Path]]:
+    return _discover_cases(source_filter="b3")
+
+
+@pytest.mark.skipif(not _get_b3_cases(), reason="No B3 golden data")
+@pytest.mark.parametrize("_name,path", _get_b3_cases())
+def test_b3_golden_parsing(_name: str, path: Path):
+    expected = _load_expected(path)
+
+    if (path / "response.html").exists():
+        from agrobr.b3.parser import parse_ajustes_html
+
+        html = (path / "response.html").read_text(encoding="utf-8")
+        df = parse_ajustes_html(html)
+
+        for col in expected["columns"]:
+            assert col in df.columns, f"Missing column: {col}"
+        assert len(df) >= expected["agro_row_count_min"]
+        tickers = sorted(df["ticker"].unique().tolist())
+        assert tickers == expected["agro_tickers"]
+
+        for sample_key in ("sample_bgi", "sample_sjc"):
+            if sample_key in expected:
+                sample = expected[sample_key]
+                row = df[
+                    (df["ticker"] == sample["ticker"])
+                    & (df["vencimento_codigo"] == sample["vencimento_codigo"])
+                ].iloc[0]
+                for key in ("ajuste_anterior", "ajuste_atual", "variacao"):
+                    if key in sample:
+                        assert row[key] == pytest.approx(sample[key], rel=1e-4), (
+                            f"{sample_key}.{key}: {row[key]} != {sample[key]}"
+                        )
+
+    elif (path / "response.csv").exists():
+        from agrobr.b3.parser import parse_posicoes_abertas
+
+        csv_bytes = (path / "response.csv").read_bytes()
+        df = parse_posicoes_abertas(csv_bytes)
+
+        for col in expected["columns"]:
+            assert col in df.columns, f"Missing column: {col}"
+        assert len(df) == expected["total_rows"]
+
+        futures = df[df["tipo"] == "futuro"]
+        options = df[df["tipo"] == "opcao"]
+        assert len(futures) == expected["futures_count"]
+        assert len(options) == expected["options_count"]
+
+        for sample_key in ("sample_bgi", "sample_ccm"):
+            if sample_key in expected:
+                sample = expected[sample_key]
+                row = df[
+                    (df["ticker"] == sample["ticker"])
+                    & (df["ticker_completo"] == sample["ticker_completo"])
+                ].iloc[0]
+                assert row["posicoes_abertas"] == sample["posicoes_abertas"]
+                assert row["variacao_posicoes"] == sample["variacao_posicoes"]
+    else:
+        pytest.skip(f"No recognized response file in {path}")
+
+
+# ============================================================================
+# Comtrade Golden Tests
+# ============================================================================
+
+
+def _get_comtrade_cases() -> list[tuple[str, Path]]:
+    return _discover_cases(source_filter="comtrade")
+
+
+@pytest.mark.skipif(not _get_comtrade_cases(), reason="No Comtrade golden data")
+@pytest.mark.parametrize("_name,path", _get_comtrade_cases())
+def test_comtrade_golden_parsing(_name: str, path: Path):
+    from agrobr.comtrade.parser import parse_mirror, parse_trade_data
+
+    expected = _load_expected(path)
+    metadata = _load_metadata(path)
+
+    if (path / "response.json").exists():
+        raw = json.loads((path / "response.json").read_text(encoding="utf-8"))
+        records = raw.get("data", raw) if isinstance(raw, dict) else raw
+        df = parse_trade_data(records)
+
+        assert len(df) == expected["record_count"]
+        _assert_dataframe_golden(df, expected)
+
+    elif (path / "response_reporter.json").exists():
+        raw_rep = json.loads((path / "response_reporter.json").read_text(encoding="utf-8"))
+        raw_par = json.loads((path / "response_partner.json").read_text(encoding="utf-8"))
+        recs_rep = raw_rep.get("data", raw_rep) if isinstance(raw_rep, dict) else raw_rep
+        recs_par = raw_par.get("data", raw_par) if isinstance(raw_par, dict) else raw_par
+
+        df_rep = parse_trade_data(recs_rep)
+        df_par = parse_trade_data(recs_par)
+
+        kwargs = metadata.get("parser_kwargs", {})
+        df = parse_mirror(df_rep, df_par, **kwargs)
+
+        assert len(df) == expected["record_count"]
+        _assert_dataframe_golden(df, expected)
+    else:
+        pytest.skip(f"No recognized response file in {path}")
+
+
+# ============================================================================
+# Queimadas Golden Tests
+# ============================================================================
+
+
+def _get_queimadas_cases() -> list[tuple[str, Path]]:
+    return _discover_cases(source_filter="queimadas")
+
+
+@pytest.mark.skipif(not _get_queimadas_cases(), reason="No Queimadas golden data")
+@pytest.mark.parametrize("_name,path", _get_queimadas_cases())
+def test_queimadas_golden_parsing(_name: str, path: Path):
+    from agrobr.queimadas.parser import parse_focos_csv
+
+    expected = _load_expected(path)
+    data = (path / "response.csv").read_bytes()
+    df = parse_focos_csv(data)
+
+    assert len(df) == expected["record_count"]
+    _assert_dataframe_golden(df, expected)
+
+
+# ============================================================================
+# Desmatamento Golden Tests
+# ============================================================================
+
+
+def _get_desmatamento_cases() -> list[tuple[str, Path]]:
+    return _discover_cases(source_filter="desmatamento")
+
+
+@pytest.mark.skipif(not _get_desmatamento_cases(), reason="No Desmatamento golden data")
+@pytest.mark.parametrize("_name,path", _get_desmatamento_cases())
+def test_desmatamento_golden_parsing(_name: str, path: Path):
+    expected = _load_expected(path)
+    metadata = _load_metadata(path)
+
+    fmt = metadata.get("format", "csv")
+    dataset = metadata.get("dataset", "")
+    bioma = metadata.get("bioma", metadata.get("parser_kwargs", {}).get("bioma", ""))
+
+    if fmt == "csv" and "prodes" in dataset:
+        from agrobr.desmatamento.parser import parse_prodes_csv
+
+        data = (path / "response.csv").read_bytes()
+        df = parse_prodes_csv(data, bioma=bioma)
+
+    elif fmt == "csv" and "deter" in dataset:
+        from agrobr.desmatamento.parser import parse_deter_csv
+
+        data = (path / "response.csv").read_bytes()
+        df = parse_deter_csv(data, bioma=bioma)
+
+    elif fmt == "geojson" and "prodes" in dataset:
+        pytest.importorskip("geopandas")
+        from agrobr.desmatamento.parser import parse_prodes_geojson
+
+        data = (path / "response.geojson").read_bytes()
+        df = parse_prodes_geojson(data, bioma=bioma)
+
+        assert df.crs.to_epsg() == expected.get("crs_epsg", 4326)
+        assert df.geometry.notna().all()
+
+    elif fmt == "geojson" and "deter" in dataset:
+        pytest.importorskip("geopandas")
+        from agrobr.desmatamento.parser import parse_deter_geojson
+
+        data = (path / "response.geojson").read_bytes()
+        df = parse_deter_geojson(data, bioma=bioma)
+
+        assert df.crs.to_epsg() == expected.get("crs_epsg", 4326)
+        assert df.geometry.notna().all()
+
+    else:
+        pytest.skip(f"Unknown desmatamento format/dataset: {fmt}/{dataset}")
+        return
+
+    _assert_dataframe_golden(df, expected)
+
+    if "ufs_expected" in expected:
+        ufs = sorted(df["uf"].unique().tolist())
+        assert ufs == expected["ufs_expected"]
+    if "classes_expected" in expected:
+        classes = sorted(df["classe"].unique().tolist())
+        assert classes == expected["classes_expected"]
+    if "bioma" in expected:
+        assert (df["bioma"] == expected["bioma"]).all()
+    if "area_km2_min" in expected and "area_km2" in df.columns:
+        assert (df["area_km2"] >= expected["area_km2_min"]).all()
+
+
+# ============================================================================
+# CONAB CEASA Golden Tests
+# ============================================================================
+
+
+def _get_conab_ceasa_cases() -> list[tuple[str, Path]]:
+    return _discover_cases(source_filter="conab_ceasa")
+
+
+@pytest.mark.skipif(not _get_conab_ceasa_cases(), reason="No CONAB CEASA golden data")
+@pytest.mark.parametrize("_name,path", _get_conab_ceasa_cases())
+def test_conab_ceasa_golden_parsing(_name: str, path: Path):
+    from agrobr.conab.ceasa.parser import parse_precos
+
+    expected = _load_expected(path)
+    precos_json = json.loads((path / "precos_response.json").read_text(encoding="utf-8"))
+    ceasas_json = json.loads((path / "ceasas_response.json").read_text(encoding="utf-8"))
+
+    df = parse_precos(precos_json, ceasas_json)
+
+    for col in expected["columns"]:
+        assert col in df.columns, f"Missing column: {col}"
+
+    assert df["produto"].nunique() >= expected["total_produtos"]
+    assert df["ceasa"].nunique() >= expected["total_ceasas"]
+    assert df["preco"].notna().sum() >= expected["non_null_prices_min"]
+
+    if "sample_tomate_ceagesp_sp" in expected:
+        s = expected["sample_tomate_ceagesp_sp"]
+        row = df[(df["produto"] == s["produto"]) & (df["ceasa"] == s["ceasa"])].iloc[0]
+        assert row["ceasa_uf"] == s["ceasa_uf"]
+        assert row["preco"] == pytest.approx(s["preco"], rel=1e-2)
+
+
+# ============================================================================
+# CONAB Progresso Golden Tests
+# ============================================================================
+
+
+def _get_conab_progresso_cases() -> list[tuple[str, Path]]:
+    return _discover_cases(source_filter="conab_progresso")
+
+
+@pytest.mark.skipif(not _get_conab_progresso_cases(), reason="No CONAB Progresso golden data")
+@pytest.mark.parametrize("_name,path", _get_conab_progresso_cases())
+def test_conab_progresso_golden_parsing(_name: str, path: Path):
+    from agrobr.conab.progresso.parser import parse_progresso_xlsx
+
+    expected = _load_expected(path)
+    data = (path / "response.xlsx").read_bytes()
+    df = parse_progresso_xlsx(data)
+
+    for col in expected["columns"]:
+        assert col in df.columns, f"Missing column: {col}"
+
+    assert len(df) == expected["total_records"]
+    assert sorted(df["cultura"].unique().tolist()) == expected["culturas"]
+    assert sorted(df["operacao"].unique().tolist()) == expected["operacoes"]
+    assert sorted(df["estado"].unique().tolist()) == expected["estados"]
+
+    if "mt_soja_colheita_pct_atual" in expected:
+        row = df[
+            (df["estado"] == "MT") & (df["cultura"] == "Soja") & (df["operacao"] == "Colheita")
+        ]
+        assert len(row) == 1
+        assert row.iloc[0]["pct_semana_atual"] == pytest.approx(
+            expected["mt_soja_colheita_pct_atual"], rel=1e-2
+        )
+
+
+# ============================================================================
+# MapBiomas Golden Tests
+# ============================================================================
+
+
+def _get_mapbiomas_cases() -> list[tuple[str, Path]]:
+    return _discover_cases(source_filter="mapbiomas")
+
+
+@pytest.mark.skipif(not _get_mapbiomas_cases(), reason="No MapBiomas golden data")
+@pytest.mark.parametrize("_name,path", _get_mapbiomas_cases())
+def test_mapbiomas_golden_parsing(_name: str, path: Path):
+    from agrobr.mapbiomas.parser import parse_cobertura_xlsx, parse_transicao_xlsx
+
+    expected = _load_expected(path)
+    data = (path / "response.xlsx").read_bytes()
+
+    exp_cob = expected["cobertura"]
+    df_cob = parse_cobertura_xlsx(data)
+
+    for col in exp_cob["columns"]:
+        assert col in df_cob.columns, f"Cobertura missing column: {col}"
+    assert len(df_cob) >= exp_cob["min_records"]
+    assert sorted(df_cob["bioma"].unique().tolist()) == exp_cob["biomas_expected"]
+    assert sorted(df_cob["estado"].unique().tolist()) == exp_cob["estados_expected"]
+    for a in exp_cob["anos_expected"]:
+        assert a in df_cob["ano"].values, f"Year {a} not found in cobertura"
+
+    exp_trans = expected["transicao"]
+    df_trans = parse_transicao_xlsx(data)
+
+    for col in exp_trans["columns"]:
+        assert col in df_trans.columns, f"Transicao missing column: {col}"
+    assert len(df_trans) >= exp_trans["min_records"]
+    assert sorted(df_trans["bioma"].unique().tolist()) == exp_trans["biomas_expected"]
+    assert sorted(df_trans["estado"].unique().tolist()) == exp_trans["estados_expected"]
+    for p in exp_trans["periodos_expected"]:
+        assert p in df_trans["periodo"].values, f"Period {p} not found in transicao"

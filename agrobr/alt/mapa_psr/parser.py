@@ -140,23 +140,23 @@ def parse_apolices(
         df["nr_apolice"] = df["nr_apolice"].fillna("").str.strip()
 
     if uf:
-        df = df[df["uf"] == uf.upper()].copy()
+        df = df[df["uf"] == uf.upper()]
 
     if cultura:
         mask = df["cultura"].str.contains(cultura.upper(), na=False)
-        df = df[mask].copy()
+        df = df[mask]
 
     if ano and "ano_apolice" in df.columns:
-        df = df[df["ano_apolice"] == ano].copy()
+        df = df[df["ano_apolice"] == ano]
 
     if municipio and "municipio" in df.columns:
         mask = df["municipio"].str.contains(municipio.upper(), na=False)
-        df = df[mask].copy()
+        df = df[mask]
 
     from agrobr.alt.mapa_psr.models import COLUNAS_APOLICES
 
     final_cols = [c for c in COLUNAS_APOLICES if c in df.columns]
-    df = df[final_cols].copy()
+    df = df[final_cols]
 
     df = df.sort_values("ano_apolice").reset_index(drop=True)
 
@@ -182,20 +182,20 @@ def parse_sinistros(
 
     if "valor_indenizacao" in df.columns:
         mask_indenizacao = df["valor_indenizacao"].fillna(0) > 0
-        df = df[mask_indenizacao].copy()
+        df = df[mask_indenizacao]
 
     if "evento" in df.columns:
         mask_evento = df["evento"].fillna("").str.strip().ne("")
-        df = df[mask_evento].copy()
+        df = df[mask_evento]
 
     if evento and "evento" in df.columns:
         mask = df["evento"].str.contains(evento.lower(), na=False)
-        df = df[mask].copy()
+        df = df[mask]
 
     from agrobr.alt.mapa_psr.models import COLUNAS_SINISTROS
 
     final_cols = [c for c in COLUNAS_SINISTROS if c in df.columns]
-    df = df[final_cols].copy()
+    df = df[final_cols]
 
     df = df.sort_values("ano_apolice").reset_index(drop=True)
 

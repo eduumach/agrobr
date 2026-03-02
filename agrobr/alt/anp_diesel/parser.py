@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import io
-import re
-from datetime import date
 from typing import Any, Literal
 
 import pandas as pd
@@ -131,7 +129,7 @@ def parse_precos(
             df[col_produto].str.strip().str.upper().str.replace(r"^[OÓ]LEO\s+", "", regex=True)
         )
         produto_mask = produto_norm == produto_upper
-        df = df[produto_mask].copy()
+        df = df[produto_mask]
 
     if uf and col_uf:
         from agrobr.normalize.regions import normalizar_uf
@@ -142,14 +140,14 @@ def parse_precos(
             .apply(lambda v: normalizar_uf(v) if pd.notna(v) and v.strip() else "")
         )
         uf_mask = df["_uf_norm"] == uf.upper()
-        df = df[uf_mask].copy()
+        df = df[uf_mask]
         df = df.drop(columns=["_uf_norm"])
 
     if municipio and col_municipio:
         municipio_mask = (
             df[col_municipio].str.strip().str.upper().str.contains(municipio.upper(), na=False)
         )
-        df = df[municipio_mask].copy()
+        df = df[municipio_mask]
 
     result: dict[str, Any] = {}
 
@@ -198,7 +196,7 @@ def parse_precos(
 
     out = pd.DataFrame(result)
 
-    out = out.dropna(subset=["data"]).copy()
+    out = out.dropna(subset=["data"])
 
     if "preco_venda" in out.columns and "preco_compra" in out.columns:
         out["margem"] = out["preco_venda"] - out["preco_compra"]
@@ -296,7 +294,7 @@ def parse_vendas(
             .str.strip()
             .apply(lambda v: normalizar_uf(v) if pd.notna(v) and v.strip() else "")
         )
-        df = df[df["_uf_norm"] == uf.upper()].copy()
+        df = df[df["_uf_norm"] == uf.upper()]
         df = df.drop(columns=["_uf_norm"])
 
     assert col_ano is not None and col_mes is not None and col_vol is not None
@@ -314,52 +312,58 @@ def _build_vendas_df(
 ) -> pd.DataFrame:
     from agrobr.normalize.regions import normalizar_uf
 
-    rows: list[dict[str, Any]] = []
+    ano = pd.to_numeric(df[col_ano], errors="coerce")
+    mes = df[col_mes].astype(str).str.strip().str.lower().map(_resolve_mes)
+    volume = df[col_vol].apply(parse_numeric_br)
 
-    for _, row in df.iterrows():
-        try:
-            ano = int(float(row[col_ano]))
-        except (ValueError, TypeError):
-            continue
-
-        mes = _resolve_mes(str(row[col_mes]))
-        if mes is None:
-            continue
-
-        volume = parse_numeric_br(row.get(col_vol))
-        if volume is None:
-            continue
-
-        raw_uf = str(row[col_uf]).strip() if col_uf and pd.notna(row.get(col_uf)) else ""
-        uf_val = normalizar_uf(raw_uf) or "" if raw_uf else ""
-        regiao_val = (
-            str(row[col_regiao]).strip() if col_regiao and pd.notna(row.get(col_regiao)) else ""
-        )
-        produto_val = (
-            re.sub(r"^[OÓ]LEO\s+", "", str(row[col_produto]).strip().upper())
-            if col_produto and pd.notna(row.get(col_produto))
-            else ""
-        )
-
-        rows.append(
-            {
-                "data": date(ano, mes, 1),
-                "uf": uf_val,
-                "regiao": regiao_val,
-                "produto": produto_val,
-                "volume_m3": volume,
-            }
-        )
-
-    if not rows:
+    valid = ano.notna() & mes.notna() & volume.notna()
+    if not valid.any():
         raise ParseError(
             source="anp_diesel",
             parser_version=PARSER_VERSION,
             reason="Nenhuma venda extraida do CSV",
         )
 
-    out = pd.DataFrame(rows)
-    out["data"] = pd.to_datetime(out["data"])
+    idx = valid[valid].index
+    ano_int = ano.loc[idx].astype(int)
+    mes_int = mes.loc[idx].astype(int)
+
+    if col_uf:
+        uf_vals = (
+            df.loc[idx, col_uf]
+            .fillna("")
+            .str.strip()
+            .apply(lambda v: normalizar_uf(v) or "" if v else "")
+            .values
+        )
+    else:
+        uf_vals = ""
+
+    regiao_vals = df.loc[idx, col_regiao].fillna("").str.strip().values if col_regiao else ""
+
+    if col_produto:
+        produto_vals = (
+            df.loc[idx, col_produto]
+            .fillna("")
+            .str.strip()
+            .str.upper()
+            .str.replace(r"^[OÓ]LEO\s+", "", regex=True)
+            .values
+        )
+    else:
+        produto_vals = ""
+
+    date_str = ano_int.astype(str) + "-" + mes_int.astype(str).str.zfill(2) + "-01"
+
+    out = pd.DataFrame(
+        {
+            "data": pd.to_datetime(date_str),
+            "uf": uf_vals,
+            "regiao": regiao_vals,
+            "produto": produto_vals,
+            "volume_m3": volume.loc[idx].values,
+        }
+    )
     out = out.sort_values(["data", "uf"]).reset_index(drop=True)
 
     logger.debug("anp_diesel_parse_vendas_ok", records=len(out))

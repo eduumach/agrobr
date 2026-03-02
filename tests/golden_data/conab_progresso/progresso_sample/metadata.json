@@ -1,0 +1,7 @@
+{
+  "source": "conab_progresso",
+  "format": "xlsx",
+  "parser": "agrobr.conab.progresso.parser::parse_progresso_xlsx()",
+  "parser_version": 1,
+  "captured_at": "2026-02-24T09:59:00Z"
+}

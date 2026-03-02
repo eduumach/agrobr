@@ -132,7 +132,7 @@ def parse_trafego_v1(content: bytes) -> pd.DataFrame:
         if col not in df.columns:
             df[col] = None
 
-    df = df.dropna(subset=["data"]).copy()
+    df = df.dropna(subset=["data"])
 
     logger.debug(
         "antt_pedagio_parse_v1_ok",
@@ -247,7 +247,7 @@ def parse_trafego_v2(content: bytes) -> pd.DataFrame:
         if col not in df.columns:
             df[col] = None
 
-    df = df.dropna(subset=["data"]).copy()
+    df = df.dropna(subset=["data"])
 
     logger.debug(
         "antt_pedagio_parse_v2_ok",
@@ -380,7 +380,7 @@ def join_fluxo_pracas(
     merged = merged.drop(columns=["_join_conc", "_join_praca"], errors="ignore")
 
     final_cols = [c for c in COLUNAS_FLUXO if c in merged.columns]
-    merged = merged[final_cols].copy()
+    merged = merged[final_cols]
 
     logger.debug(
         "antt_pedagio_join_ok",

@@ -17,11 +17,13 @@ GOLDEN_DIR = Path(__file__).parent.parent / "golden_data" / "mapbiomas"
 
 
 def _golden_xlsx() -> bytes:
-    return GOLDEN_DIR.joinpath("biome_state_sample.xlsx").read_bytes()
+    return GOLDEN_DIR.joinpath("biome_state_sample", "response.xlsx").read_bytes()
 
 
 def _expected() -> dict:
-    return json.loads(GOLDEN_DIR.joinpath("expected.json").read_text(encoding="utf-8"))
+    return json.loads(
+        GOLDEN_DIR.joinpath("biome_state_sample", "expected.json").read_text(encoding="utf-8")
+    )
 
 
 class TestParserVersion:

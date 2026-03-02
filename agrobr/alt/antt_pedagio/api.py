@@ -75,28 +75,28 @@ async def fluxo_pedagio(
 
     if concessionaria and "concessionaria" in df_out.columns:
         mask = df_out["concessionaria"].str.contains(concessionaria, case=False, na=False)
-        df_out = df_out[mask].copy()
+        df_out = df_out[mask]
 
     if praca and "praca" in df_out.columns:
         mask = df_out["praca"].str.contains(praca, case=False, na=False)
-        df_out = df_out[mask].copy()
+        df_out = df_out[mask]
 
     if rodovia and "rodovia" in df_out.columns:
         mask = df_out["rodovia"].str.upper() == rodovia.upper()
-        df_out = df_out[mask].copy()
+        df_out = df_out[mask]
 
     if uf and "uf" in df_out.columns:
-        df_out = df_out[df_out["uf"] == uf.upper()].copy()
+        df_out = df_out[df_out["uf"] == uf.upper()]
 
     if tipo_veiculo and "tipo_veiculo" in df_out.columns:
-        df_out = df_out[df_out["tipo_veiculo"] == tipo_veiculo].copy()
+        df_out = df_out[df_out["tipo_veiculo"] == tipo_veiculo]
 
     if apenas_pesados:
         mask = (df_out["n_eixos"] >= 3) & (df_out["tipo_veiculo"] == "Comercial")
-        df_out = df_out[mask].copy()
+        df_out = df_out[mask]
 
     final_cols = [c for c in COLUNAS_FLUXO if c in df_out.columns]
-    df_out = df_out[final_cols].copy()
+    df_out = df_out[final_cols]
 
     df_out = df_out.sort_values(
         ["data", "concessionaria", "praca"], na_position="last"
@@ -133,15 +133,15 @@ async def pracas_pedagio(
     df = parser.parse_pracas(raw)
 
     if uf and "uf" in df.columns:
-        df = df[df["uf"] == uf.upper()].copy()
+        df = df[df["uf"] == uf.upper()]
 
     if rodovia and "rodovia" in df.columns:
         mask = df["rodovia"].str.upper() == rodovia.upper()
-        df = df[mask].copy()
+        df = df[mask]
 
     if situacao and "situacao" in df.columns:
         mask = df["situacao"].str.contains(situacao, case=False, na=False)
-        df = df[mask].copy()
+        df = df[mask]
 
     df = df.reset_index(drop=True)
     parse_ms = int((time.monotonic() - t1) * 1000)

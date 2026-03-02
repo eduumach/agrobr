@@ -15,12 +15,14 @@ GOLDEN_DIR = Path(__file__).resolve().parent.parent / "golden_data" / "conab_pro
 
 @pytest.fixture()
 def golden_xlsx() -> bytes:
-    return (GOLDEN_DIR / "progresso_sample.xlsx").read_bytes()
+    return (GOLDEN_DIR / "progresso_sample" / "response.xlsx").read_bytes()
 
 
 @pytest.fixture()
 def expected() -> dict:
-    return json.loads((GOLDEN_DIR / "expected.json").read_text(encoding="utf-8"))
+    return json.loads(
+        (GOLDEN_DIR / "progresso_sample" / "expected.json").read_text(encoding="utf-8")
+    )
 
 
 @pytest.fixture()

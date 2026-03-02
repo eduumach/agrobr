@@ -1,0 +1,7 @@
+{
+  "source": "mapbiomas",
+  "format": "xlsx",
+  "parser": "agrobr.mapbiomas.parser::parse_cobertura_xlsx() + parse_transicao_xlsx()",
+  "parser_version": 1,
+  "captured_at": "2026-02-14T10:33:00Z"
+}
