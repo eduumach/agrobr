@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import io
 import re
 from typing import Any
 
@@ -8,6 +7,7 @@ import pandas as pd
 import structlog
 
 from agrobr.normalize.numeric import safe_float
+from agrobr.utils.io import open_excel_safe
 
 from .models import DERAL_PRODUTOS, normalize_condicao, normalize_produto
 
@@ -40,7 +40,7 @@ def _build_sheet_map() -> dict[str, str]:
 
 def parse_pc_xls(data: bytes) -> pd.DataFrame:
     try:
-        xls = pd.ExcelFile(io.BytesIO(data))
+        xls = open_excel_safe(data, source="deral", parser_version=PARSER_VERSION)
     except Exception as exc:
         logger.error("deral_parse_error", error=str(exc))
         return _empty_df()

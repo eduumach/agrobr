@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-import io
-
 import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
+from agrobr.utils.io import read_excel_safe
 
 from .models import (
     COLUNAS_SAIDA_COBERTURA,
@@ -23,14 +22,14 @@ PARSER_VERSION = 1
 
 
 def parse_cobertura_xlsx(data: bytes) -> pd.DataFrame:
-    try:
-        df = pd.read_excel(io.BytesIO(data), sheet_name=SHEET_COBERTURA, engine="openpyxl")
-    except Exception as e:
-        raise ParseError(
-            source="mapbiomas",
-            parser_version=PARSER_VERSION,
-            reason=f"Erro ao ler XLSX cobertura: {e}",
-        ) from e
+    df = read_excel_safe(
+        data,
+        source="mapbiomas",
+        parser_version=PARSER_VERSION,
+        label="XLSX cobertura",
+        sheet_name=SHEET_COBERTURA,
+        engine="openpyxl",
+    )
 
     if df.empty:
         raise ParseError(
@@ -91,14 +90,14 @@ def parse_cobertura_xlsx(data: bytes) -> pd.DataFrame:
 
 
 def parse_transicao_xlsx(data: bytes) -> pd.DataFrame:
-    try:
-        df = pd.read_excel(io.BytesIO(data), sheet_name=SHEET_TRANSICAO, engine="openpyxl")
-    except Exception as e:
-        raise ParseError(
-            source="mapbiomas",
-            parser_version=PARSER_VERSION,
-            reason=f"Erro ao ler XLSX transicao: {e}",
-        ) from e
+    df = read_excel_safe(
+        data,
+        source="mapbiomas",
+        parser_version=PARSER_VERSION,
+        label="XLSX transicao",
+        sheet_name=SHEET_TRANSICAO,
+        engine="openpyxl",
+    )
 
     if df.empty:
         raise ParseError(

@@ -22,7 +22,7 @@ no header `Content-Type`.
 | Fonte | Encoding real | O que declara |
 |-------|--------------|---------------|
 | CEPEA | Windows-1252 ou ISO-8859-1 | UTF-8 (errado) |
-| CONAB | UTF-8 (Excel) | -- |
+| CONAB | UTF-8 (Excel, fallback calamine) | -- |
 | IBGE/SIDRA | UTF-8 | Correto |
 | B3 | ISO-8859-1 | -- |
 | DERAL | ISO-8859-1 (XLS antigo) | Nada |
@@ -40,6 +40,17 @@ ENCODING_CHAIN = ("utf-8", "iso-8859-1", "windows-1252", "utf-16", "ascii")
 !!! warning "Sem tratamento, nomes quebram"
     "Feijão", "Açúcar", "São Paulo", "Paraná" viram caracteres ilegíveis
     se o encoding for interpretado errado.
+
+### Engine Excel (openpyxl → calamine)
+
+Planilhas XLSX de fontes governamentais (CONAB, ANP, etc.) podem conter
+estilos/fills malformados que crasham openpyxl (bug conhecido desde 2021,
+pandas#40499, sem fix upstream). O agrobr usa `python-calamine` (Rust, MIT)
+como fallback automatico: ignora estilos, extrai apenas dados. Arquivos
+OLE2/BIFF (.xls, ex: DERAL, serie historica legacy) usam xlrd direto.
+
+Se voce portar para outra linguagem, garanta que sua lib Excel tolere
+estilos invalidos ou tenha fallback equivalente.
 
 ### Rate Limiting
 
@@ -271,7 +282,7 @@ Thresholds: > 85% OK, 70-85% warning, < 70% layout mudou.
 - Dados desde ~1976 até safra corrente
 - ~60 produtos com mapeamento produto → URL
 - Área plantada, produção e produtividade por UF e região
-- Formato XLS (Excel 97-2003)
+- Formato XLS (Excel 97-2003) ou XLSX (com fallback calamine)
 
 ---
 

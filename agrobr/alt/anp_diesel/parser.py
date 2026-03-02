@@ -9,6 +9,7 @@ import structlog
 from agrobr.exceptions import ParseError
 from agrobr.normalize.dates import month_to_number
 from agrobr.normalize.numeric import parse_numeric_br
+from agrobr.utils.io import read_excel_safe
 
 logger = structlog.get_logger()
 
@@ -44,8 +45,11 @@ def _detect_header_row(
     engine: _ExcelEngine | None = "openpyxl",
     max_scan: int = 30,
 ) -> int:
-    df_raw = pd.read_excel(
-        io.BytesIO(content),
+    df_raw = read_excel_safe(
+        content,
+        source="anp_diesel",
+        parser_version=PARSER_VERSION,
+        label="XLSX header scan",
         engine=engine,
         header=None,
         nrows=max_scan,
@@ -65,26 +69,20 @@ def parse_precos(
     uf: str | None = None,
     municipio: str | None = None,
 ) -> pd.DataFrame:
-    try:
-        header_row = _detect_header_row(
-            content,
-            markers=["PRODUTO", "DATA INICIAL"],
-            engine="openpyxl",
-        )
-        df = pd.read_excel(
-            io.BytesIO(content),
-            engine="openpyxl",
-            header=header_row,
-            dtype=str,
-        )
-    except ParseError:
-        raise
-    except Exception as e:
-        raise ParseError(
-            source="anp_diesel",
-            parser_version=PARSER_VERSION,
-            reason=f"Erro ao ler XLSX de precos: {e}",
-        ) from e
+    header_row = _detect_header_row(
+        content,
+        markers=["PRODUTO", "DATA INICIAL"],
+        engine="openpyxl",
+    )
+    df = read_excel_safe(
+        content,
+        source="anp_diesel",
+        parser_version=PARSER_VERSION,
+        label="XLSX precos",
+        engine="openpyxl",
+        header=header_row,
+        dtype=str,
+    )
 
     if df.empty:
         raise ParseError(

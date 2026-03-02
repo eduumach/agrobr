@@ -123,7 +123,7 @@ class TestParseEdgeCases:
             parse_progresso_xlsx(buf.getvalue())
 
     def test_invalid_bytes_raises(self) -> None:
-        with pytest.raises(ParseError, match="Erro ao abrir XLSX"):
+        with pytest.raises(ParseError, match="Erro ao abrir Excel"):
             parse_progresso_xlsx(b"not an xlsx file")
 
     def test_returns_dataframe(self, golden_xlsx: bytes) -> None:

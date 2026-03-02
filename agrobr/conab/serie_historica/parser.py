@@ -9,6 +9,7 @@ import structlog
 
 from agrobr.exceptions import ParseError
 from agrobr.normalize.numeric import safe_float
+from agrobr.utils.io import open_excel_safe
 
 from .models import REGIOES_BRASIL, UFS_BRASIL, SafraHistorica, normalize_produto
 
@@ -210,22 +211,14 @@ def parse_serie_historica(
 ) -> list[SafraHistorica]:
     produto_norm = normalize_produto(produto)
 
-    try:
-        header = xls.read(8)
-        xls.seek(0)
-        engine: Literal["xlrd", "openpyxl"] = (
-            "xlrd" if header[:8] == b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1" else "openpyxl"
-        )
-        xls_file = pd.ExcelFile(xls, engine=engine)
-        sheet_names = xls_file.sheet_names
-    except ParseError:
-        raise
-    except Exception as e:
-        raise ParseError(
-            source="conab_serie_historica",
-            parser_version=PARSER_VERSION,
-            reason=f"Erro ao ler Excel ({engine}): {e}",
-        ) from e
+    raw = xls.getvalue() if isinstance(xls, BytesIO) else xls.read()
+    engine: Literal["xlrd", "openpyxl"] = (
+        "xlrd" if raw[:8] == b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1" else "openpyxl"
+    )
+    xls_file = open_excel_safe(
+        raw, source="conab_serie_historica", parser_version=PARSER_VERSION, engine=engine
+    )
+    sheet_names = xls_file.sheet_names
 
     if not sheet_names:
         raise ParseError(

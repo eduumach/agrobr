@@ -7,7 +7,7 @@
 | **Provedor** | Projeto MapBiomas — Rede multi-institucional |
 | **Dados** | Cobertura e uso da terra, transicoes entre classes |
 | **Acesso** | Download XLSX publico (data.mapbiomas.org Dataverse) |
-| **Formato** | XLSX (openpyxl) |
+| **Formato** | XLSX (openpyxl, fallback calamine) |
 | **Autenticacao** | Nenhuma |
 | **Licenca** | Dados publicos — livre com citacao |
 | **Serie Historica** | 1985-2024 (Colecao 10) |

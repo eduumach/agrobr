@@ -11,6 +11,7 @@ import structlog
 from agrobr import constants
 from agrobr.exceptions import ParseError
 from agrobr.models import Safra
+from agrobr.utils.io import read_excel_safe
 
 logger = structlog.get_logger()
 
@@ -36,14 +37,14 @@ class ConabParserV1:
                 reason=f"Produto não suportado: {produto}",
             )
 
-        try:
-            df = pd.read_excel(xlsx, sheet_name=sheet_name, header=None)
-        except Exception as e:
-            raise ParseError(
-                source="conab",
-                parser_version=self.version,
-                reason=f"Erro ao ler aba {sheet_name}: {e}",
-            ) from e
+        df = read_excel_safe(
+            xlsx,
+            source="conab",
+            parser_version=self.version,
+            label=f"aba {sheet_name}",
+            sheet_name=sheet_name,
+            header=None,
+        )
 
         header_row = self._find_header_row(df)
         if header_row is None:
@@ -159,16 +160,16 @@ class ConabParserV1:
         xlsx: BytesIO,
         produto: str | None = None,
     ) -> list[dict[str, Any]]:
-        try:
-            if hasattr(xlsx, "seek"):
-                xlsx.seek(0)
-            df = pd.read_excel(xlsx, sheet_name="Suprimento", header=None)
-        except Exception as e:
-            raise ParseError(
-                source="conab",
-                parser_version=self.version,
-                reason=f"Erro ao ler aba Suprimento: {e}",
-            ) from e
+        if hasattr(xlsx, "seek"):
+            xlsx.seek(0)
+        df = read_excel_safe(
+            xlsx,
+            source="conab",
+            parser_version=self.version,
+            label="aba Suprimento",
+            sheet_name="Suprimento",
+            header=None,
+        )
 
         header_row = None
         for idx, row in df.iterrows():
@@ -236,7 +237,14 @@ class ConabParserV1:
     ) -> list[dict[str, Any]]:
         if hasattr(xlsx, "seek"):
             xlsx.seek(0)
-        df = pd.read_excel(xlsx, sheet_name=sheet_name, header=None)
+        df = read_excel_safe(
+            xlsx,
+            source="conab",
+            parser_version=self.version,
+            label=f"aba {sheet_name}",
+            sheet_name=sheet_name,
+            header=None,
+        )
 
         safra_row = None
         for idx, row in df.iterrows():
@@ -346,14 +354,14 @@ class ConabParserV1:
         xlsx: BytesIO,
         safra_ref: str | None = None,
     ) -> list[dict[str, Any]]:
-        try:
-            df = pd.read_excel(xlsx, sheet_name="Brasil - Total por Produto", header=None)
-        except Exception as e:
-            raise ParseError(
-                source="conab",
-                parser_version=self.version,
-                reason=f"Erro ao ler aba Brasil - Total por Produto: {e}",
-            ) from e
+        df = read_excel_safe(
+            xlsx,
+            source="conab",
+            parser_version=self.version,
+            label="aba Brasil - Total por Produto",
+            sheet_name="Brasil - Total por Produto",
+            header=None,
+        )
 
         totais: list[dict[str, Any]] = []
 

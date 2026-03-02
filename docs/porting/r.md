@@ -24,7 +24,7 @@ usando o agrobr como referência de implementação.
 | `Pydantic v2` (validação) | `checkmate` ou validação manual | checkmate |
 | `structlog` (logging) | `logger::log_info()` | logger |
 | `chardet` (encoding) | `stringi::stri_enc_detect()` | stringi |
-| `openpyxl` / `read_excel` | `readxl::read_excel()` | readxl |
+| `openpyxl` / `calamine` / `read_excel` | `readxl::read_excel()` | readxl |
 | `pdfplumber` (PDF) | `pdftools::pdf_text()` | pdftools |
 | `asyncio` (paralelismo) | `furrr` + `future` | furrr |
 

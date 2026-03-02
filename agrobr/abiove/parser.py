@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import io
 from typing import Any
 
 import pandas as pd
@@ -9,6 +8,7 @@ import structlog
 from agrobr.exceptions import ParseError
 from agrobr.normalize.dates import month_to_number
 from agrobr.normalize.numeric import safe_float
+from agrobr.utils.io import open_excel_safe
 
 from .models import normalize_produto
 
@@ -64,14 +64,7 @@ def parse_exportacao_excel(
     data: bytes,
     ano: int | None = None,
 ) -> pd.DataFrame:
-    try:
-        xls = pd.ExcelFile(io.BytesIO(data))
-    except Exception as e:
-        raise ParseError(
-            source="abiove",
-            parser_version=PARSER_VERSION,
-            reason=f"Erro ao abrir Excel: {e}",
-        ) from e
+    xls = open_excel_safe(data, source="abiove", parser_version=PARSER_VERSION)
 
     all_records: list[dict[str, Any]] = []
 

@@ -7,7 +7,7 @@
 | **Provedor** | CONAB — Companhia Nacional de Abastecimento |
 | **Dados** | % semeadura e colheita semanal por cultura e UF |
 | **Acesso** | XLSX via portal gov.br (Plone CMS) |
-| **Formato** | XLSX (openpyxl) |
+| **Formato** | XLSX (openpyxl, fallback calamine) |
 | **Autenticacao** | Nenhuma |
 | **Licenca** | Dados publicos governo federal (livre) |
 | **Frequencia** | Semanal |

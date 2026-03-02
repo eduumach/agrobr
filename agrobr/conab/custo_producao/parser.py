@@ -8,6 +8,7 @@ import structlog
 
 from agrobr.exceptions import ParseError
 from agrobr.normalize.numeric import safe_float
+from agrobr.utils.io import read_excel_safe
 
 from .models import CustoTotal, ItemCusto, classify_categoria, normalize_cultura
 
@@ -103,14 +104,14 @@ def parse_planilha(
 ) -> tuple[list[ItemCusto], CustoTotal | None]:
     cultura_norm = normalize_cultura(cultura)
 
-    try:
-        df_raw = pd.read_excel(xlsx, sheet_name=sheet_name, header=None)
-    except Exception as e:
-        raise ParseError(
-            source="conab_custo",
-            parser_version=PARSER_VERSION,
-            reason=f"Erro ao ler Excel: {e}",
-        ) from e
+    df_raw = read_excel_safe(
+        xlsx,
+        source="conab_custo",
+        parser_version=PARSER_VERSION,
+        label="Excel custo",
+        sheet_name=sheet_name,
+        header=None,
+    )
 
     if df_raw.empty or len(df_raw.columns) < MIN_COLUMNS:
         raise ParseError(

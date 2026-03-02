@@ -18,7 +18,9 @@ Instaladas com `pip install agrobr`:
 | `structlog` | Logging estruturado | `>=23.2.0` |
 | `chardet` | Detecção de encoding | `>=5.2.0` |
 | `typer` | CLI | `>=0.9.0` |
-| `openpyxl` | Leitura de Excel | `>=3.1.0` |
+| `openpyxl` | Leitura de Excel (.xlsx) | `>=3.1.0` |
+| `python-calamine` | Fallback Excel (Rust, ignora estilos) | `>=0.3.0` |
+| `xlrd` | Leitura de Excel legado (.xls) | `>=2.0.1` |
 | `sidrapy` | API IBGE SIDRA | `>=0.1.4` |
 
 ### Opcionais

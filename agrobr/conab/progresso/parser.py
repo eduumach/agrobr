@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import io
 from datetime import datetime
 
 import pandas as pd
@@ -8,6 +7,7 @@ import structlog
 
 from agrobr.exceptions import ParseError
 from agrobr.normalize.numeric import safe_float
+from agrobr.utils.io import open_excel_safe
 
 from .models import (
     COLUNAS_SAIDA,
@@ -40,23 +40,18 @@ def _parse_date(val: object) -> str:
 
 
 def _read_xlsx_sheet(data: bytes) -> pd.DataFrame:
-    try:
-        wb_sheets = pd.ExcelFile(io.BytesIO(data), engine="openpyxl").sheet_names
-    except Exception as e:
-        raise ParseError(
-            source="conab_progresso",
-            parser_version=PARSER_VERSION,
-            reason=f"Erro ao abrir XLSX: {e}",
-        ) from e
+    xls = open_excel_safe(
+        data, source="conab_progresso", parser_version=PARSER_VERSION, engine="openpyxl"
+    )
 
     target_sheet: str | None = None
-    for name in wb_sheets:
+    for name in xls.sheet_names:
         name_str = str(name)
         if "progresso" in name_str.lower():
             target_sheet = name_str
             break
     if target_sheet is None:
-        target_sheet = str(wb_sheets[0]) if wb_sheets else None
+        target_sheet = str(xls.sheet_names[0]) if xls.sheet_names else None
 
     if target_sheet is None:
         raise ParseError(
@@ -66,12 +61,7 @@ def _read_xlsx_sheet(data: bytes) -> pd.DataFrame:
         )
 
     try:
-        df_raw = pd.read_excel(
-            io.BytesIO(data),
-            sheet_name=target_sheet,
-            header=None,
-            engine="openpyxl",
-        )
+        df_raw = pd.read_excel(xls, sheet_name=target_sheet, header=None)
     except Exception as e:
         raise ParseError(
             source="conab_progresso",

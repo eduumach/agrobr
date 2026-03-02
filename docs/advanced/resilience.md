@@ -134,6 +134,26 @@ Chain de fallback para encoding:
 5. Detecção automática (chardet)
 6. UTF-8 com replacement (último recurso)
 
+## Fallback de Engine Excel
+
+Planilhas XLSX de fontes governamentais podem conter estilos/fills malformados
+que crasham o openpyxl (bug conhecido desde 2021, sem fix upstream).
+
+O agrobr usa fallback automático para `python-calamine` (engine Rust, MIT):
+
+```
+openpyxl (estilos + dados)
+        ↓ falhou (stylesheet malformado)?
+calamine (ignora estilos, extrai só dados)
+        ↓ falhou?
+ParseError
+```
+
+Guard xlrd: arquivos OLE2/BIFF (.xls) usam xlrd direto, sem fallback calamine.
+
+Helpers: `open_excel_safe()` (multi-sheet) e `read_excel_safe()` (single-sheet)
+em `agrobr/utils/io.py`.
+
 ## Fallback de Fonte
 
 ### CEPEA
