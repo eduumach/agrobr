@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date
 
 from agrobr.constants import URLS, Fonte
+from agrobr.normalize.regions import UFS_VALIDAS as UFS_VALIDAS
 
 CKAN_BASE = URLS[Fonte.ANTT_PEDAGIO]["base"]
 CKAN_API = f"{CKAN_BASE}/api/3/action"
@@ -90,38 +91,6 @@ COLUNAS_PRACAS = [
     "lon",
     "situacao",
 ]
-
-UFS_VALIDAS = frozenset(
-    {
-        "AC",
-        "AL",
-        "AM",
-        "AP",
-        "BA",
-        "CE",
-        "DF",
-        "ES",
-        "GO",
-        "MA",
-        "MG",
-        "MS",
-        "MT",
-        "PA",
-        "PB",
-        "PE",
-        "PI",
-        "PR",
-        "RJ",
-        "RN",
-        "RO",
-        "RR",
-        "RS",
-        "SC",
-        "SE",
-        "SP",
-        "TO",
-    }
-)
 
 
 def _resolve_anos(

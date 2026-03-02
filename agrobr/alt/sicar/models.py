@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from agrobr.constants import URLS, Fonte
+from agrobr.normalize.regions import UFS_VALIDAS as UFS_VALIDAS
 
 WFS_BASE = URLS[Fonte.SICAR]["geoserver"]
 WFS_VERSION = "2.0.0"
@@ -63,38 +64,6 @@ TIPO_LABELS = {
     "AST": "Assentamento",
     "PCT": "Terra Indigena",
 }
-
-UFS_VALIDAS = frozenset(
-    {
-        "AC",
-        "AL",
-        "AM",
-        "AP",
-        "BA",
-        "CE",
-        "DF",
-        "ES",
-        "GO",
-        "MA",
-        "MG",
-        "MS",
-        "MT",
-        "PA",
-        "PB",
-        "PE",
-        "PI",
-        "PR",
-        "RJ",
-        "RN",
-        "RO",
-        "RR",
-        "RS",
-        "SC",
-        "SE",
-        "SP",
-        "TO",
-    }
-)
 
 MAX_FEATURES_GEO = 5_000
 

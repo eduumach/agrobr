@@ -9,7 +9,6 @@ import pandas as pd
 import pytest
 
 from agrobr.alt.antt_pedagio.api import (
-    _validate_params,
     fluxo_pedagio,
     pracas_pedagio,
 )
@@ -30,36 +29,6 @@ PRACAS_CSV = (
     b"CCR AutoBAn;Campinas;SP-348;SP;87+500;Campinas;-22.9;-47.0;Ativa\n"
     b"Arteris;Jacarezinho;BR-153;PR;10+000;Jacarezinho;-23.1;-49.9;Ativa\n"
 )
-
-
-# ============================================================================
-# Validation
-# ============================================================================
-
-
-class TestValidateParams:
-    def test_valid_params(self):
-        _validate_params(uf="SP", ano=2023)
-
-    def test_invalid_uf(self):
-        with pytest.raises(ValueError, match="UF"):
-            _validate_params(uf="XX")
-
-    def test_ano_too_old(self):
-        with pytest.raises(ValueError, match="fora do range"):
-            _validate_params(ano=2005)
-
-    def test_ano_inicio_too_old(self):
-        with pytest.raises(ValueError, match="anterior"):
-            _validate_params(ano_inicio=2005)
-
-    def test_ano_fim_future(self):
-        with pytest.raises(ValueError, match="posterior"):
-            _validate_params(ano_fim=2099)
-
-    def test_inicio_after_fim(self):
-        with pytest.raises(ValueError, match="ano_inicio"):
-            _validate_params(ano_inicio=2024, ano_fim=2020)
 
 
 # ============================================================================

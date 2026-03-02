@@ -3,6 +3,39 @@ from __future__ import annotations
 import re
 from datetime import date
 
+MESES_PT: dict[str, int] = {
+    "janeiro": 1,
+    "fevereiro": 2,
+    "março": 3,
+    "marco": 3,
+    "abril": 4,
+    "maio": 5,
+    "junho": 6,
+    "julho": 7,
+    "agosto": 8,
+    "setembro": 9,
+    "outubro": 10,
+    "novembro": 11,
+    "dezembro": 12,
+    "jan": 1,
+    "fev": 2,
+    "mar": 3,
+    "abr": 4,
+    "mai": 5,
+    "jun": 6,
+    "jul": 7,
+    "ago": 8,
+    "set": 9,
+    "out": 10,
+    "nov": 11,
+    "dez": 12,
+}
+
+
+def month_to_number(text: str) -> int | None:
+    return MESES_PT.get(text.strip().lower())
+
+
 REGEX_SAFRA_COMPLETA = re.compile(r"^(\d{4})/(\d{2})$")
 REGEX_SAFRA_CURTA = re.compile(r"^(\d{2})/(\d{2})$")
 REGEX_SAFRA_BARRA = re.compile(r"^(\d{4})/(\d{4})$")

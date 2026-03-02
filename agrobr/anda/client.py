@@ -9,6 +9,7 @@ from agrobr.constants import MIN_HTML_SIZE, MIN_ZIP_SIZE, URLS, Fonte
 from agrobr.http.retry import retry_on_status
 from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
+from agrobr.utils.html import parse_links_from_html as _parse_links
 
 logger = structlog.get_logger()
 
@@ -72,25 +73,7 @@ async def download_file(url: str) -> bytes:
 
 
 def parse_links_from_html(html: str, pattern: str = r"\.pdf|\.xlsx?") -> list[dict[str, str]]:
-    from bs4 import BeautifulSoup
-
-    soup = BeautifulSoup(html, "lxml")
-    links: list[dict[str, str]] = []
-
-    for a_tag in soup.find_all("a", href=True):
-        href = a_tag["href"]
-        if re.search(pattern, str(href), re.IGNORECASE):
-            full_url = str(href)
-            if full_url.startswith("/"):
-                full_url = f"{BASE_URL}{full_url}"
-
-            links.append(
-                {
-                    "url": full_url,
-                    "text": a_tag.get_text(strip=True),
-                }
-            )
-
+    links = _parse_links(html, base_url=BASE_URL, pattern=pattern, dedup=False)
     logger.info("anda_links_found", count=len(links))
     return links
 

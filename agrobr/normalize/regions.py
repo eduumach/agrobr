@@ -66,6 +66,8 @@ UFS: dict[str, dict[str, str | int]] = {
     "TO": {"nome": "Tocantins", "regiao": "Norte", "ibge": 17},
 }
 
+UFS_VALIDAS: frozenset[str] = frozenset(UFS)
+
 REGIOES: dict[str, list[str]] = {
     "Norte": ["AC", "AP", "AM", "PA", "RO", "RR", "TO"],
     "Nordeste": ["AL", "BA", "CE", "MA", "PB", "PE", "PI", "RN", "SE"],

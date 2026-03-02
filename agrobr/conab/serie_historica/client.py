@@ -10,6 +10,7 @@ from agrobr.constants import URLS, Fonte
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
+from agrobr.utils.html import parse_links_from_html as _parse_links
 
 logger = structlog.get_logger()
 
@@ -165,30 +166,6 @@ async def fetch_series_page(categoria: str = "graos") -> str:
 
 
 def parse_xls_links_from_html(html: str) -> list[dict[str, str]]:
-    from bs4 import BeautifulSoup
-
-    soup = BeautifulSoup(html, "lxml")
-    links: list[dict[str, str]] = []
-    seen: set[str] = set()
-
-    for a_tag in soup.find_all("a", href=True):
-        href = str(a_tag["href"])
-        if ".xls" not in href.lower():
-            continue
-
-        if href in seen:
-            continue
-        seen.add(href)
-
-        titulo = a_tag.get_text(strip=True)
-        if not titulo:
-            titulo = href.split("/")[-1].replace(".xls", "")
-
-        full_url = href
-        if full_url.startswith("/"):
-            full_url = f"{BASE_URL}{full_url}"
-
-        links.append({"url": full_url, "titulo": titulo})
-
+    links = _parse_links(html, base_url=BASE_URL, pattern=r"\.xls")
     logger.info("conab_serie_historica_links_parsed", count=len(links))
     return links

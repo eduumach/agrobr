@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import io
 import json
 from typing import Any
 
@@ -8,6 +7,7 @@ import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
+from agrobr.utils.io import read_csv_safe
 
 from .models import (
     COLUNAS_SAIDA_DETER,
@@ -24,16 +24,9 @@ PARSER_VERSION = 1
 
 
 def parse_prodes_csv(data: bytes, bioma: str) -> pd.DataFrame:
-    try:
-        df = pd.read_csv(io.BytesIO(data), encoding="utf-8")
-    except UnicodeDecodeError:
-        df = pd.read_csv(io.BytesIO(data), encoding="latin-1")
-    except Exception as e:
-        raise ParseError(
-            source="desmatamento",
-            parser_version=PARSER_VERSION,
-            reason=f"Erro ao ler CSV PRODES: {e}",
-        ) from e
+    df = read_csv_safe(
+        data, source="desmatamento", parser_version=PARSER_VERSION, label="CSV PRODES"
+    )
 
     if df.empty:
         raise ParseError(
@@ -68,16 +61,9 @@ def parse_prodes_csv(data: bytes, bioma: str) -> pd.DataFrame:
 
 
 def parse_deter_csv(data: bytes, bioma: str) -> pd.DataFrame:
-    try:
-        df = pd.read_csv(io.BytesIO(data), encoding="utf-8")
-    except UnicodeDecodeError:
-        df = pd.read_csv(io.BytesIO(data), encoding="latin-1")
-    except Exception as e:
-        raise ParseError(
-            source="desmatamento",
-            parser_version=PARSER_VERSION,
-            reason=f"Erro ao ler CSV DETER: {e}",
-        ) from e
+    df = read_csv_safe(
+        data, source="desmatamento", parser_version=PARSER_VERSION, label="CSV DETER"
+    )
 
     if df.empty:
         raise ParseError(

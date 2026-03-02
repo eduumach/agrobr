@@ -6,6 +6,7 @@ from typing import Any
 from pydantic import BaseModel, Field, field_validator
 
 from agrobr.constants import URLS, Fonte
+from agrobr.normalize.regions import UFS_VALIDAS as UFS_VALIDAS
 
 SHLP_BASE = URLS[Fonte.ANP_DIESEL]["shlp"]
 VENDAS_DIESEL_CSV_URL = URLS[Fonte.ANP_DIESEL]["vendas_diesel_csv"]
@@ -63,38 +64,6 @@ COLUNAS_XLSX_PRECOS_ALT: dict[str, str] = {
     "Preço Médio Distribuição": "preco_compra",
     "Número de Postos Pesquisados": "n_postos",
 }
-
-UFS_VALIDAS = frozenset(
-    {
-        "AC",
-        "AL",
-        "AM",
-        "AP",
-        "BA",
-        "CE",
-        "DF",
-        "ES",
-        "GO",
-        "MA",
-        "MG",
-        "MS",
-        "MT",
-        "PA",
-        "PB",
-        "PE",
-        "PI",
-        "PR",
-        "RJ",
-        "RN",
-        "RO",
-        "RR",
-        "RS",
-        "SC",
-        "SE",
-        "SP",
-        "TO",
-    }
-)
 
 
 def _resolve_periodo_municipio(ano: int) -> str | None:

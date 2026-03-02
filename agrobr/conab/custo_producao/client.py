@@ -12,6 +12,7 @@ from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.retry import retry_on_status
 from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
+from agrobr.utils.html import parse_links_from_html as _parse_links
 
 logger = structlog.get_logger()
 
@@ -111,46 +112,20 @@ async def download_xlsx(url: str) -> BytesIO:
 
 
 def parse_links_from_html(html: str) -> list[dict[str, str]]:
-    from bs4 import BeautifulSoup
+    links = _parse_links(html, base_url=BASE_URL, pattern=r"\.xlsx")
 
-    soup = BeautifulSoup(html, "lxml")
-    links: list[dict[str, str]] = []
-    seen_urls: set[str] = set()
-
-    for a_tag in soup.find_all("a", href=True):
-        href = str(a_tag["href"])
-        if ".xlsx" not in href.lower():
-            continue
-
-        if href in seen_urls:
-            continue
-        seen_urls.add(href)
-
-        titulo = a_tag.get_text(strip=True)
-        if not titulo:
-            titulo = href.split("/")[-1].replace("-", " ").replace(".xlsx", "")
-
-        full_url = href
-        if full_url.startswith("/"):
-            full_url = f"{BASE_URL}{full_url}"
-
-        link_info: dict[str, str] = {
-            "url": full_url,
-            "titulo": titulo,
-        }
-
-        safra_match = re.search(r"(\d{4})/(\d{2})", titulo)
+    for link in links:
+        text = link["text"]
+        safra_match = re.search(r"(\d{4})/(\d{2})", text)
         if safra_match:
-            link_info["safra_hint"] = safra_match.group(0)
+            link["safra_hint"] = safra_match.group(0)
 
         uf_match = re.search(
             r"\b(AC|AL|AM|AP|BA|CE|DF|ES|GO|MA|MG|MS|MT|PA|PB|PE|PI|PR|RJ|RN|RO|RR|RS|SC|SE|SP|TO)\b",
-            titulo,
+            text,
         )
         if uf_match:
-            link_info["uf_hint"] = uf_match.group(1)
-
-        links.append(link_info)
+            link["uf_hint"] = uf_match.group(1)
 
     logger.info("conab_custo_links_parsed", count=len(links))
     return links
@@ -172,7 +147,7 @@ async def fetch_xlsx_for_cultura(
         )
 
     cultura_lower = cultura.lower()
-    candidates = [link for link in links if cultura_lower in link["titulo"].lower()]
+    candidates = [link for link in links if cultura_lower in link["text"].lower()]
 
     if uf:
         uf_upper = uf.upper()
@@ -198,7 +173,7 @@ async def fetch_xlsx_for_cultura(
 
     metadata = {
         "url": selected["url"],
-        "titulo": selected["titulo"],
+        "titulo": selected["text"],
         "cultura": cultura,
     }
     if selected.get("uf_hint"):

@@ -7,9 +7,10 @@ import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
+from agrobr.normalize.dates import month_to_number
 from agrobr.normalize.numeric import safe_float
 
-from .models import MESES_PT, normalize_produto
+from .models import normalize_produto
 
 logger = structlog.get_logger()
 
@@ -32,7 +33,7 @@ def _detect_month(text: Any) -> int | None:
     except ValueError:
         pass
 
-    return MESES_PT.get(s)
+    return month_to_number(s)
 
 
 def _detect_produto_from_header(header: str) -> str | None:

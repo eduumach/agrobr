@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-from datetime import datetime
 
 import httpx
 import pandas as pd
@@ -10,6 +9,7 @@ import structlog
 from agrobr.exceptions import ParseError
 from agrobr.models import MetaInfo
 from agrobr.utils.result import build_source_meta
+from agrobr.utils.validation import validate_year_uf
 
 from . import client, parser
 from .models import (
@@ -17,7 +17,6 @@ from .models import (
     COLUNAS_FLUXO,
     DATASET_PRACAS_SLUG,
     DATASET_TRAFEGO_SLUG,
-    UFS_VALIDAS,
     _resolve_anos,
 )
 
@@ -36,7 +35,7 @@ async def fluxo_pedagio(
     apenas_pesados: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    _validate_params(uf=uf, ano=ano, ano_inicio=ano_inicio, ano_fim=ano_fim)
+    validate_year_uf(uf=uf, ano=ano, ano_inicio=ano_inicio, ano_fim=ano_fim, ano_min=ANO_INICIO)
 
     anos = _resolve_anos(ano=ano, ano_inicio=ano_inicio, ano_fim=ano_fim)
 
@@ -125,8 +124,7 @@ async def pracas_pedagio(
     situacao: str | None = None,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    if uf and uf.upper() not in UFS_VALIDAS:
-        raise ValueError(f"UF '{uf}' invalida. Opcoes: {sorted(UFS_VALIDAS)}")
+    validate_year_uf(uf=uf)
 
     t0 = time.monotonic()
     raw = await client.fetch_pracas()
@@ -162,23 +160,3 @@ async def pracas_pedagio(
         return df, meta
 
     return df
-
-
-def _validate_params(
-    uf: str | None = None,
-    ano: int | None = None,
-    ano_inicio: int | None = None,
-    ano_fim: int | None = None,
-) -> None:
-    if uf and uf.upper() not in UFS_VALIDAS:
-        raise ValueError(f"UF '{uf}' invalida. Opcoes: {sorted(UFS_VALIDAS)}")
-
-    current_year = datetime.now().year
-    if ano is not None and (ano < ANO_INICIO or ano > current_year):
-        raise ValueError(f"Ano {ano} fora do range valido ({ANO_INICIO}-{current_year})")
-    if ano_inicio is not None and ano_inicio < ANO_INICIO:
-        raise ValueError(f"ano_inicio {ano_inicio} anterior a {ANO_INICIO}")
-    if ano_fim is not None and ano_fim > current_year:
-        raise ValueError(f"ano_fim {ano_fim} posterior ao ano atual ({current_year})")
-    if ano_inicio is not None and ano_fim is not None and ano_inicio > ano_fim:
-        raise ValueError(f"ano_inicio ({ano_inicio}) > ano_fim ({ano_fim})")

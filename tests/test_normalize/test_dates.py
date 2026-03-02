@@ -5,8 +5,10 @@ from datetime import date
 import pytest
 
 from agrobr.normalize.dates import (
+    MESES_PT,
     anos_para_safra,
     lista_safras,
+    month_to_number,
     normalizar_safra,
     periodo_safra,
     safra_anterior,
@@ -131,3 +133,68 @@ class TestPeriodoSafra:
 
         assert inicio == date(2024, 7, 1)
         assert fim == date(2025, 6, 30)
+
+
+class TestMesesPt:
+    def test_all_12_months_full(self):
+        full_names = [
+            "janeiro",
+            "fevereiro",
+            "março",
+            "abril",
+            "maio",
+            "junho",
+            "julho",
+            "agosto",
+            "setembro",
+            "outubro",
+            "novembro",
+            "dezembro",
+        ]
+        for i, name in enumerate(full_names, 1):
+            assert MESES_PT[name] == i
+
+    def test_all_12_months_abbrev(self):
+        abbrevs = [
+            "jan",
+            "fev",
+            "mar",
+            "abr",
+            "mai",
+            "jun",
+            "jul",
+            "ago",
+            "set",
+            "out",
+            "nov",
+            "dez",
+        ]
+        for i, name in enumerate(abbrevs, 1):
+            assert MESES_PT[name] == i
+
+    def test_marco_sem_acento(self):
+        assert MESES_PT["marco"] == 3
+
+
+class TestMonthToNumber:
+    def test_full_name(self):
+        assert month_to_number("janeiro") == 1
+
+    def test_abbreviation(self):
+        assert month_to_number("jan") == 1
+
+    def test_case_insensitive(self):
+        assert month_to_number("JANEIRO") == 1
+        assert month_to_number("JAN") == 1
+
+    def test_whitespace(self):
+        assert month_to_number("  março  ") == 3
+
+    def test_unknown_returns_none(self):
+        assert month_to_number("xyz") is None
+
+    def test_accented(self):
+        assert month_to_number("março") == 3
+
+    def test_unaccented_variant(self):
+        assert month_to_number("marco") == 3

@@ -4,6 +4,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
+from agrobr.normalize.regions import UFS_VALIDAS as UFS_VALIDAS
+
 DATASET_ID = "baefdc68-9bad-4204-83e8-f2888b79ab48"
 
 _BASE_URL = (
@@ -129,38 +131,6 @@ CLASSIFICACOES_VALIDAS = frozenset(
         "FLORESTAL",
         "PENHOR RURAL",
         "BENFEITORIAS",
-    }
-)
-
-UFS_VALIDAS = frozenset(
-    {
-        "AC",
-        "AL",
-        "AM",
-        "AP",
-        "BA",
-        "CE",
-        "DF",
-        "ES",
-        "GO",
-        "MA",
-        "MG",
-        "MS",
-        "MT",
-        "PA",
-        "PB",
-        "PE",
-        "PI",
-        "PR",
-        "RJ",
-        "RN",
-        "RO",
-        "RR",
-        "RS",
-        "SC",
-        "SE",
-        "SP",
-        "TO",
     }
 )
 

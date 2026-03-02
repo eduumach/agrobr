@@ -6,8 +6,10 @@ from .crops import (
     normalizar_cultura,
 )
 from .dates import (
+    MESES_PT,
     anos_para_safra,
     lista_safras,
+    month_to_number,
     normalizar_safra,
     periodo_safra,
     safra_anterior,
@@ -25,6 +27,7 @@ from .municipalities import (
 )
 from .numeric import parse_numeric_br, safe_float
 from .regions import (
+    UFS_VALIDAS,
     ibge_para_uf,
     listar_regioes,
     listar_ufs,
@@ -45,6 +48,8 @@ from .units import (
 )
 
 __all__: list[str] = [
+    "MESES_PT",
+    "UFS_VALIDAS",
     "buscar_municipios",
     "converter",
     "decode_content",
@@ -55,6 +60,7 @@ __all__: list[str] = [
     "is_cultura_valida",
     "listar_culturas",
     "lista_safras",
+    "month_to_number",
     "listar_regioes",
     "listar_ufs",
     "municipio_para_ibge",

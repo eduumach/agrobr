@@ -9,6 +9,7 @@ import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
+from agrobr.normalize.dates import month_to_number
 from agrobr.normalize.numeric import parse_numeric_br
 
 logger = structlog.get_logger()
@@ -222,25 +223,8 @@ def parse_precos(
     return out
 
 
-_MONTH_MAP: dict[str, int] = {
-    "JAN": 1,
-    "FEV": 2,
-    "MAR": 3,
-    "ABR": 4,
-    "MAI": 5,
-    "JUN": 6,
-    "JUL": 7,
-    "AGO": 8,
-    "SET": 9,
-    "OUT": 10,
-    "NOV": 11,
-    "DEZ": 12,
-}
-
-
 def _resolve_mes(val: str) -> int | None:
-    key = val.strip().upper()[:3]
-    mes = _MONTH_MAP.get(key)
+    mes = month_to_number(val)
     if mes is not None:
         return mes
     try:

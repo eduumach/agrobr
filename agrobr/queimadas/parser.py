@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-import io
-
 import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
+from agrobr.utils.io import read_csv_safe
 
 from .models import COLUNAS_SAIDA, estado_para_uf, normalizar_bioma
 
@@ -28,16 +27,12 @@ def parse_focos_csv(data: bytes) -> pd.DataFrame:
         "pais_id": "Int64",
         "bioma": str,
     }
-    try:
-        df = pd.read_csv(io.BytesIO(data), encoding="utf-8", dtype=dtype_map)  # type: ignore[arg-type]
-    except UnicodeDecodeError:
-        df = pd.read_csv(io.BytesIO(data), encoding="latin-1", dtype=dtype_map)  # type: ignore[arg-type]
-    except Exception as e:
-        raise ParseError(
-            source="queimadas",
-            parser_version=PARSER_VERSION,
-            reason=f"Erro ao ler CSV: {e}",
-        ) from e
+    df = read_csv_safe(
+        data,
+        source="queimadas",
+        parser_version=PARSER_VERSION,
+        dtype=dtype_map,  # type: ignore[arg-type]
+    )
 
     if df.empty:
         raise ParseError(

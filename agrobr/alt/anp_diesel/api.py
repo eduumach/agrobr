@@ -8,6 +8,7 @@ import structlog
 
 from agrobr.models import MetaInfo
 from agrobr.utils.result import build_source_meta
+from agrobr.utils.validation import validate_year_uf
 
 from . import client, parser
 from .models import (
@@ -21,7 +22,6 @@ from .models import (
     PRECOS_ESTADOS_URL,
     PRECOS_MUNICIPIOS_URLS,
     PRODUTOS_DIESEL,
-    UFS_VALIDAS,
     VENDAS_DIESEL_CSV_URL,
     _resolve_periodo_municipio,
 )
@@ -45,8 +45,7 @@ async def precos_diesel(
         raise ValueError(f"Nivel '{nivel}' invalido. Opcoes: {sorted(NIVEIS_VALIDOS)}")
     if produto.upper() not in {p.upper() for p in PRODUTOS_DIESEL}:
         raise ValueError(f"Produto '{produto}' invalido. Opcoes: {sorted(PRODUTOS_DIESEL)}")
-    if uf and uf.upper() not in UFS_VALIDAS:
-        raise ValueError(f"UF '{uf}' invalida. Opcoes: {sorted(UFS_VALIDAS)}")
+    validate_year_uf(uf=uf)
 
     if isinstance(inicio, str):
         inicio = date.fromisoformat(inicio)
@@ -97,8 +96,7 @@ async def vendas_diesel(
     fim: str | date | None = None,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    if uf and uf.upper() not in UFS_VALIDAS:
-        raise ValueError(f"UF '{uf}' invalida. Opcoes: {sorted(UFS_VALIDAS)}")
+    validate_year_uf(uf=uf)
 
     if isinstance(inicio, str):
         inicio = date.fromisoformat(inicio)

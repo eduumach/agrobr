@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import io
 import json
 from typing import Any
 
@@ -8,6 +7,7 @@ import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
+from agrobr.utils.io import read_csv_safe
 
 from .models import COLUNAS_IMOVEIS, COLUNAS_IMOVEIS_GEO, MAX_FEATURES_GEO, RENAME_MAP
 
@@ -49,17 +49,9 @@ def parse_imoveis_csv(pages: list[bytes]) -> pd.DataFrame:
 
     dfs: list[pd.DataFrame] = []
     for i, data in enumerate(pages):
-        try:
-            df = pd.read_csv(io.BytesIO(data), encoding="utf-8")
-        except UnicodeDecodeError:
-            df = pd.read_csv(io.BytesIO(data), encoding="latin-1")
-        except Exception as e:
-            raise ParseError(
-                source="sicar",
-                parser_version=PARSER_VERSION,
-                reason=f"Erro ao ler CSV pagina {i}: {e}",
-            ) from e
-
+        df = read_csv_safe(
+            data, source="sicar", parser_version=PARSER_VERSION, label=f"CSV pagina {i}"
+        )
         if not df.empty:
             dfs.append(df)
 

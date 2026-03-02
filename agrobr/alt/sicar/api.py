@@ -10,13 +10,13 @@ import structlog
 
 from agrobr.models import MetaInfo
 from agrobr.utils.result import build_source_meta
+from agrobr.utils.validation import validate_year_uf
 
 from . import client, parser
 from .models import (
     MAX_FEATURES_WARNING,
     STATUS_VALIDOS,
     TIPO_VALIDOS,
-    UFS_VALIDAS,
     WFS_BASE,
 )
 
@@ -109,9 +109,8 @@ async def imoveis(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
+    validate_year_uf(uf=uf)
     uf_upper = uf.strip().upper()
-    if uf_upper not in UFS_VALIDAS:
-        raise ValueError(f"UF '{uf}' invalida. Opcoes: {sorted(UFS_VALIDAS)}")
 
     if municipio is not None and cod_municipio is not None:
         raise ValueError("Use 'municipio' ou 'cod_municipio', nao ambos")
@@ -237,9 +236,8 @@ async def imoveis_geo(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> Any:
+    validate_year_uf(uf=uf)
     uf_upper = uf.strip().upper()
-    if uf_upper not in UFS_VALIDAS:
-        raise ValueError(f"UF '{uf}' invalida. Opcoes: {sorted(UFS_VALIDAS)}")
 
     if municipio is not None and cod_municipio is not None:
         raise ValueError("Use 'municipio' ou 'cod_municipio', nao ambos")
@@ -336,9 +334,8 @@ async def resumo(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
+    validate_year_uf(uf=uf)
     uf_upper = uf.strip().upper()
-    if uf_upper not in UFS_VALIDAS:
-        raise ValueError(f"UF '{uf}' invalida. Opcoes: {sorted(UFS_VALIDAS)}")
 
     if municipio is not None and cod_municipio is not None:
         raise ValueError("Use 'municipio' ou 'cod_municipio', nao ambos")
