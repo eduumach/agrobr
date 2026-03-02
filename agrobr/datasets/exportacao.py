@@ -6,7 +6,7 @@ from typing import Any
 import pandas as pd
 import structlog
 
-from agrobr.datasets.base import BaseDataset, DatasetInfo, DatasetSource
+from agrobr.datasets.base import BaseDataset, DatasetInfo, DatasetSource, _unpack_result
 from agrobr.datasets.deterministic import get_snapshot
 from agrobr.models import MetaInfo
 
@@ -21,9 +21,7 @@ async def _fetch_comexstat(produto: str, **kwargs: Any) -> tuple[pd.DataFrame, M
 
     result = await comexstat.exportacao(produto, ano=ano, uf=uf, return_meta=True)
 
-    if isinstance(result, tuple):
-        return result[0], result[1]
-    return result, None
+    return _unpack_result(result)
 
 
 async def _fetch_abiove(produto: str, **kwargs: Any) -> tuple[pd.DataFrame, MetaInfo | None]:
@@ -34,17 +32,12 @@ async def _fetch_abiove(produto: str, **kwargs: Any) -> tuple[pd.DataFrame, Meta
 
     result = await abiove.exportacao(ano=ano, mes=mes, produto=produto, return_meta=True)
 
-    if isinstance(result, tuple):
-        df, meta = result
-        rename: dict[str, str] = {}
-        if "volume_ton" in df.columns and "kg_liquido" not in df.columns:
-            df["kg_liquido"] = df["volume_ton"] * 1000
-        if "receita_usd_mil" in df.columns and "valor_fob_usd" not in df.columns:
-            df["valor_fob_usd"] = df["receita_usd_mil"] * 1000
-        if rename:
-            df = df.rename(columns=rename)
-        return df, meta
-    return result, None
+    df, meta = _unpack_result(result)
+    if "volume_ton" in df.columns and "kg_liquido" not in df.columns:
+        df["kg_liquido"] = df["volume_ton"] * 1000
+    if "receita_usd_mil" in df.columns and "valor_fob_usd" not in df.columns:
+        df["valor_fob_usd"] = df["receita_usd_mil"] * 1000
+    return df, meta
 
 
 EXPORTACAO_INFO = DatasetInfo(
@@ -101,24 +94,7 @@ class ExportacaoDataset(BaseDataset):
         self._validate_contract(df)
 
         if return_meta:
-            now = datetime.now(UTC)
-            meta = MetaInfo(
-                source=f"datasets.exportacao/{source_name}",
-                source_url=source_meta.source_url if source_meta else "",
-                source_method="dataset",
-                fetched_at=source_meta.fetched_at if source_meta else now,
-                records_count=len(df),
-                columns=df.columns.tolist(),
-                from_cache=False,
-                parser_version=source_meta.parser_version if source_meta else 1,
-                dataset="exportacao",
-                contract_version=self.info.contract_version,
-                snapshot=snapshot,
-                attempted_sources=attempted,
-                selected_source=source_name,
-                fetch_timestamp=now,
-            )
-            return df, meta
+            return df, self._build_meta(df, source_name, source_meta, attempted, snapshot)
 
         return df
 

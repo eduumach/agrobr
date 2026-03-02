@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from datetime import UTC, date, datetime
+from datetime import date, datetime
 from typing import Any
 
 import pandas as pd
 import structlog
 
-from agrobr.datasets.base import BaseDataset, DatasetInfo, DatasetSource
+from agrobr.datasets.base import BaseDataset, DatasetInfo, DatasetSource, _unpack_result
 from agrobr.datasets.deterministic import get_snapshot, is_deterministic
 from agrobr.models import MetaInfo
 
@@ -21,9 +21,7 @@ async def _fetch_cepea(produto: str, **kwargs: Any) -> tuple[pd.DataFrame, MetaI
     else:
         result = await cepea.indicador(produto, return_meta=True, **kwargs)
 
-    if isinstance(result, tuple):
-        return result[0], result[1]
-    return result, None
+    return _unpack_result(result)
 
 
 async def _fetch_cache(produto: str, **kwargs: Any) -> tuple[pd.DataFrame, None]:
@@ -117,24 +115,14 @@ class PrecoDiarioDataset(BaseDataset):
             df = df[df["data"].dt.date <= snapshot_date]
 
         if return_meta:
-            now = datetime.now(UTC)
-            meta = MetaInfo(
-                source=f"datasets.preco_diario/{source_name}",
-                source_url=source_meta.source_url if source_meta else "",
-                source_method="dataset",
-                fetched_at=source_meta.fetched_at if source_meta else now,
-                records_count=len(df),
-                columns=df.columns.tolist(),
+            return df, self._build_meta(
+                df,
+                source_name,
+                source_meta,
+                attempted,
+                snapshot,
                 from_cache=source_name == "cache",
-                parser_version=source_meta.parser_version if source_meta else 1,
-                dataset="preco_diario",
-                contract_version=self.info.contract_version,
-                snapshot=snapshot,
-                attempted_sources=attempted,
-                selected_source=source_name,
-                fetch_timestamp=now,
             )
-            return df, meta
 
         return df
 

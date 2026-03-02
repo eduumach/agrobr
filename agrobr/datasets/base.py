@@ -67,8 +67,47 @@ class DatasetInfo:
         }
 
 
+def _unpack_result(
+    result: pd.DataFrame | tuple[pd.DataFrame, Any],
+) -> tuple[pd.DataFrame, MetaInfo | None]:
+    if isinstance(result, tuple):
+        return result[0], result[1]
+    return result, None
+
+
 class BaseDataset(ABC):
     info: DatasetInfo
+
+    def _build_meta(
+        self,
+        df: pd.DataFrame,
+        source_name: str,
+        source_meta: MetaInfo | None,
+        attempted: list[str],
+        snapshot: str | None,
+        *,
+        from_cache: bool = False,
+    ) -> MetaInfo:
+        from agrobr.models import MetaInfo as _MetaInfo
+        from agrobr.utils.time import utcnow
+
+        now = utcnow()
+        return _MetaInfo(
+            source=f"datasets.{self.info.name}/{source_name}",
+            source_url=source_meta.source_url if source_meta else "",
+            source_method="dataset",
+            fetched_at=source_meta.fetched_at if source_meta else now,
+            records_count=len(df),
+            columns=df.columns.tolist(),
+            from_cache=from_cache,
+            parser_version=source_meta.parser_version if source_meta else 1,
+            dataset=self.info.name,
+            contract_version=self.info.contract_version,
+            snapshot=snapshot,
+            attempted_sources=attempted,
+            selected_source=source_name,
+            fetch_timestamp=now,
+        )
 
     @abstractmethod
     async def fetch(

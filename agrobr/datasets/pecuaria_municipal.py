@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
 from typing import Any, Literal
 
 import pandas as pd
 import structlog
 
-from agrobr.datasets.base import BaseDataset, DatasetInfo, DatasetSource
+from agrobr.datasets.base import BaseDataset, DatasetInfo, DatasetSource, _unpack_result
 from agrobr.datasets.deterministic import get_snapshot
 from agrobr.ibge._helpers import SIDRA_BASE
 from agrobr.models import MetaInfo
@@ -23,9 +22,7 @@ async def _fetch_ibge_ppm(produto: str, **kwargs: Any) -> tuple[pd.DataFrame, Me
 
     result = await ibge.ppm(produto, ano=ano, nivel=nivel, uf=uf, return_meta=True)
 
-    if isinstance(result, tuple):
-        return result[0], result[1]
-    return result, None
+    return _unpack_result(result)
 
 
 PECUARIA_MUNICIPAL_INFO = DatasetInfo(
@@ -93,24 +90,7 @@ class PecuariaMunicipalDataset(BaseDataset):
         self._validate_contract(df)
 
         if return_meta:
-            now = datetime.now(UTC)
-            meta = MetaInfo(
-                source=f"datasets.pecuaria_municipal/{source_name}",
-                source_url=source_meta.source_url if source_meta else "",
-                source_method="dataset",
-                fetched_at=source_meta.fetched_at if source_meta else now,
-                records_count=len(df),
-                columns=df.columns.tolist(),
-                from_cache=False,
-                parser_version=source_meta.parser_version if source_meta else 1,
-                dataset="pecuaria_municipal",
-                contract_version=self.info.contract_version,
-                snapshot=snapshot,
-                attempted_sources=attempted,
-                selected_source=source_name,
-                fetch_timestamp=now,
-            )
-            return df, meta
+            return df, self._build_meta(df, source_name, source_meta, attempted, snapshot)
 
         return df
 
