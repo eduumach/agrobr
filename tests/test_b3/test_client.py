@@ -225,3 +225,76 @@ class TestFetchPosicoesAbertas:
 
     def test_base_url_arquivos_is_correct(self):
         assert "arquivos.b3.com.br" in client.BASE_URL_ARQUIVOS
+
+
+class TestFetchAjustesZip:
+    @pytest.mark.asyncio
+    async def test_success(self):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.content = b"\x00" * 1000
+        mock_response.raise_for_status = MagicMock()
+
+        with patch(
+            "agrobr.b3.client.retry_on_status",
+            new_callable=AsyncMock,
+            return_value=mock_response,
+        ):
+            content, url = await client.fetch_ajustes_zip("03/03/2026")
+
+        assert isinstance(content, bytes)
+        assert len(content) == 1000
+        assert "PR260303.zip" in url
+
+    @pytest.mark.asyncio
+    async def test_404_raises_source_unavailable(self):
+        mock_response = MagicMock()
+        mock_response.status_code = 404
+        mock_response.raise_for_status = MagicMock()
+
+        with (
+            patch(
+                "agrobr.b3.client.retry_on_status",
+                new_callable=AsyncMock,
+                return_value=mock_response,
+            ),
+            pytest.raises(SourceUnavailableError, match="b3"),
+        ):
+            await client.fetch_ajustes_zip("03/03/2026")
+
+    @pytest.mark.asyncio
+    async def test_too_small_raises_source_unavailable(self):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.content = b"\x00" * 10
+        mock_response.raise_for_status = MagicMock()
+
+        with (
+            patch(
+                "agrobr.b3.client.retry_on_status",
+                new_callable=AsyncMock,
+                return_value=mock_response,
+            ),
+            pytest.raises(SourceUnavailableError, match="ZIP too small"),
+        ):
+            await client.fetch_ajustes_zip("03/03/2026")
+
+    @pytest.mark.asyncio
+    async def test_date_format(self):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.content = b"\x00" * 1000
+        mock_response.raise_for_status = MagicMock()
+
+        with patch(
+            "agrobr.b3.client.retry_on_status",
+            new_callable=AsyncMock,
+            return_value=mock_response,
+        ):
+            _, url = await client.fetch_ajustes_zip("27/02/2026")
+
+        assert "PR260227.zip" in url
+
+    def test_base_url_zip_is_correct(self):
+        assert "pesquisapregao" in client.BASE_URL_ZIP
+        assert "b3.com.br" in client.BASE_URL_ZIP

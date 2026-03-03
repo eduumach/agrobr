@@ -1,17 +1,21 @@
 from __future__ import annotations
 
+import io
 import json
+import zipfile
 from datetime import date
 from pathlib import Path
 
 import pandas as pd
 import pytest
 
-from agrobr.b3.models import COLUNAS_OI_SAIDA, TICKERS_AGRO, TICKERS_AGRO_OI
+from agrobr.b3.models import COLUNAS_OI_SAIDA, COLUNAS_SAIDA, TICKERS_AGRO, TICKERS_AGRO_OI
 from agrobr.b3.parser import (
     PARSER_VERSION,
     PARSER_VERSION_OI,
+    PARSER_VERSION_ZIP,
     parse_ajustes_html,
+    parse_ajustes_zip,
     parse_posicoes_abertas,
 )
 from agrobr.exceptions import ParseError
@@ -178,6 +182,113 @@ class TestParseEdgeCases:
         df = parse_ajustes_html(html)
         assert len(df) == 1
         assert df.iloc[0]["ticker"] == "BGI"
+
+
+def _make_bvmf_xml(*pric_rpts: str) -> bytes:
+    body = "".join(pric_rpts)
+    return (
+        f'<?xml version="1.0" encoding="utf-8"?>'
+        f'<Envelope xmlns="urn:bvmf.052.01.xsd">'
+        f'<Body xmlns="urn:bvmf.217.01.xsd">{body}</Body>'
+        f"</Envelope>"
+    ).encode()
+
+
+def _make_pric_rpt(
+    ticker_symb: str,
+    trade_dt: str = "2026-02-27",
+    prev_adj: str = "353.00",
+    adj: str = "352.00",
+    var: str = "-1.00",
+    adj_val: str = "-330.00",
+) -> str:
+    ns = "urn:bvmf.217.01.xsd"
+    return (
+        f'<PricRpt xmlns="{ns}">'
+        f"<TradDt><Dt>{trade_dt}</Dt></TradDt>"
+        f"<SctyId><TckrSymb>{ticker_symb}</TckrSymb></SctyId>"
+        f"<FinInstrmAttrbts>"
+        f"<PrvsAdjstdQt>{prev_adj}</PrvsAdjstdQt>"
+        f"<AdjstdQt>{adj}</AdjstdQt>"
+        f"<VartnPts>{var}</VartnPts>"
+        f"<AdjstdValCtrct>{adj_val}</AdjstdValCtrct>"
+        f"</FinInstrmAttrbts>"
+        f"</PricRpt>"
+    )
+
+
+def _make_nested_zip(xml_content: bytes) -> bytes:
+    inner_buf = io.BytesIO()
+    with zipfile.ZipFile(inner_buf, "w", zipfile.ZIP_DEFLATED) as inner_zf:
+        inner_zf.writestr("PR26022703.xml", xml_content)
+    inner_buf.seek(0)
+
+    outer_buf = io.BytesIO()
+    with zipfile.ZipFile(outer_buf, "w", zipfile.ZIP_DEFLATED) as outer_zf:
+        outer_zf.writestr("BVBG086.zip", inner_buf.getvalue())
+    outer_buf.seek(0)
+    return outer_buf.getvalue()
+
+
+class TestParseAjustesZip:
+    def test_valid(self):
+        xml = _make_bvmf_xml(
+            _make_pric_rpt("BGIH27", prev_adj="353", adj="352", var="-1", adj_val="-330"),
+            _make_pric_rpt("CCMK26", prev_adj="70.5", adj="71.0", var="0.5", adj_val="135"),
+        )
+        zip_bytes = _make_nested_zip(xml)
+        df = parse_ajustes_zip(zip_bytes)
+        assert len(df) == 2
+        assert set(df["ticker"]) == {"BGI", "CCM"}
+        assert df.iloc[0]["descricao"] == "boi"
+        assert df.iloc[1]["descricao"] == "milho"
+
+    def test_empty_xml(self):
+        xml = _make_bvmf_xml()
+        zip_bytes = _make_nested_zip(xml)
+        df = parse_ajustes_zip(zip_bytes)
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) == 0
+
+    def test_filters_non_agro(self):
+        xml = _make_bvmf_xml(
+            _make_pric_rpt("BGIH27"),
+            _make_pric_rpt("DI1F26"),
+        )
+        zip_bytes = _make_nested_zip(xml)
+        df = parse_ajustes_zip(zip_bytes)
+        assert len(df) == 1
+        assert df.iloc[0]["ticker"] == "BGI"
+
+    def test_columns_match(self):
+        xml = _make_bvmf_xml(_make_pric_rpt("BGIH27"))
+        zip_bytes = _make_nested_zip(xml)
+        df = parse_ajustes_zip(zip_bytes)
+        assert df.columns.tolist() == COLUNAS_SAIDA
+
+    def test_dtypes(self):
+        xml = _make_bvmf_xml(_make_pric_rpt("BGIH27"))
+        zip_bytes = _make_nested_zip(xml)
+        df = parse_ajustes_zip(zip_bytes)
+        assert df["data"].dtype == "datetime64[ns]"
+        for col in ["ajuste_anterior", "ajuste_atual", "variacao", "ajuste_por_contrato"]:
+            assert df[col].dtype == "float64"
+
+    def test_corrupted_raises_parse_error(self):
+        with pytest.raises(ParseError, match="ZIP externo corrompido"):
+            parse_ajustes_zip(b"not a zip file at all")
+
+    def test_parser_version_zip(self):
+        assert isinstance(PARSER_VERSION_ZIP, int)
+        assert PARSER_VERSION_ZIP >= 1
+
+    def test_vencimento_parsed(self):
+        xml = _make_bvmf_xml(_make_pric_rpt("BGIH27"))
+        zip_bytes = _make_nested_zip(xml)
+        df = parse_ajustes_zip(zip_bytes)
+        assert df.iloc[0]["vencimento_codigo"] == "H27"
+        assert df.iloc[0]["vencimento_mes"] == 3
+        assert df.iloc[0]["vencimento_ano"] == 2027
 
 
 def _golden_oi_csv() -> bytes:

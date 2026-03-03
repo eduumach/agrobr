@@ -12,6 +12,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **deps** — `python-calamine>=0.3.0` como dependencia core (749KB, zero deps Python, engine Rust para leitura Excel)
 
 ### Improved
+- **b3** — `ajustes()` agora usa BVBG-086 ZIP como fonte primaria (endpoint `pesquisapregao/download`, XML streaming com `lxml.etree.iterparse`). Fallback automatico para HTML legado em caso de falha. `parse_ajustes_zip()` com filtragem agro, nested ZIP extraction e wrapping de erros em `ParseError`. URL antiga mantida para fallback
 - **constants** — `HTTPSettings.max_concurrent_default`, `max_concurrent_b3`, `max_concurrent_ibge` para concorrencia configuravel por fonte no RateLimiter (default 1 = sem mudanca de comportamento)
 - **normalize/numeric** — `parse_numeric_br` canonica para parsing numerico formato BR (ponto=milhar, virgula=decimal). Substitui 3 implementacoes duplicadas em `alt/` parsers
 - **normalize/encoding** — `detect_encoding_chain` para deteccao rapida de encoding via probe chain (UTF-8, UTF-8-sig, Windows-1252, ISO-8859-1, chardet fallback). Substitui 2 implementacoes duplicadas em `alt/` parsers
