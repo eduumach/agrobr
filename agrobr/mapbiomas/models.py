@@ -1,22 +1,13 @@
 from __future__ import annotations
 
+from agrobr.normalize.regions import BIOMAS as BIOMAS  # noqa: F401
+from agrobr.normalize.regions import BIOMAS_VALIDOS as BIOMAS_VALIDOS  # noqa: F401
+from agrobr.normalize.regions import normalizar_bioma as normalizar_bioma  # noqa: F401
+
 COLECAO_ATUAL = 10
 
 ANO_INICIO = 1985
 ANO_FIM = 2024
-
-BIOMAS_VALIDOS = {"Amazônia", "Caatinga", "Cerrado", "Mata Atlântica", "Pampa", "Pantanal"}
-
-BIOMAS: dict[str, str] = {
-    "amazonia": "Amazônia",
-    "amazônia": "Amazônia",
-    "cerrado": "Cerrado",
-    "mata atlantica": "Mata Atlântica",
-    "mata atlântica": "Mata Atlântica",
-    "caatinga": "Caatinga",
-    "pampa": "Pampa",
-    "pantanal": "Pantanal",
-}
 
 CLASSES_LEGENDA: dict[int, str] = {
     1: "Floresta",
@@ -139,11 +130,6 @@ ESTADOS_MAPBIOMAS: dict[str, str] = {
     "Sergipe": "SE",
     "Tocantins": "TO",
 }
-
-
-def normalizar_bioma(bioma: str) -> str:
-    key = bioma.strip().lower()
-    return BIOMAS.get(key, bioma.strip())
 
 
 def estado_para_uf(estado: str) -> str:

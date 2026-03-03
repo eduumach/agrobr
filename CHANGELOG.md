@@ -25,8 +25,9 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **utils/validation** — `validate_year_uf()` helper para validacao de UF e range de anos. Substitui 2 `_validate_params` identicos + 6 inline UF checks em antt_pedagio, mapa_psr, anp_diesel, sicar
 - **utils/io** — `read_csv_safe()` helper para leitura CSV com encoding fallback (utf-8 → latin-1). Substitui 4 blocos try/except em desmatamento (2x), sicar, queimadas
 - **utils/html** — `parse_links_from_html()` canonico para extracao de links HTML com filtro regex, dedup e base_url. Substitui 3 implementacoes em anda/client, conab/serie_historica/client, conab/custo_producao/client (~120 linhas)
-
-### Improved
+- **normalize/regions** — `normalizar_bioma()`, `BIOMAS` e `BIOMAS_VALIDOS` canonicos. Substitui 3 implementacoes identicas em desmatamento/models, mapbiomas/models, queimadas/models (~45 linhas). Re-exports mantidos para backward compat. Exportado em `agrobr.normalize` como API publica
+- **desmatamento/api** — `normalizar_bioma()` wired nos 4 entry points (`prodes`, `prodes_geo`, `deter`, `deter_geo`). Parametro `bioma` aceita lowercase/sem acento (ex: `"cerrado"` → `"Cerrado"`, `"amazonia"` → `"Amazônia"`)
+- **inmet/client** — HTTP 403 agora levanta `SourceUnavailableError` com mensagem sobre `AGROBR_INMET_TOKEN` em vez de `httpx.HTTPStatusError` generico. `fetch_dados_estacoes_uf` propaga 403 em vez de engolir silenciosamente
 - **http/rate_limiter** — `RateLimiter` com concorrencia configuravel via `HTTPSettings.max_concurrent_{source}`. `Semaphore(1)` hardcoded substituido por `Semaphore(config)`. Pattern "burst then pause": N requests simultaneos seguidos de pausa de rate_limit delay. Default 1 (zero mudanca de comportamento para fontes nao configuradas). B3 e IBGE configurados com concorrencia 3
 - **b3/api** — `historico()` e `oi_historico()` migrados de while-loop sequencial + `asyncio.sleep(1.0)` para `asyncio.gather()` com lista de weekdays. Rate limiting delegado ao RateLimiter (Semaphore(3) para B3). ~4.4x speedup esperado (22 dias: ~44s → ~10s)
 - **inmet/client** — `_get_json()` e `fetch_dados_estacao()` aceitam `http: AsyncClient | None` para reuso de conexao. `fetch_dados_estacoes_uf()` cria shared client para todas as estacoes. Elimina criacao de novo AsyncClient por request
@@ -77,6 +78,10 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **conab/custo_producao** — URL da pagina de custos tinha path duplicado (`/conab/conab/pt-br/...`) resultando em 404. `BASE_URL` ja continha `/conab`, path literal repetia. Corrigido para `{BASE_URL}/pt-br/...`
 - **alt/sicar** — `area_ha` e `modulos_fiscais` falhavam contract validation quando WFS GeoServer retornava valores com formato BR (virgula decimal). `pd.to_numeric` nao parseia `"120,5"` → coerce para NaN → `ContractViolationError`. Fix: `.str.replace(",", ".")` antes de `pd.to_numeric` (vectorizado)
 - **normalize/encoding** — `detect_encoding_chain` validava encoding apenas contra sample de 4096 bytes. Bytes invalidos alem do sample (ex: 0x81 na posicao 17.6M do CSV PSR) passavam como windows-1252 no sample mas falhavam no decode completo. Fix: valida encoding contra conteudo completo, windows-1252 cai para iso-8859-1 quando necessario
+- **comtrade/api** — `comercio()` default `periodo` corrigido de ano corrente (dados incompletos/vazios) para `year - 1` (ultimo ano completo disponivel)
+- **comexstat/api** — `exportacao()` default `ano` corrigido de ano corrente para `utcnow().year - 1`. Import migrado de `datetime.now()` local para `utcnow()` UTC
+- **datasets/exportacao** — fallback ABIOVE default `ano` corrigido para `utcnow().year - 1`
+- **conab/custo_producao** — 2 `datetime.now(UTC)` restantes em `custo_producao_total()` migrados para `utcnow()`. Import `datetime`/`UTC` removido
 
 ## [0.12.0] - 2026-02-28
 

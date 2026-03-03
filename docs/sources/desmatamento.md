@@ -68,6 +68,16 @@ A funcao `deter_geo()` retorna alertas DETER com poligonos de geometria como Geo
 
 A coluna de geometria e bioma-especifica no GeoServer. O parser normaliza ambas para `geometry` no GeoDataFrame de saida.
 
+## Normalizacao de Bioma
+
+O parametro `bioma` aceita variantes com/sem acento e case insensitive:
+
+- `"amazonia"` ou `"amazônia"` → `"Amazônia"`
+- `"cerrado"` → `"Cerrado"`
+- `"mata atlantica"` ou `"mata atlântica"` → `"Mata Atlântica"`
+
+A normalizacao e aplicada automaticamente em `prodes()`, `prodes_geo()`, `deter()` e `deter_geo()`.
+
 ## Exemplo de Uso
 
 ```python

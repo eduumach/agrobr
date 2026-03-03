@@ -179,6 +179,25 @@ PRACAS_CEPEA: dict[str, dict[str, str]] = {
 }
 
 
+BIOMAS: dict[str, str] = {
+    "amazonia": "Amazônia",
+    "amazônia": "Amazônia",
+    "cerrado": "Cerrado",
+    "mata atlantica": "Mata Atlântica",
+    "mata atlântica": "Mata Atlântica",
+    "caatinga": "Caatinga",
+    "pampa": "Pampa",
+    "pantanal": "Pantanal",
+}
+
+BIOMAS_VALIDOS: frozenset[str] = frozenset(BIOMAS.values())
+
+
+def normalizar_bioma(bioma: str) -> str:
+    key = bioma.strip().lower()
+    return BIOMAS.get(key, bioma.strip())
+
+
 def normalizar_praca(praca: str, produto: str | None = None) -> str:
     praca_norm = remover_acentos(praca.lower().strip())
 

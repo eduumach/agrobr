@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
 from typing import Any
 
 import pandas as pd
@@ -26,8 +25,9 @@ async def _fetch_comexstat(produto: str, **kwargs: Any) -> tuple[pd.DataFrame, M
 
 async def _fetch_abiove(produto: str, **kwargs: Any) -> tuple[pd.DataFrame, MetaInfo | None]:
     from agrobr import abiove
+    from agrobr.utils.time import utcnow
 
-    ano: int = kwargs.get("ano", datetime.now(UTC).year)
+    ano: int = kwargs.get("ano", utcnow().year - 1)
     mes: int | None = kwargs.get("mes")
 
     result = await abiove.exportacao(ano=ano, mes=mes, produto=produto, return_meta=True)

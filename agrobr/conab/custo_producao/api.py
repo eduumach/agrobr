@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-from datetime import UTC, datetime
 from typing import Any, Literal, overload
 
 import pandas as pd
@@ -9,6 +8,7 @@ import structlog
 
 from agrobr.models import MetaInfo
 from agrobr.utils.result import build_source_meta, finalize_result
+from agrobr.utils.time import utcnow
 
 from . import client
 from .parser import PARSER_VERSION, items_to_dataframe, parse_planilha
@@ -183,11 +183,12 @@ async def custo_producao_total(
     )
 
     if return_meta:
+        now = utcnow()
         meta = MetaInfo(
             source="conab_custo",
             source_url=metadata.get("url", client.CUSTOS_PAGE),
             source_method="httpx",
-            fetched_at=datetime.now(UTC),
+            fetched_at=now,
             fetch_duration_ms=fetch_ms,
             parse_duration_ms=parse_ms,
             records_count=1,
@@ -196,7 +197,7 @@ async def custo_producao_total(
             schema_version="1.0",
             attempted_sources=["conab_custo"],
             selected_source="conab_custo",
-            fetch_timestamp=datetime.now(UTC),
+            fetch_timestamp=now,
         )
         return result, meta
 

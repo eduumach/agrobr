@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-from datetime import datetime
 from typing import Literal, overload
 
 import pandas as pd
@@ -9,6 +8,7 @@ import structlog
 
 from agrobr.models import MetaInfo
 from agrobr.utils.result import build_source_meta, finalize_result
+from agrobr.utils.time import utcnow
 
 from . import client
 from .models import resolve_ncm
@@ -50,7 +50,8 @@ async def exportacao(
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
     if ano is None:
-        ano = datetime.now().year
+        ano = utcnow().year - 1
+        logger.info("comexstat_default_ano", ano=ano)
 
     ncm = resolve_ncm(produto)
 

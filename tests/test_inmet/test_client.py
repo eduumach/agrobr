@@ -51,14 +51,14 @@ class TestInmetHTTPErrors:
             await client._get_json("/estacoes/T")
 
     @pytest.mark.asyncio
-    async def test_http_403_raises(self):
+    async def test_http_403_raises_source_unavailable(self):
         resp_403 = make_mock_response(403, json_data=[])
         mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(return_value=resp_403)
 
         with (
             patch("agrobr.inmet.client.httpx.AsyncClient", return_value=mock_client),
-            pytest.raises(httpx.HTTPStatusError),
+            pytest.raises(SourceUnavailableError, match="AGROBR_INMET_TOKEN"),
         ):
             await client._get_json("/estacoes/T")
 
@@ -213,3 +213,40 @@ class TestInmetFetchDadosEstacaoChunking:
 
         assert mock_client.get.call_count >= 2
         assert isinstance(result, list)
+
+
+class TestInmet403InEstacoeUf:
+    @pytest.mark.asyncio
+    async def test_403_surfaces_through_estacoes_uf(self):
+        estacoes = [{"SG_ESTADO": "SP", "CD_SITUACAO": "Operante", "CD_ESTACAO": "A001"}]
+
+        with (
+            patch.object(client, "fetch_estacoes", new_callable=AsyncMock, return_value=estacoes),
+            patch.object(
+                client,
+                "fetch_dados_estacao",
+                new_callable=AsyncMock,
+                side_effect=SourceUnavailableError(
+                    source="inmet", last_error="HTTP 403 Forbidden — defina AGROBR_INMET_TOKEN"
+                ),
+            ),
+            pytest.raises(SourceUnavailableError, match="AGROBR_INMET_TOKEN"),
+        ):
+            await client.fetch_dados_estacoes_uf("SP", date(2024, 1, 1), date(2024, 1, 10))
+
+    @pytest.mark.asyncio
+    async def test_non_403_errors_still_swallowed_in_estacoes_uf(self):
+        estacoes = [{"SG_ESTADO": "SP", "CD_SITUACAO": "Operante", "CD_ESTACAO": "A001"}]
+
+        with (
+            patch.object(client, "fetch_estacoes", new_callable=AsyncMock, return_value=estacoes),
+            patch.object(
+                client,
+                "fetch_dados_estacao",
+                new_callable=AsyncMock,
+                side_effect=httpx.ReadTimeout("timeout"),
+            ),
+        ):
+            result = await client.fetch_dados_estacoes_uf("SP", date(2024, 1, 1), date(2024, 1, 10))
+
+        assert result == []

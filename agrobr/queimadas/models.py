@@ -1,17 +1,8 @@
 from __future__ import annotations
 
-BIOMAS = {
-    "amazonia": "Amazônia",
-    "amazônia": "Amazônia",
-    "cerrado": "Cerrado",
-    "mata atlantica": "Mata Atlântica",
-    "mata atlântica": "Mata Atlântica",
-    "caatinga": "Caatinga",
-    "pampa": "Pampa",
-    "pantanal": "Pantanal",
-}
-
-BIOMAS_VALIDOS = {"Amazônia", "Cerrado", "Mata Atlântica", "Caatinga", "Pampa", "Pantanal"}
+from agrobr.normalize.regions import BIOMAS as BIOMAS  # noqa: F401
+from agrobr.normalize.regions import BIOMAS_VALIDOS as BIOMAS_VALIDOS  # noqa: F401
+from agrobr.normalize.regions import normalizar_bioma as normalizar_bioma  # noqa: F401
 
 SATELITES = {
     "AQUA_M-T",
@@ -95,11 +86,6 @@ UF_ESTADO: dict[str, str] = {
     "SERGIPE": "SE",
     "TOCANTINS": "TO",
 }
-
-
-def normalizar_bioma(bioma: str) -> str:
-    key = bioma.strip().lower()
-    return BIOMAS.get(key, bioma.strip())
 
 
 def estado_para_uf(estado: str) -> str:

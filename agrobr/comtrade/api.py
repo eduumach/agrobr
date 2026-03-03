@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import time
-from datetime import UTC, datetime
 from typing import Any, Literal, overload
 
 import pandas as pd
@@ -9,6 +8,7 @@ import structlog
 
 from agrobr.models import MetaInfo
 from agrobr.utils.result import build_source_meta, finalize_result
+from agrobr.utils.time import utcnow
 
 from . import client, parser
 from .models import (
@@ -69,7 +69,8 @@ async def comercio(
     partner_code = resolve_pais(partner) if partner else 0
 
     if periodo is None:
-        periodo = str(datetime.now(UTC).year)
+        periodo = str(utcnow().year - 1)
+        logger.info("comtrade_default_periodo", periodo=periodo)
     period_str = str(periodo)
 
     logger.info(

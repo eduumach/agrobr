@@ -7,6 +7,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.normalize.regions import normalizar_bioma
 from agrobr.utils.result import build_source_meta, finalize_result
 
 from . import client, parser
@@ -48,6 +49,7 @@ async def prodes(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
+    bioma = normalizar_bioma(bioma)
     logger.info("desmatamento_prodes", bioma=bioma, ano=ano, uf=uf)
 
     t0 = time.monotonic()
@@ -104,6 +106,7 @@ async def prodes_geo(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> Any:
+    bioma = normalizar_bioma(bioma)
     logger.info("desmatamento_prodes_geo", bioma=bioma, ano=ano, uf=uf)
 
     t0 = time.monotonic()
@@ -172,6 +175,7 @@ async def deter(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
+    bioma = normalizar_bioma(bioma)
     logger.info(
         "desmatamento_deter",
         bioma=bioma,
@@ -242,6 +246,7 @@ async def deter_geo(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> Any:
+    bioma = normalizar_bioma(bioma)
     logger.info(
         "desmatamento_deter_geo",
         bioma=bioma,

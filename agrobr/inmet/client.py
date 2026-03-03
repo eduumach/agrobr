@@ -8,6 +8,7 @@ import httpx
 import structlog
 
 from agrobr.constants import RETRIABLE_STATUS_CODES, URLS, Fonte
+from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.retry import retry_on_status
 from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
@@ -58,7 +59,16 @@ async def _get_json(
             logger.info("inmet_no_content", path=path)
             return []
 
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 403:
+                raise SourceUnavailableError(
+                    source="inmet",
+                    url=url,
+                    last_error="HTTP 403 Forbidden — defina AGROBR_INMET_TOKEN",
+                ) from e
+            raise
         data = response.json()
         if not isinstance(data, list):
             return []
@@ -176,6 +186,8 @@ async def fetch_dados_estacoes_uf(
             async with semaphore:
                 try:
                     return await fetch_dados_estacao(codigo, inicio, fim, http=shared)
+                except SourceUnavailableError:
+                    raise
                 except (httpx.HTTPError, httpx.TimeoutException) as e:
                     logger.warning(
                         "inmet_station_error",

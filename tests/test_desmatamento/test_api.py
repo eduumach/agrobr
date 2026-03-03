@@ -105,6 +105,19 @@ class TestProdes:
 
         assert len(df) == 0
 
+    @pytest.mark.asyncio
+    async def test_bioma_normalization(self):
+        csv_bytes = _prodes_csv_bytes()
+        with patch.object(
+            api.client,
+            "fetch_prodes",
+            new_callable=AsyncMock,
+            return_value=(csv_bytes, "https://terrabrasilis.dpi.inpe.br/geoserver/prodes.csv"),
+        ) as mock_fetch:
+            await api.prodes(bioma="cerrado")
+
+        assert mock_fetch.call_args[0][0] == "Cerrado"
+
 
 class TestDeter:
     @pytest.mark.asyncio
@@ -171,6 +184,19 @@ class TestDeter:
         assert (df["classe"] == "DEGRADACAO").all()
 
     @pytest.mark.asyncio
+    async def test_bioma_normalization(self):
+        csv_bytes = _deter_csv_bytes()
+        with patch.object(
+            api.client,
+            "fetch_deter",
+            new_callable=AsyncMock,
+            return_value=(csv_bytes, "https://terrabrasilis.dpi.inpe.br/geoserver/deter.csv"),
+        ) as mock_fetch:
+            await api.deter(bioma="amazonia")
+
+        assert mock_fetch.call_args[0][0] == "Amazônia"
+
+    @pytest.mark.asyncio
     async def test_empty_filter(self):
         csv_bytes = _deter_csv_bytes()
         with patch.object(
@@ -188,6 +214,22 @@ gpd = pytest.importorskip("geopandas")
 
 
 class TestProdesGeo:
+    @pytest.mark.asyncio
+    async def test_bioma_normalization(self):
+        geojson_bytes = _prodes_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_prodes_geo",
+            new_callable=AsyncMock,
+            return_value=(
+                geojson_bytes,
+                "https://terrabrasilis.dpi.inpe.br/geoserver/prodes.geojson",
+            ),
+        ) as mock_fetch:
+            await api.prodes_geo(bioma="cerrado")
+
+        assert mock_fetch.call_args[0][0] == "Cerrado"
+
     @pytest.mark.asyncio
     async def test_returns_geodataframe(self):
         geojson_bytes = _prodes_geojson_bytes()
@@ -280,6 +322,22 @@ class TestProdesGeo:
 
 
 class TestDeterGeo:
+    @pytest.mark.asyncio
+    async def test_bioma_normalization(self):
+        geojson_bytes = _deter_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_deter_geo",
+            new_callable=AsyncMock,
+            return_value=(
+                geojson_bytes,
+                "https://terrabrasilis.dpi.inpe.br/geoserver/deter.geojson",
+            ),
+        ) as mock_fetch:
+            await api.deter_geo(bioma="amazonia")
+
+        assert mock_fetch.call_args[0][0] == "Amazônia"
+
     @pytest.mark.asyncio
     async def test_returns_geodataframe(self):
         geojson_bytes = _deter_geojson_bytes()

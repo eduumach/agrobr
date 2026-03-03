@@ -61,7 +61,9 @@ class TestComercio:
         assert meta.records_count == 8
 
     @pytest.mark.asyncio
-    async def test_default_periodo(self):
+    async def test_default_periodo_is_previous_year(self):
+        from agrobr.utils.time import utcnow
+
         with patch(
             "agrobr.comtrade.client.fetch_trade_data",
             new_callable=AsyncMock,
@@ -70,7 +72,7 @@ class TestComercio:
             await api.comercio("soja")
 
         call_kwargs = mock_fetch.call_args.kwargs
-        assert call_kwargs["period"].isdigit()
+        assert call_kwargs["period"] == str(utcnow().year - 1)
 
     @pytest.mark.asyncio
     async def test_partner_none_means_world(self):

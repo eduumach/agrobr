@@ -27,10 +27,13 @@ from .municipalities import (
 )
 from .numeric import parse_numeric_br, safe_float
 from .regions import (
+    BIOMAS,
+    BIOMAS_VALIDOS,
     UFS_VALIDAS,
     ibge_para_uf,
     listar_regioes,
     listar_ufs,
+    normalizar_bioma,
     normalizar_municipio,
     normalizar_praca,
     normalizar_uf,
@@ -48,6 +51,8 @@ from .units import (
 )
 
 __all__: list[str] = [
+    "BIOMAS",
+    "BIOMAS_VALIDOS",
     "MESES_PT",
     "UFS_VALIDAS",
     "buscar_municipios",
@@ -64,6 +69,7 @@ __all__: list[str] = [
     "listar_regioes",
     "listar_ufs",
     "municipio_para_ibge",
+    "normalizar_bioma",
     "normalizar_cultura",
     "normalizar_municipio",
     "normalizar_praca",

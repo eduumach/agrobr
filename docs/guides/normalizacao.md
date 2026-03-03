@@ -1,6 +1,6 @@
 # Normalização
 
-O módulo `agrobr.normalize` padroniza dados agrícolas brasileiros para garantir cruzamento entre fontes diferentes. São 37 funções organizadas em 7 sub-módulos.
+O módulo `agrobr.normalize` padroniza dados agrícolas brasileiros para garantir cruzamento entre fontes diferentes. São 38 funções organizadas em 7 sub-módulos.
 
 ## Municípios IBGE
 
@@ -86,6 +86,23 @@ validar_uf("XX")               # False
 
 listar_ufs()                   # ['AC', 'AL', 'AM', ..., 'TO']
 listar_regioes()               # ['Centro-Oeste', 'Nordeste', 'Norte', 'Sudeste', 'Sul']
+```
+
+## Biomas
+
+6 biomas brasileiros. Aceita com/sem acento, case insensitive. Usada automaticamente em `desmatamento`, `queimadas` e `mapbiomas`.
+
+```python
+from agrobr.normalize import normalizar_bioma, BIOMAS_VALIDOS
+
+normalizar_bioma("amazonia")        # "Amazônia"
+normalizar_bioma("cerrado")         # "Cerrado"
+normalizar_bioma("mata atlantica")  # "Mata Atlântica"
+normalizar_bioma("  Caatinga  ")    # "Caatinga"
+normalizar_bioma("desconhecido")    # "desconhecido" (passthrough)
+
+BIOMAS_VALIDOS
+# {'Amazônia', 'Caatinga', 'Cerrado', 'Mata Atlântica', 'Pampa', 'Pantanal'}
 ```
 
 ## Safras
@@ -180,7 +197,7 @@ parse_numeric_br("abc")          # None (inválido retorna None)
 |---|---|---|
 | `municipalities` | `municipio_para_ibge`, `ibge_para_municipio`, `buscar_municipios`, `total_municipios` | 5571 municípios |
 | `crops` | `normalizar_cultura`, `listar_culturas`, `is_cultura_valida` | 144 variantes, 35 canônicas |
-| `regions` | `normalizar_uf`, `validar_uf`, `uf_para_nome`, `uf_para_regiao`, `uf_para_ibge`, `ibge_para_uf`, `listar_ufs`, `listar_regioes`, `normalizar_municipio`, `normalizar_praca` | 27 UFs |
+| `regions` | `normalizar_uf`, `validar_uf`, `uf_para_nome`, `uf_para_regiao`, `uf_para_ibge`, `ibge_para_uf`, `listar_ufs`, `listar_regioes`, `normalizar_municipio`, `normalizar_praca`, `normalizar_bioma` | 27 UFs, 6 biomas |
 | `dates` | `safra_atual`, `normalizar_safra`, `validar_safra`, `safra_para_anos`, `anos_para_safra`, `safra_anterior`, `safra_posterior`, `periodo_safra`, `lista_safras` | Safras Jul-Jun |
 | `units` | `converter`, `sacas_para_toneladas`, `toneladas_para_sacas`, `preco_saca_para_tonelada`, `preco_tonelada_para_saca` | sc, ton, bu, @, ha |
 | `encoding` | `detect_encoding`, `decode_content`, `detect_encoding_chain` | ISO-8859-1, CP1252, UTF-8 |

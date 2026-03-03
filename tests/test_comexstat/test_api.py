@@ -19,6 +19,18 @@ def _mock_csv():
 
 class TestExportacao:
     @pytest.mark.asyncio
+    async def test_default_ano_is_previous_year(self):
+        from agrobr.utils.time import utcnow
+
+        with patch.object(
+            api.client, "fetch_exportacao_csv", new_callable=AsyncMock, return_value=_mock_csv()
+        ) as mock_fetch:
+            await api.exportacao("soja")
+
+        expected_ano = utcnow().year - 1
+        assert mock_fetch.call_args[0][0] == expected_ano
+
+    @pytest.mark.asyncio
     async def test_returns_dataframe(self):
         with patch.object(
             api.client, "fetch_exportacao_csv", new_callable=AsyncMock, return_value=_mock_csv()
