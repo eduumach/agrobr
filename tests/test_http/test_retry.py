@@ -8,12 +8,15 @@ from unittest.mock import AsyncMock, patch
 import httpx
 import pytest
 
+from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.retry import (
     RETRIABLE_EXCEPTIONS,
     retry_async,
+    retry_on_status,
     should_retry_status,
     with_retry,
 )
+from tests.helpers import RETRY_SLEEP, make_mock_response
 
 
 class TestRetryAsync:
@@ -183,3 +186,79 @@ class TestRetriableExceptions:
 
     def test_http_status_error_not_retriable_by_default(self):
         assert httpx.HTTPStatusError not in RETRIABLE_EXCEPTIONS
+
+
+class TestRetryOnStatusTransport:
+    @pytest.mark.asyncio
+    async def test_timeout_retried_then_succeeds(self):
+        resp_ok = make_mock_response(200)
+        call_count = 0
+
+        async def func() -> httpx.Response:
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                raise httpx.TimeoutException("read timeout")
+            return resp_ok
+
+        with patch(RETRY_SLEEP, new_callable=AsyncMock):
+            result = await retry_on_status(func, source="test", max_attempts=3)
+
+        assert result.status_code == 200
+        assert call_count == 2
+
+    @pytest.mark.asyncio
+    async def test_transport_exhausted_raises_source_unavailable(self):
+        call_count = 0
+
+        async def func() -> httpx.Response:
+            nonlocal call_count
+            call_count += 1
+            raise httpx.TimeoutException("timeout")
+
+        with (
+            patch(RETRY_SLEEP, new_callable=AsyncMock),
+            pytest.raises(SourceUnavailableError, match="after 3 retries"),
+        ):
+            await retry_on_status(func, source="test", max_attempts=3)
+
+        assert call_count == 3
+
+    @pytest.mark.asyncio
+    async def test_network_error_retried(self):
+        resp_ok = make_mock_response(200)
+        call_count = 0
+
+        async def func() -> httpx.Response:
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                raise httpx.ConnectError("connection refused")
+            return resp_ok
+
+        with patch(RETRY_SLEEP, new_callable=AsyncMock):
+            result = await retry_on_status(func, source="test", max_attempts=3)
+
+        assert result.status_code == 200
+        assert call_count == 2
+
+    @pytest.mark.asyncio
+    async def test_mixed_transport_and_status(self):
+        resp_500 = make_mock_response(500)
+        resp_ok = make_mock_response(200)
+        call_count = 0
+
+        async def func() -> httpx.Response:
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                raise httpx.TimeoutException("timeout")
+            if call_count == 2:
+                return resp_500
+            return resp_ok
+
+        with patch(RETRY_SLEEP, new_callable=AsyncMock):
+            result = await retry_on_status(func, source="test", max_attempts=4)
+
+        assert result.status_code == 200
+        assert call_count == 3

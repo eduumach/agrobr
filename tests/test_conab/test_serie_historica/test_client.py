@@ -9,7 +9,7 @@ import pytest
 
 from agrobr.conab.serie_historica import client
 from agrobr.exceptions import SourceUnavailableError
-from tests.helpers import make_mock_async_client, make_mock_response
+from tests.helpers import RETRY_SLEEP, make_mock_async_client, make_mock_response
 
 _URL = "https://www.gov.br/conab/test"
 _HEADERS = {"content-type": "application/vnd.ms-excel"}
@@ -35,7 +35,8 @@ class TestConabSerieTimeout:
             patch(
                 "agrobr.conab.serie_historica.client.httpx.AsyncClient", return_value=mock_client
             ),
-            pytest.raises(SourceUnavailableError, match="conab_serie_historica"),
+            patch(RETRY_SLEEP, new_callable=AsyncMock),
+            pytest.raises(SourceUnavailableError, match="conab_serie"),
         ):
             await client.download_xls("soja")
 

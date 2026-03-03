@@ -19,17 +19,18 @@ from tests.helpers import (
 
 class TestDeralTimeout:
     @pytest.mark.asyncio
-    async def test_timeout_propagates_immediately(self):
+    async def test_timeout_retried_raises_source_unavailable(self):
         mock_client = make_mock_async_client()
         mock_client.get.side_effect = httpx.TimeoutException("connect timeout")
 
         with (
             patch("agrobr.deral.client.httpx.AsyncClient", return_value=mock_client),
-            pytest.raises(httpx.TimeoutException),
+            patch(RETRY_SLEEP, new_callable=AsyncMock),
+            pytest.raises(SourceUnavailableError),
         ):
             await client._fetch_bytes("https://test.pr.gov.br/PC.xls")
 
-        assert mock_client.get.call_count == 1
+        assert mock_client.get.call_count == 3
 
 
 class TestDeralHTTPErrors:

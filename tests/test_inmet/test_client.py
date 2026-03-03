@@ -10,7 +10,7 @@ import pytest
 
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.inmet import client
-from tests.helpers import make_mock_async_client, make_mock_response
+from tests.helpers import RETRY_SLEEP, make_mock_async_client, make_mock_response
 
 
 class TestInmetTimeout:
@@ -21,7 +21,8 @@ class TestInmetTimeout:
 
         with (
             patch("agrobr.inmet.client.httpx.AsyncClient", return_value=mock_client),
-            pytest.raises(httpx.TimeoutException),
+            patch(RETRY_SLEEP, new_callable=AsyncMock),
+            pytest.raises(SourceUnavailableError),
         ):
             await client._get_json("/estacoes/T")
 
@@ -32,7 +33,8 @@ class TestInmetTimeout:
 
         with (
             patch("agrobr.inmet.client.httpx.AsyncClient", return_value=mock_client),
-            pytest.raises(httpx.TimeoutException),
+            patch(RETRY_SLEEP, new_callable=AsyncMock),
+            pytest.raises(SourceUnavailableError),
         ):
             await client.fetch_estacoes("T")
 

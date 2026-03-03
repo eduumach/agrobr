@@ -19,17 +19,18 @@ from tests.helpers import (
 
 class TestAbioveTimeout:
     @pytest.mark.asyncio
-    async def test_timeout_propagates_immediately(self):
+    async def test_timeout_retried_raises_source_unavailable(self):
         mock_client = make_mock_async_client()
         mock_client.get.side_effect = httpx.TimeoutException("connect timeout")
 
         with (
             patch("agrobr.abiove.client.httpx.AsyncClient", return_value=mock_client),
-            pytest.raises(httpx.TimeoutException),
+            patch(RETRY_SLEEP, new_callable=AsyncMock),
+            pytest.raises(SourceUnavailableError),
         ):
             await client._fetch_url("https://abiove.org.br/test.xlsx")
 
-        assert mock_client.get.call_count == 1
+        assert mock_client.get.call_count == 3
 
 
 class TestAbioveHTTPErrors:
@@ -138,17 +139,18 @@ class TestAbioveRetry:
 
 class TestAbioveConnectError:
     @pytest.mark.asyncio
-    async def test_connect_error_propagates_immediately(self):
+    async def test_connect_error_retried_raises_source_unavailable(self):
         mock_client = make_mock_async_client()
         mock_client.get.side_effect = httpx.ConnectError("connection refused")
 
         with (
             patch("agrobr.abiove.client.httpx.AsyncClient", return_value=mock_client),
-            pytest.raises(httpx.ConnectError),
+            patch(RETRY_SLEEP, new_callable=AsyncMock),
+            pytest.raises(SourceUnavailableError),
         ):
             await client._fetch_url("https://abiove.org.br/test.xlsx")
 
-        assert mock_client.get.call_count == 1
+        assert mock_client.get.call_count == 3
 
 
 class TestFetchExportacaoExcel:

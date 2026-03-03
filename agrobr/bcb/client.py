@@ -176,8 +176,8 @@ async def fetch_credito_rural_with_fallback(
         )
         return records, "odata"
 
-    except SourceUnavailableError as odata_err:
-        odata_error_msg = odata_err.last_error
+    except (SourceUnavailableError, httpx.HTTPStatusError) as odata_err:
+        odata_error_msg = getattr(odata_err, "last_error", str(odata_err))
         logger.warning(
             "bcb_odata_fallback",
             error=str(odata_err),

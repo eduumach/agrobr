@@ -27,6 +27,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **utils/html** — `parse_links_from_html()` canonico para extracao de links HTML com filtro regex, dedup e base_url. Substitui 3 implementacoes em anda/client, conab/serie_historica/client, conab/custo_producao/client (~120 linhas)
 - **normalize/regions** — `normalizar_bioma()`, `BIOMAS` e `BIOMAS_VALIDOS` canonicos. Substitui 3 implementacoes identicas em desmatamento/models, mapbiomas/models, queimadas/models (~45 linhas). Re-exports mantidos para backward compat. Exportado em `agrobr.normalize` como API publica
 - **desmatamento/api** — `normalizar_bioma()` wired nos 4 entry points (`prodes`, `prodes_geo`, `deter`, `deter_geo`). Parametro `bioma` aceita lowercase/sem acento (ex: `"cerrado"` → `"Cerrado"`, `"amazonia"` → `"Amazônia"`)
+- **http/retry** — `retry_on_status()` agora captura transport exceptions (`TimeoutException`, `NetworkError`, `RemoteProtocolError`) com retry exponencial. Antes: zero retries para falhas de rede, excecao crua propagava. Agora: retries com backoff identico ao de status codes retriable, `SourceUnavailableError` no exhaustion. 24+ source clients beneficiados automaticamente
 - **inmet/client** — HTTP 403 agora levanta `SourceUnavailableError` com mensagem sobre `AGROBR_INMET_TOKEN` em vez de `httpx.HTTPStatusError` generico. `fetch_dados_estacoes_uf` propaga 403 em vez de engolir silenciosamente
 - **http/rate_limiter** — `RateLimiter` com concorrencia configuravel via `HTTPSettings.max_concurrent_{source}`. `Semaphore(1)` hardcoded substituido por `Semaphore(config)`. Pattern "burst then pause": N requests simultaneos seguidos de pausa de rate_limit delay. Default 1 (zero mudanca de comportamento para fontes nao configuradas). B3 e IBGE configurados com concorrencia 3
 - **b3/api** — `historico()` e `oi_historico()` migrados de while-loop sequencial + `asyncio.sleep(1.0)` para `asyncio.gather()` com lista de weekdays. Rate limiting delegado ao RateLimiter (Semaphore(3) para B3). ~4.4x speedup esperado (22 dias: ~44s → ~10s)
@@ -82,6 +83,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **comexstat/api** — `exportacao()` default `ano` corrigido de ano corrente para `utcnow().year - 1`. Import migrado de `datetime.now()` local para `utcnow()` UTC
 - **datasets/exportacao** — fallback ABIOVE default `ano` corrigido para `utcnow().year - 1`
 - **conab/custo_producao** — 2 `datetime.now(UTC)` restantes em `custo_producao_total()` migrados para `utcnow()`. Import `datetime`/`UTC` removido
+- **bcb/client** — `fetch_credito_rural_with_fallback()` agora captura `httpx.HTTPStatusError` (403/404) alem de `SourceUnavailableError`, acionando BigQuery fallback. Antes: HTTP 403 de `raise_for_status()` propagava sem tentar fallback
 
 ## [0.12.0] - 2026-02-28
 

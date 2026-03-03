@@ -97,8 +97,24 @@ async def retry_on_status(
     last_response: httpx.Response | None = None
 
     for attempt in range(_max):
-        async with RateLimiter.acquire(source):
-            response = await func()
+        try:
+            async with RateLimiter.acquire(source):
+                response = await func()
+        except RETRIABLE_EXCEPTIONS as exc:
+            if attempt < _max - 1:
+                delay = min(_base * (settings.retry_exponential_base**attempt), _cap)
+                logger.warning(
+                    f"{source}_retry",
+                    attempt=attempt + 1,
+                    error=str(exc),
+                    delay=delay,
+                )
+                await asyncio.sleep(delay)
+                continue
+            raise SourceUnavailableError(
+                source=source,
+                last_error=f"{type(exc).__name__}: {exc} after {_max} retries",
+            ) from exc
 
         if not should_retry_status(response.status_code):
             return response

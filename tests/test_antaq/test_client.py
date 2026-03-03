@@ -11,9 +11,7 @@ import pytest
 
 from agrobr.antaq import client
 from agrobr.exceptions import SourceUnavailableError
-from tests.helpers import make_mock_async_client, make_mock_response
-
-RETRY_SLEEP = "agrobr.http.retry.asyncio.sleep"
+from tests.helpers import RETRY_SLEEP, make_mock_async_client, make_mock_response
 
 _ANTAQ_URL = "https://web3.antaq.gov.br/ea/txt/2024.zip"
 
@@ -53,15 +51,18 @@ class TestDownloadZip:
         assert result == zip_bytes
 
     @pytest.mark.asyncio
-    async def test_timeout_raises(self):
+    async def test_timeout_retried_raises_source_unavailable(self):
         mock_client = make_mock_async_client()
         mock_client.get = AsyncMock(side_effect=httpx.TimeoutException("timeout"))
 
         with (
             patch("agrobr.antaq.client.httpx.AsyncClient", return_value=mock_client),
-            pytest.raises(httpx.TimeoutException),
+            patch(RETRY_SLEEP, new_callable=AsyncMock),
+            pytest.raises(SourceUnavailableError),
         ):
             await client._download_zip(_ANTAQ_URL)
+
+        assert mock_client.get.call_count == 3
 
     @pytest.mark.asyncio
     async def test_500_retries_then_raises(self):

@@ -19,17 +19,18 @@ from tests.helpers import (
 
 class TestBcbTimeout:
     @pytest.mark.asyncio
-    async def test_timeout_propagates_immediately(self):
+    async def test_timeout_retried_raises_source_unavailable(self):
         mock_client = make_mock_async_client()
         mock_client.get.side_effect = httpx.TimeoutException("read timeout")
 
         with (
             patch("agrobr.bcb.client.httpx.AsyncClient", return_value=mock_client),
-            pytest.raises(httpx.TimeoutException),
+            patch(RETRY_SLEEP, new_callable=AsyncMock),
+            pytest.raises(SourceUnavailableError),
         ):
             await client._fetch_odata("CusteioRegiaoUFProduto")
 
-        assert mock_client.get.call_count == 1
+        assert mock_client.get.call_count == client.BCB_MAX_RETRIES
 
 
 class TestBcbHTTPErrors:
@@ -161,3 +162,58 @@ class TestBcbFallback:
 
             assert source == "bigquery"
             assert records == [{"id": 1}]
+
+    @pytest.mark.asyncio
+    async def test_http_403_triggers_bigquery_fallback(self):
+        resp_403 = make_mock_response(403, json_data={"value": []})
+        mock_client = make_mock_async_client()
+        mock_client.get = AsyncMock(return_value=resp_403)
+
+        with (
+            patch("agrobr.bcb.client.httpx.AsyncClient", return_value=mock_client),
+            patch(
+                "agrobr.bcb.bigquery_client.fetch_credito_rural_bigquery",
+                new_callable=AsyncMock,
+            ) as mock_bq,
+        ):
+            mock_bq.return_value = [{"id": 2}]
+            records, source = await client.fetch_credito_rural_with_fallback()
+
+        assert source == "bigquery"
+        assert records == [{"id": 2}]
+
+    @pytest.mark.asyncio
+    async def test_network_error_triggers_bigquery_fallback(self):
+        with (
+            patch("agrobr.bcb.client.fetch_credito_rural", new_callable=AsyncMock) as mock_odata,
+            patch(
+                "agrobr.bcb.bigquery_client.fetch_credito_rural_bigquery",
+                new_callable=AsyncMock,
+            ) as mock_bq,
+        ):
+            mock_odata.side_effect = SourceUnavailableError(
+                source="bcb", last_error="ConnectError: connection refused after 6 retries"
+            )
+            mock_bq.return_value = [{"id": 3}]
+            records, source = await client.fetch_credito_rural_with_fallback()
+
+            assert source == "bigquery"
+            assert records == [{"id": 3}]
+
+    @pytest.mark.asyncio
+    async def test_timeout_triggers_bigquery_fallback(self):
+        with (
+            patch("agrobr.bcb.client.fetch_credito_rural", new_callable=AsyncMock) as mock_odata,
+            patch(
+                "agrobr.bcb.bigquery_client.fetch_credito_rural_bigquery",
+                new_callable=AsyncMock,
+            ) as mock_bq,
+        ):
+            mock_odata.side_effect = SourceUnavailableError(
+                source="bcb", last_error="TimeoutException: read timeout after 6 retries"
+            )
+            mock_bq.return_value = [{"id": 4}]
+            records, source = await client.fetch_credito_rural_with_fallback()
+
+            assert source == "bigquery"
+            assert records == [{"id": 4}]

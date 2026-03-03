@@ -10,7 +10,7 @@ import pytest
 
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.nasa_power import client
-from tests.helpers import make_mock_async_client, make_mock_response
+from tests.helpers import RETRY_SLEEP, make_mock_async_client, make_mock_response
 
 
 class TestNasaPowerTimeout:
@@ -21,7 +21,8 @@ class TestNasaPowerTimeout:
 
         with (
             patch("agrobr.nasa_power.client.httpx.AsyncClient", return_value=mock_client),
-            pytest.raises(httpx.TimeoutException),
+            patch(RETRY_SLEEP, new_callable=AsyncMock),
+            pytest.raises(SourceUnavailableError),
         ):
             await client._get_json({"parameters": "T2M", "format": "JSON"})
 
