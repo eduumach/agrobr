@@ -26,6 +26,12 @@ _RENAME_MAP = {
 
 _REQUIRED_COLUMNS = {"Nome_cultura", "geocodigo", "dec1", "SafraIni", "SafraFin"}
 
+_USECOLS = (
+    {"Nome_cultura", "SafraIni", "SafraFin", "geocodigo", "municipio"}
+    | set(_RENAME_MAP.keys())
+    | {f"dec{i}" for i in range(1, 37)}
+)
+
 
 def _build_safra(row: pd.Series) -> str:
     ini = str(row.get("SafraIni", "")).strip()
@@ -48,24 +54,29 @@ def parse_tabua_risco(csv_bytes: bytes) -> pd.DataFrame:
     encoding = detect_encoding_chain(csv_bytes)
     text = csv_bytes.decode(encoding)
 
-    df = pd.read_csv(
-        StringIO(text),
-        sep=";",
-        dtype=str,
-        low_memory=False,
-        on_bad_lines="skip",
-    )
+    df_probe = pd.read_csv(StringIO(text), sep=";", nrows=0)
+    available = set(df_probe.columns)
 
-    if df.empty:
-        return pd.DataFrame(columns=COLUNAS_SAIDA)
-
-    missing = _REQUIRED_COLUMNS - set(df.columns)
+    missing = _REQUIRED_COLUMNS - available
     if missing:
         raise ParseError(
             source="zarc",
             parser_version=PARSER_VERSION,
             reason=f"Missing columns: {missing}",
         )
+
+    usecols = sorted(_USECOLS & available)
+    df = pd.read_csv(
+        StringIO(text),
+        sep=";",
+        dtype=str,
+        usecols=usecols,
+        low_memory=False,
+        on_bad_lines="skip",
+    )
+
+    if df.empty:
+        return pd.DataFrame(columns=COLUNAS_SAIDA)
 
     df = df.rename(columns=_RENAME_MAP)
 

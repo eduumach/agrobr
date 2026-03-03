@@ -15,6 +15,7 @@ from .models import CULTURAS_ZARC, extract_safras
 
 logger = structlog.get_logger()
 
+_MAX_CACHED_SAFRAS = 2
 _cache: dict[str, pd.DataFrame] = {}
 
 
@@ -92,6 +93,8 @@ async def zoneamento(
         fetch_ms = int((time.monotonic() - t0) * 1000)
 
         df = parser.parse_tabua_risco(csv_bytes)
+        if len(_cache) >= _MAX_CACHED_SAFRAS:
+            _cache.pop(next(iter(_cache)))
         _cache[safra] = df
         df = df.copy()
 
