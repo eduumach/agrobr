@@ -115,6 +115,25 @@ def _make_format_c_xlsx() -> BytesIO:
     return _make_xlsx(rows)
 
 
+def _make_format_d_xlsx() -> BytesIO:
+    rows = [
+        ["CUSTO DE PRODUÇÃO - ABACAXI - TO", None, None, None],
+        [None, None, None, None],
+        [None, None, None, None],
+        [None, None, None, None],
+        ["Produtividade Média: 30.000 kg/ha", None, None, None],
+        [None, "A PREÇOS DE:", "Abril/2014", "PARTICI-"],
+        ["DISCRIMINAÇÃO", None, None, "PAÇÃO"],
+        [None, "R$/ha", "R$/1000 kg", "(%)"],
+        ["I - DESPESAS DO CUSTEIO", None, None, None],
+        ["Mudas", 1200.00, 40.00, 25.0],
+        ["Fertilizantes", 800.00, 26.67, 16.7],
+        ["Herbicidas", 300.00, 10.00, 6.3],
+        ["CUSTO OPERACIONAL EFETIVO (COE)", 4800.00, None, None],
+    ]
+    return _make_xlsx(rows)
+
+
 class TestSafeFloat:
     def test_int(self):
         assert safe_float(10, strip=("R$", "%")) == 10.0
@@ -186,6 +205,31 @@ class TestFindHeader:
         data_start, headers = _find_header(df_raw)
         assert data_start == 3
         assert any("discriminação" in h.lower() for h in headers if h)
+
+    def test_find_header_format_d_multirow(self):
+        xlsx = _make_format_d_xlsx()
+        df_raw = pd.read_excel(xlsx, header=None)
+        data_start, headers = _find_header(df_raw)
+        assert data_start == 8
+        assert any("discriminação" in h.lower() for h in headers if h)
+        assert any("r$/ha" in h.lower() for h in headers if h)
+        col_map = _identify_columns(headers)
+        assert "item" in col_map
+        assert "valor_ha" in col_map
+
+    def test_find_header_prefers_best_candidate(self):
+        rows = [
+            [None, "A PREÇOS DE:", "data", "PARTICI-"],
+            ["DISCRIMINAÇÃO", None, None, "PAÇÃO"],
+            [None, "R$/ha", "R$/kg", "(%)"],
+            ["Sementes", 100.0, 5.0, 10.0],
+        ]
+        df = pd.DataFrame(rows)
+        data_start, headers = _find_header(df)
+        assert data_start == 3
+        col_map = _identify_columns(headers)
+        assert "item" in col_map
+        assert "valor_ha" in col_map
 
 
 class TestIdentifyColumns:
@@ -418,6 +462,16 @@ class TestParsePlanilha:
         assert mudas[0].valor_ha == pytest.approx(250.0)
         assert custo_total is not None
         assert custo_total.coe_ha == pytest.approx(1380.0)
+
+    def test_parse_format_d_multirow_header(self):
+        xlsx = _make_format_d_xlsx()
+        items, custo_total = parse_planilha(xlsx, cultura="abacaxi", uf="TO", safra="2013/14")
+        assert len(items) >= 3
+        mudas = [i for i in items if "muda" in i.item.lower()]
+        assert len(mudas) == 1
+        assert mudas[0].valor_ha == pytest.approx(1200.0)
+        assert custo_total is not None
+        assert custo_total.coe_ha == pytest.approx(4800.0)
 
 
 class TestItemsToDataframe:

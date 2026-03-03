@@ -155,11 +155,17 @@ totais = await conab.custo_producao_total("soja", uf="MT", safra="2024/25")
 | `valor_ha` | float | Valor por hectare (R$/ha) |
 | `unidade` | str | Unidade do item |
 
-### Status (fev/2026)
+### Status (mar/2026)
 
 As planilhas de graos (soja, milho, cafe, algodao) no gov.br sao carregadas
 via JavaScript dinamico e nao possuem links .xlsx acessiveis via scraping.
-Culturas menores (abacaxi, acai, etc.) funcionam normalmente.
+Culturas especiais (abacaxi, banana, cebola, cacau, tomate, etc.) funcionam normalmente.
+
+O parser (v2) suporta 4 formatos de planilha:
+- **Formato padrao** — header em 1 linha (Item/Especificacao, Unidade, Valor Total/ha)
+- **Formato A** — header split em 2 linhas (DISCRIMINACAO + R$/ha em linhas separadas)
+- **Formato C** — header compacto 1 linha (DISCRIMINACAO, CUSTO POR HA, CUSTO/kg)
+- **Formato D** — header split em 3 linhas (A PRECOS DE + DISCRIMINACAO + R$/ha). Deteccao via best-quality selection entre candidatos 2-row
 
 ## Serie Historica (v0.8.0)
 

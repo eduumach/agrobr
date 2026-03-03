@@ -63,6 +63,8 @@ def _find_header(df_raw: pd.DataFrame) -> tuple[int, list[str]]:
             headers = [str(v) if pd.notna(v) else "" for v in df_raw.iloc[idx]]
             return idx + 1, headers
 
+    best: tuple[int, list[str]] | None = None
+    best_quality = (0, 0)
     for idx in range(limit - 1):
         r1 = df_raw.iloc[idx]
         r2 = df_raw.iloc[idx + 1]
@@ -73,8 +75,17 @@ def _find_header(df_raw: pd.DataFrame) -> tuple[int, list[str]]:
             for c in range(len(r1))
         ]
         combined_text = " ".join(v.lower().strip() for v in merged if v)
-        if sum(1 for kw in keywords if kw in combined_text) >= 2:
-            return idx + 2, merged
+        if sum(1 for kw in keywords if kw in combined_text) < 2:
+            continue
+        col_map = _identify_columns(merged)
+        has_required = "item" in col_map and "valor_ha" in col_map
+        quality = (int(has_required), len(col_map))
+        if quality > best_quality:
+            best_quality = quality
+            best = (idx + 2, merged)
+
+    if best is not None:
+        return best
 
     raise ParseError(
         source="conab_custo",
