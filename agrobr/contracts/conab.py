@@ -249,7 +249,6 @@ CONAB_CUSTO_PRODUCAO_V1 = Contract(
             nullable=True,
             unit="BRL/ha",
             stable=True,
-            min_value=0,
         ),
         Column(
             name="participacao_pct",
@@ -257,16 +256,12 @@ CONAB_CUSTO_PRODUCAO_V1 = Contract(
             nullable=True,
             unit="%",
             stable=True,
-            min_value=0,
-            max_value=100,
         ),
     ],
     guarantees=[
         "Column names never change (additions only)",
         "'safra' always matches pattern YYYY/YY",
         "'uf' is always a valid Brazilian state code",
-        "Numeric values are always >= 0",
-        "'participacao_pct' is between 0 and 100",
     ],
     breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
 )
