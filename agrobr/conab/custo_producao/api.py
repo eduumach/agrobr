@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from io import BytesIO
 from typing import Any, Literal, overload
 
 import pandas as pd
@@ -11,9 +12,32 @@ from agrobr.utils.result import build_source_meta, finalize_result
 from agrobr.utils.time import utcnow
 
 from . import client
-from .parser import PARSER_VERSION, items_to_dataframe, parse_planilha
+from .parser import (
+    PARSER_VERSION,
+    _parse_sheet_info,
+    items_to_dataframe,
+    parse_planilha,
+    select_data_sheet,
+)
 
 logger = structlog.get_logger()
+
+
+def _resolve_sheet_context(
+    xlsx: bytes | BytesIO,
+    metadata: dict[str, Any],
+    uf: str | None,
+    safra: str | None,
+) -> tuple[str, str, str]:
+    sheet = select_data_sheet(xlsx, uf=uf, safra=safra)
+    sheet_uf, sheet_year = _parse_sheet_info(sheet)
+    resolved_uf = metadata.get("uf") or sheet_uf or uf or "BR"
+    resolved_safra = (
+        metadata.get("safra")
+        or safra
+        or (f"{sheet_year}/{(int(sheet_year[-2:]) + 1) % 100:02d}" if sheet_year else "latest")
+    )
+    return sheet, resolved_uf, resolved_safra
 
 
 @overload
@@ -64,8 +88,7 @@ async def custo_producao(
         safra=safra,
     )
 
-    resolved_uf = metadata.get("uf", uf or "BR")
-    resolved_safra = metadata.get("safra", safra or "latest")
+    sheet, resolved_uf, resolved_safra = _resolve_sheet_context(xlsx, metadata, uf, safra)
 
     t1 = time.monotonic()
     items, custo_total = parse_planilha(
@@ -74,6 +97,7 @@ async def custo_producao(
         uf=resolved_uf,
         safra=resolved_safra,
         tecnologia=tecnologia,
+        sheet_name=sheet,
     )
     parse_ms = int((time.monotonic() - t1) * 1000)
 
@@ -148,8 +172,7 @@ async def custo_producao_total(
         safra=safra,
     )
 
-    resolved_uf = metadata.get("uf", uf or "BR")
-    resolved_safra = metadata.get("safra", safra or "latest")
+    sheet, resolved_uf, resolved_safra = _resolve_sheet_context(xlsx, metadata, uf, safra)
 
     t1 = time.monotonic()
     _, custo_total = parse_planilha(
@@ -158,6 +181,7 @@ async def custo_producao_total(
         uf=resolved_uf,
         safra=resolved_safra,
         tecnologia=tecnologia,
+        sheet_name=sheet,
     )
     parse_ms = int((time.monotonic() - t1) * 1000)
     fetch_ms = int((time.monotonic() - t0) * 1000)

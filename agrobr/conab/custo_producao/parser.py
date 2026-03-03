@@ -8,16 +8,23 @@ import structlog
 
 from agrobr.exceptions import ParseError
 from agrobr.normalize.numeric import safe_float
-from agrobr.utils.io import read_excel_safe
+from agrobr.normalize.regions import UFS_VALIDAS
+from agrobr.utils.io import open_excel_safe, read_excel_safe
 
 from .models import CustoTotal, ItemCusto, classify_categoria, normalize_cultura
 
 logger = structlog.get_logger()
 
-PARSER_VERSION = 1
+PARSER_VERSION = 2
 
-_COE_PATTERN = re.compile(r"custo\s*operacional\s*efetivo|c\.?\s*o\.?\s*e\.?", re.IGNORECASE)
-_COT_PATTERN = re.compile(r"custo\s*operacional\s*total|c\.?\s*o\.?\s*t\.?", re.IGNORECASE)
+_COE_PATTERN = re.compile(
+    r"custo\s*operacional\s*efetivo|c\.?\s*o\.?\s*e\.?|custo\s*variável|custo\s*variavel|total\s+das\s+despesas\s+de\s+custeio",
+    re.IGNORECASE,
+)
+_COT_PATTERN = re.compile(
+    r"custo\s*operacional\s*total|c\.?\s*o\.?\s*t\.?|custo\s*operacional\s*\(",
+    re.IGNORECASE,
+)
 _CT_PATTERN = re.compile(r"custo\s*total(?!\s*operacional)|c\.?\s*t\.?\s*$", re.IGNORECASE)
 
 _SECTION_HEADERS = re.compile(
@@ -28,11 +35,13 @@ _SECTION_HEADERS = re.compile(
 MIN_COLUMNS = 4
 
 
-def _find_header_row(df_raw: pd.DataFrame) -> int:
+def _find_header(df_raw: pd.DataFrame) -> tuple[int, list[str]]:
     keywords = {
         "item",
         "especificação",
         "especificacao",
+        "discriminação",
+        "discriminacao",
         "valor",
         "unidade",
         "quantidade",
@@ -42,15 +51,30 @@ def _find_header_row(df_raw: pd.DataFrame) -> int:
         "participacao",
         "r$/ha",
         "total/ha",
+        "custo por ha",
+        "custo",
     }
+    limit = min(20, len(df_raw))
 
-    for idx in range(min(20, len(df_raw))):
+    for idx in range(limit):
         row_values = [str(v).lower().strip() for v in df_raw.iloc[idx] if pd.notna(v)]
         row_text = " ".join(row_values)
+        if sum(1 for kw in keywords if kw in row_text) >= 2:
+            headers = [str(v) if pd.notna(v) else "" for v in df_raw.iloc[idx]]
+            return idx + 1, headers
 
-        matches = sum(1 for kw in keywords if kw in row_text)
-        if matches >= 2:
-            return idx
+    for idx in range(limit - 1):
+        r1 = df_raw.iloc[idx]
+        r2 = df_raw.iloc[idx + 1]
+        merged = [
+            str(r2.iloc[c])
+            if pd.notna(r2.iloc[c])
+            else (str(r1.iloc[c]) if pd.notna(r1.iloc[c]) else "")
+            for c in range(len(r1))
+        ]
+        combined_text = " ".join(v.lower().strip() for v in merged if v)
+        if sum(1 for kw in keywords if kw in combined_text) >= 2:
+            return idx + 2, merged
 
     raise ParseError(
         source="conab_custo",
@@ -67,31 +91,134 @@ def _identify_columns(headers: list[str]) -> dict[str, int]:
 
         if any(
             w in h_lower
-            for w in ("item", "componente", "especificação", "especificacao", "discriminação")
+            for w in (
+                "item",
+                "componente",
+                "especificação",
+                "especificacao",
+                "discriminação",
+                "discriminacao",
+            )
         ):
             if "item" not in mapping:
                 mapping["item"] = i
 
         elif any(w in h_lower for w in ("unidade", "unid")):
-            mapping["unidade"] = i
+            if "unidade" not in mapping:
+                mapping["unidade"] = i
 
         elif any(w in h_lower for w in ("quantidade", "qtd", "qtde", "quant")):
-            mapping["quantidade_ha"] = i
+            if "quantidade_ha" not in mapping:
+                mapping["quantidade_ha"] = i
 
         elif any(
             w in h_lower for w in ("preço unitário", "preco unitario", "preço unit", "vlr. unit")
         ):
-            mapping["preco_unitario"] = i
+            if "preco_unitario" not in mapping:
+                mapping["preco_unitario"] = i
 
         elif any(
-            w in h_lower for w in ("valor total", "total/ha", "valor/ha", "vlr. total", "r$/ha")
+            w in h_lower
+            for w in (
+                "valor total",
+                "total/ha",
+                "valor/ha",
+                "vlr. total",
+                "r$/ha",
+                "custo por ha",
+                "custo/ha",
+                "custo por hectare",
+            )
         ):
-            mapping["valor_ha"] = i
+            if "valor_ha" not in mapping:
+                mapping["valor_ha"] = i
 
-        elif any(w in h_lower for w in ("participação", "participacao", "part.", "%")):
+        elif h_lower.startswith("custo/") and "preco_unitario" not in mapping:
+            mapping["preco_unitario"] = i
+
+        elif (
+            any(w in h_lower for w in ("participação", "participacao", "part.", "%"))
+            and "participacao_pct" not in mapping
+        ):
             mapping["participacao_pct"] = i
 
     return mapping
+
+
+_NON_DATA_SHEET = re.compile(r"ndice|index|sumario|sumário", re.IGNORECASE)
+
+
+def select_data_sheet(
+    xlsx: bytes | BytesIO,
+    uf: str | None = None,
+    safra: str | None = None,
+) -> str:
+    xf = open_excel_safe(xlsx, source="conab_custo", parser_version=PARSER_VERSION)
+    names: list[str] = [str(n) for n in xf.sheet_names]
+    if len(names) == 1:
+        return names[0]
+
+    sheets = [n for n in names if not _NON_DATA_SHEET.search(n)]
+    if not sheets:
+        raise ParseError(
+            source="conab_custo",
+            parser_version=PARSER_VERSION,
+            reason=f"Nenhuma sheet de dados encontrada (sheets={names})",
+        )
+
+    if uf:
+        pat = re.compile(rf"\b{re.escape(uf)}\b", re.IGNORECASE)
+        filtered = [s for s in sheets if pat.search(s)]
+        if filtered:
+            sheets = filtered
+
+    if safra:
+        years = re.findall(r"\d{4}", safra)
+        short_match = re.search(r"(\d{4})/(\d{2})\b", safra)
+        if short_match:
+            full_year = short_match.group(1)[:2] + short_match.group(2)
+            if full_year not in years:
+                years.append(full_year)
+        if years:
+            filtered = [s for s in sheets if any(y in s for y in years)]
+            if filtered:
+                sheets = filtered
+
+    return sheets[-1]
+
+
+def _parse_sheet_info(sheet_name: str) -> tuple[str | None, str | None]:
+    uf: str | None = None
+    year: str | None = None
+    uf_match = re.search(r"\b([A-Z]{2})\b", sheet_name)
+    if uf_match and uf_match.group(1) in UFS_VALIDAS:
+        uf = uf_match.group(1)
+    year_match = re.search(r"\b(20\d{2})\b", sheet_name)
+    if year_match:
+        year = year_match.group(1)
+    return uf, year
+
+
+def _refine_valor_column(
+    df_raw: pd.DataFrame,
+    data_start: int,
+    col_map: dict[str, int],
+) -> None:
+    if "valor_ha" not in col_map:
+        return
+    col_idx = col_map["valor_ha"]
+    end = min(data_start + 5, len(df_raw))
+    sample = df_raw.iloc[data_start:end, col_idx] if data_start < end else pd.Series(dtype=object)
+    if any(safe_float(v) is not None for v in sample):
+        return
+    for offset in (1, 2):
+        candidate = col_idx + offset
+        if candidate >= len(df_raw.columns):
+            break
+        sample_c = df_raw.iloc[data_start:end, candidate]
+        if any(safe_float(v) is not None for v in sample_c):
+            col_map["valor_ha"] = candidate
+            return
 
 
 def parse_planilha(
@@ -120,9 +247,9 @@ def parse_planilha(
             reason=f"Planilha vazia ou com poucas colunas ({len(df_raw.columns)})",
         )
 
-    header_idx = _find_header_row(df_raw)
-    headers = [str(v) if pd.notna(v) else "" for v in df_raw.iloc[header_idx]]
+    data_start, headers = _find_header(df_raw)
     col_map = _identify_columns(headers)
+    _refine_valor_column(df_raw, data_start, col_map)
 
     if "item" not in col_map or "valor_ha" not in col_map:
         raise ParseError(
@@ -136,8 +263,6 @@ def parse_planilha(
     cot_value: float | None = None
     ct_value: float | None = None
     current_category = "outros"
-
-    data_start = header_idx + 1
 
     for row_idx in range(data_start, len(df_raw)):
         row = df_raw.iloc[row_idx]
