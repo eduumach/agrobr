@@ -16,7 +16,7 @@ from .models import CULTURAS_ZARC, extract_safras
 logger = structlog.get_logger()
 
 _MAX_CACHED_SAFRAS = 2
-_cache: dict[str, pd.DataFrame] = {}
+_cache: dict[str, tuple[pd.DataFrame, str]] = {}
 
 
 @overload
@@ -78,24 +78,25 @@ async def zoneamento(
     else:
         uf_upper = None
 
+    resources: list[dict[str, str]] | None = None
     if safra is None:
         resources = await client.discover_resources()
         safras = extract_safras(resources)
         safra = next((s for s in reversed(safras) if s != "perene"), safras[-1])
 
-    source_url = ""
     if safra in _cache:
-        df = _cache[safra].copy()
+        df, source_url = _cache[safra]
+        df = df.copy()
         fetch_ms = 0
     else:
         t0 = time.monotonic()
-        csv_bytes, source_url = await client.fetch_tabua_risco(safra)
+        csv_bytes, source_url = await client.fetch_tabua_risco(safra, resources=resources)
         fetch_ms = int((time.monotonic() - t0) * 1000)
 
         df = parser.parse_tabua_risco(csv_bytes)
         if len(_cache) >= _MAX_CACHED_SAFRAS:
             _cache.pop(next(iter(_cache)))
-        _cache[safra] = df
+        _cache[safra] = (df, source_url)
         df = df.copy()
 
     t1 = time.monotonic()

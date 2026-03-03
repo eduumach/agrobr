@@ -40,7 +40,7 @@ async def discover_resources() -> list[dict[str, str]]:
             last_error=f"CKAN response missing 'result', got: {type(data).__name__}",
         )
 
-    resources = data.get("result", {}).get("resources", [])
+    resources = data["result"].get("resources", [])
     result = [
         {
             "id": r.get("id", ""),
@@ -82,10 +82,13 @@ async def download_csv(url: str) -> bytes:
     return content
 
 
-async def fetch_tabua_risco(safra: str) -> tuple[bytes, str]:
+async def fetch_tabua_risco(
+    safra: str, resources: list[dict[str, str]] | None = None
+) -> tuple[bytes, str]:
     from .models import extract_safras, match_safra_resource
 
-    resources = await discover_resources()
+    if resources is None:
+        resources = await discover_resources()
     url = match_safra_resource(resources, safra)
     if not url:
         from agrobr.exceptions import SourceUnavailableError

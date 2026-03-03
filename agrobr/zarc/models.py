@@ -54,6 +54,8 @@ SOLOS: dict[int, str] = {
     16: "AD6_95mm",
 }
 
+DEC_COLS: list[str] = [f"dec{i}" for i in range(1, 37)]
+
 COLUNAS_SAIDA: list[str] = [
     "cultura",
     "safra",
@@ -65,12 +67,18 @@ COLUNAS_SAIDA: list[str] = [
     "clima",
     "manejo",
     "portaria",
-    *[f"dec{i}" for i in range(1, 37)],
+    *DEC_COLS,
 ]
+
+_SAFRA_RE = re.compile(r"(\d{4}/\d{4})")
 
 
 def build_ckan_package_url(slug: str) -> str:
     return f"{CKAN_API}/package_show?id={slug}"
+
+
+def _csv_resources(resources: list[dict[str, str]]) -> list[dict[str, str]]:
+    return [r for r in resources if r.get("format", "").upper() in ("CSV", "")]
 
 
 def match_safra_resource(resources: list[dict[str, str]], safra: str) -> str | None:
@@ -81,12 +89,8 @@ def match_safra_resource(resources: list[dict[str, str]], safra: str) -> str | N
       safra="perene"    -> match "perene" in resource["name"] (case-insensitive)
     """
     safra_lower = safra.lower()
-    for r in resources:
-        fmt = r.get("format", "").upper()
-        if fmt not in ("CSV", ""):
-            continue
-        name_lower = r["name"].lower()
-        if safra_lower in name_lower:
+    for r in _csv_resources(resources):
+        if safra_lower in r["name"].lower():
             return r["url"]
     return None
 
@@ -96,15 +100,11 @@ def extract_safras(resources: list[dict[str, str]]) -> list[str]:
     safras_ano: list[str] = []
     has_perene = False
 
-    for r in resources:
-        fmt = r.get("format", "").upper()
-        if fmt not in ("CSV", ""):
-            continue
-        name = r["name"]
-        m = re.search(r"(\d{4}/\d{4})", name)
+    for r in _csv_resources(resources):
+        m = _SAFRA_RE.search(r["name"])
         if m:
             safras_ano.append(m.group(1))
-        elif "perene" in name.lower():
+        elif "perene" in r["name"].lower():
             has_perene = True
 
     result = sorted(safras_ano)
