@@ -197,8 +197,10 @@ def _parse_bvmf_xml(xml_stream: IO[bytes]) -> list[dict[str, object]]:
         elem.clear()
         parent = elem.getparent()
         if parent is not None:
-            while parent.getprevious() is not None:
-                del parent[0]
+            grandparent = parent.getparent()
+            if grandparent is not None:
+                while parent.getprevious() is not None:
+                    grandparent.remove(grandparent[0])
 
     return records
 

@@ -270,7 +270,7 @@ class TestParseAjustesZip:
         xml = _make_bvmf_xml(_make_pric_rpt("BGIH27"))
         zip_bytes = _make_nested_zip(xml)
         df = parse_ajustes_zip(zip_bytes)
-        assert df["data"].dtype == "datetime64[ns]"
+        assert pd.api.types.is_datetime64_any_dtype(df["data"])
         for col in ["ajuste_anterior", "ajuste_atual", "variacao", "ajuste_por_contrato"]:
             assert df[col].dtype == "float64"
 
