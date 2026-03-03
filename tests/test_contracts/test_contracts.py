@@ -538,11 +538,11 @@ class TestCONABContracts:
             "item",
         ]
 
-    def test_conab_custo_producao_participacao_range(self):
+    def test_conab_custo_producao_participacao_no_range(self):
         col = CONAB_CUSTO_PRODUCAO_V1.get_column("participacao_pct")
         assert col is not None
-        assert col.min_value == 0
-        assert col.max_value == 100
+        assert col.min_value is None
+        assert col.max_value is None
 
 
 class TestIBGEContracts:
