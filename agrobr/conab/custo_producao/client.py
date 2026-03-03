@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import re
 from io import BytesIO
 from typing import Any
@@ -12,6 +13,7 @@ from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.retry import retry_on_status
 from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
+from agrobr.normalize.regions import UFS_VALIDAS
 from agrobr.utils.html import parse_links_from_html as _parse_links
 
 logger = structlog.get_logger()
@@ -36,6 +38,9 @@ ACCEPT_EXCEL_HTML = (
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,"
     "*/*;q=0.8"
 )
+
+_XLS_PATTERN = r"\.xlsx?"
+_UF_RE = re.compile(r"\b([A-Z]{2})\b")
 
 
 async def fetch_custos_page() -> str:
@@ -109,23 +114,73 @@ async def download_xlsx(url: str) -> BytesIO:
             ) from e
 
 
+def _enrich_link_hints(link: dict[str, str]) -> None:
+    text = link["text"]
+    safra_match = re.search(r"(\d{4})/(\d{2})", text)
+    if safra_match:
+        link["safra_hint"] = safra_match.group(0)
+    uf_match = _UF_RE.search(text)
+    if uf_match and uf_match.group(1) in UFS_VALIDAS:
+        link["uf_hint"] = uf_match.group(1)
+
+
 def parse_links_from_html(html: str) -> list[dict[str, str]]:
-    links = _parse_links(html, base_url=BASE_URL, pattern=r"\.xlsx")
-
+    links = _parse_links(html, base_url=BASE_URL, pattern=_XLS_PATTERN)
     for link in links:
-        text = link["text"]
-        safra_match = re.search(r"(\d{4})/(\d{2})", text)
-        if safra_match:
-            link["safra_hint"] = safra_match.group(0)
-
-        uf_match = re.search(
-            r"\b(AC|AL|AM|AP|BA|CE|DF|ES|GO|MA|MG|MS|MT|PA|PB|PE|PI|PR|RJ|RN|RO|RR|RS|SC|SE|SP|TO)\b",
-            text,
-        )
-        if uf_match:
-            link["uf_hint"] = uf_match.group(1)
-
+        _enrich_link_hints(link)
     logger.info("conab_custo_links_parsed", count=len(links))
+    return links
+
+
+_AGRICOLAS_PATH = "/arquivos-custo-de-producao/"
+
+
+def _extract_folder_urls(html: str) -> list[str]:
+    from bs4 import BeautifulSoup
+
+    soup = BeautifulSoup(html, "lxml")
+    folders: list[str] = []
+    seen: set[str] = set()
+    for a in soup.find_all("a", href=True):
+        href = str(a["href"]).rstrip("/")
+        if _AGRICOLAS_PATH not in href:
+            continue
+        if re.search(_XLS_PATTERN, href) or "resolveuid/" in href:
+            continue
+        slug = href.rsplit("/", 1)[-1]
+        if "serie-historica" in slug:
+            continue
+        url = href if href.startswith("http") else f"{BASE_URL}{href}"
+        if url not in seen:
+            seen.add(url)
+            folders.append(url)
+    return folders
+
+
+async def _crawl_folder(folder_url: str) -> list[dict[str, str]]:
+    headers = UserAgentRotator.get_headers(source="conab_custo")
+    headers["Accept"] = ACCEPT_EXCEL_HTML
+    try:
+        async with httpx.AsyncClient(
+            timeout=TIMEOUT,
+            headers=headers,
+            follow_redirects=True,
+        ) as http:
+            response = await retry_on_status(
+                lambda: http.get(folder_url),
+                source="conab_custo",
+            )
+            response.raise_for_status()
+            folder_html = response.text
+    except (httpx.HTTPError, SourceUnavailableError) as e:
+        logger.warning("conab_custo_folder_error", url=folder_url, error=str(e))
+        return []
+
+    links = _parse_links(folder_html, base_url=BASE_URL, pattern=_XLS_PATTERN)
+    for link in links:
+        link["url"] = link["url"].removesuffix("/view")
+        _enrich_link_hints(link)
+    logger.info("conab_custo_folder_ok", url=folder_url, links=len(links))
     return links
 
 
@@ -146,6 +201,23 @@ async def fetch_xlsx_for_cultura(
 
     cultura_lower = cultura.lower()
     candidates = [link for link in links if cultura_lower in link["text"].lower()]
+
+    if not candidates:
+        folder_urls = _extract_folder_urls(html)
+        if folder_urls:
+            seen = {link["url"] for link in links}
+            results = await asyncio.gather(
+                *(_crawl_folder(u) for u in folder_urls),
+                return_exceptions=True,
+            )
+            for result in results:
+                if isinstance(result, BaseException):
+                    continue
+                for fl in result:
+                    if fl["url"] not in seen:
+                        links.append(fl)
+                        seen.add(fl["url"])
+            candidates = [link for link in links if cultura_lower in link["text"].lower()]
 
     if uf:
         uf_upper = uf.upper()
