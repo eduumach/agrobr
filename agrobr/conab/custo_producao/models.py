@@ -16,9 +16,9 @@ class ItemCusto(BaseModel):
     item: str = Field(..., min_length=1)
     unidade: str | None = None
     quantidade_ha: float | None = Field(None, ge=0)
-    preco_unitario: float | None = Field(None, ge=0)
-    valor_ha: float = Field(..., ge=0)
-    participacao_pct: float | None = Field(None, ge=0, le=100)
+    preco_unitario: float | None = None
+    valor_ha: float
+    participacao_pct: float | None = None
 
     @field_validator("cultura", mode="before")
     @classmethod

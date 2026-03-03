@@ -74,16 +74,16 @@ class TestItemCusto:
                 valor_ha=100.0,
             )
 
-    def test_valor_ha_must_be_positive(self):
-        with pytest.raises(ValueError):
-            ItemCusto(
-                cultura="soja",
-                uf="MT",
-                safra="2023/24",
-                categoria="insumos",
-                item="Sementes",
-                valor_ha=-100.0,
-            )
+    def test_valor_ha_accepts_negative(self):
+        item = ItemCusto(
+            cultura="soja",
+            uf="MT",
+            safra="2023/24",
+            categoria="insumos",
+            item="Diferencial de preço",
+            valor_ha=-2679.05,
+        )
+        assert item.valor_ha == -2679.05
 
 
 class TestCustoTotal:
