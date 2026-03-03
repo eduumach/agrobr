@@ -13,7 +13,7 @@ from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.retry import retry_on_status
 from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
-from agrobr.normalize.regions import UFS_VALIDAS
+from agrobr.normalize.regions import UFS_VALIDAS, remover_acentos
 from agrobr.utils.html import parse_links_from_html as _parse_links
 
 logger = structlog.get_logger()
@@ -199,8 +199,8 @@ async def fetch_xlsx_for_cultura(
             last_error="Nenhum link de planilha encontrado na página",
         )
 
-    cultura_lower = cultura.lower()
-    candidates = [link for link in links if cultura_lower in link["text"].lower()]
+    cultura_lower = remover_acentos(cultura.lower())
+    candidates = [link for link in links if cultura_lower in remover_acentos(link["text"].lower())]
 
     if not candidates:
         folder_urls = _extract_folder_urls(html)
@@ -217,7 +217,9 @@ async def fetch_xlsx_for_cultura(
                     if fl["url"] not in seen:
                         links.append(fl)
                         seen.add(fl["url"])
-            candidates = [link for link in links if cultura_lower in link["text"].lower()]
+            candidates = [
+                link for link in links if cultura_lower in remover_acentos(link["text"].lower())
+            ]
 
     if uf:
         uf_upper = uf.upper()
