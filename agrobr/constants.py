@@ -29,6 +29,7 @@ class Fonte(StrEnum):
     QUEIMADAS = "queimadas"
     SICAR = "sicar"
     USDA = "usda"
+    ZARC = "zarc"
 
 
 URLS = {
@@ -129,6 +130,10 @@ URLS = {
         "ajustes": "https://www2.bmf.com.br/pages/portal/bmfbovespa/boletim1/Ajustes1.asp",
         "ajustes_zip": "https://www.b3.com.br/pesquisapregao/download",
         "arquivos": "https://arquivos.b3.com.br/api/download",
+    },
+    Fonte.ZARC: {
+        "base": "https://dados.agricultura.gov.br",
+        "ckan_api": "https://dados.agricultura.gov.br/api/3/action",
     },
 }
 
@@ -279,6 +284,7 @@ class HTTPSettings(BaseSettings):
     rate_limit_sicar: float = 2.0
     rate_limit_usda: float = 1.0
     rate_limit_b3: float = 1.0
+    rate_limit_zarc: float = 2.0
     rate_limit_conab_ceasa: float = 2.0
     rate_limit_default: float = 1.0
 

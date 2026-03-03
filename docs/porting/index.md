@@ -245,7 +245,7 @@ para validar parsers em qualquer linguagem:
 2. Compare o output com o `expected.json`
 3. Se bater, seu parser está correto
 
-### Conjuntos de teste disponíveis (20 fontes, 30 casos)
+### Conjuntos de teste disponíveis (21 fontes, 31 casos)
 
 | Fonte | Caso de teste | Arquivos |
 |-------|--------------|----------|
@@ -279,6 +279,7 @@ para validar parsers em qualquer linguagem:
 | NASA POWER | `daily_sample` | response.json, expected.json |
 | Queimadas | `focos_sample` | response.csv, expected.json |
 | USDA | `psd_soja_sample` | response.json, expected.json |
+| ZARC | `tabua_risco_sample` | response.csv, expected.json |
 
 Cada diretório também contém `metadata.json` com contexto do teste.
 

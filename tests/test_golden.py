@@ -1215,3 +1215,34 @@ def test_mapbiomas_golden_parsing(_name: str, path: Path):
     assert sorted(df_trans["estado"].unique().tolist()) == exp_trans["estados_expected"]
     for p in exp_trans["periodos_expected"]:
         assert p in df_trans["periodo"].values, f"Period {p} not found in transicao"
+
+
+# ============================================================================
+# ZARC Golden Tests
+# ============================================================================
+
+
+def _get_zarc_cases() -> list[tuple[str, Path]]:
+    return _discover_cases(source_filter="zarc")
+
+
+@pytest.mark.skipif(not _get_zarc_cases(), reason="No ZARC golden data")
+@pytest.mark.parametrize("_name,path", _get_zarc_cases())
+def test_zarc_golden_parsing(_name: str, path: Path):
+    from agrobr.zarc.parser import parse_tabua_risco
+
+    expected = _load_expected(path)
+    csv_bytes = (path / "response.csv").read_bytes()
+    df = parse_tabua_risco(csv_bytes)
+
+    _assert_dataframe_golden(df, expected)
+
+    if "culturas" in expected:
+        assert sorted(df["cultura"].unique().tolist()) == expected["culturas"]
+    if "ufs" in expected:
+        assert sorted(df["uf"].unique().tolist()) == expected["ufs"]
+    if "geocodigos" in expected:
+        assert sorted(df["geocodigo"].unique().tolist()) == expected["geocodigos"]
+    if "perene_count" in expected:
+        perene = df[df["safra"] == "perene"]
+        assert len(perene) == expected["perene_count"]

@@ -112,6 +112,7 @@ _modules: dict[str, _SyncModule | None] = {
     "noticias_agricolas": None,
     "queimadas": None,
     "usda": None,
+    "zarc": None,
 }
 
 _alt_instance: _SyncAlt | None = None

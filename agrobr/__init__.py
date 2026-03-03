@@ -27,6 +27,7 @@ from agrobr import (
     noticias_agricolas,
     queimadas,
     usda,
+    zarc,
 )
 from agrobr.datasets.deterministic import deterministic
 from agrobr.models import MetaInfo
@@ -54,6 +55,7 @@ __all__ = [
     "noticias_agricolas",
     "queimadas",
     "usda",
+    "zarc",
     "MetaInfo",
     "__version__",
 ]

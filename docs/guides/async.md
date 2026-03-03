@@ -203,6 +203,7 @@ from agrobr.sync import (
     ibge,                 # PAM/LSPA (IBGE)
     inmet,                # Meteorologia (INMET)
     noticias_agricolas,   # Cotações agrícolas (Notícias Agrícolas)
+    zarc,                 # Zoneamento Agricola de Risco Climatico
 )
 ```
 

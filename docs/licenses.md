@@ -38,6 +38,7 @@
 | **IBGE Censo Agro Municipal 1985** | Dados públicos governo federal | Sim (dados públicos) | `livre` | [Biblioteca IBGE](https://biblioteca.ibge.gov.br) |
 | **B3 Futuros Agro** | Sem termos públicos para acesso programático | Verificar com B3 | `zona_cinza` | [B3](https://www.b3.com.br) |
 | **CONAB CEASA/PROHORT** | Credenciais públicas embutidas no frontend, API não documentada oficialmente | Verificar com CONAB | `zona_cinza` | [Portal CONAB](https://portaldeinformacoes.conab.gov.br) |
+| **ZARC** | Dados públicos governo federal (CC-BY) | Sim | `livre` | [dados.agricultura.gov.br](https://dados.agricultura.gov.br/dataset/tabua-de-risco-zoneamento-agricola-de-risco-climatico) |
 
 ### Legenda de Classificação
 

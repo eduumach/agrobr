@@ -13,9 +13,9 @@
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/bruno-portfolio/agrobr/blob/main/examples/agrobr_demo.ipynb)
 
-Infraestrutura Python para dados agrícolas brasileiros com camada semântica sobre **25 fontes públicas**: CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA PSD, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento PRODES/DETER, MapBiomas, CONAB Progresso, B3 Futuros Agro, CONAB CEASA/PROHORT, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedágio e SICAR.
+Infraestrutura Python para dados agrícolas brasileiros com camada semântica sobre **26 fontes públicas**: CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA PSD, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento PRODES/DETER, MapBiomas, CONAB Progresso, B3 Futuros Agro, CONAB CEASA/PROHORT, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedágio, SICAR e ZARC.
 
-**v0.12.0** — 4515+ testes, 84% cobertura, 25/25 fontes com golden tests (21 com dados reais), retry centralizado em 25/25 clients.
+**v0.12.0** — 4515+ testes, 84% cobertura, 26/26 fontes com golden tests (21 com dados reais), retry centralizado em 26/26 clients.
 
 ## Demo
 ![Animation](https://github.com/user-attachments/assets/40e1341e-f47b-4eb5-b18e-55b49c63ee97)
@@ -547,6 +547,7 @@ Use `agrobr health --all` para verificar localmente.
 | MAPA PSR | Apolices e sinistros seguro rural (2006+, 27 UFs) | ✅ | Funcional |
 | ANTT Pedagio | Fluxo de veiculos em pracas de pedagio (2010+, 200+ pracas) | ✅ | Funcional |
 | SICAR | Cadastro Ambiental Rural — imoveis rurais por UF (7.4M+ registros, WFS) | ✅ | Funcional |
+| ZARC | Zoneamento Agricola de Risco Climatico (janelas de plantio por municipio/cultura/solo) | ✅ | Funcional |
 
 > ¹ Golden test com dados sintéticos — `needs_real_data` para validação com API real.
 
@@ -606,8 +607,8 @@ normalizar_safra("24/25")             # "2024/25"
 
 ## Diferenciais
 
-- **25/25 fontes com golden tests** — validação automatizada contra dados de referência
-- **Resiliência HTTP completa** — retry centralizado em 25/25 clients, 429 handling, Retry-After
+- **26/26 fontes com golden tests** — validação automatizada contra dados de referência
+- **Resiliência HTTP completa** — retry centralizado em 26/26 clients, 429 handling, Retry-After
 - **4515+ testes, 84% cobertura** — benchmarks de escalabilidade (memory, volume, cache, async)
 - **Thread-safe cache** — DuckDB store com locking para uso em MCP servers e multi-thread
 - **Camada semântica** — datasets padronizados com fallback automático
@@ -655,7 +656,7 @@ Veja o [guia completo de pipelines](https://www.agrobr.dev/docs/advanced/pipelin
 
 - [Guia Rápido](https://www.agrobr.dev/docs/quickstart/)
 - [Datasets](https://www.agrobr.dev/docs/contracts/) — Contratos e garantias
-- [Fontes](https://www.agrobr.dev/docs/sources/) — 25 fontes documentadas
+- [Fontes](https://www.agrobr.dev/docs/sources/) — 26 fontes documentadas
 - [API Reference](https://www.agrobr.dev/docs/api/cepea/)
 - [Resiliência](https://www.agrobr.dev/docs/advanced/resilience/)
 - [Portabilidade](https://www.agrobr.dev/docs/porting/) — Guia para portar o agrobr para R, Julia ou outras linguagens

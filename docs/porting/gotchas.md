@@ -77,6 +77,7 @@ O intervalo é **por fonte**, não global.
 | Desmatamento | 2.0s | Baixa |
 | MapBiomas | 2.0s | Baixa |
 | Queimadas | 1.0s | Baixa |
+| ZARC | 2.0s | Baixa |
 
 ### Retry e Backoff
 

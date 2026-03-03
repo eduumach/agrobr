@@ -9,9 +9,9 @@
 
 ## O que é o agrobr?
 
-Infraestrutura Python para dados agrícolas brasileiros com **camada semântica** sobre 25 fontes públicas.
+Infraestrutura Python para dados agrícolas brasileiros com **camada semântica** sobre 26 fontes públicas.
 
-**v0.12.0** — 4515+ testes | 84% cobertura | 25/25 golden tests | retry centralizado 25/25 clients
+**v0.12.0** — 4515+ testes | 84% cobertura | 26/26 golden tests | retry centralizado 26/26 clients
 
 - **CEPEA/ESALQ**: 20 indicadores de preços (soja, milho, boi, café, algodão, trigo, arroz, açúcar, etanol, frango, suíno, leite, laranja)
 - **CONAB**: Safras, balanço oferta/demanda, custos de produção e série histórica
@@ -38,6 +38,7 @@ Infraestrutura Python para dados agrícolas brasileiros com **camada semântica*
 - **ANTT Pedagio**: Fluxo de veiculos em pracas de pedagio rodoviario (ANTT Dados Abertos, CC-BY, 2010+)
 - **MAPA PSR**: Apolices e sinistros do seguro rural com subvencao federal (SISSER/MAPA, 2006+)
 - **SICAR**: Cadastro Ambiental Rural — registros de imoveis rurais por UF via WFS (7.4M+ imoveis, 27 UFs)
+- **ZARC**: Zoneamento Agricola de Risco Climatico — janelas de plantio por municipio/cultura/solo/ciclo (MAPA/Embrapa, CC-BY)
 
 ## Datasets — Camada Semântica
 
@@ -127,15 +128,15 @@ df = nasa_power.clima_uf('MT', ano=2025)
 |---------|-------|
 | Testes | 4578+ passando |
 | Cobertura | 84% |
-| Golden tests | 25/25 fontes |
+| Golden tests | 26/26 fontes |
 | Resiliência HTTP | Retry centralizado + 429/Retry-After |
 | Benchmarks | Memory, volume, cache, async, rate limiting |
 | Bugs corrigidos (v0.10.1) | DuckDB thread-safety, parser NA semanal, ANDA ano_real |
 
 ## Features
 
-- **25 fontes públicas** — CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento, MapBiomas, CONAB Progresso, CONAB CEASA/PROHORT, B3 Futuros Agro, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedagio, SICAR
-- **25/25 golden tests** — validação automatizada contra dados de referência
+- **26 fontes públicas** — CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento, MapBiomas, CONAB Progresso, CONAB CEASA/PROHORT, B3 Futuros Agro, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedagio, SICAR, ZARC
+- **26/26 golden tests** — validação automatizada contra dados de referência
 - **Resiliência HTTP** — `retry_on_status()`/`retry_async()` centralizado, Retry-After, 429 handling
 - **Camada semântica** — datasets com fallback automático entre fontes
 - **Contratos públicos** — schema versionado com garantias de estabilidade

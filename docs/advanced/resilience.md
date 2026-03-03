@@ -79,6 +79,7 @@ Cada fonte tem seu próprio rate limit, configurável via env vars:
 | NASA POWER | 1 segundo | `AGROBR_HTTP_RATE_LIMIT_NASA_POWER` |
 | Notícias Agrícolas | 2 segundos | `AGROBR_HTTP_RATE_LIMIT_NOTICIAS_AGRICOLAS` |
 | USDA | 1 segundo | `AGROBR_HTTP_RATE_LIMIT_USDA` |
+| ZARC | 2 segundos | `AGROBR_HTTP_RATE_LIMIT_ZARC` |
 | Default | 1 segundo | `AGROBR_HTTP_RATE_LIMIT_DEFAULT` |
 
 O rate limiter usa semáforos por fonte, permitindo requests paralelos a fontes diferentes.

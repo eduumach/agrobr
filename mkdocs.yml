@@ -106,6 +106,7 @@ nav:
     - ANTT Pedagio: api/antt_pedagio.md
     - MAPA PSR: api/mapa_psr.md
     - SICAR: api/sicar.md
+    - ZARC: api/zarc.md
   - Fontes:
     - Visão Geral: sources/index.md
     - CEPEA: sources/cepea.md
@@ -133,6 +134,7 @@ nav:
     - ANTT Pedagio: sources/antt_pedagio.md
     - MAPA PSR: sources/mapa_psr.md
     - SICAR: sources/sicar.md
+    - ZARC: sources/zarc.md
   - Licenças dos Dados: licenses.md
   - Portabilidade:
     - Visão Geral: porting/index.md
