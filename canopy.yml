@@ -1,0 +1,37 @@
+project: agrobr
+source: agrobr
+module_depth: 2
+
+layers:
+  core:
+    modules: ["cli", "config", "constants", "exceptions", "export", "models", "quality", "sla", "snapshots", "sync"]
+    label: Core
+  data:
+    modules: ["cache", "http", "datasets", "data", "schemas", "contracts"]
+    label: Data Layer
+  market:
+    modules: ["cepea", "b3", "comexstat", "comtrade", "noticias_agricolas", "bcb"]
+    label: Market
+  production:
+    modules: ["conab", "ibge", "deral", "imea", "usda", "abiove", "anda"]
+    label: Production
+  geo:
+    modules: ["inmet", "nasa_power", "zarc", "mapbiomas", "desmatamento", "queimadas"]
+    label: Geo & Climate
+  quality:
+    modules: ["validators", "normalize", "health", "alerts", "benchmark"]
+    label: Quality
+  infra:
+    modules: ["utils", "plugins", "alt", "antaq"]
+    label: Infrastructure
+
+thresholds:
+  mi_healthy: 65
+  mi_moderate: 40
+  churn_high: 10
+  min_loc: 100
+
+output:
+  path: docs/canopy.svg
+  width: 1200
+  height: 1000
