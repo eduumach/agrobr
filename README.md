@@ -14,7 +14,7 @@
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/bruno-portfolio/agrobr/blob/main/examples/agrobr_demo.ipynb)
 
 <p align="center">
-  <a href="https://github.com/bruno-portfolio/agrobr/blob/main/docs/canopy.svg">
+  <a href="https://raw.githubusercontent.com/bruno-portfolio/agrobr/main/docs/canopy.svg">
     <img src="docs/canopy.svg" width="100%" />
   </a>
 </p>
