@@ -15,3 +15,5 @@ jobs:
         with:
           fetch-depth: 0  # full history needed for git churn analysis
       - uses: bruno-portfolio/canopy-code@main
+        with:
+          token: ${{ secrets.CANOPY_PAT }}
