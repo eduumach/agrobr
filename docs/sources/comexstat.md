@@ -1,7 +1,7 @@
-# ComexStat — Exportações
+# ComexStat — Exportações e Importações
 
 Dados de comércio exterior do MDIC/SECEX. Exportações e importações
-por produto (NCM), UF e país de destino.
+por produto (NCM), UF e país.
 
 ## API
 
@@ -11,6 +11,9 @@ from agrobr import comexstat
 # Exportações mensais de soja em 2024
 df = await comexstat.exportacao("soja", ano=2024, agregacao="mensal")
 
+# Importações mensais de soja em 2024
+df = await comexstat.importacao("soja", ano=2024, agregacao="mensal")
+
 # Exportações detalhadas (por país/UF/via)
 df = await comexstat.exportacao("soja", ano=2024, agregacao="detalhado")
 
@@ -18,7 +21,7 @@ df = await comexstat.exportacao("soja", ano=2024, agregacao="detalhado")
 df = await comexstat.exportacao("soja", ano=2024, uf="MT")
 ```
 
-## Colunas — `exportacao` (mensal)
+## Colunas — `exportacao` / `importacao` (mensal)
 
 | Coluna | Tipo | Descrição |
 |---|---|---|

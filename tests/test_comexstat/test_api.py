@@ -8,7 +8,7 @@ from agrobr.comexstat import api
 
 
 def _mock_csv():
-    """CSV de exportação de exemplo."""
+    """CSV de exportação/importação de exemplo (mesmo layout)."""
     return (
         "CO_ANO;CO_MES;CO_NCM;CO_UNID;CO_PAIS;SG_UF_NCM;CO_VIA;CO_URF;QT_ESTAT;KG_LIQUIDO;VL_FOB\n"
         "2024;1;12019000;10;160;MT;4;817800;1000;50000000;20000000\n"
@@ -89,3 +89,74 @@ class TestExportacao:
 
         assert len(df) == 1
         assert df.iloc[0]["uf"] == "PR"
+
+
+class TestImportacao:
+    @pytest.mark.asyncio
+    async def test_default_ano_is_previous_year(self):
+        from agrobr.utils.time import utcnow
+
+        with patch.object(
+            api.client, "fetch_importacao_csv", new_callable=AsyncMock, return_value=_mock_csv()
+        ) as mock_fetch:
+            await api.importacao("soja")
+
+        expected_ano = utcnow().year - 1
+        assert mock_fetch.call_args[0][0] == expected_ano
+
+    @pytest.mark.asyncio
+    async def test_returns_dataframe(self):
+        with patch.object(
+            api.client, "fetch_importacao_csv", new_callable=AsyncMock, return_value=_mock_csv()
+        ):
+            df = await api.importacao("soja", ano=2024)
+
+        assert len(df) > 0
+        assert "kg_liquido" in df.columns
+        assert "valor_fob_usd" in df.columns
+        assert "volume_ton" in df.columns
+
+    @pytest.mark.asyncio
+    async def test_return_meta(self):
+        with patch.object(
+            api.client, "fetch_importacao_csv", new_callable=AsyncMock, return_value=_mock_csv()
+        ):
+            df, meta = await api.importacao("soja", ano=2024, return_meta=True)
+
+        assert meta.source == "comexstat"
+        assert "IMP_2024" in meta.source_url
+        assert meta.records_count == len(df)
+
+    @pytest.mark.asyncio
+    async def test_mensal_aggregation(self):
+        with patch.object(
+            api.client, "fetch_importacao_csv", new_callable=AsyncMock, return_value=_mock_csv()
+        ):
+            df = await api.importacao("soja", ano=2024, agregacao="mensal")
+
+        assert len(df) == 3
+
+    @pytest.mark.asyncio
+    async def test_detalhado(self):
+        with patch.object(
+            api.client, "fetch_importacao_csv", new_callable=AsyncMock, return_value=_mock_csv()
+        ):
+            df = await api.importacao("soja", ano=2024, agregacao="detalhado")
+
+        assert len(df) == 3
+        assert "volume_ton" not in df.columns
+
+    @pytest.mark.asyncio
+    async def test_filter_uf(self):
+        csv = (
+            "CO_ANO;CO_MES;CO_NCM;CO_UNID;CO_PAIS;SG_UF_NCM;CO_VIA;CO_URF;QT_ESTAT;KG_LIQUIDO;VL_FOB\n"
+            "2024;1;12019000;10;160;SP;4;817800;1000;50000000;20000000\n"
+            "2024;1;12019000;10;160;RJ;4;817800;800;40000000;16000000\n"
+        )
+        with patch.object(
+            api.client, "fetch_importacao_csv", new_callable=AsyncMock, return_value=csv
+        ):
+            df = await api.importacao("soja", ano=2024, uf="SP")
+
+        assert len(df) == 1
+        assert df.iloc[0]["uf"] == "SP"

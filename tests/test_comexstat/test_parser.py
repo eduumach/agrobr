@@ -7,6 +7,7 @@ from agrobr.comexstat.parser import (
     _detect_separator,
     agregar_mensal,
     parse_exportacao,
+    parse_importacao,
 )
 from agrobr.exceptions import ParseError
 
@@ -160,6 +161,38 @@ class TestParseExportacao:
         df = parse_exportacao(csv)
         assert df.iloc[0]["mes"] == 1
         assert df.iloc[2]["mes"] == 3
+
+
+class TestParseImportacao:
+    def test_parse_basic(self):
+        csv = _sample_csv()
+        df = parse_importacao(csv)
+
+        assert len(df) == 3
+        assert "ano" in df.columns
+        assert "kg_liquido" in df.columns
+        assert "valor_fob_usd" in df.columns
+
+    def test_filter_by_ncm(self):
+        lines = _sample_csv(ncm="12019000", rows=2)
+        lines += "\n" + ";".join(
+            ["2024", "1", "10059010", "10", "160", "SP", "4", "817800", "500", "3000000", "1000000"]
+        )
+        df = parse_importacao(lines, ncm="12019000")
+        assert len(df) == 2
+
+    def test_filter_by_uf(self):
+        lines = _sample_csv(rows=2)
+        lines += "\n" + ";".join(
+            ["2024", "1", "12019000", "10", "160", "SP", "4", "817800", "500", "3000000", "1000000"]
+        )
+        df = parse_importacao(lines, uf="SP")
+        assert len(df) == 1
+        assert df.iloc[0]["uf"] == "SP"
+
+    def test_empty_raises(self):
+        with pytest.raises(ParseError, match="importação"):
+            parse_importacao("")
 
 
 class TestAgregarMensal:

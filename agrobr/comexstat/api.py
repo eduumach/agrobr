@@ -12,9 +12,56 @@ from agrobr.utils.time import utcnow
 
 from . import client
 from .models import resolve_ncm
-from .parser import PARSER_VERSION, agregar_mensal, parse_exportacao
+from .parser import PARSER_VERSION, agregar_mensal, parse_exportacao, parse_importacao
 
 logger = structlog.get_logger()
+
+_PARSE_FN = {"exportacao": parse_exportacao, "importacao": parse_importacao}
+_CSV_PREFIX = {"exportacao": "EXP", "importacao": "IMP"}
+
+
+async def _fetch_comexstat(
+    fluxo: str,
+    produto: str,
+    ano: int | None,
+    uf: str | None,
+    agregacao: str,
+    as_polars: bool,
+    return_meta: bool,
+) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
+    if ano is None:
+        ano = utcnow().year - 1
+        logger.info("comexstat_default_ano", ano=ano)
+
+    ncm = resolve_ncm(produto)
+
+    t0 = time.monotonic()
+    logger.info(f"comexstat_{fluxo}_request", produto=produto, ncm=ncm, ano=ano, uf=uf)
+
+    fetch_fn = getattr(client, f"fetch_{fluxo}_csv")
+    csv_text: str = await fetch_fn(ano)
+    fetch_ms = int((time.monotonic() - t0) * 1000)
+
+    t1 = time.monotonic()
+    df = _PARSE_FN[fluxo](csv_text, ncm=ncm, uf=uf)
+
+    if agregacao == "mensal":
+        df = agregar_mensal(df)
+
+    parse_ms = int((time.monotonic() - t1) * 1000)
+
+    logger.info(f"comexstat_{fluxo}_ok", produto=produto, ncm=ncm, ano=ano, records=len(df))
+
+    meta = build_source_meta(
+        "comexstat",
+        f"{client.BULK_CSV_BASE}/{_CSV_PREFIX[fluxo]}_{ano}.csv",
+        "httpx",
+        fetch_ms,
+        parse_ms,
+        df,
+        PARSER_VERSION,
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 @overload
@@ -49,48 +96,39 @@ async def exportacao(
     as_polars: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    if ano is None:
-        ano = utcnow().year - 1
-        logger.info("comexstat_default_ano", ano=ano)
+    return await _fetch_comexstat("exportacao", produto, ano, uf, agregacao, as_polars, return_meta)
 
-    ncm = resolve_ncm(produto)
 
-    t0 = time.monotonic()
+@overload
+async def importacao(
+    produto: str,
+    ano: int | None = None,
+    uf: str | None = None,
+    agregacao: str = "mensal",
+    as_polars: bool = False,
+    *,
+    return_meta: Literal[False] = False,
+) -> pd.DataFrame: ...
 
-    logger.info(
-        "comexstat_exportacao_request",
-        produto=produto,
-        ncm=ncm,
-        ano=ano,
-        uf=uf,
-    )
 
-    csv_text = await client.fetch_exportacao_csv(ano)
-    fetch_ms = int((time.monotonic() - t0) * 1000)
+@overload
+async def importacao(
+    produto: str,
+    ano: int | None = None,
+    uf: str | None = None,
+    agregacao: str = "mensal",
+    as_polars: bool = False,
+    *,
+    return_meta: Literal[True],
+) -> tuple[pd.DataFrame, MetaInfo]: ...
 
-    t1 = time.monotonic()
-    df = parse_exportacao(csv_text, ncm=ncm, uf=uf)
 
-    if agregacao == "mensal":
-        df = agregar_mensal(df)
-
-    parse_ms = int((time.monotonic() - t1) * 1000)
-
-    logger.info(
-        "comexstat_exportacao_ok",
-        produto=produto,
-        ncm=ncm,
-        ano=ano,
-        records=len(df),
-    )
-
-    meta = build_source_meta(
-        "comexstat",
-        f"{client.BULK_CSV_BASE}/EXP_{ano}.csv",
-        "httpx",
-        fetch_ms,
-        parse_ms,
-        df,
-        PARSER_VERSION,
-    )
-    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
+async def importacao(
+    produto: str,
+    ano: int | None = None,
+    uf: str | None = None,
+    agregacao: str = "mensal",
+    as_polars: bool = False,
+    return_meta: bool = False,
+) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
+    return await _fetch_comexstat("importacao", produto, ano, uf, agregacao, as_polars, return_meta)

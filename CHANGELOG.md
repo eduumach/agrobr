@@ -8,6 +8,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Unreleased]
 
 ### Added
+- **comexstat** — `importacao()` para dados de importação ComexStat (MDIC/SECEX). Mesma interface de `exportacao()`: filtro por produto (NCM), ano, UF, agregação mensal/detalhado, `as_polars`, `return_meta`. Parser refatorado com `_parse_comexstat_csv()` compartilhado (mensagens de erro corretas por fluxo). `_fetch_comexstat()` helper elimina duplicação entre export/import. 10 testes novos (6 API + 4 parser)
 - **ZARC** — Zoneamento Agricola de Risco Climatico (janelas de plantio por municipio/cultura/solo). Fonte MAPA/Embrapa via CKAN (CC-BY). `zoneamento()` com filtros cultura/uf/municipio/safra/solo/ciclo, `culturas()`, `safras_disponiveis()`. Session cache para CSVs grandes. 31 testes, golden data
 - **utils/io** — `open_excel_safe()` e `read_excel_safe()` helpers com fallback automatico para `python-calamine` (Rust, MIT). Se openpyxl falhar (ex: XLSX com estilos/fills malformados), tenta calamine que ignora estilos e extrai apenas dados. Guard xlrd: se `engine="xlrd"`, nao tenta calamine (re-raise direto). 9 parsers migrados (19 operacoes Excel em 9 arquivos): conab/progresso, abiove, conab/serie_historica, deral (multi-sheet via `open_excel_safe`); alt/anp_diesel, mapbiomas, anda, conab/parsers/v1, conab/custo_producao (single-sheet via `read_excel_safe`)
 - **deps** — `python-calamine>=0.3.0` como dependencia core (749KB, zero deps Python, engine Rust para leitura Excel)

@@ -1,5 +1,5 @@
 """Módulo ComexStat — dados de exportação/importação (MDIC/SECEX)."""
 
-from agrobr.comexstat.api import exportacao
+from agrobr.comexstat.api import exportacao, importacao
 
-__all__ = ["exportacao"]
+__all__ = ["exportacao", "importacao"]

@@ -33,16 +33,17 @@ def _detect_separator(csv_text: str) -> str:
     return ","
 
 
-def parse_exportacao(
+def _parse_comexstat_csv(
     csv_text: str,
     ncm: str | None = None,
     uf: str | None = None,
+    fluxo: str = "exportação",
 ) -> pd.DataFrame:
     if not csv_text or len(csv_text.strip()) < 10:
         raise ParseError(
             source="comexstat",
             parser_version=PARSER_VERSION,
-            reason="CSV de exportação vazio",
+            reason=f"CSV de {fluxo} vazio",
         )
 
     sep = _detect_separator(csv_text)
@@ -58,14 +59,14 @@ def parse_exportacao(
         raise ParseError(
             source="comexstat",
             parser_version=PARSER_VERSION,
-            reason=f"Erro ao ler CSV: {e}",
+            reason=f"Erro ao ler CSV de {fluxo}: {e}",
         ) from e
 
     if df.empty:
         raise ParseError(
             source="comexstat",
             parser_version=PARSER_VERSION,
-            reason="CSV parseado mas sem registros",
+            reason=f"CSV de {fluxo} parseado mas sem registros",
         )
 
     rename = {k: v for k, v in COLUNAS_MAP.items() if k in df.columns}
@@ -103,6 +104,22 @@ def parse_exportacao(
     )
 
     return df
+
+
+def parse_exportacao(
+    csv_text: str,
+    ncm: str | None = None,
+    uf: str | None = None,
+) -> pd.DataFrame:
+    return _parse_comexstat_csv(csv_text, ncm=ncm, uf=uf, fluxo="exportação")
+
+
+def parse_importacao(
+    csv_text: str,
+    ncm: str | None = None,
+    uf: str | None = None,
+) -> pd.DataFrame:
+    return _parse_comexstat_csv(csv_text, ncm=ncm, uf=uf, fluxo="importação")
 
 
 def agregar_mensal(df: pd.DataFrame) -> pd.DataFrame:

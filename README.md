@@ -250,8 +250,9 @@ async def main():
     # BCB/SICOR — agregar por programa
     df = await bcb.credito_rural(produto="soja", safra="2024/25", agregacao="programa")
 
-    # ComexStat — exportações mensais
+    # ComexStat — exportações e importações mensais
     df = await comexstat.exportacao("soja", ano=2024, agregacao="mensal")
+    df = await comexstat.importacao("soja", ano=2024, agregacao="mensal")
 
     # ANDA — entregas de fertilizantes (requer pip install agrobr[pdf])
     df = await anda.entregas(ano=2024, uf="MT")
@@ -533,7 +534,7 @@ Use `agrobr health --all` para verificar localmente.
 | IBGE | PAM, LSPA, PPM, Abate, PEVS, Leite, PIB, Censo Agro | ✅ | Funcional |
 | NASA POWER | Climatologia diária/mensal (grid 0.5°) | ✅ | Funcional |
 | BCB/SICOR | Crédito rural por cultura + dimensões SICOR (+ fallback BigQuery) | ✅¹ | Funcional |
-| ComexStat | Exportações por NCM/UF | ✅¹ | Funcional |
+| ComexStat | Exportações e importações por NCM/UF | ✅¹ | Funcional |
 | ANDA | Entregas de fertilizantes | ✅ | Funcional |
 | ABIOVE | Exportação complexo soja (volume/receita) | ✅ | Funcional |
 | USDA PSD | Estimativas internacionais (produção/oferta/demanda) | ✅¹ | Funcional |

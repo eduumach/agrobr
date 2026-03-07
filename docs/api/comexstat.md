@@ -1,6 +1,6 @@
 # API ComexStat
 
-O modulo ComexStat fornece dados de exportacao brasileira do MDIC/SECEX — volumes, valores FOB (USD) por produto, UF e pais de destino.
+O modulo ComexStat fornece dados de exportacao e importacao brasileira do MDIC/SECEX — volumes, valores FOB (USD) por produto, UF e pais.
 
 ## Funcoes
 
@@ -14,18 +14,35 @@ async def exportacao(
     ano: int | None = None,
     uf: str | None = None,
     agregacao: str = "mensal",
+    as_polars: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]
 ```
 
-**Parametros:**
+### `importacao`
+
+Dados de importacao por produto agricola. Mesma interface de `exportacao()`.
+
+```python
+async def importacao(
+    produto: str,
+    ano: int | None = None,
+    uf: str | None = None,
+    agregacao: str = "mensal",
+    as_polars: bool = False,
+    return_meta: bool = False,
+) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]
+```
+
+**Parametros (ambas):**
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `produto` | `str` | Produto (soja, milho, cafe, algodao, acucar, farelo_soja, oleo_soja) |
-| `ano` | `int \| None` | Ano de referencia. Default: ano atual |
-| `uf` | `str \| None` | Filtrar por UF de origem |
+| `produto` | `str` | Produto (soja, milho, cafe, algodao, acucar, farelo_soja, oleo_soja, ...) |
+| `ano` | `int \| None` | Ano de referencia. Default: ano anterior |
+| `uf` | `str \| None` | Filtrar por UF |
 | `agregacao` | `str` | `"mensal"` (default) ou `"detalhado"` |
+| `as_polars` | `bool` | Se True, retorna polars.DataFrame |
 | `return_meta` | `bool` | Se True, retorna tupla (DataFrame, MetaInfo) |
 
 **Retorno:**
@@ -40,6 +57,9 @@ from agrobr import comexstat
 # Exportacao soja 2024
 df = await comexstat.exportacao("soja", ano=2024)
 
+# Importacao soja 2024
+df = await comexstat.importacao("soja", ano=2024)
+
 # Filtrar por UF
 df = await comexstat.exportacao("milho", ano=2024, uf="MT")
 
@@ -53,6 +73,7 @@ df = await comexstat.exportacao("cafe", ano=2024, agregacao="detalhado")
 from agrobr.sync import comexstat
 
 df = comexstat.exportacao("soja", ano=2024)
+df = comexstat.importacao("soja", ano=2024)
 ```
 
 ## Notas
