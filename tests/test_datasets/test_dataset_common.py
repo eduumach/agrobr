@@ -39,6 +39,7 @@ class TestDatasetInfo:
             "yearly",
             "quarterly",
             "continuous",
+            "weekly",
             "decennial",
             "never",
         }

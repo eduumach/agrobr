@@ -135,62 +135,66 @@ CREDITO_RURAL_V1_1 = Contract(
     breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
 )
 
+_COMEX_COLUMNS = [
+    Column(
+        name="ano",
+        type=ColumnType.INTEGER,
+        nullable=False,
+        stable=True,
+        min_value=1997,
+    ),
+    Column(
+        name="mes",
+        type=ColumnType.INTEGER,
+        nullable=False,
+        stable=True,
+        min_value=1,
+        max_value=12,
+    ),
+    Column(
+        name="produto",
+        type=ColumnType.STRING,
+        nullable=False,
+        stable=True,
+    ),
+    Column(
+        name="uf",
+        type=ColumnType.STRING,
+        nullable=True,
+        stable=True,
+    ),
+    Column(
+        name="kg_liquido",
+        type=ColumnType.FLOAT,
+        nullable=True,
+        unit="kg",
+        stable=True,
+        min_value=0,
+    ),
+    Column(
+        name="valor_fob_usd",
+        type=ColumnType.FLOAT,
+        nullable=True,
+        unit="USD",
+        stable=True,
+        min_value=0,
+    ),
+]
+
+_COMEX_GUARANTEES = [
+    "Column names never change (additions only)",
+    "'ano' is always >= 1997",
+    "'mes' is between 1 and 12",
+    "Numeric values are always >= 0",
+]
+
 EXPORTACAO_V1 = Contract(
     name="comexstat.exportacao",
     version="1.0",
     effective_from="0.10.0",
     primary_key=["ano", "mes", "produto", "uf"],
-    columns=[
-        Column(
-            name="ano",
-            type=ColumnType.INTEGER,
-            nullable=False,
-            stable=True,
-            min_value=1997,
-        ),
-        Column(
-            name="mes",
-            type=ColumnType.INTEGER,
-            nullable=False,
-            stable=True,
-            min_value=1,
-            max_value=12,
-        ),
-        Column(
-            name="produto",
-            type=ColumnType.STRING,
-            nullable=False,
-            stable=True,
-        ),
-        Column(
-            name="uf",
-            type=ColumnType.STRING,
-            nullable=True,
-            stable=True,
-        ),
-        Column(
-            name="kg_liquido",
-            type=ColumnType.FLOAT,
-            nullable=True,
-            unit="kg",
-            stable=True,
-            min_value=0,
-        ),
-        Column(
-            name="valor_fob_usd",
-            type=ColumnType.FLOAT,
-            nullable=True,
-            unit="USD",
-            stable=True,
-            min_value=0,
-        ),
-    ],
-    guarantees=[
-        "Column names never change (additions only)",
-        "'ano' is always >= 1997",
-        "'mes' is between 1 and 12",
-        "Numeric values are always >= 0",
-    ],
+    columns=_COMEX_COLUMNS,
+    guarantees=_COMEX_GUARANTEES,
     breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
 )
 
@@ -1841,8 +1845,78 @@ SICAR_IMOVEIS_V1 = Contract(
     breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
 )
 
+IMPORTACAO_V1 = Contract(
+    name="comexstat.importacao",
+    version="1.0",
+    effective_from="0.13.0",
+    primary_key=["ano", "mes", "produto", "uf"],
+    columns=_COMEX_COLUMNS,
+    guarantees=_COMEX_GUARANTEES,
+    breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
+)
+
+PIB_AGRO_V1 = Contract(
+    name="ibge.pib_agro",
+    version="1.0",
+    effective_from="0.13.0",
+    primary_key=["trimestre", "setor", "precos"],
+    columns=[
+        Column(
+            name="trimestre",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+            description="Trimestre no formato YYYYQQ",
+        ),
+        Column(
+            name="valor",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            unit="R$ (milhões)",
+            stable=True,
+        ),
+        Column(
+            name="unidade",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="setor",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+            description="Setor: agropecuaria, industria, servicos, pib_total",
+        ),
+        Column(
+            name="precos",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+            description="Tipo de precos: corrente, real_1995 (injetado pelo dataset)",
+        ),
+        Column(
+            name="fonte",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+    ],
+    guarantees=[
+        "Column names never change (additions only)",
+        "'trimestre' always matches pattern YYYYQQ",
+        "'setor' is one of: agropecuaria, industria, servicos, pib_total",
+        "'precos' is one of: corrente, real_1995",
+        "'precos' in PK prevents collision between different deflator calls",
+    ],
+    breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
+)
+
 register_contract("sicar_imoveis", SICAR_IMOVEIS_V1)
 register_contract("cadastro_rural", SICAR_IMOVEIS_V1)
+register_contract("importacao", IMPORTACAO_V1)
+register_contract("pib_agro", PIB_AGRO_V1)
+register_contract("progresso_safra", CONAB_PROGRESSO_V1)
 
 __all__ = [
     "AJUSTE_DIARIO_V1",
@@ -1852,19 +1926,21 @@ __all__ = [
     "ANTT_PEDAGIO_PRACAS_V1",
     "COMERCIO_BILATERAL_V1",
     "CONAB_PROGRESSO_V1",
-    "PRECO_ATACADO_V1",
     "CREDITO_RURAL_V1_1",
     "DESMATAMENTO_DETER_V1",
     "DESMATAMENTO_PRODES_V1",
     "EXPORTACAO_V1",
     "FERTILIZANTE_V1",
     "FOCOS_QUEIMADAS_V1",
+    "IMPORTACAO_V1",
     "MAPA_PSR_APOLICES_V1",
     "MAPA_PSR_SINISTROS_V1",
     "MAPBIOMAS_COBERTURA_V1",
     "MAPBIOMAS_TRANSICAO_V1",
     "MOVIMENTACAO_PORTUARIA_V1",
+    "PIB_AGRO_V1",
     "POSICOES_ABERTAS_V1",
+    "PRECO_ATACADO_V1",
     "SICAR_IMOVEIS_V1",
     "TRADE_MIRROR_V1",
 ]

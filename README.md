@@ -216,8 +216,9 @@ async def main():
     # ['abate_trimestral', 'balanco', 'cadastro_rural', 'censo_agropecuario',
     #  'censo_agropecuario_historico', 'censo_agropecuario_municipal_1985',
     #  'credito_rural', 'custo_producao', 'estimativa_safra', 'exportacao',
-    #  'extrativismo_vegetal', 'fertilizante', 'leite_industrial',
-    #  'pecuaria_municipal', 'preco_diario', 'producao_anual', 'silvicultura']
+    #  'extrativismo_vegetal', 'fertilizante', 'importacao', 'leite_industrial',
+    #  'pecuaria_municipal', 'pib_agro', 'preco_diario', 'producao_anual',
+    #  'progresso_safra', 'silvicultura']
 ```
 
 ### Modo Determinístico (Reprodutibilidade)
@@ -513,6 +514,7 @@ Use `agrobr health --all` para verificar localmente.
 | `credito_rural` | Crédito rural por cultura (programa, seguro, modalidade) | BCB/SICOR → BigQuery |
 | `exportacao` | Exportações agrícolas | ComexStat → ABIOVE |
 | `fertilizante` | Entregas de fertilizantes | ANDA |
+| `importacao` | Importações agrícolas | ComexStat |
 | `custo_producao` | Custos de produção | CONAB |
 | `abate_trimestral` | Abate de bovinos, suínos e frangos por UF | IBGE Abate |
 | `cadastro_rural` | Cadastro Ambiental Rural (imóveis rurais por UF) | SICAR/GeoServer WFS |
@@ -524,6 +526,8 @@ Use `agrobr health --all` para verificar localmente.
 | `silvicultura` | Producao silvicultural (eucalipto, pinus, carvao vegetal, madeira) | IBGE PEVS |
 | `extrativismo_vegetal` | Producao extrativista vegetal (acai, castanha, erva-mate) | IBGE PEVS |
 | `leite_industrial` | Aquisicao e industrializacao trimestral de leite por UF | IBGE Leite |
+| `pib_agro` | PIB agropecuário por setor e trimestre | IBGE SIDRA |
+| `progresso_safra` | Progresso semanal semeadura/colheita | CONAB |
 
 ## Fontes Suportadas
 

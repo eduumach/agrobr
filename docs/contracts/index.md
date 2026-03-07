@@ -28,6 +28,7 @@ Validação é automática: todo `fetch()` de dataset valida o DataFrame contra 
 | [credito_rural](./credito_rural.md) | Crédito rural por cultura | BCB/SICOR → BigQuery |
 | [exportacao](./exportacao.md) | Exportações agrícolas | ComexStat → ABIOVE |
 | [fertilizante](./fertilizante.md) | Entregas de fertilizantes | ANDA |
+| [importacao](./importacao.md) | Importações agrícolas | ComexStat |
 | [custo_producao](./custo_producao.md) | Custos de produção | CONAB |
 | [pecuaria_municipal](./pecuaria_municipal.md) | Rebanhos e produção animal | IBGE PPM |
 | [abate_trimestral](./abate_trimestral.md) | Abate de bovinos, suínos e frangos | IBGE Abate |
@@ -40,6 +41,8 @@ Validação é automática: todo `fetch()` de dataset valida o DataFrame contra 
 | [extrativismo_vegetal](./extrativismo_vegetal.md) | Producao extrativista vegetal (IBGE PEVS) | IBGE PEVS |
 | [leite_industrial](./leite_industrial.md) | Leite trimestral (aquisicao/industrializacao) | IBGE Leite |
 | [lspa](./lspa.md) | Estimativas mensais de produção agrícola | IBGE LSPA |
+| [pib_agro](./pib_agro.md) | PIB agropecuário por setor e trimestre | IBGE SIDRA |
+| [progresso_safra](./progresso_safra.md) | Progresso semanal semeadura/colheita | CONAB |
 
 ## Schemas JSON
 
@@ -74,8 +77,9 @@ datasets.list_datasets()
 # ['abate_trimestral', 'balanco', 'cadastro_rural', 'censo_agropecuario',
 #  'censo_agropecuario_historico', 'censo_agropecuario_municipal_1985',
 #  'credito_rural', 'custo_producao', 'estimativa_safra', 'exportacao',
-#  'extrativismo_vegetal', 'fertilizante', 'leite_industrial',
-#  'pecuaria_municipal', 'preco_diario', 'producao_anual', 'silvicultura']
+#  'extrativismo_vegetal', 'fertilizante', 'importacao', 'leite_industrial',
+#  'pecuaria_municipal', 'pib_agro', 'preco_diario', 'producao_anual',
+#  'progresso_safra', 'silvicultura']
 
 # Listar produtos de um dataset
 datasets.list_products("preco_diario")
