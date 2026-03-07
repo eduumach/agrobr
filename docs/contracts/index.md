@@ -37,6 +37,7 @@ Validação é automática: todo `fetch()` de dataset valida o DataFrame contra 
 | [censo_agropecuario_historico](./censo_agropecuario_historico.md) | Série histórica Censo Agropecuário 1920-2006 (9 temas, até UF) | IBGE SIDRA |
 | [censo_agropecuario_municipal_1985](./censo_agropecuario_municipal_1985.md) | Censo 1985 municipal — 53 temas via OCR de PDFs (22 UFs) | IBGE PDFs |
 | [cadastro_rural](./cadastro_rural.md) | Cadastro Ambiental Rural | SICAR |
+| [clima](./clima.md) | Dados climáticos mensais por UF ou por estação | INMET → NASA POWER |
 | [silvicultura](./silvicultura.md) | Producao silvicultural (IBGE PEVS) | IBGE PEVS |
 | [extrativismo_vegetal](./extrativismo_vegetal.md) | Producao extrativista vegetal (IBGE PEVS) | IBGE PEVS |
 | [leite_industrial](./leite_industrial.md) | Leite trimestral (aquisicao/industrializacao) | IBGE Leite |
@@ -44,6 +45,7 @@ Validação é automática: todo `fetch()` de dataset valida o DataFrame contra 
 | [pib_agro](./pib_agro.md) | PIB agropecuário por setor e trimestre | IBGE SIDRA |
 | [preco_atacado](./preco_atacado.md) | Preços de atacado em CEASAs | CONAB CEASA/PROHORT |
 | [progresso_safra](./progresso_safra.md) | Progresso semanal semeadura/colheita | CONAB |
+| [futuros_agricolas](./futuros_agricolas.md) | Futuros agrícolas B3 (ajustes, histórico, posições) | B3 |
 | [seguro_rural](./seguro_rural.md) | Seguro rural — apólices e sinistros | MAPA PSR |
 | [serie_historica_safra](./serie_historica_safra.md) | Série histórica de safras (32 culturas) | CONAB |
 
@@ -107,6 +109,8 @@ credito_rural: BCB/SICOR → BigQuery (basedosdados)
 exportacao: ComexStat → ABIOVE
 fertilizante: ANDA
 custo_producao: CONAB
+clima: INMET → NASA POWER
+futuros_agricolas: B3
 ```
 
 ## MetaInfo

@@ -1955,12 +1955,143 @@ SERIE_HISTORICA_SAFRA_V1 = Contract(
     breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
 )
 
+CLIMA_V1 = Contract(
+    name="datasets.clima",
+    version="1.0",
+    effective_from="0.13.0",
+    primary_key=["mes", "uf"],
+    columns=[
+        Column(name="mes", type=ColumnType.DATE, nullable=False, stable=True),
+        Column(name="uf", type=ColumnType.STRING, nullable=False, stable=True),
+        Column(
+            name="precip_acum_mm",
+            type=ColumnType.FLOAT,
+            nullable=False,
+            stable=True,
+            unit="mm",
+            min_value=0,
+        ),
+        Column(
+            name="temp_media",
+            type=ColumnType.FLOAT,
+            nullable=False,
+            stable=True,
+            unit="°C",
+        ),
+        Column(
+            name="temp_max_media",
+            type=ColumnType.FLOAT,
+            nullable=False,
+            stable=True,
+            unit="°C",
+        ),
+        Column(
+            name="temp_min_media",
+            type=ColumnType.FLOAT,
+            nullable=False,
+            stable=True,
+            unit="°C",
+        ),
+        Column(
+            name="num_estacoes",
+            type=ColumnType.INTEGER,
+            nullable=True,
+            stable=True,
+            min_value=0,
+        ),
+        Column(
+            name="umidade_media",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            stable=True,
+            unit="%",
+            min_value=0,
+            max_value=100,
+        ),
+        Column(
+            name="radiacao_media_mj",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            stable=True,
+            unit="MJ/m²",
+            min_value=0,
+        ),
+        Column(
+            name="vento_medio_ms",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            stable=True,
+            unit="m/s",
+            min_value=0,
+        ),
+        Column(name="fonte", type=ColumnType.STRING, nullable=False, stable=True),
+    ],
+    guarantees=[
+        "PK unica por combinacao mes + uf",
+        "'uf' sempre uppercase 2 letras",
+        "'fonte' sempre 'inmet' ou 'nasa_power'",
+        "'num_estacoes' presente apenas quando fonte='inmet'",
+        "'umidade_media', 'radiacao_media_mj', 'vento_medio_ms' presentes apenas quando fonte='nasa_power'",
+        "Agregacao mensal: 'mes' sempre primeiro dia do mes",
+    ],
+    breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
+)
+
+CLIMA_ESTACAO_V1 = Contract(
+    name="datasets.clima_estacao",
+    version="1.0",
+    effective_from="0.13.0",
+    primary_key=["data", "estacao"],
+    columns=[
+        Column(name="data", type=ColumnType.DATE, nullable=False, stable=True),
+        Column(name="estacao", type=ColumnType.STRING, nullable=False, stable=True),
+        Column(name="uf", type=ColumnType.STRING, nullable=True, stable=True),
+        Column(name="temp_media", type=ColumnType.FLOAT, nullable=True, stable=True, unit="°C"),
+        Column(name="temp_max", type=ColumnType.FLOAT, nullable=True, stable=True, unit="°C"),
+        Column(name="temp_min", type=ColumnType.FLOAT, nullable=True, stable=True, unit="°C"),
+        Column(
+            name="precipitacao_mm",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            stable=True,
+            unit="mm",
+            min_value=0,
+        ),
+        Column(
+            name="umidade_media",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            stable=True,
+            unit="%",
+            min_value=0,
+            max_value=100,
+        ),
+        Column(
+            name="radiacao_total_kj_m2",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            stable=True,
+            unit="kJ/m²",
+            min_value=0,
+        ),
+    ],
+    guarantees=[
+        "PK unica por combinacao data + estacao",
+        "'estacao' codigo INMET (ex: A301)",
+        "Apenas agregacao='diario' validada contra este contrato",
+        "Todas as colunas de medicao sao nullable (estacoes podem falhar)",
+    ],
+    breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
+)
+
 register_contract("sicar_imoveis", SICAR_IMOVEIS_V1)
 register_contract("cadastro_rural", SICAR_IMOVEIS_V1)
 register_contract("importacao", IMPORTACAO_V1)
 register_contract("pib_agro", PIB_AGRO_V1)
 register_contract("progresso_safra", CONAB_PROGRESSO_V1)
 register_contract("serie_historica_safra", SERIE_HISTORICA_SAFRA_V1)
+register_contract("clima", CLIMA_V1)
+register_contract("clima_estacao", CLIMA_ESTACAO_V1)
 
 __all__ = [
     "AJUSTE_DIARIO_V1",
@@ -1968,6 +2099,8 @@ __all__ = [
     "ANP_DIESEL_VENDAS_V1",
     "ANTT_PEDAGIO_FLUXO_V1",
     "ANTT_PEDAGIO_PRACAS_V1",
+    "CLIMA_ESTACAO_V1",
+    "CLIMA_V1",
     "COMERCIO_BILATERAL_V1",
     "CONAB_PROGRESSO_V1",
     "CREDITO_RURAL_V1_1",

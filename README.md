@@ -221,12 +221,22 @@ async def main():
     df = await datasets.seguro_rural(tipo="apolices", uf="MT", ano=2023)
     df = await datasets.seguro_rural(tipo="sinistros", evento="SECA")
 
+    # Clima (INMET → NASA POWER)
+    df = await datasets.clima(uf="SP", ano=2024)
+    df = await datasets.clima(estacao="A301", inicio="2024-01-01", fim="2024-12-31")
+
+    # Futuros agrícolas B3 (ajustes, histórico, posições)
+    df = await datasets.futuros_agricolas("boi", data="2025-03-05")
+    df = await datasets.futuros_agricolas("boi", tipo="historico", inicio="2025-01-01", fim="2025-03-05")
+    df = await datasets.futuros_agricolas("boi", tipo="posicoes", data="2025-03-05")
+
     # Listar datasets disponíveis
     print(datasets.list_datasets())
     # ['abate_trimestral', 'balanco', 'cadastro_rural', 'censo_agropecuario',
     #  'censo_agropecuario_historico', 'censo_agropecuario_municipal_1985',
-    #  'credito_rural', 'custo_producao', 'estimativa_safra', 'exportacao',
-    #  'extrativismo_vegetal', 'fertilizante', 'importacao', 'leite_industrial',
+    #  'clima', 'credito_rural', 'custo_producao', 'estimativa_safra',
+    #  'exportacao', 'extrativismo_vegetal', 'fertilizante',
+    #  'futuros_agricolas', 'importacao', 'leite_industrial',
     #  'pecuaria_municipal', 'pib_agro', 'preco_atacado', 'preco_diario',
     #  'producao_anual', 'progresso_safra', 'seguro_rural',
     #  'serie_historica_safra', 'silvicultura']

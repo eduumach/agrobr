@@ -7,6 +7,7 @@ from agrobr.datasets.censo_agropecuario import censo_agropecuario
 from agrobr.datasets.censo_agropecuario_historico import censo_agropecuario_historico
 from agrobr.datasets.censo_agropecuario_legado import censo_agropecuario_legado
 from agrobr.datasets.censo_agropecuario_municipal_1985 import censo_agropecuario_municipal_1985
+from agrobr.datasets.clima import clima
 from agrobr.datasets.credito_rural import credito_rural
 from agrobr.datasets.custo_producao import custo_producao
 from agrobr.datasets.deterministic import deterministic, get_snapshot, is_deterministic
@@ -14,6 +15,7 @@ from agrobr.datasets.estimativa_safra import estimativa_safra
 from agrobr.datasets.exportacao import exportacao
 from agrobr.datasets.extrativismo_vegetal import extrativismo_vegetal
 from agrobr.datasets.fertilizante import fertilizante
+from agrobr.datasets.futuros_agricolas import futuros_agricolas
 from agrobr.datasets.importacao import importacao
 from agrobr.datasets.leite_industrial import leite_industrial
 from agrobr.datasets.pecuaria_municipal import pecuaria_municipal
@@ -42,6 +44,7 @@ __all__ = [
     "censo_agropecuario_historico",
     "censo_agropecuario_legado",
     "censo_agropecuario_municipal_1985",
+    "clima",
     "credito_rural",
     "custo_producao",
     "describe",
@@ -51,6 +54,7 @@ __all__ = [
     "exportacao",
     "extrativismo_vegetal",
     "fertilizante",
+    "futuros_agricolas",
     "get_dataset",
     "get_snapshot",
     "importacao",
