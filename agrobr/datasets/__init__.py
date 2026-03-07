@@ -10,6 +10,7 @@ from agrobr.datasets.censo_agropecuario_municipal_1985 import censo_agropecuario
 from agrobr.datasets.clima import clima
 from agrobr.datasets.credito_rural import credito_rural
 from agrobr.datasets.custo_producao import custo_producao
+from agrobr.datasets.desmatamento import desmatamento
 from agrobr.datasets.deterministic import deterministic, get_snapshot, is_deterministic
 from agrobr.datasets.estimativa_safra import estimativa_safra
 from agrobr.datasets.exportacao import exportacao
@@ -24,6 +25,7 @@ from agrobr.datasets.preco_atacado import preco_atacado
 from agrobr.datasets.preco_diario import preco_diario
 from agrobr.datasets.producao_anual import producao_anual
 from agrobr.datasets.progresso_safra import progresso_safra
+from agrobr.datasets.queimadas import queimadas
 from agrobr.datasets.registry import (
     describe,
     describe_all,
@@ -35,6 +37,7 @@ from agrobr.datasets.registry import (
 from agrobr.datasets.seguro_rural import seguro_rural
 from agrobr.datasets.serie_historica_safra import serie_historica_safra
 from agrobr.datasets.silvicultura import silvicultura as silvicultura_dataset
+from agrobr.datasets.uso_do_solo import uso_do_solo
 
 __all__ = [
     "abate_trimestral",
@@ -47,6 +50,7 @@ __all__ = [
     "clima",
     "credito_rural",
     "custo_producao",
+    "desmatamento",
     "describe",
     "describe_all",
     "deterministic",
@@ -69,7 +73,9 @@ __all__ = [
     "preco_diario",
     "producao_anual",
     "progresso_safra",
+    "queimadas",
     "seguro_rural",
     "serie_historica_safra",
     "silvicultura_dataset",
+    "uso_do_solo",
 ]
