@@ -205,3 +205,7 @@ df = await conab.serie_historica("soja", inicio=2020, uf="MT")
 |---------|-------|
 | **Frequencia** | Mensal |
 | **Publicacao** | Geralmente entre dias 10-15 |
+
+## Datasets
+
+- [`serie_historica_safra`](../contracts/serie_historica_safra.md) — wraps `conab.serie_historica()` (32 culturas)

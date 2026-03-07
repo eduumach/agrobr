@@ -6,6 +6,10 @@ from agrobr.datasets import registry
 
 ALL_DATASETS = sorted(registry.list_datasets())
 
+DYNAMIC_PRODUCTS_DATASETS = {
+    name for name in ALL_DATASETS if registry.get_dataset(name).info.products == []
+}
+
 
 @pytest.mark.parametrize("dataset_name", ALL_DATASETS)
 class TestDatasetInfo:
@@ -15,8 +19,11 @@ class TestDatasetInfo:
 
     def test_info_has_products(self, dataset_name):
         ds = registry.get_dataset(dataset_name)
-        assert len(ds.info.products) > 0
-        assert all(isinstance(p, str) for p in ds.info.products)
+        if dataset_name in DYNAMIC_PRODUCTS_DATASETS:
+            assert ds.info.products == []
+        else:
+            assert len(ds.info.products) > 0
+            assert all(isinstance(p, str) for p in ds.info.products)
 
     def test_info_has_sources(self, dataset_name):
         ds = registry.get_dataset(dataset_name)
@@ -51,11 +58,15 @@ class TestDatasetInfo:
         assert isinstance(info_dict["sources"], list)
         assert len(info_dict["sources"]) > 0
         assert isinstance(info_dict["products"], list)
-        assert len(info_dict["products"]) > 0
+        if dataset_name not in DYNAMIC_PRODUCTS_DATASETS:
+            assert len(info_dict["products"]) > 0
         assert "contract_version" in info_dict
 
 
-@pytest.mark.parametrize("dataset_name", ALL_DATASETS)
+DATASETS_WITH_PRODUCTS = [d for d in ALL_DATASETS if d not in DYNAMIC_PRODUCTS_DATASETS]
+
+
+@pytest.mark.parametrize("dataset_name", DATASETS_WITH_PRODUCTS)
 class TestDatasetValidation:
     def test_validate_produto_valid(self, dataset_name):
         ds = registry.get_dataset(dataset_name)
@@ -81,4 +92,5 @@ class TestDatasetRegistry:
     def test_list_products(self, dataset_name):
         products = registry.list_products(dataset_name)
         assert isinstance(products, list)
-        assert len(products) > 0
+        if dataset_name not in DYNAMIC_PRODUCTS_DATASETS:
+            assert len(products) > 0

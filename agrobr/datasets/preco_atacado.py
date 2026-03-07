@@ -1,0 +1,101 @@
+from __future__ import annotations
+
+from typing import Any
+
+import pandas as pd
+import structlog
+
+from agrobr.datasets.base import BaseDataset, DatasetInfo, DatasetSource, _unpack_result
+from agrobr.datasets.deterministic import get_snapshot
+from agrobr.models import MetaInfo
+
+logger = structlog.get_logger()
+
+
+async def _fetch_ceasa(produto: str, **kwargs: Any) -> tuple[pd.DataFrame, MetaInfo | None]:
+    from agrobr.conab import ceasa
+
+    ceasa_param = kwargs.get("ceasa")
+    produto_param = produto if produto else None
+
+    result = await ceasa.precos(produto=produto_param, ceasa=ceasa_param, return_meta=True)
+
+    return _unpack_result(result)
+
+
+PRECO_ATACADO_INFO = DatasetInfo(
+    name="preco_atacado",
+    description="Preços de atacado em CEASAs brasileiras (CONAB/PROHORT)",
+    sources=[
+        DatasetSource(
+            name="conab_ceasa",
+            priority=1,
+            fetch_fn=_fetch_ceasa,
+            description="CONAB CEASA/PROHORT (preços diários de hortifrúti)",
+        ),
+    ],
+    products=[],
+    contract_version="1.0",
+    update_frequency="daily",
+    typical_latency="D+1",
+    source_url="http://dw.ceasa.gov.br",
+    source_institution="CONAB/PROHORT",
+    unit="BRL/unidade",
+    license="zona_cinza",
+)
+
+
+class PrecoAtacadoDataset(BaseDataset):
+    info = PRECO_ATACADO_INFO
+
+    def _validate_produto(self, produto: str) -> None:
+        pass
+
+    async def fetch(  # type: ignore[override]
+        self,
+        produto: str | None = None,
+        *,
+        ceasa: str | None = None,
+        return_meta: bool = False,
+        **kwargs: Any,
+    ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
+        logger.info(
+            "dataset_fetch",
+            dataset="preco_atacado",
+            produto=produto,
+            ceasa=ceasa,
+        )
+
+        snapshot = get_snapshot()
+
+        df, source_name, source_meta, attempted = await self._try_sources(
+            produto or "", ceasa=ceasa, **kwargs
+        )
+
+        df = self._normalize(df)
+        self._validate_contract(df)
+
+        if return_meta:
+            return df, self._build_meta(df, source_name, source_meta, attempted, snapshot)
+
+        return df
+
+    def _normalize(self, df: pd.DataFrame) -> pd.DataFrame:
+        return df
+
+
+_preco_atacado = PrecoAtacadoDataset()
+
+from agrobr.datasets.registry import register  # noqa: E402
+
+register(_preco_atacado)
+
+
+async def preco_atacado(
+    produto: str | None = None,
+    *,
+    ceasa: str | None = None,
+    return_meta: bool = False,
+    **kwargs: Any,
+) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
+    return await _preco_atacado.fetch(produto, ceasa=ceasa, return_meta=return_meta, **kwargs)

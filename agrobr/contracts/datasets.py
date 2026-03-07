@@ -1912,11 +1912,55 @@ PIB_AGRO_V1 = Contract(
     breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
 )
 
+SERIE_HISTORICA_SAFRA_V1 = Contract(
+    name="conab.serie_historica_safra",
+    version="1.0",
+    effective_from="0.13.0",
+    primary_key=["produto", "safra", "regiao", "uf"],
+    columns=[
+        Column(name="produto", type=ColumnType.STRING, nullable=False, stable=True),
+        Column(name="safra", type=ColumnType.STRING, nullable=False, stable=True),
+        Column(name="regiao", type=ColumnType.STRING, nullable=True, stable=True),
+        Column(name="uf", type=ColumnType.STRING, nullable=True, stable=True),
+        Column(
+            name="area_plantada_mil_ha",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            stable=True,
+            min_value=0,
+        ),
+        Column(
+            name="producao_mil_ton",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            stable=True,
+            min_value=0,
+        ),
+        Column(
+            name="produtividade_kg_ha",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            stable=True,
+            min_value=0,
+        ),
+    ],
+    guarantees=[
+        "PK unica por combinacao produto + safra + regiao + uf",
+        "'produto' lowercase (ex: soja, milho_2)",
+        "'safra' formato YYYY/YY (ex: 2023/24)",
+        "'regiao' quando presente: NORTE, NORDESTE, CENTRO-OESTE, SUDESTE, SUL",
+        "'uf' quando presente: codigo UF de 2 letras uppercase",
+        "Metricas (area, producao, produtividade) >= 0 quando presentes",
+    ],
+    breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
+)
+
 register_contract("sicar_imoveis", SICAR_IMOVEIS_V1)
 register_contract("cadastro_rural", SICAR_IMOVEIS_V1)
 register_contract("importacao", IMPORTACAO_V1)
 register_contract("pib_agro", PIB_AGRO_V1)
 register_contract("progresso_safra", CONAB_PROGRESSO_V1)
+register_contract("serie_historica_safra", SERIE_HISTORICA_SAFRA_V1)
 
 __all__ = [
     "AJUSTE_DIARIO_V1",
@@ -1941,6 +1985,7 @@ __all__ = [
     "PIB_AGRO_V1",
     "POSICOES_ABERTAS_V1",
     "PRECO_ATACADO_V1",
+    "SERIE_HISTORICA_SAFRA_V1",
     "SICAR_IMOVEIS_V1",
     "TRADE_MIRROR_V1",
 ]

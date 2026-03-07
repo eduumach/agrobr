@@ -128,6 +128,10 @@ Os CSVs do SISSER podem ser grandes (o arquivo 2006-2015 tem ~500k linhas).
 O modulo baixa apenas os periodos necessarios com base nos filtros de ano.
 Timeout de leitura: 180 segundos.
 
+## Datasets
+
+- [`seguro_rural`](../contracts/seguro_rural.md) — wraps `mapa_psr.apolices()` e `mapa_psr.sinistros()` via `tipo=` dispatch
+
 ## Fonte
 
 - URL: `https://dados.agricultura.gov.br/dataset/sisser3`

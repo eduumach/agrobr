@@ -42,7 +42,10 @@ Validação é automática: todo `fetch()` de dataset valida o DataFrame contra 
 | [leite_industrial](./leite_industrial.md) | Leite trimestral (aquisicao/industrializacao) | IBGE Leite |
 | [lspa](./lspa.md) | Estimativas mensais de produção agrícola | IBGE LSPA |
 | [pib_agro](./pib_agro.md) | PIB agropecuário por setor e trimestre | IBGE SIDRA |
+| [preco_atacado](./preco_atacado.md) | Preços de atacado em CEASAs | CONAB CEASA/PROHORT |
 | [progresso_safra](./progresso_safra.md) | Progresso semanal semeadura/colheita | CONAB |
+| [seguro_rural](./seguro_rural.md) | Seguro rural — apólices e sinistros | MAPA PSR |
+| [serie_historica_safra](./serie_historica_safra.md) | Série histórica de safras (32 culturas) | CONAB |
 
 ## Schemas JSON
 

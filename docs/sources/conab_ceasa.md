@@ -55,6 +55,10 @@ O parser unpivota a matriz para formato long-form com 7 colunas.
 - **TTL:** 4 horas (precos atualizados diariamente)
 - Recomendado: usar uma vez por dia para snapshot de precos
 
+## Datasets
+
+- [`preco_atacado`](../contracts/preco_atacado.md) — wraps `ceasa.precos()` (48+ produtos PROHORT)
+
 ## Links
 
 - [Portal de Informacoes CONAB](https://portaldeinformacoes.conab.gov.br/mercado-atacadista-hortigranjeiro.html)

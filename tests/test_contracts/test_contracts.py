@@ -460,7 +460,7 @@ class TestGenerateJsonSchemas:
     def test_generate_all_schemas(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             files = generate_json_schemas(tmpdir)
-            assert len(files) == 41
+            assert len(files) == 42
 
             for filepath in files:
                 path = Path(filepath)

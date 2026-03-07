@@ -18,6 +18,7 @@ from agrobr.datasets.importacao import importacao
 from agrobr.datasets.leite_industrial import leite_industrial
 from agrobr.datasets.pecuaria_municipal import pecuaria_municipal
 from agrobr.datasets.pib_agro import pib_agro
+from agrobr.datasets.preco_atacado import preco_atacado
 from agrobr.datasets.preco_diario import preco_diario
 from agrobr.datasets.producao_anual import producao_anual
 from agrobr.datasets.progresso_safra import progresso_safra
@@ -29,6 +30,8 @@ from agrobr.datasets.registry import (
     list_datasets,
     list_products,
 )
+from agrobr.datasets.seguro_rural import seguro_rural
+from agrobr.datasets.serie_historica_safra import serie_historica_safra
 from agrobr.datasets.silvicultura import silvicultura as silvicultura_dataset
 
 __all__ = [
@@ -58,8 +61,11 @@ __all__ = [
     "list_products",
     "pecuaria_municipal",
     "pib_agro",
+    "preco_atacado",
     "preco_diario",
     "producao_anual",
     "progresso_safra",
+    "seguro_rural",
+    "serie_historica_safra",
     "silvicultura_dataset",
 ]

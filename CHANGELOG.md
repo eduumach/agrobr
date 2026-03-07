@@ -8,6 +8,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Unreleased]
 
 ### Added
+- **datasets** — 3 novos datasets na camada semântica (21→24): `serie_historica_safra` (CONAB, 32 culturas desde 1976/77, contrato `SERIE_HISTORICA_SAFRA_V1`), `preco_atacado` (CONAB CEASA/PROHORT, preços diários hortifrúti, reutiliza `PRECO_ATACADO_V1`), `seguro_rural` (MAPA PSR, apólices e sinistros com `tipo=` dispatch, reutiliza `MAPA_PSR_APOLICES_V1`/`MAPA_PSR_SINISTROS_V1`)
 - **datasets** — 3 novos datasets na camada semântica (18→21): `importacao` (ComexStat, mirror de exportacao), `pib_agro` (IBGE SIDRA, PIB agropecuário por setor/trimestre com `precos` na PK), `progresso_safra` (CONAB, progresso semanal semeadura/colheita). Contratos `IMPORTACAO_V1`, `PIB_AGRO_V1` + dual register `progresso_safra` para `CONAB_PROGRESSO_V1`
 - **comexstat** — `importacao()` para dados de importação ComexStat (MDIC/SECEX). Mesma interface de `exportacao()`: filtro por produto (NCM), ano, UF, agregação mensal/detalhado, `as_polars`, `return_meta`. Parser refatorado com `_parse_comexstat_csv()` compartilhado (mensagens de erro corretas por fluxo). `_fetch_comexstat()` helper elimina duplicação entre export/import. 10 testes novos (6 API + 4 parser)
 - **ZARC** — Zoneamento Agricola de Risco Climatico (janelas de plantio por municipio/cultura/solo). Fonte MAPA/Embrapa via CKAN (CC-BY). `zoneamento()` com filtros cultura/uf/municipio/safra/solo/ciclo, `culturas()`, `safras_disponiveis()`. Session cache para CSVs grandes. 31 testes, golden data
