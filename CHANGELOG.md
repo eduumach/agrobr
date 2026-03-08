@@ -8,6 +8,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Unreleased]
 
 ### Added
+- **py.typed** — PEP 561 marker para suporte a type checking em projetos downstream
 - **datasets** — 2 novos datasets na camada semântica (32→34): `movimentacao_portuaria` (ANTAQ, single-source, keyword-only, 21 colunas, 6 filtros opcionais, reutiliza `MOVIMENTACAO_PORTUARIA_V1`), `condicao_lavouras` (SEAB/DERAL, 14 culturas PR, normalização condicao vazia→plantio/colheita, contrato `CONDICAO_LAVOURAS_V1`)
 - **datasets** — 3 novos datasets na camada semântica (29→32): `oferta_demanda_global` (USDA PSD, long/pivot format, 8 commodities, skip contract quando `pivot=True`, contrato `OFERTA_DEMANDA_GLOBAL_V1`), `comercio_internacional` (UN Comtrade, bilateral global por HS code, 17 produtos, reutiliza `COMERCIO_BILATERAL_V1`), `zoneamento_agricola` (ZARC/MAPA, janelas de plantio por município/cultura/solo, 36 decêndios, keyword-only, contrato `ZONEAMENTO_AGRICOLA_V1`)
 - **datasets** — 3 novos datasets ambientais/ESG na camada semântica (26→29): `desmatamento` (INPE, `tipo=` dispatch prodes/deter, 6 biomas, normalização bioma, fail-fast DETER fora Amazônia/Cerrado, reutiliza `DESMATAMENTO_PRODES_V1`/`DESMATAMENTO_DETER_V1`), `uso_do_solo` (MapBiomas, `tipo=` dispatch cobertura/transição, suporte `nivel="municipio"` com skip contract, reutiliza `MAPBIOMAS_COBERTURA_V1`/`MAPBIOMAS_TRANSICAO_V1`), `queimadas` (INPE, focos de calor por satélite, dual-register contrato, reutiliza `FOCOS_QUEIMADAS_V1`)
@@ -20,6 +21,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **deps** — `python-calamine>=0.3.0` como dependencia core (749KB, zero deps Python, engine Rust para leitura Excel)
 
 ### Improved
+- **inmet/api** — `estacoes()` agora suporta `as_polars`, `return_meta` e `build_source_meta()` (unica source API que nao tinha os 3)
+- **conab/api** — `balanco()` e `brasil_total()` agora suportam `return_meta` com overloads tipados e `build_source_meta()`. `safras()` migrado de MetaInfo inline para `build_source_meta()`
 - **b3** — `ajustes()` agora usa BVBG-086 ZIP como fonte primaria (endpoint `pesquisapregao/download`, XML streaming com `lxml.etree.iterparse`). Fallback automatico para HTML legado em caso de falha. `parse_ajustes_zip()` com filtragem agro, nested ZIP extraction e wrapping de erros em `ParseError`. URL antiga mantida para fallback
 - **constants** — `HTTPSettings.max_concurrent_default`, `max_concurrent_b3`, `max_concurrent_ibge` para concorrencia configuravel por fonte no RateLimiter (default 1 = sem mudanca de comportamento)
 - **normalize/numeric** — `parse_numeric_br` canonica para parsing numerico formato BR (ponto=milhar, virgula=decimal). Substitui 3 implementacoes duplicadas em `alt/` parsers
@@ -80,6 +83,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **conab/custo_producao/api** — `custo_producao()` e `custo_producao_total()` integrados com `select_data_sheet()` e `_parse_sheet_info()` para resolucao automatica de sheet, UF e safra
 
 ### Fixed
+- **comtrade** — ausente do namespace publico `agrobr.__init__` — `from agrobr import comtrade` falhava com ImportError
+- **datasets/silvicultura** — exportado como `silvicultura_dataset` (alias desnecessario, padrao dos outros 33 e sem alias). Corrigido para `silvicultura`
 - **b3/parser** — `_parse_bvmf_xml` memory cleanup do `iterparse` fazia `del parent[0]` (filhos do parent) quando a intencao era remover siblings anteriores do parent no nivel do avo. XMLs grandes (BVBG-086, 7-8 MB) crasheavam com `IndexError` quando parent ficava vazio. Corrigido para `grandparent.remove(grandparent[0])`
 - **conab/custo_producao/client** — regex `\.xlsx` excluia `.xls` (graos: soja, trigo, algodao, cafe). Corrigido para `\.xlsx?`. Novo: folder crawl lazy para culturas em subpaginas (milho, arroz, feijao) — `_extract_folder_urls()` detecta links de pasta, `_crawl_folder()` busca `.xls` dentro delas com `asyncio.gather()` paralelo, strip `/view`. Zero overhead para culturas com link direto. UF regex hardcoded substituido por `UFS_VALIDAS` canonico
 - **sync** — `_get_or_create_event_loop()` corrigido: `except RuntimeError` no outer try engolia o `raise RuntimeError` do nest_asyncio missing. Loop running sem nest_asyncio agora levanta RuntimeError corretamente em vez de fallback silencioso para `get_event_loop()`. Test morto (`test_running_loop_without_nest_asyncio_raises`) reescrito e funcional

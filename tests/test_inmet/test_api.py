@@ -42,22 +42,34 @@ def _mock_obs(
     }
 
 
+def _mock_estacao(
+    codigo="A001",
+    nome="BRASILIA",
+    uf="DF",
+    situacao="Operante",
+    tipo="Automatica",
+    lat="-15.789",
+    lon="-47.925",
+    alt="1160.96",
+    inicio="2000-05-07",
+):
+    return {
+        "CD_ESTACAO": codigo,
+        "DC_NOME": nome,
+        "SG_ESTADO": uf,
+        "CD_SITUACAO": situacao,
+        "TP_ESTACAO": tipo,
+        "VL_LATITUDE": lat,
+        "VL_LONGITUDE": lon,
+        "VL_ALTITUDE": alt,
+        "DT_INICIO_OPERACAO": inicio,
+    }
+
+
 class TestEstacoes:
     @pytest.mark.asyncio
     async def test_estacoes_returns_dataframe(self):
-        mock_data = [
-            {
-                "CD_ESTACAO": "A001",
-                "DC_NOME": "BRASILIA",
-                "SG_ESTADO": "DF",
-                "CD_SITUACAO": "Operante",
-                "TP_ESTACAO": "Automatica",
-                "VL_LATITUDE": "-15.789",
-                "VL_LONGITUDE": "-47.925",
-                "VL_ALTITUDE": "1160.96",
-                "DT_INICIO_OPERACAO": "2000-05-07",
-            },
-        ]
+        mock_data = [_mock_estacao()]
 
         with patch.object(
             api.client, "fetch_estacoes", new_callable=AsyncMock, return_value=mock_data
@@ -71,28 +83,16 @@ class TestEstacoes:
     @pytest.mark.asyncio
     async def test_estacoes_filter_uf(self):
         mock_data = [
-            {
-                "CD_ESTACAO": "A001",
-                "DC_NOME": "BRASILIA",
-                "SG_ESTADO": "DF",
-                "CD_SITUACAO": "Operante",
-                "TP_ESTACAO": "Automatica",
-                "VL_LATITUDE": "-15.789",
-                "VL_LONGITUDE": "-47.925",
-                "VL_ALTITUDE": "1160.96",
-                "DT_INICIO_OPERACAO": "2000-05-07",
-            },
-            {
-                "CD_ESTACAO": "A002",
-                "DC_NOME": "SAO PAULO",
-                "SG_ESTADO": "SP",
-                "CD_SITUACAO": "Operante",
-                "TP_ESTACAO": "Automatica",
-                "VL_LATITUDE": "-23.5",
-                "VL_LONGITUDE": "-46.6",
-                "VL_ALTITUDE": "800.0",
-                "DT_INICIO_OPERACAO": "2001-01-01",
-            },
+            _mock_estacao(),
+            _mock_estacao(
+                codigo="A002",
+                nome="SAO PAULO",
+                uf="SP",
+                lat="-23.5",
+                lon="-46.6",
+                alt="800.0",
+                inicio="2001-01-01",
+            ),
         ]
 
         with patch.object(
@@ -173,22 +173,8 @@ class TestClimaUf:
 class TestEstacoesReturnMeta:
     @pytest.mark.asyncio
     async def test_return_meta(self):
-        mock_data = [
-            {
-                "CD_ESTACAO": "A001",
-                "DC_NOME": "BRASILIA",
-                "SG_ESTADO": "DF",
-                "CD_SITUACAO": "Operante",
-                "TP_ESTACAO": "Automatica",
-                "VL_LATITUDE": "-15.789",
-                "VL_LONGITUDE": "-47.925",
-                "VL_ALTITUDE": "1160.96",
-                "DT_INICIO_OPERACAO": "2000-05-07",
-            },
-        ]
-
         with patch.object(
-            api.client, "fetch_estacoes", new_callable=AsyncMock, return_value=mock_data
+            api.client, "fetch_estacoes", new_callable=AsyncMock, return_value=[_mock_estacao()]
         ):
             df, meta = await api.estacoes(return_meta=True)
 
@@ -196,26 +182,13 @@ class TestEstacoesReturnMeta:
         assert meta.records_count == len(df)
         assert meta.attempted_sources == ["inmet"]
         assert meta.selected_source == "inmet"
+        assert meta.fetch_timestamp is not None
 
     @pytest.mark.asyncio
     async def test_as_polars(self):
         pl = pytest.importorskip("polars")
-        mock_data = [
-            {
-                "CD_ESTACAO": "A001",
-                "DC_NOME": "BRASILIA",
-                "SG_ESTADO": "DF",
-                "CD_SITUACAO": "Operante",
-                "TP_ESTACAO": "Automatica",
-                "VL_LATITUDE": "-15.789",
-                "VL_LONGITUDE": "-47.925",
-                "VL_ALTITUDE": "1160.96",
-                "DT_INICIO_OPERACAO": "2000-05-07",
-            },
-        ]
-
         with patch.object(
-            api.client, "fetch_estacoes", new_callable=AsyncMock, return_value=mock_data
+            api.client, "fetch_estacoes", new_callable=AsyncMock, return_value=[_mock_estacao()]
         ):
             result = await api.estacoes(as_polars=True)
 

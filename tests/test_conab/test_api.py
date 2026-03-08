@@ -294,6 +294,9 @@ class TestBalanco:
         assert isinstance(df, pd.DataFrame)
         assert meta.source == "conab"
         assert meta.records_count == len(df)
+        assert meta.attempted_sources == ["conab"]
+        assert meta.selected_source == "conab"
+        assert meta.fetch_timestamp is not None
 
     async def test_return_meta_empty(self):
         mock_client, mock_parser = _mock_fetch_safra_xlsx(suprimentos=[])
@@ -306,6 +309,7 @@ class TestBalanco:
 
         assert df.empty
         assert meta.records_count == 0
+        assert meta.source == "conab"
 
     async def test_source_unavailable_propagates(self):
         with (
@@ -405,6 +409,9 @@ class TestBrasilTotal:
         assert isinstance(df, pd.DataFrame)
         assert meta.source == "conab"
         assert meta.records_count == len(df)
+        assert meta.attempted_sources == ["conab"]
+        assert meta.selected_source == "conab"
+        assert meta.fetch_timestamp is not None
 
     async def test_return_meta_empty(self):
         mock_client, mock_parser = _mock_fetch_safra_xlsx(totais=[])
@@ -417,6 +424,7 @@ class TestBrasilTotal:
 
         assert df.empty
         assert meta.records_count == 0
+        assert meta.source == "conab"
 
     async def test_source_unavailable_propagates(self):
         with (

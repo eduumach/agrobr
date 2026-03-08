@@ -16,6 +16,8 @@ from agrobr.utils.result import build_source_meta, finalize_result
 
 logger = structlog.get_logger()
 
+_SAFRAS_URL = "https://www.conab.gov.br/info-agro/safras/graos"
+
 
 @overload
 async def safras(
@@ -62,7 +64,7 @@ async def safras(
     fetch_ms = int((time.monotonic() - t0) * 1000)
 
     t1 = time.monotonic()
-    source_url = metadata.get("url", "https://www.conab.gov.br/info-agro/safras/graos")
+    source_url = metadata.get("url", _SAFRAS_URL)
 
     parser = ConabParserV1()
     safra_list = parser.parse_safra_produto(
@@ -134,7 +136,7 @@ async def balanco(
     safra: str | None = None,
     as_polars: bool = False,
     *,
-    return_meta: Literal[False] = ...,
+    return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
 
@@ -199,7 +201,7 @@ async def balanco(
         )
 
     parse_ms = int((time.monotonic() - t1) * 1000)
-    source_url = metadata.get("url", "https://www.conab.gov.br/info-agro/safras/graos")
+    source_url = metadata.get("url", _SAFRAS_URL)
 
     meta = build_source_meta("conab", source_url, "httpx", fetch_ms, parse_ms, df, parser.version)
     return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
@@ -210,7 +212,7 @@ async def brasil_total(
     safra: str | None = None,
     as_polars: bool = False,
     *,
-    return_meta: Literal[False] = ...,
+    return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
 
@@ -252,7 +254,7 @@ async def brasil_total(
         )
 
     parse_ms = int((time.monotonic() - t1) * 1000)
-    source_url = metadata.get("url", "https://www.conab.gov.br/info-agro/safras/graos")
+    source_url = metadata.get("url", _SAFRAS_URL)
 
     meta = build_source_meta("conab", source_url, "httpx", fetch_ms, parse_ms, df, parser.version)
     return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)

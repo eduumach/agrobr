@@ -22,7 +22,7 @@ async def estacoes(
     apenas_operantes: bool = ...,
     as_polars: bool = ...,
     *,
-    return_meta: Literal[False] = ...,
+    return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
 
 
