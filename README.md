@@ -233,13 +233,15 @@ async def main():
     # Listar datasets disponíveis
     print(datasets.list_datasets())
     # ['abate_trimestral', 'balanco', 'cadastro_rural', 'censo_agropecuario',
-    #  'censo_agropecuario_historico', 'censo_agropecuario_municipal_1985',
-    #  'clima', 'credito_rural', 'custo_producao', 'estimativa_safra',
-    #  'exportacao', 'extrativismo_vegetal', 'fertilizante',
+    #  'censo_agropecuario_historico', 'censo_agropecuario_legado',
+    #  'censo_agropecuario_municipal_1985', 'clima', 'comercio_internacional',
+    #  'condicao_lavouras', 'credito_rural', 'custo_producao', 'desmatamento',
+    #  'estimativa_safra', 'exportacao', 'extrativismo_vegetal', 'fertilizante',
     #  'futuros_agricolas', 'importacao', 'leite_industrial',
-    #  'pecuaria_municipal', 'pib_agro', 'preco_atacado', 'preco_diario',
-    #  'producao_anual', 'progresso_safra', 'seguro_rural',
-    #  'serie_historica_safra', 'silvicultura']
+    #  'movimentacao_portuaria', 'oferta_demanda_global', 'pecuaria_municipal',
+    #  'pib_agro', 'preco_atacado', 'preco_diario', 'producao_anual',
+    #  'progresso_safra', 'queimadas', 'seguro_rural', 'serie_historica_safra',
+    #  'silvicultura', 'uso_do_solo', 'zoneamento_agricola']
 ```
 
 ### Modo Determinístico (Reprodutibilidade)
@@ -528,29 +530,39 @@ Use `agrobr health --all` para verificar localmente.
 
 | Dataset | Descrição | Fontes |
 |---------|-----------|--------|
+| `abate_trimestral` | Abate de bovinos, suínos e frangos por UF | IBGE Abate |
+| `balanco` | Oferta/demanda | CONAB |
+| `cadastro_rural` | Cadastro Ambiental Rural (imóveis rurais por UF) | SICAR/GeoServer WFS |
+| `censo_agropecuario` | Censo Agropecuário 1995/2006/2017 (10 temas) | IBGE Censo Agro |
+| `censo_agropecuario_historico` | Série histórica Censo Agropecuário 1920-2006 (9 temas) | IBGE SIDRA |
+| `censo_agropecuario_legado` | Censo 1995/96 — 6 temas legados (FTP) | IBGE FTP |
+| `censo_agropecuario_municipal_1985` | Censo 1985 municipal — 53 temas via OCR (22 UFs) | IBGE PDFs |
+| `clima` | Dados climáticos mensais/diários por UF ou estação | INMET → NASA POWER |
+| `comercio_internacional` | Comércio internacional bilateral por HS code | UN Comtrade |
+| `condicao_lavouras` | Condição semanal das lavouras do Paraná | DERAL |
+| `credito_rural` | Crédito rural por cultura (programa, seguro, modalidade) | BCB/SICOR → BigQuery |
+| `custo_producao` | Custos de produção | CONAB |
+| `desmatamento` | Desmatamento PRODES/DETER — consolidado + alertas | INPE TerraBrasilis |
+| `estimativa_safra` | Estimativas safra corrente | CONAB → IBGE LSPA |
+| `exportacao` | Exportações agrícolas | ComexStat → ABIOVE |
+| `extrativismo_vegetal` | Produção extrativista vegetal (açaí, castanha, erva-mate) | IBGE PEVS |
+| `fertilizante` | Entregas de fertilizantes | ANDA |
+| `futuros_agricolas` | Futuros agrícolas B3 (ajustes, histórico, posições) | B3 |
+| `importacao` | Importações agrícolas | ComexStat |
+| `leite_industrial` | Aquisição e industrialização trimestral de leite por UF | IBGE Leite |
+| `movimentacao_portuaria` | Movimentação portuária de carga (granel, geral, contêiner) | ANTAQ |
+| `oferta_demanda_global` | Oferta/demanda global de commodities (USDA PSD) | USDA |
+| `pecuaria_municipal` | Pecuária municipal (rebanhos e produção animal) | IBGE PPM |
+| `pib_agro` | PIB agropecuário por setor e trimestre | IBGE SIDRA |
+| `preco_atacado` | Preços de atacado hortifrúti em CEASAs | CONAB CEASA/PROHORT |
 | `preco_diario` | Preços diários spot | CEPEA → cache |
 | `producao_anual` | Produção anual consolidada | IBGE PAM → CONAB |
-| `estimativa_safra` | Estimativas safra corrente | CONAB → IBGE LSPA |
-| `balanco` | Oferta/demanda | CONAB |
-| `credito_rural` | Crédito rural por cultura (programa, seguro, modalidade) | BCB/SICOR → BigQuery |
-| `exportacao` | Exportações agrícolas | ComexStat → ABIOVE |
-| `fertilizante` | Entregas de fertilizantes | ANDA |
-| `importacao` | Importações agrícolas | ComexStat |
-| `custo_producao` | Custos de produção | CONAB |
-| `abate_trimestral` | Abate de bovinos, suínos e frangos por UF | IBGE Abate |
-| `cadastro_rural` | Cadastro Ambiental Rural (imóveis rurais por UF) | SICAR/GeoServer WFS |
-| `pecuaria_municipal` | Pecuária municipal (rebanhos e produção animal) | IBGE PPM |
-| `comercio_internacional` | Comércio internacional bilateral (HS codes, qualquer reporter/partner) | UN Comtrade |
-| `censo_agropecuario` | Censo Agropecuário 1995/2006/2017 (10 temas: rebanho, uso terra, lavouras, manejo solo, irrigação) | IBGE Censo Agro |
-| `censo_agropecuario_legado` | Censo 1995/96 — 6 temas legados (FTP) | IBGE FTP |
-| `censo_agropecuario_historico` | Série histórica Censo Agropecuário 1920-2006 (9 temas, até UF) | IBGE SIDRA |
-| `censo_agropecuario_municipal_1985` | Censo 1985 municipal — 53 temas via OCR (22 UFs) | IBGE PDFs |
-| `silvicultura` | Producao silvicultural (eucalipto, pinus, carvao vegetal, madeira) | IBGE PEVS |
-| `extrativismo_vegetal` | Producao extrativista vegetal (acai, castanha, erva-mate) | IBGE PEVS |
-| `leite_industrial` | Aquisicao e industrializacao trimestral de leite por UF | IBGE Leite |
-| `oferta_demanda_global` | Oferta/demanda global de commodities (USDA PSD) | USDA |
-| `pib_agro` | PIB agropecuário por setor e trimestre | IBGE SIDRA |
 | `progresso_safra` | Progresso semanal semeadura/colheita | CONAB |
+| `queimadas` | Focos de calor por satélite (6 biomas) | INPE |
+| `seguro_rural` | Apólices e sinistros do seguro rural | MAPA PSR |
+| `serie_historica_safra` | Série histórica de safras — 32 culturas desde 1976 | CONAB |
+| `silvicultura` | Produção silvicultural (eucalipto, pinus, carvão vegetal) | IBGE PEVS |
+| `uso_do_solo` | Cobertura e uso da terra anual por UF/município | MapBiomas |
 | `zoneamento_agricola` | Zoneamento agrícola de risco climático (ZARC) | MAPA/Embrapa |
 
 ## Fontes Suportadas

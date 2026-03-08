@@ -68,18 +68,41 @@ nav:
   - Guia Rápido: quickstart.md
   - Datasets:
     - Visão Geral: contracts/index.md
+    - abate_trimestral: contracts/abate_trimestral.md
+    - balanco: contracts/balanco.md
+    - cadastro_rural: contracts/cadastro_rural.md
+    - censo_agropecuario: contracts/censo_agropecuario.md
+    - censo_agropecuario_historico: contracts/censo_agropecuario_historico.md
+    - censo_agropecuario_legado: contracts/censo_agropecuario_legado.md
+    - censo_agropecuario_municipal_1985: contracts/censo_agropecuario_municipal_1985.md
+    - clima: contracts/clima.md
+    - comercio_internacional: contracts/comercio_internacional.md
+    - condicao_lavouras: contracts/condicao_lavouras.md
+    - credito_rural: contracts/credito_rural.md
+    - custo_producao: contracts/custo_producao.md
+    - desmatamento: contracts/desmatamento.md
+    - estimativa_safra: contracts/estimativa_safra.md
+    - exportacao: contracts/exportacao.md
+    - extrativismo_vegetal: contracts/extrativismo_vegetal.md
+    - fertilizante: contracts/fertilizante.md
+    - futuros_agricolas: contracts/futuros_agricolas.md
+    - importacao: contracts/importacao.md
+    - leite_industrial: contracts/leite_industrial.md
+    - lspa: contracts/lspa.md
+    - movimentacao_portuaria: contracts/movimentacao_portuaria.md
+    - oferta_demanda_global: contracts/oferta_demanda_global.md
+    - pecuaria_municipal: contracts/pecuaria_municipal.md
+    - pib_agro: contracts/pib_agro.md
+    - preco_atacado: contracts/preco_atacado.md
     - preco_diario: contracts/preco_diario.md
     - producao_anual: contracts/producao_anual.md
-    - estimativa_safra: contracts/estimativa_safra.md
-    - balanco: contracts/balanco.md
-    - credito_rural: contracts/credito_rural.md
-    - exportacao: contracts/exportacao.md
-    - fertilizante: contracts/fertilizante.md
-    - custo_producao: contracts/custo_producao.md
-    - pecuaria_municipal: contracts/pecuaria_municipal.md
-    - abate_trimestral: contracts/abate_trimestral.md
-    - censo_agropecuario: contracts/censo_agropecuario.md
-    - cadastro_rural: contracts/cadastro_rural.md
+    - progresso_safra: contracts/progresso_safra.md
+    - queimadas: contracts/queimadas.md
+    - seguro_rural: contracts/seguro_rural.md
+    - serie_historica_safra: contracts/serie_historica_safra.md
+    - silvicultura: contracts/silvicultura.md
+    - uso_do_solo: contracts/uso_do_solo.md
+    - zoneamento_agricola: contracts/zoneamento_agricola.md
   - API Reference:
     - CEPEA: api/cepea.md
     - CONAB: api/conab.md

@@ -21,6 +21,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **deps** — `python-calamine>=0.3.0` como dependencia core (749KB, zero deps Python, engine Rust para leitura Excel)
 
 ### Improved
+- **docs** — README, docs/index.md, index.html e mkdocs.yml atualizados com todos os 34 datasets. Tabelas ordenadas alfabeticamente, 35 contract docs no nav mkdocs, 34 dataset cards no index.html. Typos de acentuacao corrigidos (Producao→Produção, carvao→carvão, acai→açaí)
 - **inmet/api** — `estacoes()` agora suporta `as_polars`, `return_meta` e `build_source_meta()` (unica source API que nao tinha os 3)
 - **conab/api** — `balanco()` e `brasil_total()` agora suportam `return_meta` com overloads tipados e `build_source_meta()`. `safras()` migrado de MetaInfo inline para `build_source_meta()`
 - **b3** — `ajustes()` agora usa BVBG-086 ZIP como fonte primaria (endpoint `pesquisapregao/download`, XML streaming com `lxml.etree.iterparse`). Fallback automatico para HTML legado em caso de falha. `parse_ajustes_zip()` com filtragem agro, nested ZIP extraction e wrapping de erros em `ParseError`. URL antiga mantida para fallback
