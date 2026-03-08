@@ -540,6 +540,7 @@ Use `agrobr health --all` para verificar localmente.
 | `abate_trimestral` | Abate de bovinos, suínos e frangos por UF | IBGE Abate |
 | `cadastro_rural` | Cadastro Ambiental Rural (imóveis rurais por UF) | SICAR/GeoServer WFS |
 | `pecuaria_municipal` | Pecuária municipal (rebanhos e produção animal) | IBGE PPM |
+| `comercio_internacional` | Comércio internacional bilateral (HS codes, qualquer reporter/partner) | UN Comtrade |
 | `censo_agropecuario` | Censo Agropecuário 1995/2006/2017 (10 temas: rebanho, uso terra, lavouras, manejo solo, irrigação) | IBGE Censo Agro |
 | `censo_agropecuario_legado` | Censo 1995/96 — 6 temas legados (FTP) | IBGE FTP |
 | `censo_agropecuario_historico` | Série histórica Censo Agropecuário 1920-2006 (9 temas, até UF) | IBGE SIDRA |
@@ -547,8 +548,10 @@ Use `agrobr health --all` para verificar localmente.
 | `silvicultura` | Producao silvicultural (eucalipto, pinus, carvao vegetal, madeira) | IBGE PEVS |
 | `extrativismo_vegetal` | Producao extrativista vegetal (acai, castanha, erva-mate) | IBGE PEVS |
 | `leite_industrial` | Aquisicao e industrializacao trimestral de leite por UF | IBGE Leite |
+| `oferta_demanda_global` | Oferta/demanda global de commodities (USDA PSD) | USDA |
 | `pib_agro` | PIB agropecuário por setor e trimestre | IBGE SIDRA |
 | `progresso_safra` | Progresso semanal semeadura/colheita | CONAB |
+| `zoneamento_agricola` | Zoneamento agrícola de risco climático (ZARC) | MAPA/Embrapa |
 
 ## Fontes Suportadas
 

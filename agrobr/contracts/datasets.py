@@ -2085,6 +2085,163 @@ CLIMA_ESTACAO_V1 = Contract(
     breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
 )
 
+OFERTA_DEMANDA_GLOBAL_V1 = Contract(
+    name="usda.psd",
+    version="1.0",
+    effective_from="0.13.0",
+    primary_key=["commodity_code", "country_code", "market_year", "attribute"],
+    columns=[
+        Column(
+            name="commodity_code",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="commodity",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="country_code",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="country",
+            type=ColumnType.STRING,
+            nullable=True,
+            stable=True,
+        ),
+        Column(
+            name="market_year",
+            type=ColumnType.INTEGER,
+            nullable=False,
+            stable=True,
+            min_value=1960,
+        ),
+        Column(
+            name="attribute",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="attribute_br",
+            type=ColumnType.STRING,
+            nullable=True,
+            stable=True,
+        ),
+        Column(
+            name="value",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            stable=True,
+        ),
+        Column(
+            name="unit",
+            type=ColumnType.STRING,
+            nullable=True,
+            stable=True,
+        ),
+    ],
+    guarantees=[
+        "Column names never change (additions only)",
+        "'market_year' is always >= 1960",
+        "Long format: one row per commodity/country/year/attribute",
+        "Contract validates long format only; pivot=True skips validation",
+    ],
+    breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
+)
+
+ZONEAMENTO_AGRICOLA_V1 = Contract(
+    name="zarc.zoneamento",
+    version="1.0",
+    effective_from="0.13.0",
+    primary_key=["cultura", "safra", "geocodigo", "solo_codigo", "ciclo_codigo"],
+    columns=[
+        Column(
+            name="cultura",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="safra",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="geocodigo",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="uf",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="municipio",
+            type=ColumnType.STRING,
+            nullable=True,
+            stable=True,
+        ),
+        Column(
+            name="solo_codigo",
+            type=ColumnType.INTEGER,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="ciclo_codigo",
+            type=ColumnType.INTEGER,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="clima",
+            type=ColumnType.STRING,
+            nullable=True,
+            stable=True,
+        ),
+        Column(
+            name="manejo",
+            type=ColumnType.STRING,
+            nullable=True,
+            stable=True,
+        ),
+        Column(
+            name="portaria",
+            type=ColumnType.STRING,
+            nullable=True,
+            stable=True,
+        ),
+        *[
+            Column(
+                name=f"dec{i}",
+                type=ColumnType.INTEGER,
+                nullable=True,
+                stable=True,
+            )
+            for i in range(1, 37)
+        ],
+    ],
+    guarantees=[
+        "Column names never change (additions only)",
+        "'geocodigo' is always 7-digit IBGE municipal code",
+        "'uf' is always a valid Brazilian state code (2 letters)",
+        "'dec1'..'dec36' represent risk per 10-day period (0-5)",
+        "'safra' is 'YYYY/YYYY' or 'perene'",
+    ],
+    breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
+)
+
 register_contract("sicar_imoveis", SICAR_IMOVEIS_V1)
 register_contract("cadastro_rural", SICAR_IMOVEIS_V1)
 register_contract("importacao", IMPORTACAO_V1)
@@ -2093,6 +2250,9 @@ register_contract("progresso_safra", CONAB_PROGRESSO_V1)
 register_contract("serie_historica_safra", SERIE_HISTORICA_SAFRA_V1)
 register_contract("clima", CLIMA_V1)
 register_contract("clima_estacao", CLIMA_ESTACAO_V1)
+register_contract("oferta_demanda_global", OFERTA_DEMANDA_GLOBAL_V1)
+register_contract("comercio_internacional", COMERCIO_BILATERAL_V1)
+register_contract("zoneamento_agricola", ZONEAMENTO_AGRICOLA_V1)
 
 __all__ = [
     "AJUSTE_DIARIO_V1",
@@ -2116,10 +2276,12 @@ __all__ = [
     "MAPBIOMAS_COBERTURA_V1",
     "MAPBIOMAS_TRANSICAO_V1",
     "MOVIMENTACAO_PORTUARIA_V1",
+    "OFERTA_DEMANDA_GLOBAL_V1",
     "PIB_AGRO_V1",
     "POSICOES_ABERTAS_V1",
     "PRECO_ATACADO_V1",
     "SERIE_HISTORICA_SAFRA_V1",
     "SICAR_IMOVEIS_V1",
     "TRADE_MIRROR_V1",
+    "ZONEAMENTO_AGRICOLA_V1",
 ]
