@@ -12,8 +12,7 @@ from agrobr.cache.policies import calculate_expiry
 from agrobr.conab import client
 from agrobr.conab.parsers.v1 import ConabParserV1
 from agrobr.models import MetaInfo
-from agrobr.utils.result import finalize_result
-from agrobr.utils.time import utcnow
+from agrobr.utils.result import build_source_meta, finalize_result
 
 logger = structlog.get_logger()
 
@@ -50,14 +49,6 @@ async def safras(
     as_polars: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    fetch_start = time.perf_counter()
-    meta = MetaInfo(
-        source="conab",
-        source_url="https://www.conab.gov.br/info-agro/safras/graos",
-        source_method="httpx",
-        fetched_at=utcnow(),
-    )
-
     logger.info(
         "conab_safras_request",
         produto=produto,
@@ -66,16 +57,12 @@ async def safras(
         levantamento=levantamento,
     )
 
-    parse_start = time.perf_counter()
+    t0 = time.monotonic()
     xlsx, metadata = await client.fetch_safra_xlsx(safra=safra, levantamento=levantamento)
+    fetch_ms = int((time.monotonic() - t0) * 1000)
 
-    if isinstance(xlsx, bytes):
-        meta.raw_content_size = len(xlsx)
-    elif hasattr(xlsx, "getbuffer"):
-        meta.raw_content_size = len(xlsx.getbuffer())
-    else:
-        meta.raw_content_size = 0
-    meta.source_url = metadata.get("url", meta.source_url)
+    t1 = time.monotonic()
+    source_url = metadata.get("url", "https://www.conab.gov.br/info-agro/safras/graos")
 
     parser = ConabParserV1()
     safra_list = parser.parse_safra_produto(
@@ -84,9 +71,6 @@ async def safras(
         safra_ref=safra or metadata["safra"],
         levantamento=metadata.get("levantamento"),
     )
-
-    meta.parse_duration_ms = int((time.perf_counter() - parse_start) * 1000)
-    meta.parser_version = parser.version
 
     safra_list = [s for s in safra_list if s.uf is not None]
 
@@ -101,43 +85,39 @@ async def safras(
             uf=uf,
         )
         df = pd.DataFrame()
-        meta.records_count = 0
-        meta.columns = []
-        meta.fetch_duration_ms = int((time.perf_counter() - fetch_start) * 1000)
-        meta.cache_key = build_cache_key(
-            "conab:safras",
-            {"produto": produto, "safra": safra or "latest"},
-            schema_version=meta.schema_version,
+    else:
+        df = pd.DataFrame([s.model_dump() for s in safra_list])
+
+        for col in ("area_plantada", "produtividade", "producao"):
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
+
+        if "area_colhida" not in df.columns:
+            df["area_colhida"] = df.get("area_plantada")
+
+        contract_cols = [
+            "fonte",
+            "produto",
+            "safra",
+            "uf",
+            "area_plantada",
+            "area_colhida",
+            "produtividade",
+            "producao",
+            "levantamento",
+            "data_publicacao",
+        ]
+        df = df[[c for c in contract_cols if c in df.columns]]
+
+        logger.info(
+            "conab_safras_success",
+            produto=produto,
+            records=len(df),
         )
-        meta.cache_expires_at = calculate_expiry(constants.Fonte.CONAB)
-        return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
-    df = pd.DataFrame([s.model_dump() for s in safra_list])
+    parse_ms = int((time.monotonic() - t1) * 1000)
 
-    for col in ("area_plantada", "produtividade", "producao"):
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
-
-    if "area_colhida" not in df.columns:
-        df["area_colhida"] = df.get("area_plantada")
-
-    contract_cols = [
-        "fonte",
-        "produto",
-        "safra",
-        "uf",
-        "area_plantada",
-        "area_colhida",
-        "produtividade",
-        "producao",
-        "levantamento",
-        "data_publicacao",
-    ]
-    df = df[[c for c in contract_cols if c in df.columns]]
-
-    meta.fetch_duration_ms = int((time.perf_counter() - fetch_start) * 1000)
-    meta.records_count = len(df)
-    meta.columns = df.columns.tolist()
+    meta = build_source_meta("conab", source_url, "httpx", fetch_ms, parse_ms, df, parser.version)
     meta.cache_key = build_cache_key(
         "conab:safras",
         {"produto": produto, "safra": safra or "latest"},
@@ -145,28 +125,46 @@ async def safras(
     )
     meta.cache_expires_at = calculate_expiry(constants.Fonte.CONAB)
 
-    logger.info(
-        "conab_safras_success",
-        produto=produto,
-        records=len(df),
-    )
-
     return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
+
+
+@overload
+async def balanco(
+    produto: str | None = None,
+    safra: str | None = None,
+    as_polars: bool = False,
+    *,
+    return_meta: Literal[False] = ...,
+) -> pd.DataFrame: ...
+
+
+@overload
+async def balanco(
+    produto: str | None = None,
+    safra: str | None = None,
+    as_polars: bool = False,
+    *,
+    return_meta: Literal[True],
+) -> tuple[pd.DataFrame, MetaInfo]: ...
 
 
 async def balanco(
     produto: str | None = None,
     safra: str | None = None,
     as_polars: bool = False,
-) -> pd.DataFrame:
+    return_meta: bool = False,
+) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
     logger.info(
         "conab_balanco_request",
         produto=produto,
         safra=safra,
     )
 
+    t0 = time.monotonic()
     xlsx, metadata = await client.fetch_safra_xlsx(safra=safra)
+    fetch_ms = int((time.monotonic() - t0) * 1000)
 
+    t1 = time.monotonic()
     parser = ConabParserV1()
     suprimentos = parser.parse_suprimento(xlsx=xlsx, produto=produto)
 
@@ -175,60 +173,89 @@ async def balanco(
             "conab_balanco_empty",
             produto=produto,
         )
-        return finalize_result(pd.DataFrame(), as_polars=as_polars)
+        df = pd.DataFrame()
+    else:
+        df = pd.DataFrame(suprimentos)
 
-    df = pd.DataFrame(suprimentos)
+        if "suprimento_total" in df.columns:
+            df = df.rename(columns={"suprimento_total": "suprimento"})
 
-    if "suprimento_total" in df.columns:
-        df = df.rename(columns={"suprimento_total": "suprimento"})
+        for col in (
+            "estoque_inicial",
+            "producao",
+            "importacao",
+            "suprimento",
+            "consumo",
+            "exportacao",
+            "estoque_final",
+        ):
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
 
-    for col in (
-        "estoque_inicial",
-        "producao",
-        "importacao",
-        "suprimento",
-        "consumo",
-        "exportacao",
-        "estoque_final",
-    ):
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
+        logger.info(
+            "conab_balanco_success",
+            produto=produto,
+            records=len(df),
+        )
 
-    logger.info(
-        "conab_balanco_success",
-        produto=produto,
-        records=len(df),
-    )
+    parse_ms = int((time.monotonic() - t1) * 1000)
+    source_url = metadata.get("url", "https://www.conab.gov.br/info-agro/safras/graos")
 
-    return finalize_result(df, as_polars=as_polars)
+    meta = build_source_meta("conab", source_url, "httpx", fetch_ms, parse_ms, df, parser.version)
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
+
+
+@overload
+async def brasil_total(
+    safra: str | None = None,
+    as_polars: bool = False,
+    *,
+    return_meta: Literal[False] = ...,
+) -> pd.DataFrame: ...
+
+
+@overload
+async def brasil_total(
+    safra: str | None = None,
+    as_polars: bool = False,
+    *,
+    return_meta: Literal[True],
+) -> tuple[pd.DataFrame, MetaInfo]: ...
 
 
 async def brasil_total(
     safra: str | None = None,
     as_polars: bool = False,
-) -> pd.DataFrame:
+    return_meta: bool = False,
+) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
     logger.info(
         "conab_brasil_total_request",
         safra=safra,
     )
 
+    t0 = time.monotonic()
     xlsx, metadata = await client.fetch_safra_xlsx(safra=safra)
+    fetch_ms = int((time.monotonic() - t0) * 1000)
 
+    t1 = time.monotonic()
     parser = ConabParserV1()
     totais = parser.parse_brasil_total(xlsx=xlsx, safra_ref=safra)
 
     if not totais:
         logger.warning("conab_brasil_total_empty", safra=safra)
-        return finalize_result(pd.DataFrame(), as_polars=as_polars)
+        df = pd.DataFrame()
+    else:
+        df = pd.DataFrame(totais)
+        logger.info(
+            "conab_brasil_total_success",
+            records=len(df),
+        )
 
-    df = pd.DataFrame(totais)
+    parse_ms = int((time.monotonic() - t1) * 1000)
+    source_url = metadata.get("url", "https://www.conab.gov.br/info-agro/safras/graos")
 
-    logger.info(
-        "conab_brasil_total_success",
-        records=len(df),
-    )
-
-    return finalize_result(df, as_polars=as_polars)
+    meta = build_source_meta("conab", source_url, "httpx", fetch_ms, parse_ms, df, parser.version)
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 async def levantamentos() -> list[dict[str, Any]]:

@@ -170,6 +170,66 @@ class TestClimaUf:
         assert len(df) > 0
 
 
+class TestEstacoesReturnMeta:
+    @pytest.mark.asyncio
+    async def test_return_meta(self):
+        mock_data = [
+            {
+                "CD_ESTACAO": "A001",
+                "DC_NOME": "BRASILIA",
+                "SG_ESTADO": "DF",
+                "CD_SITUACAO": "Operante",
+                "TP_ESTACAO": "Automatica",
+                "VL_LATITUDE": "-15.789",
+                "VL_LONGITUDE": "-47.925",
+                "VL_ALTITUDE": "1160.96",
+                "DT_INICIO_OPERACAO": "2000-05-07",
+            },
+        ]
+
+        with patch.object(
+            api.client, "fetch_estacoes", new_callable=AsyncMock, return_value=mock_data
+        ):
+            df, meta = await api.estacoes(return_meta=True)
+
+        assert meta.source == "inmet"
+        assert meta.records_count == len(df)
+        assert meta.attempted_sources == ["inmet"]
+        assert meta.selected_source == "inmet"
+
+    @pytest.mark.asyncio
+    async def test_as_polars(self):
+        pl = pytest.importorskip("polars")
+        mock_data = [
+            {
+                "CD_ESTACAO": "A001",
+                "DC_NOME": "BRASILIA",
+                "SG_ESTADO": "DF",
+                "CD_SITUACAO": "Operante",
+                "TP_ESTACAO": "Automatica",
+                "VL_LATITUDE": "-15.789",
+                "VL_LONGITUDE": "-47.925",
+                "VL_ALTITUDE": "1160.96",
+                "DT_INICIO_OPERACAO": "2000-05-07",
+            },
+        ]
+
+        with patch.object(
+            api.client, "fetch_estacoes", new_callable=AsyncMock, return_value=mock_data
+        ):
+            result = await api.estacoes(as_polars=True)
+
+        assert isinstance(result, pl.DataFrame)
+
+    @pytest.mark.asyncio
+    async def test_empty_return_meta(self):
+        with patch.object(api.client, "fetch_estacoes", new_callable=AsyncMock, return_value=[]):
+            df, meta = await api.estacoes(return_meta=True)
+
+        assert df.empty
+        assert meta.records_count == 0
+
+
 class TestEstacaoAsPolars:
     @pytest.mark.asyncio
     async def test_as_polars(self):

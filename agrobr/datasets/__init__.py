@@ -40,7 +40,7 @@ from agrobr.datasets.registry import (
 )
 from agrobr.datasets.seguro_rural import seguro_rural
 from agrobr.datasets.serie_historica_safra import serie_historica_safra
-from agrobr.datasets.silvicultura import silvicultura as silvicultura_dataset
+from agrobr.datasets.silvicultura import silvicultura
 from agrobr.datasets.uso_do_solo import uso_do_solo
 from agrobr.datasets.zoneamento_agricola import zoneamento_agricola
 
@@ -85,7 +85,7 @@ __all__ = [
     "queimadas",
     "seguro_rural",
     "serie_historica_safra",
-    "silvicultura_dataset",
+    "silvicultura",
     "uso_do_solo",
     "zoneamento_agricola",
 ]

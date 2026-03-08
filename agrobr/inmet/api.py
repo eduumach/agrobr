@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 from datetime import date
-from typing import Any
+from typing import Any, Literal, overload
 
 import pandas as pd
 import structlog
@@ -15,45 +15,85 @@ from . import client, parser
 logger = structlog.get_logger()
 
 
+@overload
+async def estacoes(
+    tipo: str = ...,
+    uf: str | None = ...,
+    apenas_operantes: bool = ...,
+    as_polars: bool = ...,
+    *,
+    return_meta: Literal[False] = ...,
+) -> pd.DataFrame: ...
+
+
+@overload
+async def estacoes(
+    tipo: str = ...,
+    uf: str | None = ...,
+    apenas_operantes: bool = ...,
+    as_polars: bool = ...,
+    *,
+    return_meta: Literal[True],
+) -> tuple[pd.DataFrame, MetaInfo]: ...
+
+
 async def estacoes(
     tipo: str = "T",
     uf: str | None = None,
     apenas_operantes: bool = True,
-) -> pd.DataFrame:
+    as_polars: bool = False,
+    return_meta: bool = False,
+) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
+    t0 = time.monotonic()
     dados = await client.fetch_estacoes(tipo)
+    fetch_ms = int((time.monotonic() - t0) * 1000)
+
+    t1 = time.monotonic()
 
     if not dados:
-        return pd.DataFrame()
+        df = pd.DataFrame()
+    else:
+        df = pd.DataFrame(dados)
 
-    df = pd.DataFrame(dados)
+        rename_map = {
+            "CD_ESTACAO": "codigo",
+            "DC_NOME": "nome",
+            "SG_ESTADO": "uf",
+            "CD_SITUACAO": "situacao",
+            "TP_ESTACAO": "tipo",
+            "VL_LATITUDE": "latitude",
+            "VL_LONGITUDE": "longitude",
+            "VL_ALTITUDE": "altitude",
+            "DT_INICIO_OPERACAO": "inicio_operacao",
+        }
 
-    rename_map = {
-        "CD_ESTACAO": "codigo",
-        "DC_NOME": "nome",
-        "SG_ESTADO": "uf",
-        "CD_SITUACAO": "situacao",
-        "TP_ESTACAO": "tipo",
-        "VL_LATITUDE": "latitude",
-        "VL_LONGITUDE": "longitude",
-        "VL_ALTITUDE": "altitude",
-        "DT_INICIO_OPERACAO": "inicio_operacao",
-    }
+        colunas_presentes = {k: v for k, v in rename_map.items() if k in df.columns}
+        df = df.rename(columns=colunas_presentes)
 
-    colunas_presentes = {k: v for k, v in rename_map.items() if k in df.columns}
-    df = df.rename(columns=colunas_presentes)
+        for col in ["latitude", "longitude", "altitude"]:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
 
-    for col in ["latitude", "longitude", "altitude"]:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
+        if apenas_operantes and "situacao" in df.columns:
+            df = df[df["situacao"] == "Operante"]
 
-    if apenas_operantes and "situacao" in df.columns:
-        df = df[df["situacao"] == "Operante"]
+        if uf and "uf" in df.columns:
+            df = df[df["uf"] == uf.upper()]
 
-    if uf and "uf" in df.columns:
-        df = df[df["uf"] == uf.upper()]
+        df = df.reset_index(drop=True)
 
-    df = df.reset_index(drop=True)
-    return df
+    parse_ms = int((time.monotonic() - t1) * 1000)
+
+    meta = build_source_meta(
+        "inmet",
+        f"{client.BASE_URL}/estacoes/{tipo}",
+        "httpx",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
 async def estacao(

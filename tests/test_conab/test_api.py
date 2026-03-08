@@ -273,6 +273,40 @@ class TestBalanco:
 
         mock_client.assert_awaited_once_with(safra="2024/25")
 
+    async def test_return_meta(self):
+        suprimentos = [
+            {
+                "produto": "SOJA",
+                "safra": "2024/25",
+                "producao": Decimal("150000"),
+            }
+        ]
+        mock_client, mock_parser = _mock_fetch_safra_xlsx(suprimentos=suprimentos)
+
+        with (
+            patch("agrobr.conab.api.client.fetch_safra_xlsx", mock_client),
+            patch("agrobr.conab.api.ConabParserV1", return_value=mock_parser),
+        ):
+            result = await api.balanco("soja", return_meta=True)
+
+        assert isinstance(result, tuple)
+        df, meta = result
+        assert isinstance(df, pd.DataFrame)
+        assert meta.source == "conab"
+        assert meta.records_count == len(df)
+
+    async def test_return_meta_empty(self):
+        mock_client, mock_parser = _mock_fetch_safra_xlsx(suprimentos=[])
+
+        with (
+            patch("agrobr.conab.api.client.fetch_safra_xlsx", mock_client),
+            patch("agrobr.conab.api.ConabParserV1", return_value=mock_parser),
+        ):
+            df, meta = await api.balanco("soja", return_meta=True)
+
+        assert df.empty
+        assert meta.records_count == 0
+
     async def test_source_unavailable_propagates(self):
         with (
             patch(
@@ -347,6 +381,42 @@ class TestBrasilTotal:
         mock_parser.parse_brasil_total.assert_called_once_with(
             xlsx=mock_client.return_value[0], safra_ref="2024/25"
         )
+
+    async def test_return_meta(self):
+        totais = [
+            {
+                "produto": "Soja",
+                "safra": "2025/26",
+                "area_plantada": Decimal("45000"),
+                "producao": Decimal("150000"),
+                "produtividade": Decimal("3333"),
+            }
+        ]
+        mock_client, mock_parser = _mock_fetch_safra_xlsx(totais=totais)
+
+        with (
+            patch("agrobr.conab.api.client.fetch_safra_xlsx", mock_client),
+            patch("agrobr.conab.api.ConabParserV1", return_value=mock_parser),
+        ):
+            result = await api.brasil_total(return_meta=True)
+
+        assert isinstance(result, tuple)
+        df, meta = result
+        assert isinstance(df, pd.DataFrame)
+        assert meta.source == "conab"
+        assert meta.records_count == len(df)
+
+    async def test_return_meta_empty(self):
+        mock_client, mock_parser = _mock_fetch_safra_xlsx(totais=[])
+
+        with (
+            patch("agrobr.conab.api.client.fetch_safra_xlsx", mock_client),
+            patch("agrobr.conab.api.ConabParserV1", return_value=mock_parser),
+        ):
+            df, meta = await api.brasil_total(return_meta=True)
+
+        assert df.empty
+        assert meta.records_count == 0
 
     async def test_source_unavailable_propagates(self):
         with (
