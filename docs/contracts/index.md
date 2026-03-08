@@ -39,6 +39,7 @@ Validação é automática: todo `fetch()` de dataset valida o DataFrame contra 
 | [cadastro_rural](./cadastro_rural.md) | Cadastro Ambiental Rural | SICAR |
 | [clima](./clima.md) | Dados climáticos mensais por UF ou por estação | INMET → NASA POWER |
 | [comercio_internacional](./comercio_internacional.md) | Comércio internacional bilateral (HS codes) | UN Comtrade |
+| [condicao_lavouras](./condicao_lavouras.md) | Condição das lavouras paranaenses | SEAB/DERAL |
 | [desmatamento](./desmatamento.md) | Desmatamento PRODES e alertas DETER por bioma | INPE |
 | [silvicultura](./silvicultura.md) | Producao silvicultural (IBGE PEVS) | IBGE PEVS |
 | [extrativismo_vegetal](./extrativismo_vegetal.md) | Producao extrativista vegetal (IBGE PEVS) | IBGE PEVS |
@@ -50,6 +51,7 @@ Validação é automática: todo `fetch()` de dataset valida o DataFrame contra 
 | [progresso_safra](./progresso_safra.md) | Progresso semanal semeadura/colheita | CONAB |
 | [queimadas](./queimadas.md) | Focos de calor por satélite | INPE |
 | [futuros_agricolas](./futuros_agricolas.md) | Futuros agrícolas B3 (ajustes, histórico, posições) | B3 |
+| [movimentacao_portuaria](./movimentacao_portuaria.md) | Movimentação portuária de cargas | ANTAQ |
 | [seguro_rural](./seguro_rural.md) | Seguro rural — apólices e sinistros | MAPA PSR |
 | [serie_historica_safra](./serie_historica_safra.md) | Série histórica de safras (32 culturas) | CONAB |
 | [uso_do_solo](./uso_do_solo.md) | Cobertura e uso da terra (MapBiomas) | MapBiomas |

@@ -348,6 +348,7 @@ class TestContractRegistry:
             "antt_pedagio_fluxo",
             "antt_pedagio_pracas",
             "balanco",
+            "condicao_lavouras",
             "credito_rural",
             "custo_producao",
             "lspa",
@@ -460,7 +461,7 @@ class TestGenerateJsonSchemas:
     def test_generate_all_schemas(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             files = generate_json_schemas(tmpdir)
-            assert len(files) == 48
+            assert len(files) == 49
 
             for filepath in files:
                 path = Path(filepath)

@@ -9,6 +9,7 @@ from agrobr.datasets.censo_agropecuario_legado import censo_agropecuario_legado
 from agrobr.datasets.censo_agropecuario_municipal_1985 import censo_agropecuario_municipal_1985
 from agrobr.datasets.clima import clima
 from agrobr.datasets.comercio_internacional import comercio_internacional
+from agrobr.datasets.condicao_lavouras import condicao_lavouras
 from agrobr.datasets.credito_rural import credito_rural
 from agrobr.datasets.custo_producao import custo_producao
 from agrobr.datasets.desmatamento import desmatamento
@@ -20,6 +21,7 @@ from agrobr.datasets.fertilizante import fertilizante
 from agrobr.datasets.futuros_agricolas import futuros_agricolas
 from agrobr.datasets.importacao import importacao
 from agrobr.datasets.leite_industrial import leite_industrial
+from agrobr.datasets.movimentacao_portuaria import movimentacao_portuaria
 from agrobr.datasets.oferta_demanda_global import oferta_demanda_global
 from agrobr.datasets.pecuaria_municipal import pecuaria_municipal
 from agrobr.datasets.pib_agro import pib_agro
@@ -52,6 +54,7 @@ __all__ = [
     "censo_agropecuario_municipal_1985",
     "clima",
     "comercio_internacional",
+    "condicao_lavouras",
     "credito_rural",
     "custo_producao",
     "desmatamento",
@@ -71,6 +74,7 @@ __all__ = [
     "leite_industrial",
     "list_datasets",
     "list_products",
+    "movimentacao_portuaria",
     "oferta_demanda_global",
     "pecuaria_municipal",
     "pib_agro",

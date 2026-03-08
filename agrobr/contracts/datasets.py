@@ -2254,6 +2254,72 @@ register_contract("oferta_demanda_global", OFERTA_DEMANDA_GLOBAL_V1)
 register_contract("comercio_internacional", COMERCIO_BILATERAL_V1)
 register_contract("zoneamento_agricola", ZONEAMENTO_AGRICOLA_V1)
 
+CONDICAO_LAVOURAS_V1 = Contract(
+    name="deral.condicao_lavouras",
+    version="1.0",
+    effective_from="0.13.0",
+    primary_key=["produto", "data", "condicao"],
+    columns=[
+        Column(
+            name="produto",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="data",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+            description="dd/mm/yyyy",
+        ),
+        Column(
+            name="condicao",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+            description="boa|media|ruim|plantio|colheita",
+        ),
+        Column(
+            name="pct",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            stable=True,
+            unit="%",
+            min_value=0,
+            max_value=100,
+        ),
+        Column(
+            name="plantio_pct",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            stable=True,
+            unit="%",
+            min_value=0,
+            max_value=100,
+        ),
+        Column(
+            name="colheita_pct",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            stable=True,
+            unit="%",
+            min_value=0,
+            max_value=100,
+        ),
+    ],
+    guarantees=[
+        "Column names never change (additions only)",
+        "'produto' is always a normalized DERAL key (lowercase)",
+        "'condicao' is always one of: boa, media, ruim, plantio, colheita",
+        "'pct', 'plantio_pct', 'colheita_pct' are percentages 0-100 when present",
+        "Data covers only Paraná (PR)",
+    ],
+    breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
+)
+
+register_contract("condicao_lavouras", CONDICAO_LAVOURAS_V1)
+
 __all__ = [
     "AJUSTE_DIARIO_V1",
     "ANP_DIESEL_PRECOS_V1",
@@ -2264,6 +2330,7 @@ __all__ = [
     "CLIMA_V1",
     "COMERCIO_BILATERAL_V1",
     "CONAB_PROGRESSO_V1",
+    "CONDICAO_LAVOURAS_V1",
     "CREDITO_RURAL_V1_1",
     "DESMATAMENTO_DETER_V1",
     "DESMATAMENTO_PRODES_V1",
