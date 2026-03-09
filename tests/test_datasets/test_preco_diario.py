@@ -1,11 +1,16 @@
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import httpx
 import pandas as pd
 import pytest
 
-from agrobr.datasets.preco_diario import PRECO_DIARIO_INFO, PrecoDiarioDataset
-from agrobr.exceptions import SourceUnavailableError
+from agrobr.datasets.deterministic import deterministic
+from agrobr.datasets.preco_diario import (
+    PRECO_DIARIO_INFO,
+    PrecoDiarioDataset,
+    preco_diario,
+)
+from agrobr.exceptions import ParseError, SourceUnavailableError
 
 from .conftest import make_source, mock_source_meta
 
@@ -71,6 +76,60 @@ class TestPrecoDiarioFetch:
         with pytest.raises(ValueError, match="não suportado"):
             await dataset.fetch("aveia")
 
+    @pytest.mark.asyncio
+    async def test_fetch_snapshot_filters_dates(self):
+        dataset = PrecoDiarioDataset()
+        df_with_future = pd.DataFrame(
+            [
+                {
+                    "data": pd.Timestamp("2025-01-20"),
+                    "valor": 150.0,
+                    "unidade": "R$/saca 60kg",
+                },
+                {
+                    "data": pd.Timestamp("2025-01-15"),
+                    "valor": 145.0,
+                    "unidade": "R$/saca 60kg",
+                },
+                {
+                    "data": pd.Timestamp("2025-01-10"),
+                    "valor": 140.0,
+                    "unidade": "R$/saca 60kg",
+                },
+            ]
+        )
+        dataset.info.sources[0].fetch_fn = make_source(df_with_future)
+
+        async with deterministic("2025-01-15"):
+            df = await dataset.fetch("soja")
+
+        assert len(df) == 2
+        assert df["data"].max().date() <= pd.Timestamp("2025-01-15").date()
+
+    @pytest.mark.asyncio
+    async def test_fetch_snapshot_sets_fim(self):
+        dataset = PrecoDiarioDataset()
+        mock_fn = make_source(_mock_df())
+        dataset.info.sources[0].fetch_fn = mock_fn
+
+        async with deterministic("2025-01-15"):
+            await dataset.fetch("soja")
+
+        _, kwargs = mock_fn.call_args
+        assert kwargs["fim"] == "2025-01-15"
+
+    @pytest.mark.asyncio
+    async def test_fetch_forwards_kwargs(self):
+        dataset = PrecoDiarioDataset()
+        mock_fn = make_source(_mock_df())
+        dataset.info.sources[0].fetch_fn = mock_fn
+
+        await dataset.fetch("soja", inicio="2025-01-01", fim="2025-01-31")
+
+        _, kwargs = mock_fn.call_args
+        assert kwargs["inicio"] == "2025-01-01"
+        assert kwargs["fim"] == "2025-01-31"
+
 
 class TestPrecoDiarioNormalize:
     @pytest.mark.asyncio
@@ -116,6 +175,27 @@ class TestPrecoDiarioNormalize:
         assert result["fonte"].iloc[0] == "cepea"
 
     @pytest.mark.asyncio
+    async def test_normalize_keeps_existing_produto_fonte(self):
+        df = pd.DataFrame(
+            [
+                {
+                    "data": pd.Timestamp("2025-01-15"),
+                    "valor": 145.0,
+                    "unidade": "R$/saca 60kg",
+                    "produto": "milho",
+                    "fonte": "custom",
+                },
+            ]
+        )
+        dataset = PrecoDiarioDataset()
+        dataset.info.sources[0].fetch_fn = make_source(df)
+
+        result = await dataset.fetch("soja")
+
+        assert result["produto"].iloc[0] == "milho"
+        assert result["fonte"].iloc[0] == "custom"
+
+    @pytest.mark.asyncio
     async def test_normalize_missing_required_raises(self):
         df = pd.DataFrame(
             [
@@ -129,6 +209,38 @@ class TestPrecoDiarioNormalize:
         dataset.info.sources[0].fetch_fn = make_source(df)
 
         with pytest.raises(ValueError, match="Missing required column"):
+            await dataset.fetch("soja")
+
+    @pytest.mark.asyncio
+    async def test_normalize_missing_data_column(self):
+        df = pd.DataFrame(
+            [
+                {
+                    "valor": 145.0,
+                    "unidade": "R$/saca 60kg",
+                },
+            ]
+        )
+        dataset = PrecoDiarioDataset()
+        dataset.info.sources[0].fetch_fn = make_source(df)
+
+        with pytest.raises(ValueError, match="Missing required column: data"):
+            await dataset.fetch("soja")
+
+    @pytest.mark.asyncio
+    async def test_normalize_missing_unidade_column(self):
+        df = pd.DataFrame(
+            [
+                {
+                    "data": pd.Timestamp("2025-01-15"),
+                    "valor": 145.0,
+                },
+            ]
+        )
+        dataset = PrecoDiarioDataset()
+        dataset.info.sources[0].fetch_fn = make_source(df)
+
+        with pytest.raises(ValueError, match="Missing required column: unidade"):
             await dataset.fetch("soja")
 
 
@@ -148,6 +260,19 @@ class TestPrecoDiarioFallback:
         assert meta.from_cache is True
 
     @pytest.mark.asyncio
+    async def test_cepea_parse_error_falls_back(self):
+        dataset = PrecoDiarioDataset()
+        dataset.info.sources[0].fetch_fn = AsyncMock(
+            side_effect=ParseError("cepea", 1, "layout changed")
+        )
+        dataset.info.sources[1].fetch_fn = make_source(_mock_df())
+
+        df, meta = await dataset.fetch("soja", return_meta=True)
+
+        assert meta.selected_source == "cache"
+        assert meta.attempted_sources == ["cepea", "cache"]
+
+    @pytest.mark.asyncio
     async def test_all_sources_fail(self):
         dataset = PrecoDiarioDataset()
         dataset.info.sources[0].fetch_fn = AsyncMock(side_effect=httpx.ConnectError("test"))
@@ -155,3 +280,41 @@ class TestPrecoDiarioFallback:
 
         with pytest.raises(SourceUnavailableError):
             await dataset.fetch("soja")
+
+    @pytest.mark.asyncio
+    async def test_disabled_source_skipped(self):
+        dataset = PrecoDiarioDataset()
+        dataset.info.sources[0].enabled = False
+        dataset.info.sources[1].fetch_fn = make_source(_mock_df())
+
+        try:
+            df, meta = await dataset.fetch("soja", return_meta=True)
+
+            assert "cepea" not in meta.attempted_sources
+            assert meta.selected_source == "cache"
+        finally:
+            dataset.info.sources[0].enabled = True
+
+
+class TestPrecoDiarioPublicAPI:
+    @pytest.mark.asyncio
+    async def test_public_function_delegates(self):
+        with patch.object(PrecoDiarioDataset, "fetch", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = _mock_df()
+            await preco_diario("soja", inicio="2025-01-01", fim="2025-01-31")
+
+            mock_fetch.assert_called_once_with(
+                "soja", inicio="2025-01-01", fim="2025-01-31", return_meta=False
+            )
+
+    @pytest.mark.asyncio
+    async def test_public_function_return_meta(self):
+        with patch.object(PrecoDiarioDataset, "fetch", new_callable=AsyncMock) as mock_fetch:
+            meta = mock_source_meta()
+            mock_fetch.return_value = (_mock_df(), meta)
+            result = await preco_diario("soja", return_meta=True)
+
+            assert isinstance(result, tuple)
+            assert len(result) == 2
+            assert isinstance(result[0], pd.DataFrame)
+            mock_fetch.assert_called_once_with("soja", inicio=None, fim=None, return_meta=True)

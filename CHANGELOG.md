@@ -22,6 +22,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ### Improved
 - **docs** — README, docs/index.md, index.html e mkdocs.yml atualizados com todos os 34 datasets. Tabelas ordenadas alfabeticamente, 35 contract docs no nav mkdocs, 34 dataset cards no index.html. Typos de acentuacao corrigidos (Producao→Produção, carvao→carvão, acai→açaí)
+- **CI** — Python 3.13 adicionado a matrix de testes. Classifier `Programming Language :: Python :: 3.13` em pyproject.toml
+- **coverage** — benchmark/ excluido do coverage (`omit`). 5093+ testes, 88% cobertura (era 4906/87%). ~190 testes novos: datasets/ (snapshots 49→97%, datasets/ multiple files pushed to 80%+, conab/progresso/client 19→60%+). Dead code `_parse_week_date` removido. Test quality audit: singleton mutation fix, `@requires_pyarrow` guards, weak assertion strengthening
 - **inmet/api** — `estacoes()` agora suporta `as_polars`, `return_meta` e `build_source_meta()` (unica source API que nao tinha os 3)
 - **conab/api** — `balanco()` e `brasil_total()` agora suportam `return_meta` com overloads tipados e `build_source_meta()`. `safras()` migrado de MetaInfo inline para `build_source_meta()`
 - **b3** — `ajustes()` agora usa BVBG-086 ZIP como fonte primaria (endpoint `pesquisapregao/download`, XML streaming com `lxml.etree.iterparse`). Fallback automatico para HTML legado em caso de falha. `parse_ajustes_zip()` com filtragem agro, nested ZIP extraction e wrapping de erros em `ParseError`. URL antiga mantida para fallback

@@ -4,10 +4,15 @@ import httpx
 import pandas as pd
 import pytest
 
-from agrobr.datasets.seguro_rural import SEGURO_RURAL_INFO, SeguroRuralDataset
+from agrobr.datasets.deterministic import deterministic
+from agrobr.datasets.seguro_rural import (
+    SEGURO_RURAL_INFO,
+    SeguroRuralDataset,
+    seguro_rural,
+)
 from agrobr.exceptions import SourceUnavailableError
 
-from .conftest import make_source
+from .conftest import make_source, mock_source_meta
 
 
 def _mock_apolices_df():
@@ -104,6 +109,17 @@ class TestSeguroRuralFetch:
         assert args[0] == "soja"
 
     @pytest.mark.asyncio
+    async def test_null_produto_sends_empty_string(self):
+        dataset = SeguroRuralDataset()
+        mock_fn = make_source(_mock_apolices_df())
+        dataset.info.sources[0].fetch_fn = mock_fn
+
+        await dataset.fetch()
+
+        args, _ = mock_fn.call_args
+        assert args[0] == ""
+
+    @pytest.mark.asyncio
     async def test_meta_apolices(self):
         dataset = SeguroRuralDataset()
         dataset.info.sources[0].fetch_fn = make_source(_mock_apolices_df())
@@ -160,12 +176,47 @@ class TestSeguroRuralFetch:
         assert kwargs["tipo"] == "apolices"
 
     @pytest.mark.asyncio
+    async def test_forwards_all_kwargs(self):
+        dataset = SeguroRuralDataset()
+        mock_fn = make_source(_mock_apolices_df())
+        dataset.info.sources[0].fetch_fn = mock_fn
+
+        await dataset.fetch(
+            "soja",
+            tipo="apolices",
+            uf="MT",
+            ano=2023,
+            ano_inicio=2020,
+            ano_fim=2023,
+            municipio="Sorriso",
+            evento="SECA",
+        )
+
+        _, kwargs = mock_fn.call_args
+        assert kwargs["uf"] == "MT"
+        assert kwargs["ano"] == 2023
+        assert kwargs["ano_inicio"] == 2020
+        assert kwargs["ano_fim"] == 2023
+        assert kwargs["municipio"] == "Sorriso"
+        assert kwargs["evento"] == "SECA"
+
+    @pytest.mark.asyncio
     async def test_source_failure(self):
         dataset = SeguroRuralDataset()
         dataset.info.sources[0].fetch_fn = AsyncMock(side_effect=httpx.ConnectError("test"))
 
         with pytest.raises(SourceUnavailableError):
             await dataset.fetch()
+
+    @pytest.mark.asyncio
+    async def test_snapshot_in_meta(self):
+        dataset = SeguroRuralDataset()
+        dataset.info.sources[0].fetch_fn = make_source(_mock_apolices_df())
+
+        async with deterministic("2023-12-15"):
+            df, meta = await dataset.fetch(return_meta=True)
+
+        assert meta.snapshot == "2023-12-15"
 
 
 class TestSeguroRuralInfo:
@@ -174,3 +225,47 @@ class TestSeguroRuralInfo:
 
     def test_license_livre(self):
         assert SEGURO_RURAL_INFO.license == "livre"
+
+    def test_validate_produto_noop(self):
+        dataset = SeguroRuralDataset()
+        dataset._validate_produto("anything")
+
+
+class TestSeguroRuralPublicAPI:
+    @pytest.mark.asyncio
+    async def test_public_function_delegates(self):
+        with patch.object(SeguroRuralDataset, "fetch", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = _mock_apolices_df()
+            await seguro_rural("soja", tipo="apolices", uf="MT", ano=2023)
+
+            mock_fetch.assert_called_once_with(
+                "soja",
+                tipo="apolices",
+                uf="MT",
+                ano=2023,
+                ano_inicio=None,
+                ano_fim=None,
+                municipio=None,
+                evento=None,
+                return_meta=False,
+            )
+
+    @pytest.mark.asyncio
+    async def test_public_function_return_meta(self):
+        with patch.object(SeguroRuralDataset, "fetch", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = (_mock_apolices_df(), mock_source_meta())
+            result = await seguro_rural(return_meta=True)
+
+            assert isinstance(result, tuple)
+            assert len(result) == 2
+            assert isinstance(result[0], pd.DataFrame)
+
+    @pytest.mark.asyncio
+    async def test_public_function_sinistros(self):
+        with patch.object(SeguroRuralDataset, "fetch", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = _mock_sinistros_df()
+            await seguro_rural(tipo="sinistros", evento="SECA")
+
+            _, kwargs = mock_fetch.call_args
+            assert kwargs["tipo"] == "sinistros"
+            assert kwargs["evento"] == "SECA"

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 from functools import partial
 
 import httpx
@@ -45,16 +44,6 @@ def _extract_plantio_link(html: str) -> str | None:
         if "plantio" in href.lower() and "colheita" in href.lower():
             return href if href.startswith("http") else f"{_CONAB_BASE}{href}"
     return None
-
-
-def _parse_week_date(text: str) -> str:
-    match = re.search(r"(\d{2}/\d{2})\s*a\s*(\d{2}/\d{2}/\d{2})", text)
-    if match:
-        return match.group(2)
-    match = re.search(r"(\d{2}/\d{2})\s*a\s*(\d{2}/\d{2})", text)
-    if match:
-        return match.group(2)
-    return text.strip()
 
 
 async def list_semanas(max_pages: int = 4) -> list[tuple[str, str]]:

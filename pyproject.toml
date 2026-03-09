@@ -45,6 +45,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering",
     "Topic :: Office/Business :: Financial",
     "Typing :: Typed",
@@ -81,6 +82,9 @@ polars = [
 ]
 geo = [
     "geopandas>=0.14.0",
+]
+app = [
+    "streamlit>=1.30",
 ]
 dev = [
     "pytest>=7.4.0",
@@ -177,6 +181,7 @@ markers = [
 [tool.coverage.run]
 source = ["agrobr"]
 branch = true
+omit = ["agrobr/benchmark/*"]
 
 [tool.coverage.report]
 exclude_lines = [

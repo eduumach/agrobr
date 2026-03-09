@@ -1,13 +1,18 @@
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import httpx
 import pandas as pd
 import pytest
 
-from agrobr.datasets.producao_anual import PRODUCAO_ANUAL_INFO, ProducaoAnualDataset
+from agrobr.datasets.deterministic import deterministic
+from agrobr.datasets.producao_anual import (
+    PRODUCAO_ANUAL_INFO,
+    ProducaoAnualDataset,
+    producao_anual,
+)
 from agrobr.exceptions import SourceUnavailableError
 
-from .conftest import make_source
+from .conftest import make_source, mock_source_meta
 
 
 def _mock_df():
@@ -64,6 +69,42 @@ class TestProducaoAnualFetch:
         with pytest.raises(ValueError, match="não suportado"):
             await dataset.fetch("aveia")
 
+    @pytest.mark.asyncio
+    async def test_snapshot_sets_ano_minus_1(self):
+        dataset = ProducaoAnualDataset()
+        mock_fn = make_source(_mock_df())
+        dataset.info.sources[0].fetch_fn = mock_fn
+
+        async with deterministic("2025-06-15"):
+            await dataset.fetch("soja")
+
+        _, kwargs = mock_fn.call_args
+        assert kwargs["ano"] == 2024
+
+    @pytest.mark.asyncio
+    async def test_snapshot_does_not_override_explicit_ano(self):
+        dataset = ProducaoAnualDataset()
+        mock_fn = make_source(_mock_df())
+        dataset.info.sources[0].fetch_fn = mock_fn
+
+        async with deterministic("2025-06-15"):
+            await dataset.fetch("soja", ano=2022)
+
+        _, kwargs = mock_fn.call_args
+        assert kwargs["ano"] == 2022
+
+    @pytest.mark.asyncio
+    async def test_forwards_nivel_uf(self):
+        dataset = ProducaoAnualDataset()
+        mock_fn = make_source(_mock_df())
+        dataset.info.sources[0].fetch_fn = mock_fn
+
+        await dataset.fetch("soja", ano=2023, nivel="municipio", uf="MT")
+
+        _, kwargs = mock_fn.call_args
+        assert kwargs["nivel"] == "municipio"
+        assert kwargs["uf"] == "MT"
+
 
 class TestProducaoAnualNormalize:
     @pytest.mark.asyncio
@@ -71,6 +112,16 @@ class TestProducaoAnualNormalize:
         df = _mock_df().drop(columns=["produto", "fonte"])
         dataset = ProducaoAnualDataset()
         dataset.info.sources[0].fetch_fn = make_source(df)
+
+        result = await dataset.fetch("soja")
+
+        assert result["produto"].iloc[0] == "soja"
+        assert result["fonte"].iloc[0] == "ibge_pam"
+
+    @pytest.mark.asyncio
+    async def test_normalize_keeps_existing_produto_fonte(self):
+        dataset = ProducaoAnualDataset()
+        dataset.info.sources[0].fetch_fn = make_source(_mock_df())
 
         result = await dataset.fetch("soja")
 
@@ -99,3 +150,25 @@ class TestProducaoAnualFallback:
 
         with pytest.raises(SourceUnavailableError):
             await dataset.fetch("soja")
+
+
+class TestProducaoAnualPublicAPI:
+    @pytest.mark.asyncio
+    async def test_public_function_delegates(self):
+        with patch.object(ProducaoAnualDataset, "fetch", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = _mock_df()
+            await producao_anual("soja", ano=2023, nivel="uf", uf="MT")
+
+            mock_fetch.assert_called_once_with(
+                "soja", ano=2023, nivel="uf", uf="MT", return_meta=False
+            )
+
+    @pytest.mark.asyncio
+    async def test_public_function_return_meta(self):
+        with patch.object(ProducaoAnualDataset, "fetch", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = (_mock_df(), mock_source_meta())
+            result = await producao_anual("soja", return_meta=True)
+
+            assert isinstance(result, tuple)
+            assert len(result) == 2
+            assert isinstance(result[0], pd.DataFrame)

@@ -4,7 +4,8 @@ import httpx
 import pandas as pd
 import pytest
 
-from agrobr.datasets.clima import CLIMA_INFO, ClimaDataset
+from agrobr.datasets.clima import CLIMA_INFO, ClimaDataset, clima
+from agrobr.datasets.deterministic import deterministic
 from agrobr.exceptions import SourceUnavailableError
 
 from .conftest import make_source, mock_source_meta
@@ -101,6 +102,42 @@ class TestClimaFetchUF:
         with pytest.raises(ValueError, match="uf é obrigatório"):
             await dataset.fetch()
 
+    @pytest.mark.asyncio
+    async def test_ano_defaults_to_current_year(self):
+        dataset = ClimaDataset()
+        mock_fn = make_source(_add_inmet_nullable_cols(_mock_inmet_df()))
+        dataset.info.sources[0].fetch_fn = mock_fn
+
+        await dataset.fetch("SP")
+
+        _, kwargs = mock_fn.call_args
+        assert isinstance(kwargs["ano"], int)
+        assert kwargs["ano"] >= 2024
+
+    @pytest.mark.asyncio
+    async def test_snapshot_sets_ano(self):
+        dataset = ClimaDataset()
+        mock_fn = make_source(_add_inmet_nullable_cols(_mock_inmet_df()))
+        dataset.info.sources[0].fetch_fn = mock_fn
+
+        async with deterministic("2023-06-15"):
+            await dataset.fetch("SP")
+
+        _, kwargs = mock_fn.call_args
+        assert kwargs["ano"] == 2023
+
+    @pytest.mark.asyncio
+    async def test_snapshot_does_not_override_explicit_ano(self):
+        dataset = ClimaDataset()
+        mock_fn = make_source(_add_inmet_nullable_cols(_mock_inmet_df()))
+        dataset.info.sources[0].fetch_fn = mock_fn
+
+        async with deterministic("2023-06-15"):
+            await dataset.fetch("SP", ano=2024)
+
+        _, kwargs = mock_fn.call_args
+        assert kwargs["ano"] == 2024
+
 
 class TestClimaFallback:
     @pytest.mark.asyncio
@@ -142,6 +179,17 @@ class TestClimaNormalize:
         assert (df["uf"] == "SP").all()
 
     @pytest.mark.asyncio
+    async def test_normalize_adds_uf_when_missing(self):
+        dataset = ClimaDataset()
+        df_inmet = _mock_inmet_df().drop(columns=["uf"])
+        df_inmet = _add_inmet_nullable_cols(df_inmet)
+        dataset.info.sources[0].fetch_fn = make_source(df_inmet)
+
+        df = await dataset.fetch("sp", ano=2024)
+
+        assert (df["uf"] == "SP").all()
+
+    @pytest.mark.asyncio
     async def test_inmet_has_estacoes_nasa_null(self):
         dataset = ClimaDataset()
         df_inmet = _add_inmet_nullable_cols(_mock_inmet_df())
@@ -175,6 +223,20 @@ class TestClimaEstacao:
             await dataset.fetch(estacao="A301")
 
     @pytest.mark.asyncio
+    async def test_missing_inicio_only_raises(self):
+        dataset = ClimaDataset()
+
+        with pytest.raises(ValueError, match="inicio e fim"):
+            await dataset.fetch(estacao="A301", fim="2024-01-31")
+
+    @pytest.mark.asyncio
+    async def test_missing_fim_only_raises(self):
+        dataset = ClimaDataset()
+
+        with pytest.raises(ValueError, match="inicio e fim"):
+            await dataset.fetch(estacao="A301", inicio="2024-01-01")
+
+    @pytest.mark.asyncio
     async def test_estacao_calls_inmet(self):
         dataset = ClimaDataset()
         mock_df = pd.DataFrame(
@@ -202,3 +264,81 @@ class TestClimaEstacao:
         mock_estacao.assert_called_once_with(
             "A301", "2024-01-01", "2024-01-31", agregacao="diario", return_meta=True
         )
+
+    @pytest.mark.asyncio
+    async def test_estacao_without_meta(self):
+        dataset = ClimaDataset()
+        mock_df = pd.DataFrame(
+            {
+                "data": pd.to_datetime(["2024-01-01"]),
+                "estacao": ["A301"],
+                "uf": ["SP"],
+                "temp_media": [25.0],
+            }
+        )
+
+        with patch("agrobr.inmet.estacao", new_callable=AsyncMock) as mock_estacao:
+            mock_estacao.return_value = (mock_df, mock_source_meta())
+            df = await dataset.fetch(estacao="A301", inicio="2024-01-01", fim="2024-01-31")
+
+        assert len(df) == 1
+
+    @pytest.mark.asyncio
+    async def test_estacao_mensal_agregacao(self):
+        dataset = ClimaDataset()
+        mock_df = pd.DataFrame(
+            {
+                "mes": pd.to_datetime(["2024-01-01"]),
+                "estacao": ["A301"],
+                "uf": ["SP"],
+                "temp_media": [25.0],
+            }
+        )
+
+        with patch("agrobr.inmet.estacao", new_callable=AsyncMock) as mock_estacao:
+            mock_estacao.return_value = (mock_df, mock_source_meta())
+            df = await dataset.fetch(
+                estacao="A301",
+                inicio="2024-01-01",
+                fim="2024-01-31",
+                agregacao="mensal",
+            )
+
+        assert len(df) == 1
+        mock_estacao.assert_called_once_with(
+            "A301", "2024-01-01", "2024-01-31", agregacao="mensal", return_meta=True
+        )
+
+
+class TestClimaPublicAPI:
+    @pytest.mark.asyncio
+    async def test_public_function_delegates(self):
+        with patch.object(ClimaDataset, "fetch", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = _add_inmet_nullable_cols(_mock_inmet_df())
+            await clima("SP", ano=2024)
+
+            mock_fetch.assert_called_once_with(
+                "SP",
+                2024,
+                estacao=None,
+                inicio=None,
+                fim=None,
+                agregacao="diario",
+                return_meta=False,
+            )
+
+    @pytest.mark.asyncio
+    async def test_public_function_estacao(self):
+        with patch.object(ClimaDataset, "fetch", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = pd.DataFrame()
+            await clima(estacao="A301", inicio="2024-01-01", fim="2024-01-31")
+
+            mock_fetch.assert_called_once_with(
+                None,
+                None,
+                estacao="A301",
+                inicio="2024-01-01",
+                fim="2024-01-31",
+                agregacao="diario",
+                return_meta=False,
+            )

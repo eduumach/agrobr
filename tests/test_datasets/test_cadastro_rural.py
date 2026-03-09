@@ -119,6 +119,71 @@ class TestCadastroRuralDataset:
         assert dataset.info.sources[0].priority == 1
 
 
+class TestCadastroRuralNormalize:
+    @pytest.mark.asyncio
+    async def test_return_meta_snapshot(self):
+        from agrobr.datasets.deterministic import deterministic
+
+        dataset = CadastroRuralDataset()
+        dataset.info.sources[0].fetch_fn = AsyncMock(return_value=(_mock_df(), _mock_meta()))
+
+        async with deterministic("2024-01-15"):
+            df, meta = await dataset.fetch("DF", return_meta=True)
+
+        assert meta.snapshot == "2024-01-15"
+
+    @pytest.mark.asyncio
+    async def test_snapshot_sets_criado_apos(self):
+        from agrobr.datasets.deterministic import deterministic
+
+        mock_fn = AsyncMock(return_value=(_mock_df(), _mock_meta()))
+        dataset = CadastroRuralDataset()
+        dataset.info.sources[0].fetch_fn = mock_fn
+
+        async with deterministic("2024-06-15"):
+            await dataset.fetch("DF")
+
+        _, kwargs = mock_fn.call_args
+        assert kwargs["criado_apos"] == "2024-06-15"
+
+    @pytest.mark.asyncio
+    async def test_snapshot_does_not_override_explicit_criado_apos(self):
+        from agrobr.datasets.deterministic import deterministic
+
+        mock_fn = AsyncMock(return_value=(_mock_df(), _mock_meta()))
+        dataset = CadastroRuralDataset()
+        dataset.info.sources[0].fetch_fn = mock_fn
+
+        async with deterministic("2024-06-15"):
+            await dataset.fetch("DF", criado_apos="2023-01-01")
+
+        _, kwargs = mock_fn.call_args
+        assert kwargs["criado_apos"] == "2023-01-01"
+
+
+class TestCadastroRuralPublicAPI:
+    @pytest.mark.asyncio
+    async def test_public_function_delegates(self):
+        from unittest.mock import patch
+
+        from agrobr.datasets.cadastro_rural import cadastro_rural
+
+        with patch.object(CadastroRuralDataset, "fetch", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = _mock_df()
+            await cadastro_rural("MT", municipio="Sorriso", status="AT")
+
+            mock_fetch.assert_called_once_with(
+                "MT",
+                municipio="Sorriso",
+                status="AT",
+                tipo=None,
+                area_min=None,
+                area_max=None,
+                criado_apos=None,
+                return_meta=False,
+            )
+
+
 class TestCadastroRuralRegistered:
     def test_registered_in_registry(self):
         from agrobr.datasets.registry import list_datasets

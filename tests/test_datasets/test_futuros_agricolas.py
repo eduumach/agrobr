@@ -180,3 +180,84 @@ class TestFuturosContract:
             await dataset.fetch("boi", tipo="posicoes", data="2025-03-05")
             mock_has.assert_called_with("posicoes_abertas")
             mock_validate.assert_called_once()
+
+
+class TestFuturosSnapshot:
+    @pytest.mark.asyncio
+    async def test_snapshot_sets_data_for_ajustes(self):
+        from agrobr.datasets.deterministic import deterministic
+
+        dataset = FuturosAgricolasDataset()
+        mock_fn = make_source(_mock_ajustes_df())
+        dataset.info.sources[0].fetch_fn = mock_fn
+
+        async with deterministic("2025-03-05"):
+            await dataset.fetch("boi")
+
+        _, kwargs = mock_fn.call_args
+        assert kwargs["data"] == "2025-03-05"
+
+    @pytest.mark.asyncio
+    async def test_snapshot_sets_data_for_posicoes(self):
+        from agrobr.datasets.deterministic import deterministic
+
+        dataset = FuturosAgricolasDataset()
+        mock_fn = make_source(_mock_posicoes_df())
+        dataset.info.sources[0].fetch_fn = mock_fn
+
+        async with deterministic("2025-03-05"):
+            await dataset.fetch("boi", tipo="posicoes")
+
+        _, kwargs = mock_fn.call_args
+        assert kwargs["data"] == "2025-03-05"
+
+    @pytest.mark.asyncio
+    async def test_snapshot_does_not_set_data_for_historico(self):
+        from agrobr.datasets.deterministic import deterministic
+
+        dataset = FuturosAgricolasDataset()
+        mock_fn = make_source(_mock_ajustes_df())
+        dataset.info.sources[0].fetch_fn = mock_fn
+
+        async with deterministic("2025-03-05"):
+            await dataset.fetch("boi", tipo="historico", inicio="2025-01-01", fim="2025-03-05")
+
+        _, kwargs = mock_fn.call_args
+        assert kwargs["data"] is None
+
+
+class TestFuturosPublicAPI:
+    @pytest.mark.asyncio
+    async def test_public_function_delegates(self):
+        from agrobr.datasets.futuros_agricolas import futuros_agricolas
+
+        with patch.object(FuturosAgricolasDataset, "fetch", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = _mock_ajustes_df()
+            await futuros_agricolas("boi", data="2025-03-05")
+
+            mock_fetch.assert_called_once_with(
+                "boi",
+                tipo="ajustes",
+                data="2025-03-05",
+                inicio=None,
+                fim=None,
+                vencimento=None,
+                return_meta=False,
+            )
+
+    @pytest.mark.asyncio
+    async def test_public_function_empty_produto(self):
+        from agrobr.datasets.futuros_agricolas import futuros_agricolas
+
+        with patch.object(FuturosAgricolasDataset, "fetch", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = _mock_ajustes_df()
+            await futuros_agricolas(data="2025-03-05")
+
+            args, _ = mock_fetch.call_args
+            assert args[0] is None
+
+
+class TestFuturosValidateProduto:
+    def test_empty_produto_allowed(self):
+        dataset = FuturosAgricolasDataset()
+        dataset._validate_produto("")

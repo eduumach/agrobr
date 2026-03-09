@@ -1,11 +1,18 @@
+from unittest.mock import AsyncMock, patch
+
 import httpx
 import pandas as pd
 import pytest
 
-from agrobr.datasets.progresso_safra import PROGRESSO_SAFRA_INFO, ProgressoSafraDataset
+from agrobr.datasets.deterministic import deterministic
+from agrobr.datasets.progresso_safra import (
+    PROGRESSO_SAFRA_INFO,
+    ProgressoSafraDataset,
+    progresso_safra,
+)
 from agrobr.exceptions import SourceUnavailableError
 
-from .conftest import make_source
+from .conftest import make_source, mock_source_meta
 
 
 def _make_df(**overrides):
@@ -95,6 +102,28 @@ class TestProgressoSafraFetch:
         call_args = mock_fn.call_args
         assert call_args[0][0] == "soja"
 
+    @pytest.mark.asyncio
+    async def test_forwards_estado_operacao(self):
+        mock_fn = make_source(_make_df())
+        dataset = ProgressoSafraDataset()
+        dataset.info.sources[0].fetch_fn = mock_fn
+
+        await dataset.fetch("soja", estado="MT", operacao="Semeadura")
+
+        _, kwargs = mock_fn.call_args
+        assert kwargs["estado"] == "MT"
+        assert kwargs["operacao"] == "Semeadura"
+
+    @pytest.mark.asyncio
+    async def test_snapshot_in_meta(self):
+        dataset = ProgressoSafraDataset()
+        dataset.info.sources[0].fetch_fn = make_source(_make_df())
+
+        async with deterministic("2024-11-15"):
+            df, meta = await dataset.fetch("soja", return_meta=True)
+
+        assert meta.snapshot == "2024-11-15"
+
 
 class TestProgressoSafraInfo:
     def test_single_source(self):
@@ -105,3 +134,39 @@ class TestProgressoSafraInfo:
         assert "soja" in PROGRESSO_SAFRA_INFO.products
         assert "milho_1" in PROGRESSO_SAFRA_INFO.products
         assert "milho_2" in PROGRESSO_SAFRA_INFO.products
+
+    def test_all_products(self):
+        expected = ["algodao", "arroz", "feijao_1", "milho_1", "milho_2", "soja", "trigo"]
+        assert PROGRESSO_SAFRA_INFO.products == expected
+
+
+class TestProgressoSafraPublicAPI:
+    @pytest.mark.asyncio
+    async def test_public_function_delegates(self):
+        with patch.object(ProgressoSafraDataset, "fetch", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = _make_df()
+            await progresso_safra("soja", estado="MT", operacao="Semeadura")
+
+            mock_fetch.assert_called_once_with(
+                "soja", estado="MT", operacao="Semeadura", return_meta=False
+            )
+
+    @pytest.mark.asyncio
+    async def test_public_function_return_meta(self):
+        with patch.object(ProgressoSafraDataset, "fetch", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = (_make_df(), mock_source_meta())
+            result = await progresso_safra("soja", return_meta=True)
+
+            assert isinstance(result, tuple)
+            assert len(result) == 2
+            assert isinstance(result[0], pd.DataFrame)
+
+    @pytest.mark.asyncio
+    async def test_public_function_forwards_kwargs(self):
+        with patch.object(ProgressoSafraDataset, "fetch", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = _make_df()
+            await progresso_safra("soja", estado="PR", operacao="Colheita")
+
+            _, kwargs = mock_fetch.call_args
+            assert kwargs["estado"] == "PR"
+            assert kwargs["operacao"] == "Colheita"

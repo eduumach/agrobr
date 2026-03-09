@@ -1,13 +1,18 @@
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import httpx
 import pandas as pd
 import pytest
 
-from agrobr.datasets.estimativa_safra import ESTIMATIVA_SAFRA_INFO, EstimativaSafraDataset
+from agrobr.datasets.deterministic import deterministic
+from agrobr.datasets.estimativa_safra import (
+    ESTIMATIVA_SAFRA_INFO,
+    EstimativaSafraDataset,
+    estimativa_safra,
+)
 from agrobr.exceptions import SourceUnavailableError
 
-from .conftest import make_source
+from .conftest import make_source, mock_source_meta
 
 
 def _mock_df():
@@ -67,6 +72,28 @@ class TestEstimativaSafraFetch:
         with pytest.raises(ValueError, match="não suportado"):
             await dataset.fetch("aveia")
 
+    @pytest.mark.asyncio
+    async def test_forwards_safra_and_uf(self):
+        dataset = EstimativaSafraDataset()
+        mock_fn = make_source(_mock_df())
+        dataset.info.sources[0].fetch_fn = mock_fn
+
+        await dataset.fetch("soja", safra="2024/25", uf="MT")
+
+        _, kwargs = mock_fn.call_args
+        assert kwargs["safra"] == "2024/25"
+        assert kwargs["uf"] == "MT"
+
+    @pytest.mark.asyncio
+    async def test_snapshot_included_in_meta(self):
+        dataset = EstimativaSafraDataset()
+        dataset.info.sources[0].fetch_fn = make_source(_mock_df())
+
+        async with deterministic("2025-01-15"):
+            df, meta = await dataset.fetch("soja", return_meta=True)
+
+        assert meta.snapshot == "2025-01-15"
+
 
 class TestEstimativaSafraNormalize:
     @pytest.mark.asyncio
@@ -74,6 +101,16 @@ class TestEstimativaSafraNormalize:
         df = _mock_df().drop(columns=["produto", "fonte"])
         dataset = EstimativaSafraDataset()
         dataset.info.sources[0].fetch_fn = make_source(df)
+
+        result = await dataset.fetch("soja")
+
+        assert result["produto"].iloc[0] == "soja"
+        assert result["fonte"].iloc[0] == "conab"
+
+    @pytest.mark.asyncio
+    async def test_normalize_keeps_existing_produto_fonte(self):
+        dataset = EstimativaSafraDataset()
+        dataset.info.sources[0].fetch_fn = make_source(_mock_df())
 
         result = await dataset.fetch("soja")
 
@@ -102,3 +139,23 @@ class TestEstimativaSafraFallback:
 
         with pytest.raises(SourceUnavailableError):
             await dataset.fetch("soja")
+
+
+class TestEstimativaSafraPublicAPI:
+    @pytest.mark.asyncio
+    async def test_public_function_delegates(self):
+        with patch.object(EstimativaSafraDataset, "fetch", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = _mock_df()
+            await estimativa_safra("soja", safra="2024/25", uf="MT")
+
+            mock_fetch.assert_called_once_with("soja", safra="2024/25", uf="MT", return_meta=False)
+
+    @pytest.mark.asyncio
+    async def test_public_function_return_meta(self):
+        with patch.object(EstimativaSafraDataset, "fetch", new_callable=AsyncMock) as mock_fetch:
+            mock_fetch.return_value = (_mock_df(), mock_source_meta())
+            result = await estimativa_safra("soja", return_meta=True)
+
+            assert isinstance(result, tuple)
+            assert len(result) == 2
+            assert isinstance(result[0], pd.DataFrame)
