@@ -21,7 +21,7 @@
 
 Infraestrutura Python para dados agrícolas brasileiros com camada semântica sobre **26 fontes públicas**: CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA PSD, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento PRODES/DETER, MapBiomas, CONAB Progresso, B3 Futuros Agro, CONAB CEASA/PROHORT, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedágio, SICAR e ZARC.
 
-**v0.12.0** — 5093+ testes, 88% cobertura, 26/26 fontes com golden tests (21 com dados reais), retry centralizado em 26/26 clients.
+**v1.0.0** — 5100+ testes, 88% cobertura, 26/26 fontes com golden tests (21 com dados reais), retry centralizado em 26/26 clients.
 
 ## Demo
 ![Animation](https://github.com/user-attachments/assets/40e1341e-f47b-4eb5-b18e-55b49c63ee97)
@@ -656,7 +656,7 @@ normalizar_safra("24/25")             # "2024/25"
 
 - **26/26 fontes com golden tests** — validação automatizada contra dados de referência
 - **Resiliência HTTP completa** — retry centralizado em 26/26 clients, 429 handling, Retry-After
-- **5093+ testes, 88% cobertura** — benchmarks de escalabilidade (memory, volume, cache, async)
+- **5100+ testes, 88% cobertura** — benchmarks de escalabilidade (memory, volume, cache, async)
 - **Thread-safe cache** — DuckDB store com locking para uso em MCP servers e multi-thread
 - **Camada semântica** — datasets padronizados com fallback automático
 - **Contratos formais** — schema versionado com validação automática, primary keys e constraints

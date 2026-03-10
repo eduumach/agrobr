@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-__version__ = "0.12.0"
+__version__ = "1.0.0"
 __author__ = "Bruno"
 
 from agrobr import (
@@ -30,7 +30,14 @@ from agrobr import (
     usda,
     zarc,
 )
+from agrobr.config import configure
 from agrobr.datasets.deterministic import deterministic
+from agrobr.exceptions import (
+    AgrobrError,
+    ContractViolationError,
+    ParseError,
+    SourceUnavailableError,
+)
 from agrobr.models import MetaInfo
 
 __all__ = [
@@ -44,6 +51,7 @@ __all__ = [
     "comexstat",
     "comtrade",
     "conab",
+    "configure",
     "contracts",
     "datasets",
     "deral",
@@ -58,6 +66,10 @@ __all__ = [
     "queimadas",
     "usda",
     "zarc",
+    "AgrobrError",
+    "ContractViolationError",
+    "ParseError",
+    "SourceUnavailableError",
     "MetaInfo",
     "__version__",
 ]

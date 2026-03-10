@@ -7,6 +7,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-03-09
+
 ### Added
 - **py.typed** — PEP 561 marker para suporte a type checking em projetos downstream
 - **datasets** — 2 novos datasets na camada semântica (32→34): `movimentacao_portuaria` (ANTAQ, single-source, keyword-only, 21 colunas, 6 filtros opcionais, reutiliza `MOVIMENTACAO_PORTUARIA_V1`), `condicao_lavouras` (SEAB/DERAL, 14 culturas PR, normalização condicao vazia→plantio/colheita, contrato `CONDICAO_LAVOURAS_V1`)
@@ -1028,7 +1030,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - Type hints completos
 - Logging estruturado com structlog
 
-[Unreleased]: https://github.com/bruno-portfolio/agrobr/compare/v0.12.0...HEAD
+[Unreleased]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/bruno-portfolio/agrobr/compare/v0.12.0...v1.0.0
 [0.12.0]: https://github.com/bruno-portfolio/agrobr/compare/v0.11.3...v0.12.0
 [0.11.3]: https://github.com/bruno-portfolio/agrobr/compare/v0.11.2...v0.11.3
 [0.11.2]: https://github.com/bruno-portfolio/agrobr/compare/v0.11.1...v0.11.2

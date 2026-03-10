@@ -5,6 +5,18 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+__all__ = [
+    "CEPEA_PRODUTOS",
+    "CONAB_PRODUTOS",
+    "CONAB_REGIOES",
+    "CONAB_UFS",
+    "CacheSettings",
+    "Fonte",
+    "HTTPSettings",
+    "NOTICIAS_AGRICOLAS_PRODUTOS",
+    "URLS",
+]
+
 
 class Fonte(StrEnum):
     ABIOVE = "abiove"

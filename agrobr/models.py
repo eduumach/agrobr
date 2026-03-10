@@ -13,6 +13,13 @@ from pydantic import BaseModel, Field, field_validator
 from .constants import Fonte
 from .utils.time import utcnow
 
+__all__ = [
+    "Fingerprint",
+    "Indicador",
+    "MetaInfo",
+    "Safra",
+]
+
 
 class Indicador(BaseModel):
     fonte: Fonte
