@@ -7,6 +7,19 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+### Added
+- **CLI** — `cepea indicador` funcional (era stub). Suporta `--inicio`, `--fim`, `--ultimo`, `--formato`
+- **docs** — guia dedicado de snapshots (`docs/guides/snapshots.md`): criação, listagem, uso, delete, modo determinístico CLI vs programático
+- **docs** — docstring Google style em `cepea.indicador()` (10 params, inclui `_moeda`, `validate_sanity`, `force_refresh`, `offline`)
+
+### Improved
+- **docs** — README: seção "Modo Determinístico" expandida com snapshots (CLI + programático). `docs/index.md`: menção a snapshots na feature list. `mkdocs.yml`: nav entry para guia de snapshots
+
+### Changed
+- **CLI** — stubs `cache status`/`cache clear` removidos (subcommand `cache` eliminado)
+- **CLI** — `config show` não exibe mais AlertSettings (módulo privado)
+- **wheel** — `agrobr/health`, `agrobr/alerts` e `agrobr/benchmark` excluídos do wheel distribuído (infra interna)
+
 ## [1.0.0] - 2026-03-09
 
 ### Added

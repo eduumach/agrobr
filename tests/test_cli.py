@@ -133,19 +133,36 @@ class TestDoctorCommand:
 
 class TestCepeaCommands:
     def test_cepea_indicador(self):
-        result = runner.invoke(app, ["cepea", "indicador", "soja"])
+        df = pd.DataFrame({"data": ["2025-01-01"], "produto": ["soja"], "valor": [150.0]})
+        with patch("agrobr.cepea.indicador", new_callable=AsyncMock, return_value=df):
+            result = runner.invoke(app, ["cepea", "indicador", "soja"])
         assert result.exit_code == 0
         assert "soja" in result.output
 
-
-class TestCacheCommands:
-    def test_cache_status(self):
-        result = runner.invoke(app, ["cache", "status"])
+    def test_cepea_indicador_ultimo(self):
+        df = pd.DataFrame(
+            {
+                "data": ["2025-01-01", "2025-01-02"],
+                "produto": ["soja", "soja"],
+                "valor": [150.0, 151.0],
+            }
+        )
+        with patch("agrobr.cepea.indicador", new_callable=AsyncMock, return_value=df):
+            result = runner.invoke(app, ["cepea", "indicador", "soja", "--ultimo"])
         assert result.exit_code == 0
+        assert "151" in result.output
 
-    def test_cache_clear(self):
-        result = runner.invoke(app, ["cache", "clear"])
+    def test_cepea_indicador_empty(self):
+        df = pd.DataFrame()
+        with patch("agrobr.cepea.indicador", new_callable=AsyncMock, return_value=df):
+            result = runner.invoke(app, ["cepea", "indicador", "soja"])
         assert result.exit_code == 0
+        assert "Nenhum dado" in result.output
+
+    def test_cepea_indicador_error(self):
+        with patch("agrobr.cepea.indicador", new_callable=AsyncMock, side_effect=Exception("fail")):
+            result = runner.invoke(app, ["cepea", "indicador", "soja"])
+        assert result.exit_code == 1
 
 
 class TestConabCommands:
@@ -461,7 +478,6 @@ class TestConfigCommands:
         assert result.exit_code == 0
         assert "Cache Settings" in result.output
         assert "HTTP Settings" in result.output
-        assert "Alert Settings" in result.output
 
 
 class TestSnapshotCommands:

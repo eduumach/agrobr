@@ -244,15 +244,36 @@ async def main():
     #  'silvicultura', 'uso_do_solo', 'zoneamento_agricola']
 ```
 
-### Modo Determinístico (Reprodutibilidade)
+### Modo Determinístico e Snapshots (Reprodutibilidade)
+
+Snapshots capturam dados locais em parquet para reprodutibilidade total — ideal para papers, auditorias e pipelines CI.
 
 ```python
 from agrobr import datasets
+from agrobr.snapshots import create_snapshot, list_snapshots, delete_snapshot
 
+# Criar snapshot (salva dados atuais em ~/.agrobr/snapshots/)
+info = await create_snapshot("2025-Q4")                        # nome customizado
+info = await create_snapshot(sources=["cepea", "conab"])       # fontes específicas
+
+# Listar e remover
+for s in list_snapshots():
+    print(s.name, s.file_count, f"{s.size_bytes/1024/1024:.1f} MB")
+delete_snapshot("2025-Q4")
+
+# Modo determinístico — consultas usam apenas cache local, sem rede
 async with datasets.deterministic("2025-12-31"):
-    # Todas as consultas filtram data <= snapshot
-    # Usa apenas cache local (sem rede)
     df = await datasets.preco_diario("soja")
+```
+
+Via CLI:
+
+```bash
+agrobr snapshot create 2025-Q4 --sources cepea,conab,ibge
+agrobr snapshot list
+agrobr snapshot list --json
+agrobr snapshot use 2025-Q4       # ativa modo determinístico
+agrobr snapshot delete 2025-Q4
 ```
 
 ### Novas Fontes v0.7.0+
@@ -510,7 +531,8 @@ agrobr ibge pam soja --ano 2023 --nivel uf
 agrobr ibge lspa milho --ano 2024 --mes 6
 
 # Health check & diagnóstico
-agrobr health --all
+agrobr health
+agrobr health --source cepea --deep
 agrobr doctor --verbose
 agrobr config show
 ```

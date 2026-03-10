@@ -51,13 +51,32 @@ app.add_typer(cepea_app, name="cepea")
 @cepea_app.command("indicador")  # type: ignore[misc, untyped-decorator]
 def cepea_indicador(
     produto: str = typer.Argument(..., help="Produto (soja, milho, cafe, boi, etc)"),
-    _inicio: str | None = typer.Option(None, "--inicio", "-i", help="Data inicio (YYYY-MM-DD)"),
-    _fim: str | None = typer.Option(None, "--fim", "-f", help="Data fim (YYYY-MM-DD)"),
-    _ultimo: bool = typer.Option(False, "--ultimo", "-u", help="Apenas ultimo valor"),
-    _formato: str = typer.Option("table", "--formato", "-o", help="Formato: table, csv, json"),
+    inicio: str | None = typer.Option(None, "--inicio", "-i", help="Data inicio (YYYY-MM-DD)"),
+    fim: str | None = typer.Option(None, "--fim", "-f", help="Data fim (YYYY-MM-DD)"),
+    ultimo: bool = typer.Option(False, "--ultimo", "-u", help="Apenas ultimo valor"),
+    formato: str = typer.Option("table", "--formato", "-o", help="Formato: table, csv, json"),
 ) -> None:
+    import asyncio
+
+    from agrobr import cepea
+
     typer.echo(f"Consultando {produto}...")
-    typer.echo("Funcionalidade em desenvolvimento")
+
+    try:
+        df = asyncio.run(cepea.indicador(produto, inicio=inicio, fim=fim))
+
+        if df.empty:
+            typer.echo("Nenhum dado encontrado")
+            return
+
+        if ultimo:
+            df = df.tail(1)
+
+        _output_df(df, formato)
+
+    except Exception as e:
+        typer.echo(f"Erro: {e}", err=True)
+        raise typer.Exit(1) from None
 
 
 @app.command("health")  # type: ignore[misc, untyped-decorator]
@@ -117,23 +136,6 @@ def doctor(
     except Exception as e:
         typer.echo(f"Erro ao executar diagnostico: {e}", err=True)
         raise typer.Exit(1) from None
-
-
-cache_app = typer.Typer(help="Gerenciamento de cache")
-app.add_typer(cache_app, name="cache")
-
-
-@cache_app.command("status")  # type: ignore[misc, untyped-decorator]
-def cache_status() -> None:
-    typer.echo("Status do cache em desenvolvimento")
-
-
-@cache_app.command("clear")  # type: ignore[misc, untyped-decorator]
-def cache_clear(
-    _source: str | None = typer.Option(None, "--source", "-s", help="Limpar apenas fonte"),
-    _older_than: str | None = typer.Option(None, "--older-than", help="Ex: 30d"),
-) -> None:
-    typer.echo("Limpeza de cache em desenvolvimento")
 
 
 conab_app = typer.Typer(help="Dados CONAB - Safras e balanco")
@@ -420,11 +422,6 @@ def config_show() -> None:
     http = constants.HTTPSettings()
     typer.echo(f"  timeout_read: {http.timeout_read}s")
     typer.echo(f"  max_retries: {http.max_retries}")
-
-    typer.echo("\n=== Alert Settings ===")
-    alerts = constants.AlertSettings()
-    typer.echo(f"  enabled: {alerts.enabled}")
-    typer.echo(f"  slack_webhook: {'configured' if alerts.slack_webhook else 'not set'}")
 
 
 @snapshot_app.command("list")  # type: ignore[misc, untyped-decorator]

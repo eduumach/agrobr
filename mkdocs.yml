@@ -166,6 +166,7 @@ nav:
   - Guias:
     - Async: guides/async.md
     - Normalização: guides/normalizacao.md
+    - Snapshots: guides/snapshots.md
     - Dependências: guides/dependencies.md
   - Avançado:
     - Reprodutibilidade: advanced/reproducibility.md

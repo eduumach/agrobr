@@ -156,7 +156,7 @@ df = nasa_power.clima_uf('MT', ano=2025)
 - **Resiliência HTTP** — `retry_on_status()`/`retry_async()` centralizado, Retry-After, 429 handling
 - **Camada semântica** — datasets com fallback automático entre fontes
 - **Contratos públicos** — schema versionado com garantias de estabilidade
-- **Modo determinístico** — reprodutibilidade total para papers/auditorias
+- **Modo determinístico + snapshots** — reprodutibilidade total para papers/auditorias ([guia](guides/snapshots.md))
 - **Async-first** com sync wrapper para uso simples
 - **Cache DuckDB** com histórico permanente
 - **Suporte pandas + polars** (`as_polars=True`)

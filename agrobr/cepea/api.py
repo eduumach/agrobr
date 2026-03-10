@@ -164,6 +164,23 @@ async def indicador(
     offline: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | pl.DataFrame | tuple[pd.DataFrame | pl.DataFrame, MetaInfo]:
+    """Série histórica de indicadores CEPEA/ESALQ.
+
+    Busca dados do cache DuckDB e, se necessário, faz fetch na fonte
+    (CEPEA ou Notícias Agrícolas como fallback).
+
+    Args:
+        produto: Código do produto (ex: "soja", "milho", "boi_gordo").
+        praca: Praça de cotação. ``None`` retorna todas.
+        inicio: Data inicial (ISO string ou ``date``). Default: 365 dias atrás.
+        fim: Data final. Default: hoje.
+        _moeda: Reservado para conversão futura de moeda. Sem efeito atual.
+        as_polars: Retorna ``polars.DataFrame`` em vez de pandas.
+        validate_sanity: Aplica validação estatística (outliers, gaps).
+        force_refresh: Ignora cache e força fetch na fonte.
+        offline: Usa apenas cache local, sem requests HTTP.
+        return_meta: Retorna tupla ``(df, MetaInfo)`` com metadados de proveniência.
+    """
     fetch_start = time.perf_counter()
     meta = MetaInfo(
         source="unknown",

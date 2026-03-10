@@ -118,6 +118,7 @@ Issues = "https://github.com/bruno-portfolio/agrobr/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["agrobr"]
+exclude = ["agrobr/health", "agrobr/alerts", "agrobr/benchmark"]
 
 [tool.ruff]
 target-version = "py311"
