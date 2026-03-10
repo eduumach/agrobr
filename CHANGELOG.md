@@ -7,22 +7,12 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-03-10
+
 ### Added
 - **CLI** — `cepea indicador` funcional (era stub). Suporta `--inicio`, `--fim`, `--ultimo`, `--formato`
 - **docs** — guia dedicado de snapshots (`docs/guides/snapshots.md`): criação, listagem, uso, delete, modo determinístico CLI vs programático
 - **docs** — docstring Google style em `cepea.indicador()` (10 params, inclui `_moeda`, `validate_sanity`, `force_refresh`, `offline`)
-
-### Improved
-- **docs** — README: seção "Modo Determinístico" expandida com snapshots (CLI + programático). `docs/index.md`: menção a snapshots na feature list. `mkdocs.yml`: nav entry para guia de snapshots
-
-### Changed
-- **CLI** — stubs `cache status`/`cache clear` removidos (subcommand `cache` eliminado)
-- **CLI** — `config show` não exibe mais AlertSettings (módulo privado)
-- **wheel** — `agrobr/health`, `agrobr/alerts` e `agrobr/benchmark` excluídos do wheel distribuído (infra interna)
-
-## [1.0.0] - 2026-03-09
-
-### Added
 - **py.typed** — PEP 561 marker para suporte a type checking em projetos downstream
 - **datasets** — 2 novos datasets na camada semântica (32→34): `movimentacao_portuaria` (ANTAQ, single-source, keyword-only, 21 colunas, 6 filtros opcionais, reutiliza `MOVIMENTACAO_PORTUARIA_V1`), `condicao_lavouras` (SEAB/DERAL, 14 culturas PR, normalização condicao vazia→plantio/colheita, contrato `CONDICAO_LAVOURAS_V1`)
 - **datasets** — 3 novos datasets na camada semântica (29→32): `oferta_demanda_global` (USDA PSD, long/pivot format, 8 commodities, skip contract quando `pivot=True`, contrato `OFERTA_DEMANDA_GLOBAL_V1`), `comercio_internacional` (UN Comtrade, bilateral global por HS code, 17 produtos, reutiliza `COMERCIO_BILATERAL_V1`), `zoneamento_agricola` (ZARC/MAPA, janelas de plantio por município/cultura/solo, 36 decêndios, keyword-only, contrato `ZONEAMENTO_AGRICOLA_V1`)
@@ -36,6 +26,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **deps** — `python-calamine>=0.3.0` como dependencia core (749KB, zero deps Python, engine Rust para leitura Excel)
 
 ### Improved
+- **docs** — README: seção "Modo Determinístico" expandida com snapshots (CLI + programático). `docs/index.md`: menção a snapshots na feature list. `mkdocs.yml`: nav entry para guia de snapshots
 - **docs** — README, docs/index.md, index.html e mkdocs.yml atualizados com todos os 34 datasets. Tabelas ordenadas alfabeticamente, 35 contract docs no nav mkdocs, 34 dataset cards no index.html. Typos de acentuacao corrigidos (Producao→Produção, carvao→carvão, acai→açaí)
 - **CI** — Python 3.13 adicionado a matrix de testes. Classifier `Programming Language :: Python :: 3.13` em pyproject.toml
 - **coverage** — benchmark/ excluido do coverage (`omit`). 5093+ testes, 88% cobertura (era 4906/87%). ~190 testes novos: datasets/ (snapshots 49→97%, datasets/ multiple files pushed to 80%+, conab/progresso/client 19→60%+). Dead code `_parse_week_date` removido. Test quality audit: singleton mutation fix, `@requires_pyarrow` guards, weak assertion strengthening
@@ -99,6 +90,11 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **alt/ perf** — 27 `.copy()` desnecessarios removidos de 4 parsers (mapa_psr 9, antt_pedagio/api 10, antt_pedagio/parser 3, anp_diesel 5). 6 mantidos por mutation safety. `_build_vendas_df` em anp_diesel vectorizado: iterrows substituido por `pd.to_numeric`/`.str.map`/`.apply` column-wise. Imports mortos `re`/`date` removidos
 - **conab/custo_producao/parser** — multi-format support: `_find_header()` substitui `_find_header_row()` com 2-step detection (single-row scan + 2-row sliding window para headers split). 2-row window usa best-quality selection: avalia todos os candidatos via `_identify_columns` e escolhe o que produz col_map mais completo (bonus para candidatos com ambas colunas obrigatorias item+valor_ha). Corrige culturas especiais (abacaxi, banana, cebola) cujo header split em 3 rows causava false positive no window anterior (keyword "preço" casava em "A PREÇOS DE:" sem mapear valor_ha). `_identify_columns()` expandido com patterns para "custo por ha", "custo/ha", "custo por hectare" (valor_ha) e "custo/{unit}" prefix (preco_unitario). Guards `if key not in mapping` em todas as chaves previnem overwrite (ex: PARTICIPAÇÃO CV ganha sobre CT). `_refine_valor_column()` novo para corrigir offset de merged cells (scan col+1/col+2 por dados numericos). `select_data_sheet()` novo para selecao robusta de sheet de dados (skip Indice/Index, filtro por UF/safra, fallback para ultima sheet). `_parse_sheet_info()` extrai UF e ano do nome da sheet via regex. Suporte a safra "2023/24" expandindo ano curto para 4 digitos. COE/COT patterns expandidos para "custo variavel", "total das despesas de custeio", "custo operacional (". Link regex `.xlsx` → `.xlsx?` para suportar .xls. PARSER_VERSION 1→2
 - **conab/custo_producao/api** — `custo_producao()` e `custo_producao_total()` integrados com `select_data_sheet()` e `_parse_sheet_info()` para resolucao automatica de sheet, UF e safra
+
+### Changed
+- **CLI** — stubs `cache status`/`cache clear` removidos (subcommand `cache` eliminado)
+- **CLI** — `config show` não exibe mais AlertSettings (módulo privado)
+- **wheel** — `agrobr/health`, `agrobr/alerts` e `agrobr/benchmark` excluídos do wheel distribuído (infra interna)
 
 ### Fixed
 - **comtrade** — ausente do namespace publico `agrobr.__init__` — `from agrobr import comtrade` falhava com ImportError
@@ -1043,6 +1039,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - Type hints completos
 - Logging estruturado com structlog
 
+[Unreleased]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.0...HEAD
 [Unreleased]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.0...HEAD
 [1.0.0]: https://github.com/bruno-portfolio/agrobr/compare/v0.12.0...v1.0.0
 [0.12.0]: https://github.com/bruno-portfolio/agrobr/compare/v0.11.3...v0.12.0
