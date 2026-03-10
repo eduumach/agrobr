@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 logger = structlog.get_logger()
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 
 MIGRATIONS: dict[int, str] = {
     1: """
@@ -27,6 +27,17 @@ MIGRATIONS: dict[int, str] = {
     3: """
         CREATE INDEX IF NOT EXISTS idx_history_key_date ON history_entries(key, data_date);
         CREATE INDEX IF NOT EXISTS idx_history_parser ON history_entries(parser_version);
+    """,
+    4: """
+        CREATE TABLE IF NOT EXISTS health_checks (
+            source TEXT NOT NULL,
+            status TEXT NOT NULL,
+            category TEXT,
+            latency_ms REAL NOT NULL,
+            message TEXT,
+            checked_at TIMESTAMP NOT NULL DEFAULT current_timestamp
+        );
+        CREATE INDEX IF NOT EXISTS idx_hc_composite ON health_checks(source, checked_at, status);
     """,
 }
 
@@ -58,9 +69,12 @@ def migrate(conn: duckdb.DuckDBPyConnection) -> None:
                         try:
                             conn.execute(statement)
                         except Exception as stmt_error:
-                            if "already exists" in str(stmt_error).lower():
+                            err_msg = str(stmt_error).lower()
+                            if "already exists" in err_msg:
                                 continue
-                            if "duplicate" in str(stmt_error).lower():
+                            if "duplicate" in err_msg:
+                                continue
+                            if "depend on it" in err_msg:
                                 continue
                             raise
 
