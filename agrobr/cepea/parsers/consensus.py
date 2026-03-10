@@ -5,7 +5,6 @@ from typing import Any
 
 import structlog
 
-from ...alerts.notifier import AlertLevel, send_alert
 from ...exceptions import ParseError
 from ...models import Indicador
 from .base import BaseParser
@@ -77,6 +76,8 @@ async def parse_with_consensus(
         )
 
         if require_consensus:
+            from ...alerts.notifier import AlertLevel, send_alert
+
             await send_alert(
                 level=AlertLevel.WARNING,
                 title="Parser consensus failed",
