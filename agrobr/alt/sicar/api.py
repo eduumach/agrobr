@@ -168,14 +168,9 @@ async def imoveis(
     parse_ms = int((time.monotonic() - t1) * 1000)
 
     if not df.empty and "cod_imovel" in df.columns:
-        df = df.sort_values(
-            ["cod_imovel", "data_atualizacao"],
-            ascending=[True, False],
-            na_position="last",
-        )
         before = len(df)
         df = df.drop_duplicates(subset=["cod_imovel"], keep="first")
-        df = df.reset_index(drop=True)
+        df = df.sort_values("cod_imovel").reset_index(drop=True)
         if len(df) < before:
             logger.info("sicar_dedup", removed=before - len(df), remaining=len(df))
 
@@ -278,14 +273,9 @@ async def imoveis_geo(
     parse_ms = int((time.monotonic() - t1) * 1000)
 
     if not gdf.empty and "cod_imovel" in gdf.columns:
-        gdf = gdf.sort_values(
-            ["cod_imovel", "data_atualizacao"],
-            ascending=[True, False],
-            na_position="last",
-        )
         before = len(gdf)
         gdf = gdf.drop_duplicates(subset=["cod_imovel"], keep="first")
-        gdf = gdf.reset_index(drop=True)
+        gdf = gdf.sort_values("cod_imovel").reset_index(drop=True)
         if len(gdf) < before:
             logger.info("sicar_geo_dedup", removed=before - len(gdf), remaining=len(gdf))
 

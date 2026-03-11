@@ -63,7 +63,13 @@ async def ajustes(
 
     logger.info("b3_ajustes", data=str(data), contrato=contrato)
 
-    data_str = data.strftime("%d/%m/%Y") if isinstance(data, date) else data
+    if isinstance(data, date):
+        data_str = data.strftime("%d/%m/%Y")
+    else:
+        try:
+            data_str = datetime.strptime(data, "%Y-%m-%d").strftime("%d/%m/%Y")
+        except ValueError:
+            data_str = data
 
     t0 = time.monotonic()
     zip_bytes, source_url = await client.fetch_ajustes_zip(data_str)

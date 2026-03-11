@@ -11,6 +11,7 @@ from agrobr.exceptions import SourceUnavailableError
 
 logger = structlog.get_logger()
 
+BQ_TIMEOUT = 120.0
 BQ_DATASET = "br_bcb_sicor"
 BQ_TABLE = "microdados_operacao"
 
@@ -168,7 +169,17 @@ async def fetch_credito_rural_bigquery(
         uf=uf_sigla,
     )
 
-    return await asyncio.to_thread(_query_bigquery_sync, query)
+    try:
+        return await asyncio.wait_for(
+            asyncio.to_thread(_query_bigquery_sync, query),
+            timeout=BQ_TIMEOUT,
+        )
+    except TimeoutError as exc:
+        raise SourceUnavailableError(
+            source="bcb_bigquery",
+            url="https://basedosdados.org/dataset/br-bcb-sicor",
+            last_error=f"BigQuery timeout after {BQ_TIMEOUT}s",
+        ) from exc
 
 
 def is_bigquery_available() -> bool:

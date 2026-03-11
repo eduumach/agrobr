@@ -1,5 +1,6 @@
 """Testes para o fallback BigQuery do BCB/SICOR."""
 
+import time
 from unittest.mock import MagicMock, patch
 
 import pandas as pd
@@ -152,6 +153,23 @@ class TestFetchCreditoRuralBigquery:
 
         call_query = mock_query.call_args[0][0]
         assert "sigla_uf = 'MT'" in call_query
+
+    @pytest.mark.asyncio
+    async def test_timeout_raises_source_unavailable(self, monkeypatch):
+        monkeypatch.setattr("agrobr.bcb.bigquery_client.BQ_TIMEOUT", 0.01)
+
+        def _slow_query(query):  # noqa: ARG001
+            time.sleep(1)
+            return []
+
+        with (
+            patch(
+                "agrobr.bcb.bigquery_client._query_bigquery_sync",
+                side_effect=_slow_query,
+            ),
+            pytest.raises(SourceUnavailableError, match="timeout"),
+        ):
+            await fetch_credito_rural_bigquery(finalidade="custeio")
 
     @pytest.mark.asyncio
     async def test_raises_when_bigquery_fails(self):

@@ -149,6 +149,12 @@ class TestAjustes:
         mock_fetch_zip.assert_called_once_with("13/02/2025")
 
     @pytest.mark.asyncio
+    async def test_accepts_iso_string(self, mock_fetch_zip):
+        df = await api.ajustes(data="2025-02-13")
+        assert isinstance(df, pd.DataFrame)
+        mock_fetch_zip.assert_called_once_with("13/02/2025")
+
+    @pytest.mark.asyncio
     async def test_filter_contrato_by_name(self, mock_fetch_zip):  # noqa: ARG002
         df = await api.ajustes(data="13/02/2025", contrato="boi")
         assert len(df) > 0

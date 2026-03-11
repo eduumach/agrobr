@@ -63,7 +63,6 @@ class TestPropertyNames:
             "cod_imovel",
             "status_imovel",
             "dat_criacao",
-            "data_atualizacao",
             "area",
             "condicao",
             "uf",
@@ -79,7 +78,7 @@ class TestPropertyNames:
         assert "the_geom" not in PROPERTY_NAMES
 
     def test_count(self):
-        assert len(PROPERTY_NAMES) == 11
+        assert len(PROPERTY_NAMES) == 10
 
 
 class TestRenameMap:

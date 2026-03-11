@@ -18,7 +18,6 @@ PROPERTY_NAMES = [
     "cod_imovel",
     "status_imovel",
     "dat_criacao",
-    "data_atualizacao",
     "area",
     "condicao",
     "uf",
