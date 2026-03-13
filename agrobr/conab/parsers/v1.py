@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from datetime import date
 from decimal import Decimal, InvalidOperation
 from io import BytesIO
@@ -454,6 +455,10 @@ class ConabParserV1:
                         safra_full = f"{ano1}/{ano2}"
                         if safra_full not in safras_encontradas:
                             safras_encontradas.append(safra_full)
+            else:
+                year_str = cell.replace(".0", "").strip()
+                if re.match(r"^\d{4}$", year_str) and year_str not in safras_encontradas:
+                    safras_encontradas.append(year_str)
 
         if area_start and prod_start and producao_start and safras_encontradas:
             for i, safra in enumerate(safras_encontradas):

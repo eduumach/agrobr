@@ -235,3 +235,20 @@ class TestExtractSafraColumnsFallback:
         )
         with pytest.raises(ParseError, match="detectar colunas de safra"):
             parser._extract_safra_columns(df, 0)
+
+    def test_year_only_columns_detected(self, parser):
+        df = pd.DataFrame(
+            [
+                ["REGIAO/UF", "ÁREA", None, "PRODUTIVIDADE", None, "PRODUÇÃO", None],
+                ["", 2024.0, 2025.0, 2024.0, 2025.0, 2024.0, 2025.0],
+            ]
+        )
+        cols = parser._extract_safra_columns(df, 0)
+        assert "2024" in cols
+        assert "2025" in cols
+        assert cols["2024"]["area"] == 1
+        assert cols["2025"]["area"] == 2
+        assert cols["2024"]["produtividade"] == 3
+        assert cols["2025"]["produtividade"] == 4
+        assert cols["2024"]["producao"] == 5
+        assert cols["2025"]["producao"] == 6

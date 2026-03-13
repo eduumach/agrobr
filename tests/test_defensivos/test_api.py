@@ -57,7 +57,7 @@ class TestFormulados:
         assert isinstance(df, pd.DataFrame)
         assert isinstance(meta, MetaInfo)
         assert meta.source == "defensivos"
-        assert meta.parser_version == 1
+        assert meta.parser_version == 2
 
     @pytest.mark.asyncio
     async def test_filter_ingrediente_ativo(self):

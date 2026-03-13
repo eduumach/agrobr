@@ -45,6 +45,7 @@ class ProdutoTecnico(_StripBase):
     titular: str | None = None
     classe: str | None = None
     grupo_quimico: str | None = None
+    nome_cientifico: str | None = None
     classe_toxicologica: str | None = None
     classe_ambiental: str | None = None
 
@@ -114,6 +115,7 @@ TECNICOS_COLS: list[str] = [
     "titular",
     "classe",
     "grupo_quimico",
+    "nome_cientifico",
     "classe_toxicologica",
     "classe_ambiental",
 ]
