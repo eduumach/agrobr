@@ -25,9 +25,9 @@ class TestCache:
         assert result.columns.tolist() == ["nr_registro", "marca"]
 
     def test_stale_cache_returns_none(self, tmp_path: Path):
-        df = pd.DataFrame({"a": [1]})
+        df = pd.DataFrame({"a": ["1"]})
         cache.write_cache("test", df)
-        path = tmp_path / "test.parquet"
+        path = tmp_path / "test.csv"
         old_mtime = time.time() - cache.TTL_SECONDS - 100
         import os
 
@@ -39,20 +39,20 @@ class TestCache:
         result = cache.read_cached("nonexistent")
         assert result is None
 
-    def test_corrupt_parquet_returns_none(self, tmp_path: Path):
-        path = tmp_path / "corrupt.parquet"
-        path.write_bytes(b"not a parquet file")
+    def test_corrupt_file_returns_none(self, tmp_path: Path):
+        path = tmp_path / "corrupt.csv"
+        path.write_bytes(b"")
         result = cache.read_cached("corrupt")
         assert result is None
         assert not path.exists()
 
     def test_invalidate(self, tmp_path: Path):
-        df = pd.DataFrame({"a": [1]})
+        df = pd.DataFrame({"a": ["1"]})
         cache.write_cache("file1", df)
         cache.write_cache("file2", df)
-        assert len(list(tmp_path.glob("*.parquet"))) == 2
+        assert len(list(tmp_path.glob("*.csv"))) == 2
         cache.invalidate()
-        assert len(list(tmp_path.glob("*.parquet"))) == 0
+        assert len(list(tmp_path.glob("*.csv"))) == 0
 
     def test_write_formulados_pair(self):
         form_df = pd.DataFrame({"nr_registro": ["001"], "marca": ["A"]})
