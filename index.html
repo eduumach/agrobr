@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>agrobr — Dados agrícolas brasileiros em uma linha de código</title>
-<meta name="description" content="Infraestrutura Python para dados agrícolas brasileiros. 26 fontes públicas — CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA, IMEA, DERAL, INMET, Queimadas/INPE, Desmatamento, MapBiomas, CONAB Progresso, CONAB CEASA/PROHORT, B3 Futuros Agro, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedagio, SICAR, ZARC — uma API, fallback automático, cache DuckDB.">
+<meta name="description" content="Infraestrutura Python para dados agrícolas brasileiros. 27 fontes públicas — CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA, IMEA, DERAL, INMET, Queimadas/INPE, Desmatamento, MapBiomas, CONAB Progresso, CONAB CEASA/PROHORT, B3 Futuros Agro, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedagio, SICAR, ZARC, Agrofit/MAPA (Defensivos) — uma API, fallback automático, cache DuckDB.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -573,7 +573,6 @@
     <li><a href="#datasets">Datasets</a></li>
     <li><a href="#features">Features</a></li>
     <li><a href="#sources">Fontes</a></li>
-    <li><a href="https://agrobr.streamlit.app/" target="_blank">Playground</a></li>
     <li><a href="https://www.agrobr.dev/docs/">Docs</a></li>
     <li><a href="https://github.com/bruno-portfolio/agrobr" target="_blank">GitHub</a></li>
   </ul>
@@ -585,7 +584,7 @@
   <div class="hero-content">
     <p class="hero-eyebrow">Python · Open Source · PyPI</p>
     <h1 class="hero-title">Dados agrícolas brasileiros em <em>uma linha</em> de código</h1>
-    <p class="hero-subtitle"><span class="hero-sources">CEPEA, CONAB, IBGE, NASA POWER, USDA, B3</span> e mais 20 fontes — 26 origens, uma API unificada com fallback automático, cache inteligente e contratos versionados.</p>
+    <p class="hero-subtitle"><span class="hero-sources">CEPEA, CONAB, IBGE, NASA POWER, USDA, B3</span> e mais 21 fontes — 27 origens, uma API unificada com fallback automático, cache inteligente e contratos versionados.</p>
     <div class="hero-install" onclick="copyInstall(this)" title="Copiar">
       <span><span class="pip">$</span> pip install agrobr</span>
       <span class="copy-icon">⎘</span>
@@ -849,7 +848,7 @@
 <section id="sources">
   <div class="reveal">
     <p class="section-label">Fontes de dados</p>
-    <h2 class="section-title">Vinte e seis origens. Uma API.</h2>
+    <h2 class="section-title">Vinte e sete origens. Uma API.</h2>
     <p class="section-desc">Cada fonte tem seu próprio parser com versionamento, fingerprinting e tratamento de encoding. Você só vê o DataFrame.</p>
   </div>
 
@@ -989,6 +988,11 @@
       <div class="source-count">40+ culturas · todos municipios</div>
       <div class="source-detail">Zoneamento Agricola de Risco Climatico — janelas de plantio por municipio/cultura/solo/ciclo</div>
     </div>
+    <div class="source-card">
+      <div class="source-name">Agrofit/MAPA</div>
+      <div class="source-count">~8K formulados · ~2.8K tecnicos</div>
+      <div class="source-detail">Defensivos agricolas registrados — produtos formulados, autorizacoes de uso e produtos tecnicos (CC-BY)</div>
+    </div>
   </div>
 </section>
 
@@ -997,10 +1001,9 @@
   <div class="reveal">
     <p class="section-label">Começar</p>
     <h2 class="section-title">pip install agrobr</h2>
-    <p class="section-desc" style="margin: 0 auto 0;">MIT License (código). 5100+ testes. 26 fontes. 34 datasets. <a href="https://www.agrobr.dev/docs/licenses/" style="color: var(--accent-gold-dim);">Licenças dos dados →</a></p>
+    <p class="section-desc" style="margin: 0 auto 0;">MIT License (código). 5100+ testes. 27 fontes. 34 datasets. <a href="https://www.agrobr.dev/docs/licenses/" style="color: var(--accent-gold-dim);">Licenças dos dados →</a></p>
     <div class="cta-links">
       <a href="https://www.agrobr.dev/docs/" class="cta-btn primary">Documentação →</a>
-      <a href="https://agrobr.streamlit.app/" class="cta-btn secondary" target="_blank">Playground ↗</a>
       <a href="https://colab.research.google.com/github/bruno-portfolio/agrobr/blob/main/examples/agrobr_demo.ipynb" class="cta-btn secondary">Abrir no Colab ↗</a>
       <a href="https://github.com/bruno-portfolio/agrobr" class="cta-btn secondary">GitHub ↗</a>
       <a href="https://pypi.org/project/agrobr/" class="cta-btn secondary">PyPI ↗</a>
@@ -1014,7 +1017,6 @@
   <div class="footer-links">
     <a href="https://github.com/bruno-portfolio/agrobr">GitHub</a>
     <a href="https://pypi.org/project/agrobr/">PyPI</a>
-    <a href="https://agrobr.streamlit.app/" target="_blank">Playground</a>
     <a href="https://www.agrobr.dev/docs/">Docs</a>
   </div>
 </footer>

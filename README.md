@@ -19,9 +19,9 @@
   </a>
 </p>
 
-Infraestrutura Python para dados agrícolas brasileiros com camada semântica sobre **26 fontes públicas**: CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA PSD, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento PRODES/DETER, MapBiomas, CONAB Progresso, B3 Futuros Agro, CONAB CEASA/PROHORT, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedágio, SICAR e ZARC.
+Infraestrutura Python para dados agrícolas brasileiros com camada semântica sobre **27 fontes públicas**: CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA PSD, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento PRODES/DETER, MapBiomas, CONAB Progresso, B3 Futuros Agro, CONAB CEASA/PROHORT, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedágio, SICAR, ZARC e Agrofit/MAPA (Defensivos).
 
-**v1.0.0** — 5100+ testes, 88% cobertura, 26/26 fontes com golden tests (21 com dados reais), retry centralizado em 26/26 clients.
+**v1.0.0** — 5100+ testes, 88% cobertura, 27/27 fontes com golden tests (21 com dados reais), retry centralizado em 27/27 clients.
 
 ## Demo
 ![Animation](https://github.com/user-attachments/assets/40e1341e-f47b-4eb5-b18e-55b49c63ee97)
@@ -617,6 +617,7 @@ Use `agrobr health --all` para verificar localmente.
 | ANTT Pedagio | Fluxo de veiculos em pracas de pedagio (2010+, 200+ pracas) | ✅ | Funcional |
 | SICAR | Cadastro Ambiental Rural — imoveis rurais por UF (7.4M+ registros, WFS) | ✅ | Funcional |
 | ZARC | Zoneamento Agricola de Risco Climatico (janelas de plantio por municipio/cultura/solo) | ✅ | Funcional |
+| Agrofit/MAPA (Defensivos) | Agrotoxicos registrados — formulados, autorizacoes, tecnicos (~8K produtos) | ✅ | Funcional |
 
 > ¹ Golden test com dados sintéticos — `needs_real_data` para validação com API real.
 

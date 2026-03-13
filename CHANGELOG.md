@@ -7,6 +7,9 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+### Added
+- **defensivos** — dados de agrotoxicos registrados no Brasil (Agrofit/MAPA). 3 funcoes: `formulados()`, `autorizacoes()`, `tecnicos()`. Fonte: Portal de Dados Abertos MAPA (CC-BY). Cache Parquet 24h. ~8K formulados, ~267K autorizacoes, ~2.8K tecnicos. Filtros por ingrediente ativo, classe, titular, cultura, organicos. 51 testes, golden data
+
 ### Fixed
 - **b3/api** — `ajustes(data=)` agora aceita formato ISO (`"2025-03-07"`) alem de BR (`"07/03/2025"`) e `date` object. Antes: ISO string passava direto pro client e causava `ValueError` no `strptime("%d/%m/%Y")`
 - **alt/sicar** — `data_atualizacao` removido de `PROPERTY_NAMES` WFS. Campo nao existe em todos os layers estaduais (SP, RS, PR, SC, RJ, TO), causando 400 Bad Request. Parser ja tratava campo ausente via `.get()`. Dedup em `imoveis()`/`imoveis_geo()` simplificado (sort por `cod_imovel` apenas, sem `data_atualizacao` que era all-NaT)

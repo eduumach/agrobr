@@ -102,6 +102,7 @@ _modules: dict[str, _SyncModule | None] = {
     "comtrade": None,
     "conab": None,
     "datasets": None,
+    "defensivos": None,
     "deral": None,
     "desmatamento": None,
     "ibge": None,

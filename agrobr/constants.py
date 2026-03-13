@@ -30,6 +30,7 @@ class Fonte(StrEnum):
     COMEXSTAT = "comexstat"
     COMTRADE = "comtrade"
     CONAB = "conab"
+    DEFENSIVOS = "defensivos"
     DERAL = "deral"
     IBGE = "ibge"
     IMEA = "imea"
@@ -88,6 +89,11 @@ URLS = {
         "base": "https://www.gov.br/conab",
         "boletim_graos": "https://www.gov.br/conab/pt-br/atuacao/informacoes-agropecuarias/safras/safra-de-graos/boletim-da-safra-de-graos",
         "ceasa_prohort": "https://pentahoportaldeinformacoes.conab.gov.br/pentaho/plugin/cda/api/doQuery",
+    },
+    Fonte.DEFENSIVOS: {
+        "base": "https://dados.agricultura.gov.br",
+        "formulados": "https://dados.agricultura.gov.br/dataset/6c913699-e82e-4da3-a0a1-fb6c431e367f/resource/25ab48c9-6280-47db-b7a0-73d6a1e8e96c/download/produtos_formulados_e_autorizacoes_de_uso.csv",
+        "tecnicos": "https://dados.agricultura.gov.br/dataset/6c913699-e82e-4da3-a0a1-fb6c431e367f/resource/3d7a62e6-82e0-4e70-ac75-71ed29e63753/download/produtos_tecnicos.csv",
     },
     Fonte.DERAL: {
         "base": "https://www.agricultura.pr.gov.br/deral",
@@ -283,6 +289,7 @@ class HTTPSettings(BaseSettings):
     rate_limit_comexstat: float = 2.0
     rate_limit_comtrade: float = 2.0
     rate_limit_conab: float = 3.0
+    rate_limit_defensivos: float = 2.0
     rate_limit_deral: float = 3.0
     rate_limit_ibge: float = 1.0
     rate_limit_imea: float = 1.0
