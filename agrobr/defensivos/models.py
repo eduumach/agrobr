@@ -34,6 +34,7 @@ class AutorizacaoUso(_StripBase):
     classe: str | None = None
     cultura: str | None = None
     praga: str | None = None
+    praga_nome_comum: str | None = None
     modalidade_de_emprego: str | None = None
 
 
@@ -44,7 +45,8 @@ class ProdutoTecnico(_StripBase):
     titular: str | None = None
     classe: str | None = None
     grupo_quimico: str | None = None
-    nome_cientifico: str | None = None
+    classe_toxicologica: str | None = None
+    classe_ambiental: str | None = None
 
 
 FORMULADOS_RENAME: dict[str, str] = {
@@ -56,21 +58,28 @@ FORMULADOS_RENAME: dict[str, str] = {
     "FORMULACAO": "formulacao",
     "CLASSE_TOXICOLOGICA": "classe_toxicologica",
     "CLASSIFICACAO_AMBIENTAL": "classe_ambiental",
+    "CLASSE_AMBIENTAL": "classe_ambiental",
     "ORGANICOS": "organicos",
     "MODO_DE_ACAO": "modo_de_acao",
     "CULTURA": "cultura",
     "PRAGA_NOME_CIENTIFICO": "praga",
+    "PRAGA_NOME_COMUM": "praga_nome_comum",
     "MODALIDADE_DE_EMPREGO": "modalidade_de_emprego",
 }
 
 TECNICOS_RENAME: dict[str, str] = {
     "NR_REGISTRO": "nr_registro",
+    "NUMERO_REGISTRO": "nr_registro",
     "MARCA_COMERCIAL": "marca_comercial",
+    "PRODUTO_TECNICO_MARCA_COMERCIAL": "marca_comercial",
     "INGREDIENTE_ATIVO": "ingrediente_ativo",
     "TITULAR_DE_REGISTRO": "titular",
+    "TITULAR_REGISTRO": "titular",
     "CLASSE": "classe",
     "GRUPO_QUIMICI": "grupo_quimico",
     "NOME_CIENTIFICO": "nome_cientifico",
+    "CLASSIFICACAO_TOXICOLOGICA": "classe_toxicologica",
+    "CLASSIFICACAO_AMBIENTAL": "classe_ambiental",
 }
 
 FORMULADOS_PRODUCT_COLS: list[str] = [
@@ -94,6 +103,7 @@ AUTORIZACOES_COLS: list[str] = [
     "classe",
     "cultura",
     "praga",
+    "praga_nome_comum",
     "modalidade_de_emprego",
 ]
 
@@ -104,14 +114,17 @@ TECNICOS_COLS: list[str] = [
     "titular",
     "classe",
     "grupo_quimico",
-    "nome_cientifico",
+    "classe_toxicologica",
+    "classe_ambiental",
 ]
 
 FORMULADOS_COLS_DROP: list[str] = [
     "EMPRESA_PAIS_TIPO",
+    "EMPRESA_<PAIS>_TIPO",
     "SITUACAO",
 ]
 
 TECNICOS_COLS_DROP: list[str] = [
     "EMPRESA_PAIS_TIPO",
+    "EMPRESA_<PAIS>_TIPO",
 ]

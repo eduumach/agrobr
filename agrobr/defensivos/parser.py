@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import re
 
 import pandas as pd
 
@@ -16,10 +17,13 @@ from .models import (
     TECNICOS_RENAME,
 )
 
-PARSER_VERSION = 1
+PARSER_VERSION = 2
 
-_REQUIRED_FORMULADOS = {"NR_REGISTRO", "MARCA_COMERCIAL", "INGREDIENTE_ATIVO", "CULTURA"}
-_REQUIRED_TECNICOS = {"NR_REGISTRO", "MARCA_COMERCIAL", "INGREDIENTE_ATIVO"}
+_REQUIRED_FORMULADOS = {"MARCA_COMERCIAL", "INGREDIENTE_ATIVO", "CULTURA"}
+_REQUIRED_TECNICOS = {"CLASSE"}
+
+_COMPOSITE_IA_COL = "INGREDIENTE_ATIVO(GRUPO_QUIMICI)(CONCENTRACAO)"
+_RE_COMPOSITE_IA = re.compile(r"^(.+?)\s*\(([^)]*)\)\s*\(([^)]*)\)$")
 
 _EN_DASH_UTF8 = "\u2013".encode()
 
@@ -78,6 +82,13 @@ def parse_formulados_csv(data: bytes) -> tuple[pd.DataFrame, pd.DataFrame]:
     return product_df, auth_df
 
 
+def _split_composite_ia(value: str) -> tuple[str, str]:
+    m = _RE_COMPOSITE_IA.match(value)
+    if m:
+        return m.group(1).strip(), m.group(2).strip()
+    return value.strip(), ""
+
+
 def parse_tecnicos_csv(data: bytes) -> pd.DataFrame:
     if not data.strip():
         raise ParseError(
@@ -102,6 +113,12 @@ def parse_tecnicos_csv(data: bytes) -> pd.DataFrame:
             parser_version=PARSER_VERSION,
             reason=f"Colunas faltando no CSV tecnicos: {sorted(missing)}",
         )
+
+    if _COMPOSITE_IA_COL in df.columns:
+        split = df[_COMPOSITE_IA_COL].apply(_split_composite_ia)
+        df["INGREDIENTE_ATIVO"] = split.str[0]
+        df["GRUPO_QUIMICI"] = split.str[1]
+        df = df.drop(columns=[_COMPOSITE_IA_COL])
 
     drop_cols = [c for c in TECNICOS_COLS_DROP if c in df.columns]
     if drop_cols:

@@ -92,8 +92,8 @@ URLS = {
     },
     Fonte.DEFENSIVOS: {
         "base": "https://dados.agricultura.gov.br",
-        "formulados": "https://dados.agricultura.gov.br/dataset/6c913699-e82e-4da3-a0a1-fb6c431e367f/resource/25ab48c9-6280-47db-b7a0-73d6a1e8e96c/download/produtos_formulados_e_autorizacoes_de_uso.csv",
-        "tecnicos": "https://dados.agricultura.gov.br/dataset/6c913699-e82e-4da3-a0a1-fb6c431e367f/resource/3d7a62e6-82e0-4e70-ac75-71ed29e63753/download/produtos_tecnicos.csv",
+        "formulados": "https://dados.agricultura.gov.br/dataset/6c913699-e82e-4da3-a0a1-fb6c431e367f/resource/d30b30d7-e256-484e-9ab8-cd40974e1238/download/agrofitprodutosformulados.csv",
+        "tecnicos": "https://dados.agricultura.gov.br/dataset/6c913699-e82e-4da3-a0a1-fb6c431e367f/resource/a200c70b-e025-4a9a-be1b-ec7275d7921f/download/agrofitprodutostecnicos.csv",
     },
     Fonte.DERAL: {
         "base": "https://www.agricultura.pr.gov.br/deral",
