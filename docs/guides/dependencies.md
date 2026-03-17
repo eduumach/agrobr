@@ -14,7 +14,7 @@ Instaladas com `pip install agrobr`:
 | `pandas` | DataFrames | `>=2.0.0` |
 | `pydantic` | Validação de modelos | `>=2.5.0` |
 | `pydantic-settings` | Configurações | `>=2.1.0` |
-| `duckdb` | Cache local | `>=0.9.0` |
+| `duckdb` | Cache local | `>=1.5.0` |
 | `structlog` | Logging estruturado | `>=23.2.0` |
 | `chardet` | Detecção de encoding | `>=5.2.0` |
 | `typer` | CLI | `>=0.9.0` |

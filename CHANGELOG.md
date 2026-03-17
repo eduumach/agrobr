@@ -10,6 +10,9 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ### Added
 - **defensivos** — dados de agrotoxicos registrados no Brasil (Agrofit/MAPA). 3 funcoes: `formulados()`, `autorizacoes()`, `tecnicos()`. Fonte: Portal de Dados Abertos MAPA (CC-BY). Cache Parquet 24h. ~8K formulados, ~267K autorizacoes, ~2.8K tecnicos. Filtros por ingrediente ativo, classe, titular, cultura, organicos. 51 testes, golden data
 
+### Changed
+- **deps** — duckdb `>=1.4.4` → `>=1.5.0`. Non-blocking checkpointing, 17% throughput, K-way merge sort, late materialization. Workaround em conftest.py para `_duckdb._sqltypes` coverage+Python 3.14
+
 ### Fixed
 - **b3/api** — `ajustes(data=)` agora aceita formato ISO (`"2025-03-07"`) alem de BR (`"07/03/2025"`) e `date` object. Antes: ISO string passava direto pro client e causava `ValueError` no `strptime("%d/%m/%Y")`
 - **alt/sicar** — `data_atualizacao` removido de `PROPERTY_NAMES` WFS. Campo nao existe em todos os layers estaduais (SP, RS, PR, SC, RJ, TO), causando 400 Bad Request. Parser ja tratava campo ausente via `.get()`. Dedup em `imoveis()`/`imoveis_geo()` simplificado (sort por `cod_imovel` apenas, sem `data_atualizacao` que era all-NaT)
@@ -694,7 +697,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ### Known Issues
 - 4 golden tests com dados sintéticos (INMET, USDA, NA, ANDA) — `needs_real_data`
   (BCB, IBGE, ComexStat, DERAL, ABIOVE migrados para dados reais na issue #10)
-- DuckDB 1.4.4 incompatível com coverage no Python 3.14
+- ~~DuckDB 1.4.4 incompatível com coverage no Python 3.14~~ (resolvido: bump 1.5.0 + workaround conftest.py)
 
 ## [0.8.0] - 2026-02-09
 

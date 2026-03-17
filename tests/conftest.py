@@ -2,7 +2,17 @@
 
 from __future__ import annotations
 
+import sys
+
 import pytest
+
+try:
+    import _duckdb
+
+    sys.modules.setdefault("_duckdb._sqltypes", _duckdb._sqltypes)
+    sys.modules.setdefault("_duckdb._func", _duckdb._func)
+except (ImportError, AttributeError):
+    pass
 
 
 @pytest.fixture(autouse=True)
