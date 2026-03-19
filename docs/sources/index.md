@@ -1,6 +1,6 @@
 # Fontes de Dados
 
-O agrobr integra dados de 26 fontes de dados agricolas.
+O agrobr integra dados de 27 fontes de dados agricolas.
 Todas as fontes suportam `return_meta=True` para rastreabilidade completa.
 
 ## Visao Geral
@@ -33,6 +33,7 @@ Todas as fontes suportam `return_meta=True` para rastreabilidade completa.
 | [MAPA PSR](mapa_psr.md) | Apolices e sinistros seguro rural | Anual | 27 UFs, 2006+ |
 | [SICAR](sicar.md) | Cadastro Ambiental Rural | Continua | 27 UFs, 7.4M+ imoveis |
 | [ZARC](zarc.md) | Zoneamento Agricola de Risco Climatico | Semanal | 40+ culturas, todos municipios |
+| [Agrofit/MAPA](defensivos.md) | Agrotoxicos registrados | Continua | ~8K formulados, ~267K autorizacoes |
 
 ## Proveniencia e Rastreabilidade
 

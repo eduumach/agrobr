@@ -3,12 +3,12 @@
 > **Licença:** Todos os direitos reservados (Lei 9.610/98). Empresa privada
 > sem termos de uso públicos sobre republicação de cotações. Dados originários
 > do CEPEA estão sujeitos a CC BY-NC 4.0.
-> Classificação: `restrito` — deprecação planejada para v0.10.0
+> Classificação: `restrito`
 
-!!! warning "Deprecação planejada"
-    Este módulo é um fallback temporário para contornar proteção Cloudflare
-    no site do CEPEA. Será removido na v0.10.0 quando o acesso direto ao
-    CEPEA for resolvido. Um `warnings.warn()` é emitido no primeiro uso.
+!!! info "Fallback ativo"
+    Este módulo é o fallback principal para contornar proteção Cloudflare
+    no site do CEPEA. Enquanto o CEPEA estiver protegido por Cloudflare,
+    o NA é a fonte efetiva de dados. Um `warnings.warn()` é emitido no primeiro uso.
 
 ## Visão Geral
 

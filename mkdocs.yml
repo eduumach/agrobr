@@ -130,6 +130,7 @@ nav:
     - MAPA PSR: api/mapa_psr.md
     - SICAR: api/sicar.md
     - ZARC: api/zarc.md
+    - Defensivos: api/defensivos.md
   - Fontes:
     - Visão Geral: sources/index.md
     - CEPEA: sources/cepea.md
@@ -158,6 +159,7 @@ nav:
     - MAPA PSR: sources/mapa_psr.md
     - SICAR: sources/sicar.md
     - ZARC: sources/zarc.md
+    - Defensivos: sources/defensivos.md
   - Licenças dos Dados: licenses.md
   - Portabilidade:
     - Visão Geral: porting/index.md

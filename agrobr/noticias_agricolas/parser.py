@@ -5,7 +5,7 @@ from datetime import datetime
 from decimal import Decimal, InvalidOperation
 
 import structlog
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 from agrobr.constants import Fonte
 from agrobr.exceptions import ParseError
@@ -108,6 +108,19 @@ def _parse_variacao(var_str: str) -> Decimal | None:
         return None
 
 
+def _extract_parent_date(table: Tag) -> tuple[datetime, bool] | None:
+    cotacao_div = table.find_parent("div", class_="cotacao")
+    if not cotacao_div:
+        return None
+    fechamento = cotacao_div.find("div", class_="fechamento")
+    if not fechamento:
+        return None
+    date_match = re.search(r"(\d{2}/\d{2}/\d{4})", fechamento.get_text())
+    if not date_match:
+        return None
+    return _parse_date(date_match.group(1))
+
+
 def parse_indicador(html: str, produto: str) -> list[Indicador]:
     soup = BeautifulSoup(html, "lxml")
     indicadores: list[Indicador] = []
@@ -121,22 +134,28 @@ def parse_indicador(html: str, produto: str) -> list[Indicador]:
     if not tables:
         tables = soup.find_all("table")
 
-    has_region_col = produto_lower == "trigo"
-
     for table in tables:
         headers = table.find_all("th")
         header_text = " ".join(h.get_text(strip=True).lower() for h in headers)
 
-        if "data" not in header_text:
-            continue
-
+        has_date_col = "data" in header_text or "vencimento" in header_text
+        has_state_col = "estado" in header_text
         has_valor = "valor" in header_text or "r$" in header_text
-        has_region_header = "regi" in header_text
-        if not has_valor and not has_region_header:
+        has_region_header = "regi" in header_text or has_state_col
+
+        if not has_date_col and not has_state_col:
             continue
 
-        if has_region_header:
-            has_region_col = True
+        if not has_valor:
+            continue
+
+        parent_date: tuple[datetime, bool] | None = None
+        if not has_date_col:
+            parent_date = _extract_parent_date(table)
+            if parent_date is None:
+                continue
+
+        has_region_col = (produto_lower == "trigo") or has_region_header
 
         tbody = table.find("tbody")
         rows = tbody.find_all("tr") if tbody else table.find_all("tr")[1:]
@@ -147,18 +166,27 @@ def parse_indicador(html: str, produto: str) -> list[Indicador]:
             if len(cells) < 2:
                 continue
 
-            data_str = cells[0].get_text(strip=True)
-
-            if has_region_col and len(cells) >= 3:
-                regiao = cells[1].get_text(strip=True)
-                valor_str = cells[2].get_text(strip=True)
-                var_idx = 3
+            if has_date_col:
+                data_str = cells[0].get_text(strip=True)
+                parsed = _parse_date(data_str)
+                if has_region_col and len(cells) >= 3:
+                    regiao = cells[1].get_text(strip=True)
+                    valor_str = cells[2].get_text(strip=True)
+                    var_idx = 3
+                else:
+                    regiao = None
+                    valor_str = cells[1].get_text(strip=True)
+                    var_idx = 2
             else:
-                regiao = None
+                parsed = parent_date
+                data_str = f"{parsed[0]:%d/%m/%Y}" if parsed else ""
+                regiao = cells[0].get_text(strip=True)
                 valor_str = cells[1].get_text(strip=True)
                 var_idx = 2
 
-            parsed = _parse_date(data_str)
+            if not valor_str:
+                continue
+
             valor = _parse_valor(valor_str)
 
             if parsed is None or valor is None:

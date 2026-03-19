@@ -7,6 +7,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-03-19
+
 ### Added
 - **defensivos** — dados de agrotoxicos registrados no Brasil (Agrofit/MAPA). 3 funcoes: `formulados()`, `autorizacoes()`, `tecnicos()`. Fonte: Portal de Dados Abertos MAPA (CC-BY). Cache Parquet 24h. ~8K formulados, ~267K autorizacoes, ~2.8K tecnicos. Filtros por ingrediente ativo, classe, titular, cultura, organicos. 51 testes, golden data
 
@@ -14,6 +16,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **deps** — duckdb `>=1.4.4` → `>=1.5.0`. Non-blocking checkpointing, 17% throughput, K-way merge sort, late materialization. Workaround em conftest.py para `_duckdb._sqltypes` coverage+Python 3.14
 
 ### Fixed
+- **noticias_agricolas/parser** — `parse_indicador()` agora reconhece 3 layouts adicionais do NA: tabelas com coluna `Vencimento` (acucar, acucar_refinado), tabelas com coluna `Estado` (suino), e tabelas sem coluna de data com data no div `Fechamento` (leite). Novo helper `_extract_parent_date()`. Bug pre-existente corrigido: `has_region_col` vazava entre iteracoes de tabela
 - **b3/api** — `ajustes(data=)` agora aceita formato ISO (`"2025-03-07"`) alem de BR (`"07/03/2025"`) e `date` object. Antes: ISO string passava direto pro client e causava `ValueError` no `strptime("%d/%m/%Y")`
 - **alt/sicar** — `data_atualizacao` removido de `PROPERTY_NAMES` WFS. Campo nao existe em todos os layers estaduais (SP, RS, PR, SC, RJ, TO), causando 400 Bad Request. Parser ja tratava campo ausente via `.get()`. Dedup em `imoveis()`/`imoveis_geo()` simplificado (sort por `cod_imovel` apenas, sem `data_atualizacao` que era all-NaT)
 - **bcb/bigquery_client** — `fetch_credito_rural_bigquery()` agora tem timeout de 120s via `asyncio.wait_for()`. Antes: fallback BigQuery podia travar indefinidamente quando OData retornava 500
@@ -1050,7 +1053,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - Type hints completos
 - Logging estruturado com structlog
 
-[Unreleased]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/bruno-portfolio/agrobr/compare/v0.12.0...v1.0.0
 [0.12.0]: https://github.com/bruno-portfolio/agrobr/compare/v0.11.3...v0.12.0
 [0.11.3]: https://github.com/bruno-portfolio/agrobr/compare/v0.11.2...v0.11.3

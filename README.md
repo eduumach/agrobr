@@ -677,8 +677,8 @@ normalizar_safra("24/25")             # "2024/25"
 
 ## Diferenciais
 
-- **26/26 fontes com golden tests** — validação automatizada contra dados de referência
-- **Resiliência HTTP completa** — retry centralizado em 26/26 clients, 429 handling, Retry-After
+- **27/27 fontes com golden tests** — validação automatizada contra dados de referência
+- **Resiliência HTTP completa** — retry centralizado em 27/27 clients, 429 handling, Retry-After
 - **5100+ testes, 88% cobertura** — benchmarks de escalabilidade (memory, volume, cache, async)
 - **Thread-safe cache** — DuckDB store com locking para uso em MCP servers e multi-thread
 - **Camada semântica** — datasets padronizados com fallback automático

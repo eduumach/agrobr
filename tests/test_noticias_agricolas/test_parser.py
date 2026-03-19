@@ -227,12 +227,152 @@ class TestParseIndicador:
             assert indicadores[0].praca == PRACAS[produto]
 
     def test_parse_indicador_new_products(self, sample_html_no_class):
-        """Novos produtos adicionados."""
-        for produto in ["arroz", "acucar", "frango_congelado", "suino"]:
+        for produto in ["arroz", "frango_congelado"]:
             indicadores = parse_indicador(sample_html_no_class, produto)
             assert len(indicadores) == 2
             assert indicadores[0].produto == produto
             assert indicadores[0].unidade == UNIDADES[produto]
+
+    @pytest.fixture
+    def sample_html_vencimento(self):
+        return """
+        <html><body>
+        <table class="cot-fisicas">
+            <thead><tr>
+                <th>Vencimento</th>
+                <th>R$/Saca de 50 Kg</th>
+                <th>Variação Diária %</th>
+            </tr></thead>
+            <tbody>
+                <tr><td>18/03/2026</td><td>98,16</td><td>+1,08</td></tr>
+                <tr><td>17/03/2026</td><td>97,11</td><td>-0,52</td></tr>
+            </tbody>
+        </table>
+        </body></html>
+        """
+
+    @pytest.fixture
+    def sample_html_estado(self):
+        return """
+        <html><body>
+        <table class="cot-fisicas">
+            <thead><tr>
+                <th>Data</th>
+                <th>Estado</th>
+                <th>R$/Kg</th>
+                <th>Variação (%)</th>
+            </tr></thead>
+            <tbody>
+                <tr><td>18/03/2026</td><td>MG - posto</td><td>6,76</td><td>0,00</td></tr>
+                <tr><td>18/03/2026</td><td>SP - posto</td><td>7,33</td><td>-0,14</td></tr>
+            </tbody>
+        </table>
+        </body></html>
+        """
+
+    @pytest.fixture
+    def sample_html_leite(self):
+        return """
+        <html><body>
+        <div class="cotacao">
+            <div class="info">
+                <div class="fechamento">Fechamento: 02/03/2026</div>
+            </div>
+            <div class="table-content">
+                <table class="cot-fisicas">
+                    <thead><tr>
+                        <th>Estados</th>
+                        <th>Preço (R$/Litro)</th>
+                        <th>Variação (%)</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr><td>RS</td><td>2,0046</td><td>-0,26</td></tr>
+                        <tr><td>SP</td><td>2,1056</td><td>-0,59</td></tr>
+                        <tr><td>MG</td><td>2,0633</td><td>+1,79</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="cotacao">
+            <div class="info">
+                <div class="fechamento">Fechamento: 01/03/2026</div>
+            </div>
+            <div class="table-content">
+                <table class="cot-fisicas">
+                    <thead><tr>
+                        <th>Estados</th>
+                        <th>Preço (R$/Litro)</th>
+                        <th>Variação (%)</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr><td>PR</td><td>1,9800</td><td>+0,51</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        </body></html>
+        """
+
+    def test_parse_acucar_vencimento_header(self, sample_html_vencimento):
+        indicadores = parse_indicador(sample_html_vencimento, "acucar")
+        assert len(indicadores) == 2
+        assert indicadores[0].data == date(2026, 3, 18)
+        assert indicadores[0].valor == Decimal("98.16")
+        assert indicadores[0].unidade == "BRL/sc50kg"
+        assert indicadores[0].praca == "São Paulo/SP"
+        assert indicadores[0].meta["variacao_percentual"] == 1.08
+        assert indicadores[1].data == date(2026, 3, 17)
+        assert indicadores[1].valor == Decimal("97.11")
+
+    def test_parse_acucar_refinado_vencimento(self, sample_html_vencimento):
+        indicadores = parse_indicador(sample_html_vencimento, "acucar_refinado")
+        assert len(indicadores) == 2
+        assert indicadores[0].produto == "acucar_refinado"
+
+    def test_parse_suino_estado_column(self, sample_html_estado):
+        indicadores = parse_indicador(sample_html_estado, "suino")
+        assert len(indicadores) == 2
+        assert indicadores[0].data == date(2026, 3, 18)
+        assert indicadores[0].praca == "MG - posto"
+        assert indicadores[0].valor == Decimal("6.76")
+        assert indicadores[0].meta["variacao_percentual"] == 0.0
+        assert indicadores[1].praca == "SP - posto"
+        assert indicadores[1].valor == Decimal("7.33")
+
+    def test_parse_leite_fechamento_date(self, sample_html_leite):
+        indicadores = parse_indicador(sample_html_leite, "leite")
+        assert len(indicadores) == 4
+        rs = indicadores[0]
+        assert rs.data == date(2026, 3, 2)
+        assert rs.praca == "RS"
+        assert rs.valor == Decimal("2.0046")
+        assert rs.unidade == "BRL/L"
+        assert rs.meta["variacao_percentual"] == -0.26
+        sp = indicadores[1]
+        assert sp.praca == "SP"
+        assert sp.valor == Decimal("2.1056")
+        pr = indicadores[3]
+        assert pr.data == date(2026, 3, 1)
+        assert pr.praca == "PR"
+        assert pr.valor == Decimal("1.9800")
+
+    def test_parse_leite_no_fechamento_div(self):
+        html = """
+        <html><body>
+        <table class="cot-fisicas">
+            <thead><tr>
+                <th>Estados</th>
+                <th>Preço (R$/Litro)</th>
+                <th>Variação (%)</th>
+            </tr></thead>
+            <tbody>
+                <tr><td>RS</td><td>2,00</td><td>0,00</td></tr>
+            </tbody>
+        </table>
+        </body></html>
+        """
+        with pytest.raises(ParseError):
+            parse_indicador(html, "leite")
 
 
 class TestConstants:

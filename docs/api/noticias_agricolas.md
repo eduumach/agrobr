@@ -3,7 +3,7 @@
 O modulo Noticias Agricolas republica indicadores CEPEA/ESALQ e serve como fallback automatico quando o acesso direto ao CEPEA falha (Cloudflare).
 
 !!! danger "Licenca restrito"
-    Todos os direitos reservados (Lei 9.610/98). Dados originarios do CEPEA (CC BY-NC 4.0). Deprecacao planejada para v0.10.0.
+    Todos os direitos reservados (Lei 9.610/98). Dados originarios do CEPEA (CC BY-NC 4.0).
 
 !!! note "Uso interno"
     Este modulo **nao e chamado diretamente pelo usuario**. E invocado automaticamente pelo modulo CEPEA como fallback. Documentado aqui para referencia tecnica.
@@ -46,4 +46,4 @@ def parse_indicador(html: str, produto: str) -> list[Indicador]
 - Fonte: [Noticias Agricolas](https://noticiasagricolas.com.br) — licenca `restrito`
 - Fallback automatico do CEPEA — usuario nao precisa chamar diretamente
 - Warning emitido no primeiro uso
-- Deprecacao planejada: sera substituido por acesso direto CEPEA com browser headless
+- Fallback ativo enquanto CEPEA estiver protegido por Cloudflare
