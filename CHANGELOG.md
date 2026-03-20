@@ -7,6 +7,14 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-03-20
+
+### Improved
+- **http** — log hygiene cross-cutting: URLs movidas de info/warning para debug em 25 source clients. Logs de producao mais limpos e sem vazamento de endpoints
+
+### Security
+- **b3** — token de autenticacao JWT removido de logs info. `url=download_url` (que continha `?token=...`) substituido por `source="b3", size=N`
+
 ## [1.0.1] - 2026-03-19
 
 ### Added
@@ -1053,7 +1061,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - Type hints completos
 - Logging estruturado com structlog
 
-[Unreleased]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/bruno-portfolio/agrobr/compare/v0.12.0...v1.0.0
 [0.12.0]: https://github.com/bruno-portfolio/agrobr/compare/v0.11.3...v0.12.0

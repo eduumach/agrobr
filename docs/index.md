@@ -11,7 +11,7 @@
 
 Infraestrutura Python para dados agrícolas brasileiros com **camada semântica** sobre 27 fontes públicas.
 
-**v1.0.0** — 5100+ testes | 88% cobertura | 27/27 golden tests | retry centralizado 27/27 clients
+**v1.0.2** — 5190+ testes | 88% cobertura | 27/27 golden tests | retry centralizado 27/27 clients
 
 - **CEPEA/ESALQ**: 20 indicadores de preços (soja, milho, boi, café, algodão, trigo, arroz, açúcar, etanol, frango, suíno, leite, laranja)
 - **CONAB**: Safras, balanço oferta/demanda, custos de produção e série histórica
@@ -143,12 +143,12 @@ df = nasa_power.clima_uf('MT', ano=2025)
 
 | Métrica | Valor |
 |---------|-------|
-| Testes | 5100+ passando |
+| Testes | 5190+ passando |
 | Cobertura | 88% |
 | Golden tests | 27/27 fontes |
 | Resiliência HTTP | Retry centralizado + 429/Retry-After |
 | Benchmarks | Memory, volume, cache, async, rate limiting |
-| Bugs corrigidos (v0.10.1) | DuckDB thread-safety, parser NA semanal, ANDA ano_real |
+| Bugs corrigidos (v1.0.1) | Parser NA 3 layouts, B3 ISO date, SICAR WFS field, BCB timeout |
 
 ## Features
 

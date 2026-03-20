@@ -21,7 +21,7 @@
 
 Infraestrutura Python para dados agrícolas brasileiros com camada semântica sobre **27 fontes públicas**: CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA PSD, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento PRODES/DETER, MapBiomas, CONAB Progresso, B3 Futuros Agro, CONAB CEASA/PROHORT, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedágio, SICAR, ZARC e Agrofit/MAPA (Defensivos).
 
-**v1.0.0** — 5100+ testes, 88% cobertura, 27/27 fontes com golden tests (21 com dados reais), retry centralizado em 27/27 clients.
+**v1.0.2** — 5190+ testes, 88% cobertura, 27/27 fontes com golden tests (21 com dados reais), retry centralizado em 27/27 clients.
 
 ## Demo
 ![Animation](https://github.com/user-attachments/assets/40e1341e-f47b-4eb5-b18e-55b49c63ee97)
