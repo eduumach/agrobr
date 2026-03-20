@@ -54,13 +54,8 @@ async def fetch_indicador_page(produto: str) -> str:
     url = _get_produto_url(produto)
     headers = UserAgentRotator.get_headers(source="noticias_agricolas")
 
-    logger.info(
-        "http_request",
-        source="noticias_agricolas",
-        url=url,
-        method="GET",
-        produto=produto,
-    )
+    logger.debug("http_request", source="noticias_agricolas", url=url, method="GET")
+    logger.info("http_request", source="noticias_agricolas", produto=produto)
 
     async def _fetch() -> httpx.Response:
         async with (
@@ -85,10 +80,10 @@ async def fetch_indicador_page(produto: str) -> str:
     try:
         response = await retry_async(_fetch)
     except httpx.HTTPError as e:
+        logger.debug("http_request_failed_detail", source="noticias_agricolas", url=url)
         logger.error(
             "http_request_failed",
             source="noticias_agricolas",
-            url=url,
             error=str(e),
         )
         raise SourceUnavailableError(

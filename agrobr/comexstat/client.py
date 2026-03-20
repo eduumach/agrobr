@@ -23,7 +23,8 @@ TIMEOUT = get_timeout(read=120.0)
 
 
 async def download_csv(url: str) -> str:
-    logger.info("comexstat_download_csv", url=url)
+    logger.debug("comexstat_download_csv", url=url)
+    logger.info("comexstat_download_csv", source="comexstat")
 
     async with httpx.AsyncClient(
         timeout=TIMEOUT,
@@ -54,7 +55,7 @@ async def download_csv(url: str) -> str:
 
         logger.info(
             "comexstat_download_ok",
-            url=url,
+            source="comexstat",
             size_chars=len(content),
         )
         return content

@@ -36,7 +36,8 @@ async def _get_with_retry(url: str) -> httpx.Response:
 async def fetch_estatisticas_page() -> str:
     from agrobr.exceptions import SourceUnavailableError
 
-    logger.info("anda_fetch_page", url=ESTATISTICAS_URL)
+    logger.debug("anda_fetch_page", url=ESTATISTICAS_URL)
+    logger.info("anda_fetch_page", source="anda")
     response = await _get_with_retry(ESTATISTICAS_URL)
     html = response.text
 
@@ -55,7 +56,8 @@ async def fetch_estatisticas_page() -> str:
 async def download_file(url: str) -> bytes:
     from agrobr.exceptions import SourceUnavailableError
 
-    logger.info("anda_download", url=url)
+    logger.debug("anda_download", url=url)
+    logger.info("anda_download", source="anda")
     response = await _get_with_retry(url)
     content = response.content
 
@@ -121,8 +123,7 @@ async def fetch_entregas_pdf(ano: int) -> tuple[bytes, int]:
         if filename_years:
             ano_real = int(filename_years[-1])
 
-    logger.info(
-        "anda_pdf_found", ano=ano, ano_real=ano_real, url=target["url"], text=target["text"]
-    )
+    logger.debug("anda_pdf_found_detail", url=target["url"])
+    logger.info("anda_pdf_found", source="anda", ano=ano, ano_real=ano_real, text=target["text"])
     pdf_bytes = await download_file(target["url"])
     return pdf_bytes, ano_real

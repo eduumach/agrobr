@@ -49,7 +49,7 @@ async def fetch_ajustes_zip(data: str) -> tuple[bytes, str]:
                 last_error=f"ZIP too small ({len(content)} bytes)",
             )
 
-        logger.info("b3_zip_fetch_ok", url=url, size=len(content))
+        logger.info("b3_zip_fetch_ok", source="b3", size=len(content))
         return content, url
 
 
@@ -104,5 +104,5 @@ async def fetch_posicoes_abertas(data: str) -> tuple[bytes, str]:
                 ),
             )
 
-        logger.info("b3_oi_fetch_ok", url=download_url, size=len(csv_bytes))
+        logger.info("b3_oi_fetch_ok", source="b3", size=len(csv_bytes))
         return csv_bytes, token_url

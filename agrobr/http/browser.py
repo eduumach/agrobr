@@ -130,11 +130,8 @@ async def fetch_with_browser(
     wait_selector: str | None = None,
     wait_timeout: float = 30000,
 ) -> str:
-    logger.info(
-        "browser_fetch_start",
-        source=source,
-        url=url,
-    )
+    logger.debug("browser_fetch_start_detail", url=url)
+    logger.info("browser_fetch_start", source=source)
 
     try:
         async with get_page() as page:
@@ -180,7 +177,6 @@ async def fetch_with_browser(
             logger.info(
                 "browser_fetch_success",
                 source=source,
-                url=url,
                 content_length=len(html),
                 status=response.status,
             )
@@ -188,10 +184,10 @@ async def fetch_with_browser(
             return html
 
     except Exception as e:
+        logger.debug("browser_fetch_failed_detail", url=url)
         logger.error(
             "browser_fetch_failed",
             source=source,
-            url=url,
             error=str(e),
         )
         raise SourceUnavailableError(

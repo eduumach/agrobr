@@ -33,9 +33,10 @@ async def _try_fetch(client: httpx.AsyncClient, url: str) -> bytes | None:
 
     content = response.content
     if len(content) < MIN_WFS_SIZE:
+        logger.debug("queimadas_response_too_small_detail", url=url)
         logger.warning(
             "queimadas_response_too_small",
-            url=url,
+            source="queimadas",
             size=len(content),
         )
         return None
@@ -62,7 +63,7 @@ async def fetch_focos_diario(data: str) -> tuple[bytes, str]:
         content = await _try_fetch(c, url)
     if content is None:
         raise SourceUnavailableError(source="queimadas", url=url, last_error="HTTP 404")
-    logger.info("queimadas_csv_found", url=url, size=len(content))
+    logger.info("queimadas_csv_found", source="queimadas", size=len(content))
     return content, url
 
 
@@ -77,14 +78,14 @@ async def fetch_focos_mensal(ano: int, mes: int) -> tuple[bytes, str]:
     ) as c:
         content = await _try_fetch(c, csv_url)
         if content is not None:
-            logger.info("queimadas_csv_found", url=csv_url, size=len(content))
+            logger.info("queimadas_csv_found", source="queimadas", size=len(content))
             return content, csv_url
 
         logger.debug("queimadas_csv_404_trying_zip", periodo=periodo)
         content = await _try_fetch(c, zip_url)
         if content is not None:
             csv_bytes = _extract_csv_from_zip(content)
-            logger.info("queimadas_zip_found", url=zip_url, size=len(csv_bytes))
+            logger.info("queimadas_zip_found", source="queimadas", size=len(csv_bytes))
             return csv_bytes, zip_url
 
         logger.debug("queimadas_zip_404_trying_anual", ano=ano)
@@ -93,7 +94,7 @@ async def fetch_focos_mensal(ano: int, mes: int) -> tuple[bytes, str]:
             csv_bytes = _extract_csv_from_zip(content)
             logger.info(
                 "queimadas_anual_found",
-                url=anual_url,
+                source="queimadas",
                 size_raw=len(csv_bytes),
                 filtering_month=mes,
             )

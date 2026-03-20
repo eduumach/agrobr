@@ -337,6 +337,11 @@ class AlertSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="AGROBR_ALERT_")
 
 
+_CEPEA_ENDPOINTS: tuple[str, ...] = (
+    "https://www.cepea.org.br",
+    "https://cepea.org.br",
+)
+
 CONFIDENCE_HIGH: float = 0.85
 CONFIDENCE_LOW: float = 0.50
 

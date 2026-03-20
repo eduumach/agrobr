@@ -10,19 +10,18 @@ import pytest
 
 from agrobr.cepea import client
 from agrobr.cepea.client import FetchResult
+from agrobr.constants import _CEPEA_ENDPOINTS
 from agrobr.exceptions import SourceUnavailableError
 from tests.helpers import make_mock_response
 
 
 @pytest.fixture(autouse=True)
 def _reset_circuit_breaker():
-    client._httpx_circuit_open = False
-    client._httpx_circuit_opened_at = 0.0
+    client._circuit_state.clear()
     client._use_browser = False
     client._use_alternative_source = False
     yield
-    client._httpx_circuit_open = False
-    client._httpx_circuit_opened_at = 0.0
+    client._circuit_state.clear()
     client._use_browser = False
     client._use_alternative_source = True
 
@@ -53,7 +52,7 @@ class TestCepeaHTTPErrors:
             with pytest.raises(SourceUnavailableError):
                 await client.fetch_indicador_page("soja")
 
-        assert client._httpx_circuit_open is True
+        assert len(client._circuit_state) > 0
 
     @pytest.mark.asyncio
     async def test_http_500_does_not_open_circuit(self):
@@ -64,31 +63,40 @@ class TestCepeaHTTPErrors:
             with pytest.raises(SourceUnavailableError):
                 await client.fetch_indicador_page("soja")
 
-        assert client._httpx_circuit_open is False
+        assert len(client._circuit_state) == 0
 
 
 class TestCepeaCircuitBreaker:
     def test_circuit_closed_by_default(self):
-        assert client._is_circuit_open() is False
+        assert client._is_circuit_open(_CEPEA_ENDPOINTS[0]) is False
 
     def test_circuit_opens_on_cloudflare(self):
-        client._open_circuit()
-        assert client._is_circuit_open() is True
+        endpoint = _CEPEA_ENDPOINTS[0]
+        client._open_circuit(endpoint)
+        assert client._is_circuit_open(endpoint) is True
 
     def test_circuit_resets_after_timeout(self):
-        client._open_circuit()
-        client._httpx_circuit_opened_at = time.monotonic() - client._CIRCUIT_RESET_SECONDS - 1
-        assert client._is_circuit_open() is False
+        endpoint = _CEPEA_ENDPOINTS[0]
+        client._open_circuit(endpoint)
+        client._circuit_state[endpoint] = time.monotonic() - client._CIRCUIT_RESET_SECONDS - 1
+        assert client._is_circuit_open(endpoint) is False
 
     @pytest.mark.asyncio
     async def test_circuit_open_skips_httpx(self):
-        client._open_circuit()
+        for ep in _CEPEA_ENDPOINTS:
+            client._open_circuit(ep)
 
         with patch("agrobr.cepea.client._fetch_with_httpx", new_callable=AsyncMock) as mock_httpx:
             with pytest.raises(SourceUnavailableError):
                 await client.fetch_indicador_page("soja")
 
             mock_httpx.assert_not_called()
+
+    def test_per_endpoint_isolation(self):
+        ep0, ep1 = _CEPEA_ENDPOINTS[0], _CEPEA_ENDPOINTS[1]
+        client._open_circuit(ep0)
+        assert client._is_circuit_open(ep0) is True
+        assert client._is_circuit_open(ep1) is False
 
 
 class TestCepeaFallbackChain:
@@ -197,3 +205,49 @@ class TestCepeaSetters:
         assert client._use_alternative_source is True
         client.set_use_alternative_source(False)
         assert client._use_alternative_source is False
+
+
+class TestCepeaEndpointRotation:
+    @pytest.mark.asyncio
+    async def test_first_endpoint_success(self):
+        with patch("agrobr.cepea.client._fetch_with_httpx", new_callable=AsyncMock) as mock_httpx:
+            mock_httpx.return_value = FetchResult("<html>ok</html>", "cepea")
+            result = await client.fetch_indicador_page("soja")
+
+        assert result.html == "<html>ok</html>"
+        assert mock_httpx.call_count == 1
+        call_url = mock_httpx.call_args[0][0]
+        assert call_url.startswith(_CEPEA_ENDPOINTS[0])
+
+    @pytest.mark.asyncio
+    async def test_first_fails_second_succeeds(self):
+        call_count = 0
+
+        async def _side_effect(url: str, _headers: dict[str, str]) -> FetchResult:
+            nonlocal call_count
+            call_count += 1
+            if url.startswith(_CEPEA_ENDPOINTS[0]):
+                raise httpx.HTTPStatusError(
+                    "403 Forbidden", request=MagicMock(), response=MagicMock(status_code=403)
+                )
+            return FetchResult("<html>second</html>", "cepea")
+
+        with patch("agrobr.cepea.client._fetch_with_httpx", new_callable=AsyncMock) as mock_httpx:
+            mock_httpx.side_effect = _side_effect
+            result = await client.fetch_indicador_page("soja")
+
+        assert result.html == "<html>second</html>"
+        assert call_count == 2
+
+    @pytest.mark.asyncio
+    async def test_circuit_open_skips_to_next(self):
+        client._open_circuit(_CEPEA_ENDPOINTS[0])
+
+        with patch("agrobr.cepea.client._fetch_with_httpx", new_callable=AsyncMock) as mock_httpx:
+            mock_httpx.return_value = FetchResult("<html>second</html>", "cepea")
+            result = await client.fetch_indicador_page("soja")
+
+        assert result.html == "<html>second</html>"
+        assert mock_httpx.call_count == 1
+        call_url = mock_httpx.call_args[0][0]
+        assert call_url.startswith(_CEPEA_ENDPOINTS[1])

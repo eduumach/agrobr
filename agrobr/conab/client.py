@@ -26,7 +26,8 @@ async def fetch_boletim_page() -> str:
 
     url = constants.URLS[constants.Fonte.CONAB]["boletim_graos"]
 
-    logger.info("conab_fetch_boletim_page", url=url)
+    logger.debug("conab_fetch_boletim_page", url=url)
+    logger.info("conab_fetch_boletim_page", source="conab")
 
     from agrobr.http.browser import is_available
 
@@ -123,7 +124,8 @@ async def list_levantamentos(html: str | None = None) -> list[dict[str, Any]]:
 
 
 async def download_xlsx(url: str) -> BytesIO:
-    logger.info("conab_download_xlsx", url=url)
+    logger.debug("conab_download_xlsx", url=url)
+    logger.info("conab_download_xlsx", source="conab")
 
     from agrobr.http.browser import is_available
 
@@ -163,7 +165,7 @@ async def download_xlsx(url: str) -> BytesIO:
 
                 logger.info(
                     "conab_download_success",
-                    url=url,
+                    source="conab",
                     size_bytes=len(content),
                 )
 
@@ -176,9 +178,10 @@ async def download_xlsx(url: str) -> BytesIO:
                 )
 
         except Exception as e:
+            logger.debug("conab_download_failed_detail", url=url)
             logger.error(
                 "conab_download_failed",
-                url=url,
+                source="conab",
                 error=str(e),
             )
             raise SourceUnavailableError(
