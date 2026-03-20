@@ -85,7 +85,7 @@ async def download_xlsx(url: str) -> BytesIO:
     if not url.startswith("http"):
         url = f"{BASE_URL}{url}"
 
-    logger.info("conab_custo_download_xlsx", url=url)
+    logger.debug("conab_custo_download_xlsx", url=url)
 
     headers = UserAgentRotator.get_headers(source="conab_custo")
     headers["Accept"] = ACCEPT_EXCEL_HTML
@@ -101,7 +101,7 @@ async def download_xlsx(url: str) -> BytesIO:
 
             logger.info(
                 "conab_custo_download_ok",
-                url=url,
+                source="conab_custo",
                 size_bytes=len(content),
             )
 
@@ -173,14 +173,15 @@ async def _crawl_folder(folder_url: str) -> list[dict[str, str]]:
             response.raise_for_status()
             folder_html = response.text
     except (httpx.HTTPError, SourceUnavailableError) as e:
-        logger.warning("conab_custo_folder_error", url=folder_url, error=str(e))
+        logger.debug("conab_custo_folder_error_detail", url=folder_url)
+        logger.warning("conab_custo_folder_error", source="conab_custo", error=str(e))
         return []
 
     links = _parse_links(folder_html, base_url=BASE_URL, pattern=_XLS_PATTERN)
     for link in links:
         link["url"] = link["url"].removesuffix("/view")
         _enrich_link_hints(link)
-    logger.info("conab_custo_folder_ok", url=folder_url, links=len(links))
+    logger.info("conab_custo_folder_ok", source="conab_custo", links=len(links))
     return links
 
 

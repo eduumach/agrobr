@@ -55,7 +55,7 @@ async def discover_resources() -> list[dict[str, str]]:
 
 
 async def download_csv(url: str) -> bytes:
-    logger.info("zarc_download", url=url)
+    logger.debug("zarc_download", url=url)
 
     async with httpx.AsyncClient(
         timeout=TIMEOUT,
@@ -78,7 +78,7 @@ async def download_csv(url: str) -> bytes:
                 last_error=f"CSV too small ({len(content)} bytes)",
             )
 
-    logger.info("zarc_download_ok", url=url, size_bytes=len(content))
+    logger.info("zarc_download_ok", source="zarc", size_bytes=len(content))
     return content
 
 

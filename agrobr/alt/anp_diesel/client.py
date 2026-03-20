@@ -14,7 +14,7 @@ TIMEOUT = get_timeout(read=180.0)
 
 
 async def download_xlsx(url: str) -> bytes:
-    logger.info("anp_diesel_download", url=url)
+    logger.debug("anp_diesel_download", url=url)
 
     async with httpx.AsyncClient(
         timeout=TIMEOUT,
@@ -43,7 +43,7 @@ async def download_xlsx(url: str) -> bytes:
 
         logger.info(
             "anp_diesel_download_ok",
-            url=url,
+            source="anp_diesel",
             size_bytes=len(content),
         )
         return content
@@ -74,7 +74,7 @@ async def fetch_precos_brasil() -> bytes:
 
 
 async def download_csv(url: str) -> bytes:
-    logger.info("anp_diesel_download_csv", url=url)
+    logger.debug("anp_diesel_download_csv", url=url)
 
     async with httpx.AsyncClient(
         timeout=TIMEOUT,
@@ -102,7 +102,7 @@ async def download_csv(url: str) -> bytes:
 
         logger.info(
             "anp_diesel_download_csv_ok",
-            url=url,
+            source="anp_diesel",
             size_bytes=len(content),
         )
         return content

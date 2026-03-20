@@ -14,7 +14,7 @@ TIMEOUT = get_timeout(read=180.0)
 
 
 async def download_csv(url: str) -> bytes:
-    logger.info("mapa_psr_download", url=url)
+    logger.debug("mapa_psr_download", url=url)
 
     async with httpx.AsyncClient(
         timeout=TIMEOUT,
@@ -41,7 +41,7 @@ async def download_csv(url: str) -> bytes:
 
         logger.info(
             "mapa_psr_download_ok",
-            url=url,
+            source="mapa_psr",
             size_bytes=len(content),
         )
         return content

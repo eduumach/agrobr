@@ -55,12 +55,12 @@ async def _fetch_url(url: str) -> bytes:
 async def fetch_biome_state() -> tuple[bytes, str]:
     url = _build_xlsx_url("BIOME_STATE")
     content = await _fetch_url(url)
-    logger.info("mapbiomas_xlsx_found", url=url, size=len(content))
+    logger.info("mapbiomas_xlsx_found", source="mapbiomas", size=len(content))
     return content, url
 
 
 async def fetch_biome_state_municipality() -> tuple[bytes, str]:
     url = _build_xlsx_url("BIOME_STATE_MUNICIPALITY")
     content = await _fetch_url(url)
-    logger.info("mapbiomas_xlsx_found", url=url, size=len(content))
+    logger.info("mapbiomas_xlsx_found", source="mapbiomas", size=len(content))
     return content, url

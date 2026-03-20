@@ -53,11 +53,11 @@ async def _fetch_bytes(url: str) -> bytes:
 
 async def fetch_pc_xls() -> bytes:
     url = f"{BASE_URL}/PC.xls"
-    logger.info("deral_fetch_pc", url=url)
+    logger.debug("deral_fetch_pc", url=url)
     return await _fetch_bytes(url)
 
 
 async def fetch_pss_xlsx() -> bytes:
     url = f"{BASE_URL}/pss.xlsx"
-    logger.info("deral_fetch_pss", url=url)
+    logger.debug("deral_fetch_pss", url=url)
     return await _fetch_bytes(url)

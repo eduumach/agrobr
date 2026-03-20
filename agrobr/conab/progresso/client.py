@@ -107,7 +107,9 @@ async def fetch_xlsx_semanal(week_url: str) -> tuple[bytes, str]:
                 last_error=f"Content-Type inesperado: {ct}",
             )
 
-        logger.info("conab_progresso_xlsx_ok", url=xlsx_url, size=len(xlsx_resp.content))
+        logger.info(
+            "conab_progresso_xlsx_ok", source="conab_progresso", size=len(xlsx_resp.content)
+        )
         return xlsx_resp.content, xlsx_url
 
 

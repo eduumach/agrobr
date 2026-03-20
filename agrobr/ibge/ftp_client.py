@@ -60,7 +60,7 @@ TIMEOUT = get_timeout(read=180.0)
 async def download_legacy_zip(filename: str, uf_dir: str = "Brasil") -> bytes:
     suffix = "Mn" if uf_dir != "Brasil" else ""
     url = f"{FTP_BASE}/{uf_dir}/{filename}{suffix}.zip"
-    logger.info("ibge_legacy_download", url=url)
+    logger.debug("ibge_legacy_download", url=url)
 
     async with httpx.AsyncClient(
         timeout=TIMEOUT,
@@ -85,7 +85,7 @@ async def download_legacy_zip(filename: str, uf_dir: str = "Brasil") -> bytes:
 
         logger.info(
             "ibge_legacy_download_ok",
-            url=url,
+            source="ibge",
             size_bytes=len(content),
         )
         return content

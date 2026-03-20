@@ -52,7 +52,7 @@ async def fetch_exportacao_excel(ano: int, mes: int | None = None) -> tuple[byte
         url = f"{BASE_URL}/exp_{ano:04d}{m:02d}.xlsx"
         try:
             data = await _fetch_url(url)
-            logger.info("abiove_excel_found", url=url, size=len(data))
+            logger.info("abiove_excel_found", source="abiove", size=len(data))
             return data, url
         except SourceUnavailableError as e:
             last_error = e.last_error

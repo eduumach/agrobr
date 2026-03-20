@@ -158,5 +158,5 @@ async def fetch_imoveis_geo(
         property_names=PROPERTY_NAMES_GEO,
     )
     content = await _fetch_url(url)
-    logger.info("sicar_imoveis_geojson", url=url, size=len(content), uf=uf)
+    logger.info("sicar_imoveis_geojson", source="sicar", size=len(content), uf=uf)
     return content, url

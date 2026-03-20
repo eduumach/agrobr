@@ -19,7 +19,7 @@ TIMEOUT = get_timeout(read=180.0)
 
 
 async def _download_zip(url: str) -> bytes:
-    logger.info("antaq_download_zip", url=url)
+    logger.debug("antaq_download_zip", url=url)
 
     async with httpx.AsyncClient(
         timeout=TIMEOUT, headers=UserAgentRotator.get_headers(source="antaq"), follow_redirects=True
@@ -44,7 +44,7 @@ async def _download_zip(url: str) -> bytes:
 
         logger.info(
             "antaq_download_ok",
-            url=url,
+            source="antaq",
             size_bytes=len(content),
         )
         return content

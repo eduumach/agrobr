@@ -116,9 +116,10 @@ async def _fetch_chunks(
 
         data = response.json()
         if not isinstance(data, dict):
+            logger.debug("comtrade_unexpected_response_detail", url=url, chunk=chunk)
             logger.warning(
                 "comtrade_unexpected_response_type",
-                url=url,
+                source="comtrade",
                 chunk=chunk,
                 type=type(data).__name__,
             )
@@ -163,7 +164,8 @@ async def fetch_trade_data(
             if result is not None:
                 return result, url
 
-            logger.warning("comtrade_auth_failed_fallback_guest", url=url)
+            logger.debug("comtrade_auth_failed_detail", url=url)
+            logger.warning("comtrade_auth_failed_fallback_guest", source="comtrade")
 
         url = f"{BASE_URL_GUEST}/C/{freq.upper()}/HS"
         headers = _build_headers(None)

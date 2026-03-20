@@ -97,7 +97,8 @@ async def download_xls(produto: str) -> tuple[BytesIO, dict[str, Any]]:
     from agrobr.http.retry import retry_on_status
 
     url = get_xls_url(produto)
-    logger.info("conab_serie_historica_download", produto=produto, url=url)
+    logger.debug("conab_serie_historica_download", url=url)
+    logger.info("conab_serie_historica_download", source="conab_serie", produto=produto)
 
     headers = UserAgentRotator.get_headers(source="conab_serie")
     headers["Accept"] = ACCEPT_EXCEL
@@ -113,8 +114,8 @@ async def download_xls(produto: str) -> tuple[BytesIO, dict[str, Any]]:
 
             logger.info(
                 "conab_serie_historica_download_ok",
+                source="conab_serie",
                 produto=produto,
-                url=url,
                 size_bytes=len(content),
             )
 

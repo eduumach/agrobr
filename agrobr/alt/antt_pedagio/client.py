@@ -88,7 +88,7 @@ def _match_pracas_resource(resources: list[dict[str, str]]) -> str | None:
 
 
 async def download_csv(url: str) -> bytes:
-    logger.info("antt_pedagio_download", url=url)
+    logger.debug("antt_pedagio_download", url=url)
 
     async with httpx.AsyncClient(
         timeout=TIMEOUT,
@@ -115,7 +115,7 @@ async def download_csv(url: str) -> bytes:
 
         logger.info(
             "antt_pedagio_download_ok",
-            url=url,
+            source="antt_pedagio",
             size_bytes=len(content),
         )
         return content

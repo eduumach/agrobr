@@ -143,7 +143,7 @@ async def fetch_prodes(
     content, url = await _fetch_prodes_raw(
         bioma, ano, uf, output_format="csv", include_geometry=False
     )
-    logger.info("desmatamento_prodes_csv", url=url, size=len(content), bioma=bioma)
+    logger.info("desmatamento_prodes_csv", source="desmatamento", size=len(content), bioma=bioma)
     return content, url
 
 
@@ -155,7 +155,9 @@ async def fetch_prodes_geo(
     content, url = await _fetch_prodes_raw(
         bioma, ano, uf, output_format="application/json", include_geometry=True
     )
-    logger.info("desmatamento_prodes_geojson", url=url, size=len(content), bioma=bioma)
+    logger.info(
+        "desmatamento_prodes_geojson", source="desmatamento", size=len(content), bioma=bioma
+    )
     return content, url
 
 
@@ -216,7 +218,7 @@ async def fetch_deter(
     content, url = await _fetch_deter_raw(
         bioma, uf, data_inicio, data_fim, output_format="csv", include_geometry=False
     )
-    logger.info("desmatamento_deter_csv", url=url, size=len(content), bioma=bioma)
+    logger.info("desmatamento_deter_csv", source="desmatamento", size=len(content), bioma=bioma)
     return content, url
 
 
@@ -229,7 +231,7 @@ async def fetch_deter_geo(
     content, url = await _fetch_deter_raw(
         bioma, uf, data_inicio, data_fim, output_format="application/json", include_geometry=True
     )
-    logger.info("desmatamento_deter_geojson", url=url, size=len(content), bioma=bioma)
+    logger.info("desmatamento_deter_geojson", source="desmatamento", size=len(content), bioma=bioma)
     return content, url
 
 

@@ -21,7 +21,7 @@ MIN_CSV_TECNICOS = 50_000
 
 
 async def _download(url: str, timeout: httpx.Timeout, min_size: int, label: str) -> bytes:
-    logger.info(f"defensivos_download_{label}", url=url)
+    logger.debug(f"defensivos_download_{label}", url=url)
 
     async with httpx.AsyncClient(
         timeout=timeout,

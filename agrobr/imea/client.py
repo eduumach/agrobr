@@ -34,12 +34,14 @@ async def _fetch_json(url: str) -> list[dict[str, Any]]:
 
 async def fetch_cotacoes(cadeia_id: int) -> list[dict[str, Any]]:
     url = f"{BASE_URL}/v2/mobile/cadeias/{cadeia_id}/cotacoes"
-    logger.info("imea_fetch_cotacoes", cadeia_id=cadeia_id, url=url)
+    logger.debug("imea_fetch_cotacoes", url=url)
+    logger.info("imea_fetch_cotacoes", source="imea", cadeia_id=cadeia_id)
     return await _fetch_json(url)
 
 
 async def fetch_indicadores() -> list[dict[str, Any]]:
     url = f"{BASE_URL}/indicador"
-    logger.info("imea_fetch_indicadores", url=url)
+    logger.debug("imea_fetch_indicadores", url=url)
+    logger.info("imea_fetch_indicadores", source="imea")
     data = await _fetch_json(url)
     return data if isinstance(data, list) else [data] if data else []
