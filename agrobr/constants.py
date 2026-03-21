@@ -285,7 +285,7 @@ class HTTPSettings(BaseSettings):
     rate_limit_antaq: float = 1.0
     rate_limit_antt_pedagio: float = 2.0
     rate_limit_bcb: float = 1.0
-    rate_limit_cepea: float = 2.0
+    rate_limit_cepea: float = 5.0
     rate_limit_comexstat: float = 2.0
     rate_limit_comtrade: float = 2.0
     rate_limit_conab: float = 3.0
