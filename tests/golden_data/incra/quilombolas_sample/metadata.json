@@ -1,0 +1,6 @@
+{
+    "dataset": "quilombolas",
+    "format": "csv",
+    "parser": "parse_quilombolas_csv",
+    "source": "incra"
+}

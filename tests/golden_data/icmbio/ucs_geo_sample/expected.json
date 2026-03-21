@@ -1,0 +1,6 @@
+{
+    "count_min": 10,
+    "columns": ["codigo", "nome", "categoria", "grupo", "uf", "bioma", "area_ha", "ano_criacao", "ato_criacao", "geometry"],
+    "crs_epsg": 4326,
+    "non_null_columns": ["codigo", "nome", "categoria", "grupo", "uf", "bioma", "area_ha", "geometry"]
+}

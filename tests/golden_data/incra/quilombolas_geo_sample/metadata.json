@@ -1,0 +1,6 @@
+{
+    "dataset": "quilombolas_geo",
+    "format": "geojson",
+    "parser": "parse_quilombolas_geojson",
+    "source": "incra"
+}

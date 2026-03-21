@@ -1,0 +1,6 @@
+{
+    "dataset": "ucs_geo",
+    "format": "geojson",
+    "parser": "parse_ucs_geojson",
+    "source": "icmbio"
+}

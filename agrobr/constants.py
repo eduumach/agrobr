@@ -32,8 +32,11 @@ class Fonte(StrEnum):
     CONAB = "conab"
     DEFENSIVOS = "defensivos"
     DERAL = "deral"
+    FUNAI = "funai"
     IBGE = "ibge"
+    ICMBIO = "icmbio"
     IMEA = "imea"
+    INCRA = "incra"
     INMET = "inmet"
     NASA_POWER = "nasa_power"
     NOTICIAS_AGRICOLAS = "noticias_agricolas"
@@ -107,6 +110,18 @@ URLS = {
     Fonte.IMEA: {
         "base": "https://api1.imea.com.br/api",
         "cotacoes": "https://api1.imea.com.br/api/v2/mobile/cadeias",
+    },
+    Fonte.FUNAI: {
+        "base": "https://geoserver.funai.gov.br",
+        "geoserver": "https://geoserver.funai.gov.br/geoserver/Funai/ows",
+    },
+    Fonte.ICMBIO: {
+        "base": "https://geoservicos.inde.gov.br",
+        "geoserver": "https://geoservicos.inde.gov.br/geoserver/ICMBio/ows",
+    },
+    Fonte.INCRA: {
+        "base": "https://cmr.funai.gov.br",
+        "geoserver": "https://cmr.funai.gov.br/geoserver/ows",
     },
     Fonte.INMET: {
         "base": "https://apitempo.inmet.gov.br",
@@ -293,6 +308,9 @@ class HTTPSettings(BaseSettings):
     rate_limit_deral: float = 3.0
     rate_limit_ibge: float = 1.0
     rate_limit_imea: float = 1.0
+    rate_limit_funai: float = 2.0
+    rate_limit_icmbio: float = 2.0
+    rate_limit_incra: float = 2.0
     rate_limit_inmet: float = 0.5
     rate_limit_nasa_power: float = 1.0
     rate_limit_noticias_agricolas: float = 2.0

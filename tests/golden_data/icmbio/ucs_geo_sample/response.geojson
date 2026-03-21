@@ -1,0 +1,185 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-55.84, -15.46], [-55.83, -15.46], [-55.83, -15.45], [-55.84, -15.45], [-55.84, -15.46]]]]
+      },
+      "properties": {
+        "cnuc": "UC001",
+        "nomeuc": "Parque Nacional da Chapada dos Guimaraes",
+        "siglacateg": "PARNA",
+        "grupouc": "PI",
+        "areahaalb": 32630.0,
+        "ufabrang": "MT",
+        "biomaibge": "Cerrado",
+        "criacaoano": "1989",
+        "criacaoato": "Decreto 97656"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-57.22, -15.63], [-57.21, -15.63], [-57.21, -15.62], [-57.22, -15.62], [-57.22, -15.63]]]]
+      },
+      "properties": {
+        "cnuc": "UC002",
+        "nomeuc": "Estacao Ecologica Serra das Araras",
+        "siglacateg": "ESEC",
+        "grupouc": "PI",
+        "areahaalb": 28700.0,
+        "ufabrang": "MT",
+        "biomaibge": "Cerrado",
+        "criacaoano": "1982",
+        "criacaoato": "Decreto 87222"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-54.95, -9.40], [-54.94, -9.40], [-54.94, -9.39], [-54.95, -9.39], [-54.95, -9.40]]]]
+      },
+      "properties": {
+        "cnuc": "UC003",
+        "nomeuc": "Reserva Biologica Nascentes da Serra do Cachimbo",
+        "siglacateg": "REBIO",
+        "grupouc": "PI",
+        "areahaalb": 342000.0,
+        "ufabrang": "MT;PA",
+        "biomaibge": "Amazonia",
+        "criacaoano": "2005",
+        "criacaoato": "Decreto s/n"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-50.35, -6.10], [-50.34, -6.10], [-50.34, -6.09], [-50.35, -6.09], [-50.35, -6.10]]]]
+      },
+      "properties": {
+        "cnuc": "UC004",
+        "nomeuc": "Floresta Nacional de Carajas",
+        "siglacateg": "FLONA",
+        "grupouc": "US",
+        "areahaalb": 395827.0,
+        "ufabrang": "PA",
+        "biomaibge": "Amazonia",
+        "criacaoano": "1998",
+        "criacaoato": "Decreto 2486"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-55.82, -15.44], [-55.81, -15.44], [-55.81, -15.43], [-55.82, -15.43], [-55.82, -15.44]]]]
+      },
+      "properties": {
+        "cnuc": "UC005",
+        "nomeuc": "Area de Protecao Ambiental da Chapada dos Guimaraes",
+        "siglacateg": "APA",
+        "grupouc": "US",
+        "areahaalb": 25100.0,
+        "ufabrang": "MT",
+        "biomaibge": "Cerrado",
+        "criacaoano": "1992",
+        "criacaoato": "Decreto 537"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-57.45, -17.85], [-57.44, -17.85], [-57.44, -17.84], [-57.45, -17.84], [-57.45, -17.85]]]]
+      },
+      "properties": {
+        "cnuc": "UC006",
+        "nomeuc": "Parque Nacional do Pantanal Matogrossense",
+        "siglacateg": "PARNA",
+        "grupouc": "PI",
+        "areahaalb": 135000.0,
+        "ufabrang": "MT",
+        "biomaibge": "Pantanal",
+        "criacaoano": "1981",
+        "criacaoato": "Decreto 86392"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-60.30, -9.50], [-60.29, -9.50], [-60.29, -9.49], [-60.30, -9.49], [-60.30, -9.50]]]]
+      },
+      "properties": {
+        "cnuc": "UC007",
+        "nomeuc": "Reserva Extrativista Guariba Roosevelt",
+        "siglacateg": "RESEX",
+        "grupouc": "US",
+        "areahaalb": 138000.0,
+        "ufabrang": "MT",
+        "biomaibge": "Amazonia",
+        "criacaoano": "1996",
+        "criacaoato": "Decreto 1845"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-56.70, -13.70], [-56.69, -13.70], [-56.69, -13.69], [-56.70, -13.69], [-56.70, -13.70]]]]
+      },
+      "properties": {
+        "cnuc": "UC008",
+        "nomeuc": "Estacao Ecologica de Ique",
+        "siglacateg": "ESEC",
+        "grupouc": "PI",
+        "areahaalb": 200000.0,
+        "ufabrang": "MT",
+        "biomaibge": "Cerrado",
+        "criacaoano": "1981",
+        "criacaoato": "Decreto 86061"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-47.92, -15.73], [-47.91, -15.73], [-47.91, -15.72], [-47.92, -15.72], [-47.92, -15.73]]]]
+      },
+      "properties": {
+        "cnuc": "UC009",
+        "nomeuc": "Parque Nacional de Brasilia",
+        "siglacateg": "PARNA",
+        "grupouc": "PI",
+        "areahaalb": 42389.0,
+        "ufabrang": "DF",
+        "biomaibge": "Cerrado",
+        "criacaoano": "1961",
+        "criacaoato": "Decreto 241"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-47.88, -15.90], [-47.87, -15.90], [-47.87, -15.89], [-47.88, -15.89], [-47.88, -15.90]]]]
+      },
+      "properties": {
+        "cnuc": "UC010",
+        "nomeuc": "Area de Relevante Interesse Ecologico Capetinga/Taquara",
+        "siglacateg": "ARIE",
+        "grupouc": "US",
+        "areahaalb": 1050.0,
+        "ufabrang": "DF",
+        "biomaibge": "Cerrado",
+        "criacaoano": "1986",
+        "criacaoato": "Decreto 91303"
+      }
+    }
+  ]
+}

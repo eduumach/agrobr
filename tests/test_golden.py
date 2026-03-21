@@ -1221,3 +1221,111 @@ def test_zarc_golden_parsing(_name: str, path: Path):
     if "perene_count" in expected:
         perene = df[df["safra"] == "perene"]
         assert len(perene) == expected["perene_count"]
+
+
+# ============================================================================
+# FUNAI Golden Tests
+# ============================================================================
+
+
+def _get_funai_cases() -> list[tuple[str, Path]]:
+    return _discover_cases(source_filter="funai")
+
+
+@pytest.mark.skipif(not _get_funai_cases(), reason="No FUNAI golden data")
+@pytest.mark.parametrize("_name,path", _get_funai_cases())
+def test_funai_golden_parsing(_name: str, path: Path):
+    expected = _load_expected(path)
+    metadata = _load_metadata(path)
+    fmt = metadata.get("format", "csv")
+
+    if fmt == "csv":
+        from agrobr.funai.parser import parse_terras_indigenas_csv
+
+        data = (path / "response.csv").read_bytes()
+        df = parse_terras_indigenas_csv(data)
+    elif fmt == "geojson":
+        pytest.importorskip("geopandas")
+        from agrobr.funai.parser import parse_terras_indigenas_geojson
+
+        data = (path / "response.geojson").read_bytes()
+        df = parse_terras_indigenas_geojson(data)
+        assert df.crs.to_epsg() == expected.get("crs_epsg", 4326)
+        assert df.geometry.notna().all()
+    else:
+        pytest.skip(f"Unknown funai format: {fmt}")
+        return
+
+    _assert_dataframe_golden(df, expected)
+
+
+# ============================================================================
+# ICMBio Golden Tests
+# ============================================================================
+
+
+def _get_icmbio_cases() -> list[tuple[str, Path]]:
+    return _discover_cases(source_filter="icmbio")
+
+
+@pytest.mark.skipif(not _get_icmbio_cases(), reason="No ICMBio golden data")
+@pytest.mark.parametrize("_name,path", _get_icmbio_cases())
+def test_icmbio_golden_parsing(_name: str, path: Path):
+    expected = _load_expected(path)
+    metadata = _load_metadata(path)
+    fmt = metadata.get("format", "csv")
+
+    if fmt == "csv":
+        from agrobr.icmbio.parser import parse_ucs_csv
+
+        data = (path / "response.csv").read_bytes()
+        df = parse_ucs_csv(data)
+    elif fmt == "geojson":
+        pytest.importorskip("geopandas")
+        from agrobr.icmbio.parser import parse_ucs_geojson
+
+        data = (path / "response.geojson").read_bytes()
+        df = parse_ucs_geojson(data)
+        assert df.crs.to_epsg() == expected.get("crs_epsg", 4326)
+        assert df.geometry.notna().all()
+    else:
+        pytest.skip(f"Unknown icmbio format: {fmt}")
+        return
+
+    _assert_dataframe_golden(df, expected)
+
+
+# ============================================================================
+# INCRA Golden Tests
+# ============================================================================
+
+
+def _get_incra_cases() -> list[tuple[str, Path]]:
+    return _discover_cases(source_filter="incra")
+
+
+@pytest.mark.skipif(not _get_incra_cases(), reason="No INCRA golden data")
+@pytest.mark.parametrize("_name,path", _get_incra_cases())
+def test_incra_golden_parsing(_name: str, path: Path):
+    expected = _load_expected(path)
+    metadata = _load_metadata(path)
+    fmt = metadata.get("format", "csv")
+
+    if fmt == "csv":
+        from agrobr.incra.parser import parse_quilombolas_csv
+
+        data = (path / "response.csv").read_bytes()
+        df = parse_quilombolas_csv(data)
+    elif fmt == "geojson":
+        pytest.importorskip("geopandas")
+        from agrobr.incra.parser import parse_quilombolas_geojson
+
+        data = (path / "response.geojson").read_bytes()
+        df = parse_quilombolas_geojson(data)
+        assert df.crs.to_epsg() == expected.get("crs_epsg", 4326)
+        assert df.geometry.notna().all()
+    else:
+        pytest.skip(f"Unknown incra format: {fmt}")
+        return
+
+    _assert_dataframe_golden(df, expected)

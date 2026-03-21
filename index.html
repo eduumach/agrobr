@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>agrobr — Dados agrícolas brasileiros em uma linha de código</title>
-<meta name="description" content="Infraestrutura Python para dados agrícolas brasileiros. 27 fontes públicas — CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA, IMEA, DERAL, INMET, Queimadas/INPE, Desmatamento, MapBiomas, CONAB Progresso, CONAB CEASA/PROHORT, B3 Futuros Agro, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedagio, SICAR, ZARC, Agrofit/MAPA (Defensivos) — uma API, fallback automático, cache DuckDB.">
+<meta name="description" content="Infraestrutura Python para dados agrícolas brasileiros. 30 fontes públicas — CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA, IMEA, DERAL, INMET, Queimadas/INPE, Desmatamento, MapBiomas, CONAB Progresso, CONAB CEASA/PROHORT, B3 Futuros Agro, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedagio, SICAR, ZARC, Agrofit/MAPA (Defensivos), FUNAI, ICMBio, INCRA — uma API, fallback automático, cache DuckDB.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -848,7 +848,7 @@
 <section id="sources">
   <div class="reveal">
     <p class="section-label">Fontes de dados</p>
-    <h2 class="section-title">Vinte e sete origens. Uma API.</h2>
+    <h2 class="section-title">Trinta origens. Uma API.</h2>
     <p class="section-desc">Cada fonte tem seu próprio parser com versionamento, fingerprinting e tratamento de encoding. Você só vê o DataFrame.</p>
   </div>
 
@@ -993,6 +993,21 @@
       <div class="source-count">~8K formulados · ~2.8K tecnicos</div>
       <div class="source-detail">Defensivos agricolas registrados — produtos formulados, autorizacoes de uso e produtos tecnicos (CC-BY)</div>
     </div>
+    <div class="source-card">
+      <div class="source-name">FUNAI</div>
+      <div class="source-count">~740 TIs + geometria</div>
+      <div class="source-detail">Terras indigenas — poligonos WFS GeoDataFrame, filtro uf/fase/bbox</div>
+    </div>
+    <div class="source-card">
+      <div class="source-name">ICMBio</div>
+      <div class="source-count">344 UCs federais + geometria</div>
+      <div class="source-detail">Unidades de conservacao — PI/US, filtro uf/grupo/bioma/bbox</div>
+    </div>
+    <div class="source-card">
+      <div class="source-name">INCRA</div>
+      <div class="source-count">~426 territorios + geometria</div>
+      <div class="source-detail">Territorios quilombolas — compliance EUDR, filtro uf/fase/bbox</div>
+    </div>
   </div>
 </section>
 
@@ -1001,7 +1016,7 @@
   <div class="reveal">
     <p class="section-label">Começar</p>
     <h2 class="section-title">pip install agrobr</h2>
-    <p class="section-desc" style="margin: 0 auto 0;">MIT License (código). 5190+ testes. 27 fontes. 34 datasets. <a href="https://www.agrobr.dev/docs/licenses/" style="color: var(--accent-gold-dim);">Licenças dos dados →</a></p>
+    <p class="section-desc" style="margin: 0 auto 0;">MIT License (código). 5400+ testes. 30 fontes. 34 datasets. <a href="https://www.agrobr.dev/docs/licenses/" style="color: var(--accent-gold-dim);">Licenças dos dados →</a></p>
     <div class="cta-links">
       <a href="https://www.agrobr.dev/docs/" class="cta-btn primary">Documentação →</a>
       <a href="https://colab.research.google.com/github/bruno-portfolio/agrobr/blob/main/examples/agrobr_demo.ipynb" class="cta-btn secondary">Abrir no Colab ↗</a>

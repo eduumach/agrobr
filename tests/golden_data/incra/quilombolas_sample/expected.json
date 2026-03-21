@@ -1,0 +1,5 @@
+{
+    "count": 10,
+    "columns": ["codigo", "nome", "municipio", "uf", "area_ha", "familias", "fase", "titulado", "data_publicacao", "data_titulo"],
+    "non_null_columns": ["codigo", "nome", "municipio", "uf", "area_ha", "familias", "fase", "titulado"]
+}

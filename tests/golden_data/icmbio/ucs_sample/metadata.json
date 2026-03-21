@@ -1,0 +1,6 @@
+{
+    "dataset": "ucs",
+    "format": "csv",
+    "parser": "parse_ucs_csv",
+    "source": "icmbio"
+}

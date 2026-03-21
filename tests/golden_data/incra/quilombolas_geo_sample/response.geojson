@@ -1,0 +1,195 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-46.80, -13.60], [-46.79, -13.60], [-46.79, -13.59], [-46.80, -13.59], [-46.80, -13.60]]]]
+      },
+      "properties": {
+        "cd_quilomb": "Q001",
+        "no_comunidade": "Kalunga",
+        "no_municipio": "Monte Alegre de Goias",
+        "sg_uf": "GO",
+        "nu_area_ha": 262000.0,
+        "nu_familia": "600",
+        "ds_fase": "Titulada",
+        "st_titulad": "T",
+        "dt_publica": "2009-04-15",
+        "dt_titulo": "2009-04-15"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-44.80, -2.10], [-44.79, -2.10], [-44.79, -2.09], [-44.80, -2.09], [-44.80, -2.10]]]]
+      },
+      "properties": {
+        "cd_quilomb": "Q002",
+        "no_comunidade": "Frechal",
+        "no_municipio": "Mirinzal",
+        "sg_uf": "MA",
+        "nu_area_ha": 9542.0,
+        "nu_familia": "92",
+        "ds_fase": "Titulada",
+        "st_titulad": "T",
+        "dt_publica": "1992-11-20",
+        "dt_titulo": "1996-03-21"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-48.40, -24.50], [-48.39, -24.50], [-48.39, -24.49], [-48.40, -24.49], [-48.40, -24.50]]]]
+      },
+      "properties": {
+        "cd_quilomb": "Q003",
+        "no_comunidade": "Ivaporunduva",
+        "no_municipio": "Eldorado",
+        "sg_uf": "SP",
+        "nu_area_ha": 2754.0,
+        "nu_familia": "80",
+        "ds_fase": "Titulada",
+        "st_titulad": "T",
+        "dt_publica": "2010-05-18",
+        "dt_titulo": "2010-06-20"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-38.40, -12.80], [-38.39, -12.80], [-38.39, -12.79], [-38.40, -12.79], [-38.40, -12.80]]]]
+      },
+      "properties": {
+        "cd_quilomb": "Q004",
+        "no_comunidade": "Rio dos Macacos",
+        "no_municipio": "Simoes Filho",
+        "sg_uf": "BA",
+        "nu_area_ha": 301.0,
+        "nu_familia": "56",
+        "ds_fase": "Em Titulacao",
+        "st_titulad": "F",
+        "dt_publica": "2014-12-10",
+        "dt_titulo": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-43.20, -22.95], [-43.19, -22.95], [-43.19, -22.94], [-43.20, -22.94], [-43.20, -22.95]]]]
+      },
+      "properties": {
+        "cd_quilomb": "Q005",
+        "no_comunidade": "Sacopa",
+        "no_municipio": "Rio de Janeiro",
+        "sg_uf": "RJ",
+        "nu_area_ha": 0.6,
+        "nu_familia": "3",
+        "ds_fase": "Decreto Publicado",
+        "st_titulad": "F",
+        "dt_publica": "2018-08-01",
+        "dt_titulo": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-42.00, -22.88], [-41.99, -22.88], [-41.99, -22.87], [-42.00, -22.87], [-42.00, -22.88]]]]
+      },
+      "properties": {
+        "cd_quilomb": "Q006",
+        "no_comunidade": "Preto Forro",
+        "no_municipio": "Cabo Frio",
+        "sg_uf": "RJ",
+        "nu_area_ha": 80.0,
+        "nu_familia": "45",
+        "ds_fase": "RTID em Elaboracao",
+        "st_titulad": "F",
+        "dt_publica": null,
+        "dt_titulo": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-49.30, -15.75], [-49.29, -15.75], [-49.29, -15.74], [-49.30, -15.74], [-49.30, -15.75]]]]
+      },
+      "properties": {
+        "cd_quilomb": "Q007",
+        "no_comunidade": "Furnas do Dionisio",
+        "no_municipio": "Jaragua",
+        "sg_uf": "GO",
+        "nu_area_ha": 998.0,
+        "nu_familia": "150",
+        "ds_fase": "Em Titulacao",
+        "st_titulad": "F",
+        "dt_publica": "2019-07-22",
+        "dt_titulo": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-51.20, -29.15], [-51.19, -29.15], [-51.19, -29.14], [-51.20, -29.14], [-51.20, -29.15]]]]
+      },
+      "properties": {
+        "cd_quilomb": "Q008",
+        "no_comunidade": "Alpes",
+        "no_municipio": "Caxias do Sul",
+        "sg_uf": "RS",
+        "nu_area_ha": 62.0,
+        "nu_familia": "28",
+        "ds_fase": "Titulada",
+        "st_titulad": "T",
+        "dt_publica": "2011-09-30",
+        "dt_titulo": "2012-01-15"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-51.10, -30.08], [-51.09, -30.08], [-51.09, -30.07], [-51.10, -30.07], [-51.10, -30.08]]]]
+      },
+      "properties": {
+        "cd_quilomb": "Q009",
+        "no_comunidade": "Sao Sebastiao",
+        "no_municipio": "Viamao",
+        "sg_uf": "RS",
+        "nu_area_ha": 4329.0,
+        "nu_familia": "160",
+        "ds_fase": "RTID Publicado",
+        "st_titulad": "F",
+        "dt_publica": "2007-10-05",
+        "dt_titulo": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[-44.80, -23.35], [-44.79, -23.35], [-44.79, -23.34], [-44.80, -23.34], [-44.80, -23.35]]]]
+      },
+      "properties": {
+        "cd_quilomb": "Q010",
+        "no_comunidade": "Cacandoca",
+        "no_municipio": "Ubatuba",
+        "sg_uf": "SP",
+        "nu_area_ha": 890.0,
+        "nu_familia": "50",
+        "ds_fase": "Titulada",
+        "st_titulad": "T",
+        "dt_publica": "2005-12-09",
+        "dt_titulo": "2005-12-09"
+      }
+    }
+  ]
+}

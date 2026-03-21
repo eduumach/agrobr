@@ -1,0 +1,6 @@
+{
+    "count_min": 10,
+    "columns": ["codigo", "nome", "municipio", "uf", "area_ha", "familias", "fase", "titulado", "data_publicacao", "data_titulo", "geometry"],
+    "crs_epsg": 4326,
+    "non_null_columns": ["codigo", "nome", "municipio", "uf", "area_ha", "fase", "titulado", "geometry"]
+}

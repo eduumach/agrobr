@@ -40,6 +40,9 @@
 | **CONAB CEASA/PROHORT** | Credenciais públicas embutidas no frontend, API não documentada oficialmente | Verificar com CONAB | `zona_cinza` | [Portal CONAB](https://portaldeinformacoes.conab.gov.br) |
 | **MAPA Agrofit (Defensivos)** | CC-BY 4.0 | Sim | `livre` | [dados.agricultura.gov.br](https://dados.agricultura.gov.br/dataset/6c913699-e82e-4da3-a0a1-fb6c431e367f) |
 | **ZARC** | Dados públicos governo federal (CC-BY) | Sim | `livre` | [dados.agricultura.gov.br](https://dados.agricultura.gov.br/dataset/tabua-de-risco-zoneamento-agricola-de-risco-climatico) |
+| **FUNAI Terras Indigenas** | CC BY-ND 3.0 | Sim (com citacao, sem derivados) | `livre` | [geoserver.funai.gov.br](https://geoserver.funai.gov.br) |
+| **ICMBio UCs Federais** | Dados publicos governo federal | Sim (dados publicos) | `livre` | [geoservicos.inde.gov.br](https://geoservicos.inde.gov.br) |
+| **INCRA Quilombolas** | Dados publicos governo federal | Sim (dados publicos) | `livre` | [cmr.funai.gov.br](https://cmr.funai.gov.br) |
 
 ### Legenda de Classificação
 
