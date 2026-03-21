@@ -8,12 +8,14 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Unreleased]
 
 ### Added
+- **ibama** — embargos ambientais via WFS (siscom.ibama.gov.br). `embargos()` tabular + `embargos_geo()` GeoDataFrame. Paginacao WFS 2.0 (~89K features, 10K/pagina). Filtros uf/bbox. Dedup por numero_tad. PII excluido. Null geometry warning. Licenca ODbL
+- **queimadas** — `focos_geo()` converte lat/lon existente para GeoDataFrame (Point, EPSG:4326). Wrapper sobre `focos()`, sem novo endpoint HTTP
 - **funai** — terras indigenas via WFS (geoserver.funai.gov.br). `terras_indigenas()` tabular + `terras_indigenas_geo()` GeoDataFrame. Filtros uf/fase/bbox. ~740 TIs. Licenca CC BY-ND 3.0
 - **icmbio** — unidades de conservacao federais via WFS (geoservicos.inde.gov.br). `ucs()` tabular + `ucs_geo()` GeoDataFrame. Filtros uf/grupo/bioma/bbox. 344 UCs. Dados publicos
 - **incra** — territorios quilombolas via WFS (cmr.funai.gov.br). `quilombolas()` tabular + `quilombolas_geo()` GeoDataFrame. Filtros uf/fase/bbox. ~426 territorios. Dados publicos
 
 ### Improved
-- **utils/geo** — `check_geopandas()` extraido de desmatamento/sicar para `utils/geo.py` (dedup 2 copias). `validate_bbox()` canonica com checagem min<max (3 implementacoes inconsistentes consolidadas)
+- **utils/geo** — `check_geopandas()` extraido de desmatamento/sicar para `utils/geo.py` (dedup 2 copias). `validate_bbox()` canonica com checagem min<max (3 implementacoes inconsistentes consolidadas). `fetch_wfs()` agora aceita `base_delay` para throttle de paginacao
 
 ## [1.0.2] - 2026-03-20
 

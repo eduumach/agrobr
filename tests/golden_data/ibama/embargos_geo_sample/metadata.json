@@ -1,0 +1,6 @@
+{
+    "dataset": "embargos_ibama_geo",
+    "format": "geojson",
+    "parser": "parse_embargos_geojson",
+    "source": "ibama"
+}

@@ -1,0 +1,6 @@
+{
+    "dataset": "embargos_ibama",
+    "format": "csv",
+    "parser": "parse_embargos_csv",
+    "source": "ibama"
+}

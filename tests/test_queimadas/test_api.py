@@ -158,3 +158,128 @@ class TestFocosAsPolars:
         ):
             result = await api.focos(ano=2024, mes=9, as_polars=True)
         assert isinstance(result, pl.DataFrame)
+
+
+class TestFocosGeo:
+    @pytest.fixture(autouse=True)
+    def _skip_no_geopandas(self):
+        pytest.importorskip("geopandas")
+
+    @pytest.mark.asyncio
+    async def test_returns_geodataframe(self):
+        import geopandas as local_gpd
+
+        csv_bytes = _golden_csv_bytes()
+        with patch.object(
+            api.client,
+            "fetch_focos_mensal",
+            new_callable=AsyncMock,
+            return_value=(csv_bytes, "https://example.com/focos.csv"),
+        ):
+            gdf = await api.focos_geo(ano=2024, mes=9)
+
+        assert isinstance(gdf, local_gpd.GeoDataFrame)
+        assert len(gdf) >= 8
+        assert "geometry" in gdf.columns
+
+    @pytest.mark.asyncio
+    async def test_geometry_is_point(self):
+        from shapely.geometry import Point
+
+        csv_bytes = _golden_csv_bytes()
+        with patch.object(
+            api.client,
+            "fetch_focos_mensal",
+            new_callable=AsyncMock,
+            return_value=(csv_bytes, "https://example.com/focos.csv"),
+        ):
+            gdf = await api.focos_geo(ano=2024, mes=9)
+
+        for geom in gdf.geometry:
+            assert isinstance(geom, Point)
+
+    @pytest.mark.asyncio
+    async def test_crs_4326(self):
+        csv_bytes = _golden_csv_bytes()
+        with patch.object(
+            api.client,
+            "fetch_focos_mensal",
+            new_callable=AsyncMock,
+            return_value=(csv_bytes, "https://example.com/focos.csv"),
+        ):
+            gdf = await api.focos_geo(ano=2024, mes=9)
+
+        assert gdf.crs.to_epsg() == 4326
+
+    @pytest.mark.asyncio
+    async def test_return_meta(self):
+        csv_bytes = _golden_csv_bytes()
+        with patch.object(
+            api.client,
+            "fetch_focos_mensal",
+            new_callable=AsyncMock,
+            return_value=(csv_bytes, "https://example.com/focos.csv"),
+        ):
+            gdf, meta = await api.focos_geo(ano=2024, mes=9, return_meta=True)
+
+        assert meta.source == "queimadas"
+        assert meta.records_count == len(gdf)
+
+    @pytest.mark.asyncio
+    async def test_filters_passthrough(self):
+        csv_bytes = _golden_csv_bytes()
+        with patch.object(
+            api.client,
+            "fetch_focos_mensal",
+            new_callable=AsyncMock,
+            return_value=(csv_bytes, "https://example.com/focos.csv"),
+        ):
+            gdf = await api.focos_geo(ano=2024, mes=9, uf="MT")
+
+        assert len(gdf) >= 1
+        assert (gdf["uf"] == "MT").all()
+
+    @pytest.mark.asyncio
+    async def test_lat_lon_match_geometry(self):
+        csv_bytes = _golden_csv_bytes()
+        with patch.object(
+            api.client,
+            "fetch_focos_mensal",
+            new_callable=AsyncMock,
+            return_value=(csv_bytes, "https://example.com/focos.csv"),
+        ):
+            gdf = await api.focos_geo(ano=2024, mes=9)
+
+        for _, row in gdf.iterrows():
+            assert abs(row.geometry.x - row["lon"]) < 1e-6
+            assert abs(row.geometry.y - row["lat"]) < 1e-6
+
+    @pytest.mark.asyncio
+    async def test_geopandas_not_installed(self):
+        with (
+            patch(
+                "agrobr.queimadas.api.check_geopandas",
+                side_effect=ImportError(
+                    "geopandas is required for geo functions. Install with: pip install agrobr[geo]"
+                ),
+            ),
+            pytest.raises(ImportError, match="agrobr\\[geo\\]"),
+        ):
+            await api.focos_geo(ano=2024, mes=9)
+
+    @pytest.mark.asyncio
+    async def test_empty_result(self):
+        import geopandas as local_gpd
+        import pandas as pd
+
+        empty_df = pd.DataFrame(columns=["data", "lat", "lon", "satelite", "uf", "bioma"])
+        with patch.object(
+            api,
+            "focos",
+            new_callable=AsyncMock,
+            return_value=empty_df,
+        ):
+            gdf = await api.focos_geo(ano=2024, mes=9)
+
+        assert len(gdf) == 0
+        assert isinstance(gdf, local_gpd.GeoDataFrame)

@@ -33,6 +33,7 @@ class Fonte(StrEnum):
     DEFENSIVOS = "defensivos"
     DERAL = "deral"
     FUNAI = "funai"
+    IBAMA = "ibama"
     IBGE = "ibge"
     ICMBIO = "icmbio"
     IMEA = "imea"
@@ -114,6 +115,11 @@ URLS = {
     Fonte.FUNAI: {
         "base": "https://geoserver.funai.gov.br",
         "geoserver": "https://geoserver.funai.gov.br/geoserver/Funai/ows",
+    },
+    Fonte.IBAMA: {
+        "base": "https://www.ibama.gov.br",
+        "geoserver": "https://siscom.ibama.gov.br/geoserver/wfs",
+        "dados_abertos": "https://dadosabertos.ibama.gov.br",
     },
     Fonte.ICMBIO: {
         "base": "https://geoservicos.inde.gov.br",
@@ -309,6 +315,7 @@ class HTTPSettings(BaseSettings):
     rate_limit_ibge: float = 1.0
     rate_limit_imea: float = 1.0
     rate_limit_funai: float = 2.0
+    rate_limit_ibama: float = 2.0
     rate_limit_icmbio: float = 2.0
     rate_limit_incra: float = 2.0
     rate_limit_inmet: float = 0.5

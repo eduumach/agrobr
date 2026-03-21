@@ -1,16 +1,20 @@
 from __future__ import annotations
 
 import time
-from typing import Any, Literal, overload
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.utils.geo import check_geopandas
 from agrobr.utils.result import build_source_meta, finalize_result
 
 from . import client, parser
 from .models import BIOMAS_VALIDOS
+
+if TYPE_CHECKING:
+    import geopandas as gpd
 
 logger = structlog.get_logger()
 
@@ -106,3 +110,70 @@ async def focos(
         parser.PARSER_VERSION,
     )
     return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
+
+
+@overload
+async def focos_geo(
+    *,
+    ano: int,
+    mes: int,
+    dia: int | None = None,
+    uf: str | None = None,
+    bioma: str | None = None,
+    satelite: str | None = None,
+    return_meta: Literal[False] = False,
+) -> gpd.GeoDataFrame: ...
+
+
+@overload
+async def focos_geo(
+    *,
+    ano: int,
+    mes: int,
+    dia: int | None = None,
+    uf: str | None = None,
+    bioma: str | None = None,
+    satelite: str | None = None,
+    return_meta: Literal[True],
+) -> tuple[gpd.GeoDataFrame, MetaInfo]: ...
+
+
+async def focos_geo(
+    *,
+    ano: int,
+    mes: int,
+    dia: int | None = None,
+    uf: str | None = None,
+    bioma: str | None = None,
+    satelite: str | None = None,
+    return_meta: bool = False,
+    **kwargs: Any,  # noqa: ARG001
+) -> Any:
+    gpd_mod = check_geopandas()
+
+    if return_meta:
+        df, meta = await focos(
+            ano=ano,
+            mes=mes,
+            dia=dia,
+            uf=uf,
+            bioma=bioma,
+            satelite=satelite,
+            return_meta=True,
+        )
+    else:
+        df = await focos(
+            ano=ano,
+            mes=mes,
+            dia=dia,
+            uf=uf,
+            bioma=bioma,
+            satelite=satelite,
+        )
+
+    geometry = gpd_mod.points_from_xy(df["lon"], df["lat"])
+    gdf = gpd_mod.GeoDataFrame(df, geometry=geometry, crs="EPSG:4326")
+
+    if return_meta:
+        return gdf, meta
+    return gdf

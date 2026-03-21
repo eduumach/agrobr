@@ -4,6 +4,7 @@ from agrobr.queimadas.models import (
     BIOMAS_VALIDOS,
     COLUNAS_CSV,
     COLUNAS_SAIDA,
+    COLUNAS_SAIDA_GEO,
     SATELITES,
     UF_ESTADO,
     estado_para_uf,
@@ -77,3 +78,7 @@ class TestConstants:
         assert len(SATELITES) > 0
         assert "AQUA_M-T" in SATELITES
         assert "NOAA-20" in SATELITES
+
+    def test_colunas_saida_geo(self):
+        assert COLUNAS_SAIDA_GEO == COLUNAS_SAIDA + ["geometry"]
+        assert "geometry" in COLUNAS_SAIDA_GEO

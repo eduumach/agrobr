@@ -19,9 +19,9 @@
   </a>
 </p>
 
-Infraestrutura Python para dados agrícolas brasileiros com camada semântica sobre **30 fontes públicas**: CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA PSD, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento PRODES/DETER, MapBiomas, CONAB Progresso, B3 Futuros Agro, CONAB CEASA/PROHORT, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedágio, SICAR, ZARC, Agrofit/MAPA (Defensivos), FUNAI, ICMBio e INCRA.
+Infraestrutura Python para dados agrícolas brasileiros com camada semântica sobre **31 fontes públicas**: CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA PSD, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento PRODES/DETER, MapBiomas, CONAB Progresso, B3 Futuros Agro, CONAB CEASA/PROHORT, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedágio, SICAR, ZARC, Agrofit/MAPA (Defensivos), FUNAI, ICMBio, INCRA e IBAMA.
 
-**v1.0.2** — 5400+ testes, 88% cobertura, 30/30 fontes com golden tests, retry centralizado em 30/30 clients.
+**v1.0.2** — 5500+ testes, 88% cobertura, 31/31 fontes com golden tests, retry centralizado em 31/31 clients.
 
 ## Demo
 ![Animation](https://github.com/user-attachments/assets/40e1341e-f47b-4eb5-b18e-55b49c63ee97)
@@ -38,7 +38,7 @@ pip install agrobr[pdf]             # pdfplumber para ANDA (fertilizantes)
 pip install agrobr[polars]          # Suporte a Polars
 pip install agrobr[browser]         # Playwright (opcional, para fontes com JS)
 pip install agrobr[bigquery]        # Base dos Dados (fallback BCB/SICOR)
-pip install agrobr[geo]             # GeoPandas (geometria PRODES + DETER + SICAR + FUNAI + ICMBio + INCRA)
+pip install agrobr[geo]             # GeoPandas (geometria PRODES + DETER + SICAR + FUNAI + ICMBio + INCRA + IBAMA + Queimadas)
 pip install agrobr[all]             # Tudo incluído
 ```
 

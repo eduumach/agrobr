@@ -1,6 +1,6 @@
 # Fontes de Dados
 
-O agrobr integra dados de 30 fontes de dados agricolas.
+O agrobr integra dados de 31 fontes de dados agricolas.
 Todas as fontes suportam `return_meta=True` para rastreabilidade completa.
 
 ## Visao Geral
@@ -37,6 +37,7 @@ Todas as fontes suportam `return_meta=True` para rastreabilidade completa.
 | [FUNAI Terras Indigenas](funai.md) | Terras indigenas (WFS geo) | Continua | ~740 TIs, todas UFs |
 | [ICMBio UCs Federais](icmbio.md) | Unidades de conservacao federais (WFS geo) | Continua | 344 UCs federais |
 | [INCRA Quilombolas](incra.md) | Territorios quilombolas (WFS geo) | Continua | ~426 territorios |
+| [IBAMA Embargos](ibama.md) | Embargos ambientais (WFS geo) | Continua | ~89K embargos, paginado |
 
 ## Proveniencia e Rastreabilidade
 

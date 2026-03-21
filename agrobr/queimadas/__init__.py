@@ -11,6 +11,6 @@ Dados abertos: https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/
 LICENCA: Dados publicos INPE — livre para uso com citacao.
 """
 
-from agrobr.queimadas.api import focos
+from agrobr.queimadas.api import focos, focos_geo
 
-__all__ = ["focos"]
+__all__ = ["focos", "focos_geo"]

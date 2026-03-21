@@ -41,7 +41,13 @@ def validate_bbox(
     return bbox
 
 
-async def fetch_wfs(url: str, *, source: str, timeout: httpx.Timeout) -> bytes:
+async def fetch_wfs(
+    url: str,
+    *,
+    source: str,
+    timeout: httpx.Timeout,
+    base_delay: float | None = None,
+) -> bytes:
     async with httpx.AsyncClient(
         timeout=timeout, headers=UserAgentRotator.get_bot_headers(), follow_redirects=True
     ) as client:
@@ -49,6 +55,7 @@ async def fetch_wfs(url: str, *, source: str, timeout: httpx.Timeout) -> bytes:
         response = await retry_on_status(
             lambda: client.get(url),
             source=source,
+            base_delay=base_delay,
         )
 
         if response.status_code == 404:

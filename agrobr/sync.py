@@ -106,6 +106,7 @@ _modules: dict[str, _SyncModule | None] = {
     "deral": None,
     "desmatamento": None,
     "funai": None,
+    "ibama": None,
     "ibge": None,
     "icmbio": None,
     "incra": None,
