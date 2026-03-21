@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from unittest.mock import AsyncMock, patch
+from urllib.parse import unquote
 
 import pytest
 
 from agrobr.desmatamento.client import _build_state_cql, _build_wfs_url, _uf_to_estado
 from agrobr.exceptions import SourceUnavailableError
-from tests.helpers import make_mock_async_client, make_mock_response
 
 
 class TestBuildWfsUrl:
@@ -89,17 +89,10 @@ class TestFetchProdes:
     async def test_successful_fetch(self):
         from agrobr.desmatamento.client import fetch_prodes
 
-        mock_response = make_mock_response(200, content=b"x" * 5000)
-        mock_client = make_mock_async_client()
-        mock_client.get = AsyncMock(return_value=mock_response)
-
-        with (
-            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
-            patch(
-                "agrobr.desmatamento.client.retry_on_status",
-                new_callable=AsyncMock,
-                return_value=mock_response,
-            ),
+        with patch(
+            "agrobr.desmatamento.client.fetch_wfs",
+            new_callable=AsyncMock,
+            return_value=b"x" * 5000,
         ):
             content, url = await fetch_prodes("Amazônia")
         assert len(content) >= 5000
@@ -110,17 +103,10 @@ class TestFetchProdes:
     async def test_with_ano_and_uf(self):
         from agrobr.desmatamento.client import fetch_prodes
 
-        mock_response = make_mock_response(200, content=b"x" * 5000)
-        mock_client = make_mock_async_client()
-        mock_client.get = AsyncMock(return_value=mock_response)
-
-        with (
-            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
-            patch(
-                "agrobr.desmatamento.client.retry_on_status",
-                new_callable=AsyncMock,
-                return_value=mock_response,
-            ),
+        with patch(
+            "agrobr.desmatamento.client.fetch_wfs",
+            new_callable=AsyncMock,
+            return_value=b"x" * 5000,
         ):
             content, url = await fetch_prodes("Amazônia", ano=2023, uf="MT")
         assert len(content) >= 5000
@@ -138,17 +124,10 @@ class TestFetchDeter:
     async def test_successful_fetch(self):
         from agrobr.desmatamento.client import fetch_deter
 
-        mock_response = make_mock_response(200, content=b"x" * 5000)
-        mock_client = make_mock_async_client()
-        mock_client.get = AsyncMock(return_value=mock_response)
-
-        with (
-            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
-            patch(
-                "agrobr.desmatamento.client.retry_on_status",
-                new_callable=AsyncMock,
-                return_value=mock_response,
-            ),
+        with patch(
+            "agrobr.desmatamento.client.fetch_wfs",
+            new_callable=AsyncMock,
+            return_value=b"x" * 5000,
         ):
             content, url = await fetch_deter(
                 "Amazônia", uf="PA", data_inicio="2024-01-01", data_fim="2024-06-01"
@@ -159,16 +138,13 @@ class TestFetchDeter:
     async def test_404_raises(self):
         from agrobr.desmatamento.client import fetch_deter
 
-        mock_response = make_mock_response(404, content=b"not found")
-        mock_client = make_mock_async_client()
-        mock_client.get = AsyncMock(return_value=mock_response)
-
         with (
-            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
             patch(
-                "agrobr.desmatamento.client.retry_on_status",
+                "agrobr.desmatamento.client.fetch_wfs",
                 new_callable=AsyncMock,
-                return_value=mock_response,
+                side_effect=SourceUnavailableError(
+                    source="desmatamento", url="", last_error="HTTP 404"
+                ),
             ),
             pytest.raises(SourceUnavailableError),
         ):
@@ -180,18 +156,10 @@ class TestFetchDeterGeo:
     async def test_successful_fetch(self):
         from agrobr.desmatamento.client import fetch_deter_geo
 
-        geojson = b'{"type":"FeatureCollection","features":[' + b"x" * 5000 + b"]}"
-        mock_response = make_mock_response(200, content=geojson)
-        mock_client = make_mock_async_client()
-        mock_client.get = AsyncMock(return_value=mock_response)
-
-        with (
-            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
-            patch(
-                "agrobr.desmatamento.client.retry_on_status",
-                new_callable=AsyncMock,
-                return_value=mock_response,
-            ),
+        with patch(
+            "agrobr.desmatamento.client.fetch_wfs",
+            new_callable=AsyncMock,
+            return_value=b"x" * 5000,
         ):
             content, url = await fetch_deter_geo("Amazônia")
         assert len(content) >= 5000
@@ -200,17 +168,10 @@ class TestFetchDeterGeo:
     async def test_url_max_features_10000(self):
         from agrobr.desmatamento.client import fetch_deter_geo
 
-        mock_response = make_mock_response(200, content=b"x" * 5000)
-        mock_client = make_mock_async_client()
-        mock_client.get = AsyncMock(return_value=mock_response)
-
-        with (
-            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
-            patch(
-                "agrobr.desmatamento.client.retry_on_status",
-                new_callable=AsyncMock,
-                return_value=mock_response,
-            ),
+        with patch(
+            "agrobr.desmatamento.client.fetch_wfs",
+            new_callable=AsyncMock,
+            return_value=b"x" * 5000,
         ):
             content, url = await fetch_deter_geo("Amazônia")
         assert "maxFeatures=10000" in url
@@ -219,17 +180,10 @@ class TestFetchDeterGeo:
     async def test_url_contains_geom_column_amz(self):
         from agrobr.desmatamento.client import fetch_deter_geo
 
-        mock_response = make_mock_response(200, content=b"x" * 5000)
-        mock_client = make_mock_async_client()
-        mock_client.get = AsyncMock(return_value=mock_response)
-
-        with (
-            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
-            patch(
-                "agrobr.desmatamento.client.retry_on_status",
-                new_callable=AsyncMock,
-                return_value=mock_response,
-            ),
+        with patch(
+            "agrobr.desmatamento.client.fetch_wfs",
+            new_callable=AsyncMock,
+            return_value=b"x" * 5000,
         ):
             _, url = await fetch_deter_geo("Amazônia")
         assert "propertyName=geom," in url
@@ -238,17 +192,10 @@ class TestFetchDeterGeo:
     async def test_url_contains_geom_column_cerrado(self):
         from agrobr.desmatamento.client import fetch_deter_geo
 
-        mock_response = make_mock_response(200, content=b"x" * 5000)
-        mock_client = make_mock_async_client()
-        mock_client.get = AsyncMock(return_value=mock_response)
-
-        with (
-            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
-            patch(
-                "agrobr.desmatamento.client.retry_on_status",
-                new_callable=AsyncMock,
-                return_value=mock_response,
-            ),
+        with patch(
+            "agrobr.desmatamento.client.fetch_wfs",
+            new_callable=AsyncMock,
+            return_value=b"x" * 5000,
         ):
             _, url = await fetch_deter_geo("Cerrado")
         assert "propertyName=st_multi," in url
@@ -257,17 +204,10 @@ class TestFetchDeterGeo:
     async def test_url_output_format_json(self):
         from agrobr.desmatamento.client import fetch_deter_geo
 
-        mock_response = make_mock_response(200, content=b"x" * 5000)
-        mock_client = make_mock_async_client()
-        mock_client.get = AsyncMock(return_value=mock_response)
-
-        with (
-            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
-            patch(
-                "agrobr.desmatamento.client.retry_on_status",
-                new_callable=AsyncMock,
-                return_value=mock_response,
-            ),
+        with patch(
+            "agrobr.desmatamento.client.fetch_wfs",
+            new_callable=AsyncMock,
+            return_value=b"x" * 5000,
         ):
             _, url = await fetch_deter_geo("Amazônia")
         assert "outputFormat=application/json" in url
@@ -285,17 +225,10 @@ class TestFetchProdesGeo:
     async def test_successful_fetch(self):
         from agrobr.desmatamento.client import fetch_prodes_geo
 
-        mock_response = make_mock_response(200, content=b"x" * 5000)
-        mock_client = make_mock_async_client()
-        mock_client.get = AsyncMock(return_value=mock_response)
-
-        with (
-            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
-            patch(
-                "agrobr.desmatamento.client.retry_on_status",
-                new_callable=AsyncMock,
-                return_value=mock_response,
-            ),
+        with patch(
+            "agrobr.desmatamento.client.fetch_wfs",
+            new_callable=AsyncMock,
+            return_value=b"x" * 5000,
         ):
             content, url = await fetch_prodes_geo("Cerrado")
         assert len(content) >= 5000
@@ -304,17 +237,10 @@ class TestFetchProdesGeo:
     async def test_max_features_10000(self):
         from agrobr.desmatamento.client import fetch_prodes_geo
 
-        mock_response = make_mock_response(200, content=b"x" * 5000)
-        mock_client = make_mock_async_client()
-        mock_client.get = AsyncMock(return_value=mock_response)
-
-        with (
-            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
-            patch(
-                "agrobr.desmatamento.client.retry_on_status",
-                new_callable=AsyncMock,
-                return_value=mock_response,
-            ),
+        with patch(
+            "agrobr.desmatamento.client.fetch_wfs",
+            new_callable=AsyncMock,
+            return_value=b"x" * 5000,
         ):
             _, url = await fetch_prodes_geo("Cerrado")
         assert "maxFeatures=10000" in url
@@ -323,17 +249,10 @@ class TestFetchProdesGeo:
     async def test_geom_column_in_url(self):
         from agrobr.desmatamento.client import fetch_prodes_geo
 
-        mock_response = make_mock_response(200, content=b"x" * 5000)
-        mock_client = make_mock_async_client()
-        mock_client.get = AsyncMock(return_value=mock_response)
-
-        with (
-            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
-            patch(
-                "agrobr.desmatamento.client.retry_on_status",
-                new_callable=AsyncMock,
-                return_value=mock_response,
-            ),
+        with patch(
+            "agrobr.desmatamento.client.fetch_wfs",
+            new_callable=AsyncMock,
+            return_value=b"x" * 5000,
         ):
             _, url = await fetch_prodes_geo("Cerrado")
         assert "propertyName=geom," in url
@@ -342,17 +261,10 @@ class TestFetchProdesGeo:
     async def test_output_format_json(self):
         from agrobr.desmatamento.client import fetch_prodes_geo
 
-        mock_response = make_mock_response(200, content=b"x" * 5000)
-        mock_client = make_mock_async_client()
-        mock_client.get = AsyncMock(return_value=mock_response)
-
-        with (
-            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
-            patch(
-                "agrobr.desmatamento.client.retry_on_status",
-                new_callable=AsyncMock,
-                return_value=mock_response,
-            ),
+        with patch(
+            "agrobr.desmatamento.client.fetch_wfs",
+            new_callable=AsyncMock,
+            return_value=b"x" * 5000,
         ):
             _, url = await fetch_prodes_geo("Cerrado")
         assert "outputFormat=application/json" in url
@@ -368,21 +280,12 @@ class TestFetchProdesGeo:
     async def test_with_ano_and_uf(self):
         from agrobr.desmatamento.client import fetch_prodes_geo
 
-        mock_response = make_mock_response(200, content=b"x" * 5000)
-        mock_client = make_mock_async_client()
-        mock_client.get = AsyncMock(return_value=mock_response)
-
-        with (
-            patch("agrobr.desmatamento.client.httpx.AsyncClient", return_value=mock_client),
-            patch(
-                "agrobr.desmatamento.client.retry_on_status",
-                new_callable=AsyncMock,
-                return_value=mock_response,
-            ),
+        with patch(
+            "agrobr.desmatamento.client.fetch_wfs",
+            new_callable=AsyncMock,
+            return_value=b"x" * 5000,
         ):
             _, url = await fetch_prodes_geo("Cerrado", ano=2023, uf="MT")
-        from urllib.parse import unquote
-
         decoded = unquote(url)
         assert "year=2023" in decoded
         assert "state='MT'" in decoded

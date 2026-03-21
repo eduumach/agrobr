@@ -297,7 +297,7 @@ class TestParseImoveisGeojson:
         from agrobr.alt.sicar import parser as _parser
 
         with (
-            patch.object(_parser, "_check_geopandas", side_effect=ImportError("no geopandas")),
+            patch.object(_parser, "check_geopandas", side_effect=ImportError("no geopandas")),
             pytest.raises(ImportError, match="geopandas"),
         ):
             _parser.parse_imoveis_geojson(b'{"type":"FeatureCollection","features":[]}')

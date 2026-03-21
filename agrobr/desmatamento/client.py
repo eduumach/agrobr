@@ -3,14 +3,12 @@ from __future__ import annotations
 import re
 from urllib.parse import quote
 
-import httpx
 import structlog
 
-from agrobr.constants import MIN_WFS_SIZE, URLS, Fonte
+from agrobr.constants import URLS, Fonte
 from agrobr.exceptions import SourceUnavailableError
-from agrobr.http.retry import retry_on_status
 from agrobr.http.settings import get_timeout
-from agrobr.http.user_agents import UserAgentRotator
+from agrobr.utils.geo import fetch_wfs
 
 from .models import (
     DETER_COLUNAS_WFS_AMZ,
@@ -60,33 +58,6 @@ def _build_wfs_url(
     return url
 
 
-async def _fetch_url(url: str) -> bytes:
-    async with httpx.AsyncClient(
-        timeout=TIMEOUT, headers=UserAgentRotator.get_bot_headers(), follow_redirects=True
-    ) as client:
-        logger.debug("desmatamento_request", url=url)
-        response = await retry_on_status(
-            lambda: client.get(url),
-            source="desmatamento",
-        )
-
-        if response.status_code == 404:
-            raise SourceUnavailableError(source="desmatamento", url=url, last_error="HTTP 404")
-
-        response.raise_for_status()
-
-        content = response.content
-        if len(content) < MIN_WFS_SIZE:
-            raise SourceUnavailableError(
-                source="desmatamento",
-                url=url,
-                last_error=(
-                    f"WFS response too small ({len(content)} bytes), expected WFS feature data"
-                ),
-            )
-        return content
-
-
 def _build_state_cql(uf: str) -> str:
     uf_upper = uf.strip().upper()
     if not _UF_RE.match(uf_upper):
@@ -131,7 +102,7 @@ async def _fetch_prodes_raw(
     url = _build_wfs_url(
         workspace, layer, cols, cql, max_features=max_features, output_format=output_format
     )
-    content = await _fetch_url(url)
+    content = await fetch_wfs(url, source="desmatamento", timeout=TIMEOUT)
     return content, url
 
 
@@ -205,7 +176,7 @@ async def _fetch_deter_raw(
     url = _build_wfs_url(
         workspace, layer, cols, cql, max_features=max_features, output_format=output_format
     )
-    content = await _fetch_url(url)
+    content = await fetch_wfs(url, source="desmatamento", timeout=TIMEOUT)
     return content, url
 
 

@@ -259,7 +259,7 @@ class TestParseDeterGeojson:
 
         with (
             patch(
-                "agrobr.desmatamento.parser._check_geopandas",
+                "agrobr.desmatamento.parser.check_geopandas",
                 side_effect=ImportError(
                     "geopandas is required for deter_geo(). Install with: pip install agrobr[geo]"
                 ),
@@ -369,7 +369,7 @@ class TestParseProdesGeojson:
 
         with (
             patch(
-                "agrobr.desmatamento.parser._check_geopandas",
+                "agrobr.desmatamento.parser.check_geopandas",
                 side_effect=ImportError(
                     "geopandas is required for geo functions. Install with: pip install agrobr[geo]"
                 ),

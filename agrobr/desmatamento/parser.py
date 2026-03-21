@@ -7,6 +7,7 @@ import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
+from agrobr.utils.geo import check_geopandas
 from agrobr.utils.io import read_csv_safe
 
 from .models import (
@@ -101,19 +102,8 @@ def parse_deter_csv(data: bytes, bioma: str) -> pd.DataFrame:
     return df
 
 
-def _check_geopandas() -> Any:
-    try:
-        import geopandas
-
-        return geopandas
-    except ImportError:
-        raise ImportError(
-            "geopandas is required for geo functions. Install with: pip install agrobr[geo]"
-        ) from None
-
-
 def parse_deter_geojson(data: bytes, bioma: str) -> Any:
-    gpd = _check_geopandas()
+    gpd = check_geopandas()
 
     try:
         geojson = json.loads(data)
@@ -172,7 +162,7 @@ def parse_deter_geojson(data: bytes, bioma: str) -> Any:
 
 
 def parse_prodes_geojson(data: bytes, bioma: str) -> Any:
-    gpd = _check_geopandas()
+    gpd = check_geopandas()
 
     try:
         geojson = json.loads(data)

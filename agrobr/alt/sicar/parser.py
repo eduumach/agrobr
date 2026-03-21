@@ -7,6 +7,7 @@ import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
+from agrobr.utils.geo import check_geopandas
 from agrobr.utils.io import read_csv_safe
 
 from .models import COLUNAS_IMOVEIS, COLUNAS_IMOVEIS_GEO, MAX_FEATURES_GEO, RENAME_MAP
@@ -75,19 +76,8 @@ def parse_imoveis_csv(pages: list[bytes]) -> pd.DataFrame:
     return df
 
 
-def _check_geopandas() -> Any:
-    try:
-        import geopandas
-
-        return geopandas
-    except ImportError:
-        raise ImportError(
-            "geopandas is required for imoveis_geo(). Install with: pip install agrobr[geo]"
-        ) from None
-
-
 def parse_imoveis_geojson(data: bytes) -> Any:
-    gpd = _check_geopandas()
+    gpd = check_geopandas()
 
     try:
         geojson = json.loads(data)
