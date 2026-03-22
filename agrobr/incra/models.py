@@ -6,7 +6,7 @@ WFS_BASE: str = URLS[Fonte.INCRA]["geoserver"]
 WFS_VERSION = "1.0.0"
 LAYER = "lim_quilombolas_a"
 NAMESPACE = "CMR-PUBLICO"
-GEOM_COLUMN = "the_geom"
+GEOM_COLUMN = "geom"
 MAX_FEATURES_GEO = 500
 MAX_FEATURES_TABULAR = 500
 
