@@ -7,24 +7,26 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-03-22
+
 ### Added
 - **ibama** — embargos ambientais via WFS (siscom.ibama.gov.br). `embargos()` tabular + `embargos_geo()` GeoDataFrame. Paginacao WFS 2.0 (~89K features, 10K/pagina). Filtros uf/bbox. Dedup por numero_tad. PII excluido. Null geometry warning. Licenca ODbL
 - **queimadas** — `focos_geo()` converte lat/lon existente para GeoDataFrame (Point, EPSG:4326). Wrapper sobre `focos()`, sem novo endpoint HTTP
 - **funai** — terras indigenas via WFS (geoserver.funai.gov.br). `terras_indigenas()` tabular + `terras_indigenas_geo()` GeoDataFrame. Filtros uf/fase/bbox. ~740 TIs. Licenca CC BY-ND 3.0
 - **icmbio** — unidades de conservacao federais via WFS (geoservicos.inde.gov.br). `ucs()` tabular + `ucs_geo()` GeoDataFrame. Filtros uf/grupo/bioma/bbox. 344 UCs. Dados publicos
 - **incra** — territorios quilombolas via WFS (cmr.funai.gov.br). `quilombolas()` tabular + `quilombolas_geo()` GeoDataFrame. Filtros uf/fase/bbox. ~426 territorios. Dados publicos
-- **mapbiomas_alerta** — modulo GraphQL para alertas de desmatamento MapBiomas, auth via token, paginacao, filtros por data/fonte/bbox/uf, suporte WKT geometry. Fonte: livre (citacao)
-- **lista_suja** — cadastro de empregadores (trabalho escravo) via download XLSX do Portal da Transparencia. Filtro por UF, warning PII automatico. Fonte: livre (Lei de Acesso a Informacao)
+- **mapbiomas_alerta** — alertas de desmatamento via GraphQL (plataforma.alerta.mapbiomas.org). `alertas()` tabular + `alertas_geo()` GeoDataFrame com WKT geometry + `alerta_info()` publico. Auth via token (AGROBR_MAPBIOMAS_ALERTA_TOKEN). Paginacao, filtros data/fonte/bbox. Fonte: livre (citacao)
+- **lista_suja** — cadastro de empregadores (trabalho escravo) via PDF do MTE (gov.br/trabalho-e-emprego). `empregadores()` com filtro UF, warning PII automatico. Parser pdfplumber. Fonte: livre (Lei de Acesso a Informacao)
 - **ana** — 4 layers ArcGIS REST do SNIRH: hidrografia (620K polylines), pivos_irrigacao (19.9K polygons), demanda_irrigacao (265K polygons), disponibilidade_hidrica (42K polylines). Paginacao automatica. Fonte: livre
 - **sfb** — 3 layers ArcGIS REST do Servico Florestal: CNFP florestas publicas (20.8K polygons), concessoes florestais (8 polygons), IFN conglomerados (14.5K points). Fonte: livre
 
 ### Improved
 - **utils/geo** — `check_geopandas()` extraido de desmatamento/sicar para `utils/geo.py` (dedup 2 copias). `validate_bbox()` canonica com checagem min<max (3 implementacoes inconsistentes consolidadas). `fetch_wfs()` agora aceita `base_delay` para throttle de paginacao e `client` opcional para connection reuse em paginacao
 - **utils/geo** — dedup WFS: `build_wfs_url()` centraliza construcao de URL WFS com dispatch automatico v1/v2 (typeNames/count vs typeName/maxFeatures), elimina 4 copias em funai/icmbio/incra/ibama. `parse_wfs_hits()` centraliza parsing de `numberMatched` (2 copias ibama+sicar). `parse_geojson_base()` centraliza boilerplate GeoJSON (json.loads, empty check, truncation warning, null geom, from_features, required cols) — 5 parsers migrados
-- **utils/validation** — `validate_uf()` com `UFS_VALIDAS` (27 UFs reais) substitui 10 copias de `_UF_RE` regex em 6 modulos WFS. Validacao mais rigorosa (rejeita "XX", "ZZ" que regex aceitava). Desmatamento ganha validacao de UF (antes aceitava qualquer string)
+- **utils/geo** — infra ArcGIS REST compartilhada: `LayerConfig` TypedDict, `build_arcgis_query_url()`, `fetch_arcgis_count()`, `fetch_arcgis_layer()`, `parse_arcgis_tabular()`, `parse_arcgis_geojson()` — reusados por ANA e SFB
+- **utils/validation** — `validate_uf()` com `UFS_VALIDAS` (27 UFs reais) substitui 10 copias de `_UF_RE` regex em 6 modulos WFS
 - **utils/io** — `concat_csv_pages()` centraliza loop de concat paginado CSV (2 copias ibama+sicar eliminadas)
-- **ibama/sicar** — paginacao WFS agora reutiliza conexao HTTP (1 TLS handshake em vez de N). SICAR `_fetch_url` eliminado, migrado para `fetch_wfs()` compartilhado
-- **utils/geo** — `build_arcgis_query_url()` e `fetch_arcgis_count()` para infra ArcGIS REST compartilhada entre ANA e SFB
+- **ibama/sicar** — paginacao WFS agora reutiliza conexao HTTP (1 TLS handshake em vez de N)
 
 ## [1.0.2] - 2026-03-20
 
@@ -1080,7 +1082,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - Type hints completos
 - Logging estruturado com structlog
 
-[Unreleased]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/bruno-portfolio/agrobr/compare/v0.12.0...v1.0.0
