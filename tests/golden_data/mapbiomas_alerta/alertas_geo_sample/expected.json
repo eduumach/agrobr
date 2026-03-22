@@ -1,1 +1,1 @@
-{"count": 5, "columns": ["alert_code", "area_ha", "data_deteccao", "fonte", "bioma", "uf", "geometry"], "crs_epsg": 4326}
+{"count": 5, "columns": ["alert_code", "area_ha", "data_deteccao", "data_publicacao", "status", "fonte", "lat", "lon", "geometry"], "crs_epsg": 4326}

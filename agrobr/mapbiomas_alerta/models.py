@@ -2,36 +2,36 @@ from agrobr.constants import URLS, Fonte
 
 GRAPHQL_URL: str = URLS[Fonte.MAPBIOMAS_ALERTA]["graphql"]
 
-SIGN_IN_MUTATION = """
-mutation signIn($email: String!, $password: String!) {
-  signIn(email: $email, password: $password) {
-    token
-  }
-}
-"""
-
 ALERTS_QUERY = """
 query alerts(
-  $limit: Int, $offset: Int,
-  $startDate: String, $endDate: String,
-  $sources: [String!], $geometry: JSON
+  $page: Int, $limit: Int,
+  $startDate: BaseDate, $endDate: BaseDate,
+  $sources: [SourceTypes!],
+  $boundingBox: [BoundingBoxInput!],
+  $territoryIds: [Int!]
 ) {
   alerts(
-    limit: $limit, offset: $offset,
-    startDetectedAt: $startDate, endDetectedAt: $endDate,
-    sources: $sources, territoryGeometry: $geometry
+    page: $page, limit: $limit,
+    startDate: $startDate, endDate: $endDate,
+    sources: $sources,
+    boundingBox: $boundingBox,
+    territoryIds: $territoryIds
   ) {
-    alertCode
-    areaHa
-    detectedAt
-    publishedAt
-    statusName
-    source
-    biome
-    state
-    city
-    coordenates { lat lng }
-    geometryWkt
+    collection {
+      alertCode
+      areaHa
+      detectedAt
+      publishedAt
+      statusName
+      sources { name }
+      coordenates { latitude longitude }
+      geometryWkt
+    }
+    metadata {
+      currentPage
+      totalCount
+      totalPages
+    }
   }
 }
 """
@@ -39,8 +39,10 @@ query alerts(
 ALERT_DATE_RANGE_QUERY = """
 {
   alertDateRange {
-    minDate
-    maxDate
+    minDetectedAt
+    maxDetectedAt
+    minPublishedAt
+    maxPublishedAt
   }
 }
 """
@@ -48,13 +50,11 @@ ALERT_DATE_RANGE_QUERY = """
 LAST_PUBLICATION_QUERY = """
 {
   lastAlertPublication {
-    date
-    alertsCount
+    publishedAt
+    total
   }
 }
 """
-
-SOURCES_VALIDOS: frozenset[str] = frozenset({"DETER", "SAD", "GLAD", "SAD Caatinga"})
 
 RENAME_MAP: dict[str, str] = {
     "alertCode": "alert_code",
@@ -62,10 +62,6 @@ RENAME_MAP: dict[str, str] = {
     "detectedAt": "data_deteccao",
     "publishedAt": "data_publicacao",
     "statusName": "status",
-    "source": "fonte",
-    "biome": "bioma",
-    "state": "uf",
-    "city": "municipio",
 }
 
 COLUNAS_SAIDA: list[str] = [
@@ -75,9 +71,6 @@ COLUNAS_SAIDA: list[str] = [
     "data_publicacao",
     "status",
     "fonte",
-    "bioma",
-    "uf",
-    "municipio",
     "lat",
     "lon",
 ]

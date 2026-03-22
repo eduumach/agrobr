@@ -3,7 +3,6 @@ from agrobr.mapbiomas_alerta.models import (
     COLUNAS_SAIDA_GEO,
     GRAPHQL_URL,
     RENAME_MAP,
-    SOURCES_VALIDOS,
 )
 
 
@@ -15,20 +14,6 @@ class TestGraphqlUrl:
         assert GRAPHQL_URL.startswith("https://")
 
 
-class TestSourcesValidos:
-    def test_deter_present(self):
-        assert "DETER" in SOURCES_VALIDOS
-
-    def test_sad_present(self):
-        assert "SAD" in SOURCES_VALIDOS
-
-    def test_glad_present(self):
-        assert "GLAD" in SOURCES_VALIDOS
-
-    def test_minimum_count(self):
-        assert len(SOURCES_VALIDOS) >= 4
-
-
 class TestRenameMap:
     def test_alert_code_key(self):
         assert "alertCode" in RENAME_MAP
@@ -38,9 +23,11 @@ class TestRenameMap:
         assert "areaHa" in RENAME_MAP
         assert RENAME_MAP["areaHa"] == "area_ha"
 
-    def test_state_maps_to_uf(self):
-        assert "state" in RENAME_MAP
-        assert RENAME_MAP["state"] == "uf"
+    def test_no_source_key(self):
+        assert "source" not in RENAME_MAP
+
+    def test_no_state_key(self):
+        assert "state" not in RENAME_MAP
 
 
 class TestColunasSaida:
@@ -53,6 +40,18 @@ class TestColunasSaida:
     def test_lat_lon_present(self):
         assert "lat" in COLUNAS_SAIDA
         assert "lon" in COLUNAS_SAIDA
+
+    def test_fonte_present(self):
+        assert "fonte" in COLUNAS_SAIDA
+
+    def test_no_bioma(self):
+        assert "bioma" not in COLUNAS_SAIDA
+
+    def test_no_uf(self):
+        assert "uf" not in COLUNAS_SAIDA
+
+    def test_no_municipio(self):
+        assert "municipio" not in COLUNAS_SAIDA
 
 
 class TestColunasSaidaGeo:

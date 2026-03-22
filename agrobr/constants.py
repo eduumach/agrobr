@@ -117,8 +117,8 @@ URLS = {
         "ftp_censo_agro_1996": "https://ftp.ibge.gov.br/Censo_Agropecuario/Censo_Agropecuario_1995_96",
     },
     Fonte.LISTA_SUJA: {
-        "base": "https://dados.gov.br",
-        "download": "https://portaldatransparencia.gov.br/download-de-dados/cadastro-empregadores-escravidao",
+        "base": "https://www.gov.br/trabalho-e-emprego",
+        "download": "https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/areas-de-atuacao/cadastro_de_empregadores.pdf",
     },
     Fonte.IMEA: {
         "base": "https://api1.imea.com.br/api",

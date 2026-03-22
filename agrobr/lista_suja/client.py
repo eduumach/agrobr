@@ -3,7 +3,6 @@ from __future__ import annotations
 import httpx
 import structlog
 
-from agrobr.constants import MIN_XLSX_SIZE
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.retry import retry_on_status
 from agrobr.http.settings import get_timeout
@@ -14,6 +13,7 @@ from .models import DOWNLOAD_URL
 logger = structlog.get_logger()
 
 TIMEOUT = get_timeout(read=60.0)
+MIN_PDF_SIZE = 5_000
 
 
 async def fetch_empregadores() -> tuple[bytes, str]:
@@ -29,11 +29,11 @@ async def fetch_empregadores() -> tuple[bytes, str]:
         response.raise_for_status()
         content = response.content
 
-        if len(content) < MIN_XLSX_SIZE:
+        if len(content) < MIN_PDF_SIZE:
             raise SourceUnavailableError(
                 source="lista_suja",
                 url=DOWNLOAD_URL,
-                last_error=f"XLSX muito pequeno ({len(content)} bytes)",
+                last_error=f"PDF muito pequeno ({len(content)} bytes)",
             )
 
         logger.info("lista_suja_download_ok", size=len(content))

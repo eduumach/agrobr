@@ -11,7 +11,7 @@ class TestRenameMap:
         assert len(RENAME_MAP) >= 5
 
     def test_empregador_key(self):
-        assert "EMPREGADOR" in RENAME_MAP
+        assert "Empregador" in RENAME_MAP
 
     def test_values_in_colunas_saida(self):
         for value in RENAME_MAP.values():

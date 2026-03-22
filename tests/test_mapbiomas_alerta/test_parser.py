@@ -29,7 +29,7 @@ class TestParseAlertas:
         assert len(df) == 5
         assert "alert_code" in df.columns
         assert "area_ha" in df.columns
-        assert "uf" in df.columns
+        assert "fonte" in df.columns
 
     def test_empty_records(self):
         df = parse_alertas([])
@@ -56,10 +56,11 @@ class TestParseAlertas:
         assert "lon" in df.columns
         assert df["lat"].notna().all()
 
-    def test_uf_uppercase(self):
+    def test_sources_flattened(self):
         records = _load_records()
         df = parse_alertas(records)
-        assert (df["uf"].str.isupper() | (df["uf"] == "")).all()
+        assert df["fonte"].iloc[0] == "DETER"
+        assert "SAD, DETER" in df["fonte"].values
 
     def test_golden_data_columns(self):
         records = _load_records()
@@ -84,15 +85,12 @@ class TestParseAlertas:
     def test_null_coordenates(self):
         records = [
             {
-                "alertCode": "X",
+                "alertCode": 1,
                 "areaHa": 1.0,
                 "detectedAt": "2024-01-01",
                 "publishedAt": "2024-01-05",
                 "statusName": "Publicado",
-                "source": "DETER",
-                "biome": "Amazonia",
-                "state": "PA",
-                "city": "Altamira",
+                "sources": [{"name": "DETER"}],
                 "coordenates": None,
             }
         ]
@@ -105,6 +103,41 @@ class TestParseAlertas:
         df = parse_alertas(records)
         assert "geometryWkt" not in df.columns
         assert "geometry" not in df.columns
+
+    def test_alert_code_is_int(self):
+        records = _load_records()
+        df = parse_alertas(records)
+        assert df["alert_code"].iloc[0] == 1001
+
+    def test_empty_sources_list(self):
+        records = [
+            {
+                "alertCode": 1,
+                "areaHa": 1.0,
+                "detectedAt": "2024-01-01",
+                "publishedAt": "2024-01-05",
+                "statusName": "Publicado",
+                "sources": [],
+                "coordenates": {"latitude": -3.0, "longitude": -52.0},
+            }
+        ]
+        df = parse_alertas(records)
+        assert df["fonte"].iloc[0] == ""
+
+    def test_null_sources(self):
+        records = [
+            {
+                "alertCode": 1,
+                "areaHa": 1.0,
+                "detectedAt": "2024-01-01",
+                "publishedAt": "2024-01-05",
+                "statusName": "Publicado",
+                "sources": None,
+                "coordenates": {"latitude": -3.0, "longitude": -52.0},
+            }
+        ]
+        df = parse_alertas(records)
+        assert df["fonte"].iloc[0] == ""
 
 
 class TestParseAlertasGeo:
@@ -138,16 +171,13 @@ class TestParseAlertasGeo:
 
         records = [
             {
-                "alertCode": "X",
+                "alertCode": 1,
                 "areaHa": 1.0,
                 "detectedAt": "2024-01-01",
                 "publishedAt": "2024-01-05",
                 "statusName": "Publicado",
-                "source": "DETER",
-                "biome": "Amazonia",
-                "state": "PA",
-                "city": "Altamira",
-                "coordenates": {"lat": -3.0, "lng": -52.0},
+                "sources": [{"name": "DETER"}],
+                "coordenates": {"latitude": -3.0, "longitude": -52.0},
                 "geometryWkt": None,
             }
         ]
@@ -160,16 +190,13 @@ class TestParseAlertasGeo:
 
         records = [
             {
-                "alertCode": "X",
+                "alertCode": 1,
                 "areaHa": 1.0,
                 "detectedAt": "2024-01-01",
                 "publishedAt": "2024-01-05",
                 "statusName": "Publicado",
-                "source": "DETER",
-                "biome": "Amazonia",
-                "state": "PA",
-                "city": "Altamira",
-                "coordenates": {"lat": -3.0, "lng": -52.0},
+                "sources": [{"name": "DETER"}],
+                "coordenates": {"latitude": -3.0, "longitude": -52.0},
                 "geometryWkt": "NOT_A_WKT",
             }
         ]

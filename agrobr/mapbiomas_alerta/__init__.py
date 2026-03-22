@@ -1,5 +1,5 @@
 """MapBiomas Alerta — Alertas de desmatamento.
-Fonte: plataforma.alerta.mapbiomas.org (GraphQL, auth via token).
+Fonte: plataforma.alerta.mapbiomas.org (GraphQL, acesso publico).
 Licenca: Livre (citacao obrigatoria).
 """
 

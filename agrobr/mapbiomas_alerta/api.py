@@ -10,7 +10,6 @@ import structlog
 from agrobr.models import MetaInfo
 from agrobr.utils.geo import validate_bbox
 from agrobr.utils.result import build_source_meta, finalize_result
-from agrobr.utils.validation import validate_uf
 
 from . import client, parser
 
@@ -20,25 +19,13 @@ if TYPE_CHECKING:
 logger = structlog.get_logger()
 
 
-def _prepare_request(
-    token: str | None,
-    sources: list[str] | None,
+def _prepare_bbox(
     bbox: tuple[float, float, float, float] | None,
-) -> tuple[str, list[list[float]] | None]:
-    if sources:
-        from .models import SOURCES_VALIDOS
-
-        invalid = set(sources) - SOURCES_VALIDOS
-        if invalid:
-            raise ValueError(f"Fontes invalidas: {invalid}. Validas: {sorted(SOURCES_VALIDOS)}")
-
-    resolved_token = client._get_token(token)
-    bbox_polygon = None
-    if bbox:
-        xmin, ymin, xmax, ymax = bbox
-        bbox_polygon = [[xmin, ymin], [xmin, ymax], [xmax, ymax], [xmax, ymin], [xmin, ymin]]
-
-    return resolved_token, bbox_polygon
+) -> list[dict[str, float]] | None:
+    if not bbox:
+        return None
+    xmin, ymin, xmax, ymax = bbox
+    return [{"swLat": ymin, "swLng": xmin, "neLat": ymax, "neLng": xmax}]
 
 
 @overload
@@ -48,7 +35,6 @@ async def alertas(
     start_date: str | None = None,
     end_date: str | None = None,
     sources: list[str] | None = None,
-    uf: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
     limit: int = 100,
     as_polars: bool = False,
@@ -63,7 +49,6 @@ async def alertas(
     start_date: str | None = None,
     end_date: str | None = None,
     sources: list[str] | None = None,
-    uf: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
     limit: int = 100,
     as_polars: bool = False,
@@ -77,18 +62,17 @@ async def alertas(
     start_date: str | None = None,
     end_date: str | None = None,
     sources: list[str] | None = None,
-    uf: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
     limit: int = 100,
     as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    uf = validate_uf(uf)
     bbox = validate_bbox(bbox)
-    resolved_token, bbox_polygon = _prepare_request(token, sources, bbox)
+    resolved_token = client._get_token(token)
+    bounding_box = _prepare_bbox(bbox)
 
-    logger.info("mapbiomas_alertas", uf=uf, bbox=bbox, sources=sources)
+    logger.info("mapbiomas_alertas", bbox=bbox, sources=sources)
 
     t0 = time.monotonic()
     records, source_url = await client.fetch_alertas(
@@ -96,7 +80,7 @@ async def alertas(
         start_date=start_date,
         end_date=end_date,
         sources=sources,
-        bbox_polygon=bbox_polygon,
+        bounding_box=bounding_box,
         limit=limit,
     )
     fetch_ms = int((time.monotonic() - t0) * 1000)
@@ -104,9 +88,6 @@ async def alertas(
     t1 = time.monotonic()
     df = parser.parse_alertas(records)
     parse_ms = int((time.monotonic() - t1) * 1000)
-
-    if uf:
-        df = df[df["uf"] == uf].reset_index(drop=True)
 
     meta = build_source_meta(
         "mapbiomas_alerta",
@@ -129,7 +110,6 @@ async def alertas_geo(
     start_date: str | None = None,
     end_date: str | None = None,
     sources: list[str] | None = None,
-    uf: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
     limit: int = 100,
     return_meta: Literal[False] = False,
@@ -143,7 +123,6 @@ async def alertas_geo(
     start_date: str | None = None,
     end_date: str | None = None,
     sources: list[str] | None = None,
-    uf: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
     limit: int = 100,
     return_meta: Literal[True],
@@ -156,17 +135,16 @@ async def alertas_geo(
     start_date: str | None = None,
     end_date: str | None = None,
     sources: list[str] | None = None,
-    uf: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
     limit: int = 100,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> Any:
-    uf = validate_uf(uf)
     bbox = validate_bbox(bbox)
-    resolved_token, bbox_polygon = _prepare_request(token, sources, bbox)
+    resolved_token = client._get_token(token)
+    bounding_box = _prepare_bbox(bbox)
 
-    logger.info("mapbiomas_alertas_geo", uf=uf, bbox=bbox, sources=sources)
+    logger.info("mapbiomas_alertas_geo", bbox=bbox, sources=sources)
 
     t0 = time.monotonic()
     records, source_url = await client.fetch_alertas(
@@ -174,7 +152,7 @@ async def alertas_geo(
         start_date=start_date,
         end_date=end_date,
         sources=sources,
-        bbox_polygon=bbox_polygon,
+        bounding_box=bounding_box,
         limit=limit,
     )
     fetch_ms = int((time.monotonic() - t0) * 1000)
@@ -182,9 +160,6 @@ async def alertas_geo(
     t1 = time.monotonic()
     gdf = parser.parse_alertas_geo(records)
     parse_ms = int((time.monotonic() - t1) * 1000)
-
-    if uf:
-        gdf = gdf[gdf["uf"] == uf].reset_index(drop=True)
 
     if return_meta:
         meta = build_source_meta(

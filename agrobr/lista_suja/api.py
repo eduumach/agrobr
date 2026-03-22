@@ -62,7 +62,7 @@ async def empregadores(
     meta = build_source_meta(
         "lista_suja",
         source_url,
-        "httpx+xlsx",
+        "httpx+pdf",
         fetch_ms,
         parse_ms,
         df,

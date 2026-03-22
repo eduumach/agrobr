@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import os
 from typing import Any
 
 import httpx
@@ -29,8 +30,6 @@ _THROTTLE_DELAY = 3.0
 def _get_token(token: str | None = None) -> str:
     if token:
         return token
-    import os
-
     env_token = os.environ.get("AGROBR_MAPBIOMAS_ALERTA_TOKEN")
     if not env_token:
         raise SourceUnavailableError(
@@ -43,7 +42,7 @@ def _get_token(token: str | None = None) -> str:
 
 async def _graphql_request(
     query: str,
-    variables: dict[str, object],
+    variables: dict[str, Any],
     *,
     token: str | None = None,
     client: httpx.AsyncClient | None = None,
@@ -51,7 +50,6 @@ async def _graphql_request(
     headers = {**UserAgentRotator.get_bot_headers()}
     if token:
         headers["Authorization"] = f"Bearer {token}"
-
     payload = {"query": query, "variables": variables}
 
     async def _do(http: httpx.AsyncClient) -> dict[str, Any]:
@@ -84,25 +82,25 @@ async def fetch_alertas(
     start_date: str | None = None,
     end_date: str | None = None,
     sources: list[str] | None = None,
-    bbox_polygon: list[list[float]] | None = None,
+    bounding_box: list[dict[str, float]] | None = None,
     limit: int = 100,
     max_pages: int = 50,
-) -> tuple[list[dict[str, object]], str]:
-    records: list[dict[str, object]] = []
+) -> tuple[list[dict[str, Any]], str]:
+    records: list[dict[str, Any]] = []
 
     async with httpx.AsyncClient(timeout=TIMEOUT, follow_redirects=True) as http:
-        for page in range(max_pages):
-            variables: dict[str, object] = {"limit": limit, "offset": page * limit}
+        for page_num in range(1, max_pages + 1):
+            variables: dict[str, Any] = {"limit": limit, "page": page_num}
             if start_date:
                 variables["startDate"] = start_date
             if end_date:
                 variables["endDate"] = end_date
             if sources:
                 variables["sources"] = sources
-            if bbox_polygon:
-                variables["geometry"] = {"type": "Polygon", "coordinates": [bbox_polygon]}
+            if bounding_box:
+                variables["boundingBox"] = bounding_box
 
-            if page >= _THROTTLE_AFTER_PAGE:
+            if page_num > _THROTTLE_AFTER_PAGE:
                 await asyncio.sleep(_THROTTLE_DELAY)
 
             data = await _graphql_request(
@@ -111,22 +109,33 @@ async def fetch_alertas(
                 token=token,
                 client=http,
             )
-            alerts = data.get("alerts", [])
-            if not alerts:
+            alerts_data = data.get("alerts", {})
+            collection = alerts_data.get("collection", [])
+            if not collection:
                 break
-            records.extend(alerts)
-            logger.debug("mapbiomas_alerta_page", page=page + 1, records=len(alerts))
-            if len(alerts) < limit:
+            records.extend(collection)
+
+            metadata = alerts_data.get("metadata", {})
+            total_pages = metadata.get("totalPages", 1)
+            logger.debug(
+                "mapbiomas_alerta_page",
+                page=page_num,
+                total_pages=total_pages,
+                records=len(collection),
+            )
+            if page_num >= total_pages:
                 break
 
     return records, GRAPHQL_URL
 
 
-async def fetch_alert_date_range() -> tuple[dict[str, object], str]:
+async def fetch_alert_date_range() -> tuple[dict[str, Any], str]:
     data = await _graphql_request(ALERT_DATE_RANGE_QUERY, {})
-    return data.get("alertDateRange", {}), GRAPHQL_URL
+    result: dict[str, Any] = data.get("alertDateRange", {})
+    return result, GRAPHQL_URL
 
 
-async def fetch_last_publication() -> tuple[dict[str, object], str]:
+async def fetch_last_publication() -> tuple[dict[str, Any], str]:
     data = await _graphql_request(LAST_PUBLICATION_QUERY, {})
-    return data.get("lastAlertPublication", {}), GRAPHQL_URL
+    result: dict[str, Any] = data.get("lastAlertPublication", {})
+    return result, GRAPHQL_URL

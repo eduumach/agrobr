@@ -12,9 +12,16 @@ from .models import COLUNAS_SAIDA, COLUNAS_SAIDA_GEO, RENAME_MAP
 
 logger = structlog.get_logger()
 
-PARSER_VERSION = 1
+PARSER_VERSION = 2
 
-_REQUIRED_FIELDS = {"alertCode", "areaHa", "detectedAt", "source"}
+_REQUIRED_FIELDS = {"alertCode", "areaHa", "detectedAt"}
+
+
+def _flatten_sources(sources: Any) -> str:
+    if not sources or not isinstance(sources, list):
+        return ""
+    names = [s.get("name", "") for s in sources if isinstance(s, dict)]
+    return ", ".join(n for n in names if n)
 
 
 def _normalize_records(
@@ -29,8 +36,12 @@ def _normalize_records(
         row = dict(rec)
         raw_coords = row.pop("coordenates", None)
         coords = raw_coords if isinstance(raw_coords, dict) else {}
-        row["lat"] = coords.get("lat")
-        row["lng"] = coords.get("lng")
+        row["lat"] = coords.get("latitude")
+        row["lon"] = coords.get("longitude")
+
+        raw_sources = row.pop("sources", None)
+        row["fonte"] = _flatten_sources(raw_sources)
+
         geometries.append(row.pop("geometryWkt", None))
         rows.append(row)
 
@@ -44,13 +55,12 @@ def _normalize_records(
             reason=f"Campos obrigatorios ausentes: {missing}",
         )
 
-    df = df.rename(columns={**RENAME_MAP, "lng": "lon"})
+    df = df.rename(columns=RENAME_MAP)
     df["data_deteccao"] = pd.to_datetime(df["data_deteccao"], errors="coerce")
     df["data_publicacao"] = pd.to_datetime(df["data_publicacao"], errors="coerce")
     df["area_ha"] = pd.to_numeric(df["area_ha"], errors="coerce")
     df["lat"] = pd.to_numeric(df["lat"], errors="coerce")
     df["lon"] = pd.to_numeric(df["lon"], errors="coerce")
-    df["uf"] = df["uf"].fillna("").str.strip().str.upper()
 
     return df, geometries
 

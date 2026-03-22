@@ -36,13 +36,14 @@ def _build_where(
     clauses: list[str] = []
     if uf:
         field = fields.get("uf", "uf")
-        clauses.append(f"{field}='{uf}'")
+        clauses.append(f"{field}='{uf.upper()}'")
     if bioma:
         field = fields.get("bioma", "bioma")
-        clauses.append(f"{field}='{bioma}'")
+        clauses.append(f"{field}='{bioma.upper()}'")
     if categoria:
         field = fields.get("categoria", "categoria")
-        clauses.append(f"{field}='{categoria}'")
+        clauses.append(f"{field}='{categoria.upper()}'")
+
     return " AND ".join(clauses) if clauses else "1=1"
 
 

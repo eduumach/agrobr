@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import io
-import json
-from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pandas as pd
 import pytest
@@ -11,98 +9,117 @@ from agrobr.exceptions import ParseError
 from agrobr.lista_suja.models import COLUNAS_SAIDA
 from agrobr.lista_suja.parser import PARSER_VERSION, parse_empregadores
 
-GOLDEN_DIR = Path(__file__).parent.parent / "golden_data" / "lista_suja" / "empregadores_sample"
+_HEADER = [
+    "ID",
+    "Ano da\nação\nfiscal",
+    "UF",
+    "Empregador",
+    "CNPJ/CPF",
+    "Estabelecimento",
+    "Trabalhadores\nenvolvidos",
+    "CNAE",
+    "Decisão\nadministrativa",
+    "Inclusão no\nCadastro de\nEmpregadores",
+]
+
+_ROWS = [
+    ["1", "2023", "MT", "Fazenda X", "12345678901", "Faz. X", "5", "0111", "Sim", "01/01/2023"],
+    ["2", "2023", "PA", "Empresa Y", "98765432101", "Emp. Y", "12", "0112", "Sim", "01/02/2023"],
+    ["3", "2023", "MA", "Sitio Z", "11122233344", "Sit. Z", "3", "0113", "Sim", "01/03/2023"],
+    ["4", "2023", "GO", "Rural W", "55566677788", "Rur. W", "8", "0114", "Sim", "01/04/2023"],
+    ["5", "2023", "TO", "Agro V", "99988877766", "Agr. V", "15", "0115", "Sim", "01/05/2023"],
+]
 
 
-def _make_xlsx(df: pd.DataFrame) -> bytes:
-    buf = io.BytesIO()
-    df.to_excel(buf, index=False)
-    return buf.getvalue()
+def _mock_pdf_data() -> bytes:
+    return b"%PDF-mock"
 
 
-def _sample_df() -> pd.DataFrame:
-    return pd.DataFrame(
-        {
-            "EMPREGADOR": ["Fazenda X", "Empresa Y", "Sitio Z", "Rural W", "Agro V"],
-            "CPF/CNPJ": [
-                "12345678901",
-                "98765432101",
-                "11122233344",
-                "55566677788",
-                "99988877766",
-            ],
-            "ESTABELECIMENTO": ["Faz. X", "Emp. Y", "Sit. Z", "Rur. W", "Agr. V"],
-            "UF": ["MT", "PA", "MA", "GO", "TO"],
-            "MUNICÍPIO": ["Sinop", "Maraba", "Balsas", "Jatai", "Palmas"],
-            "CNAE": ["0111", "0112", "0113", "0114", "0115"],
-            "DATA DA INCLUSÃO": pd.to_datetime(
-                ["2023-01-01", "2023-02-01", "2023-03-01", "2023-04-01", "2023-05-01"]
-            ),
-            "TRABALHADORES ENVOLVIDOS": [5, 12, 3, 8, 15],
-        }
-    )
+def _make_mock_pdf(header: list[str], rows: list[list[str]]):
+    table = [header] + rows
+    page = MagicMock()
+    page.extract_table.return_value = table
+    pdf = MagicMock()
+    pdf.pages = [page]
+    pdf.close = MagicMock()
+    return pdf
 
 
 class TestParserVersion:
     def test_version_is_int(self):
         assert isinstance(PARSER_VERSION, int)
-        assert PARSER_VERSION >= 1
+        assert PARSER_VERSION >= 2
 
 
 class TestParseEmpregadores:
-    def test_valid_xlsx(self):
-        xlsx_data = _make_xlsx(_sample_df())
-        df = parse_empregadores(xlsx_data)
+    def test_valid_pdf(self):
+        pdf = _make_mock_pdf(_HEADER, _ROWS)
+        with patch("agrobr.lista_suja.parser._check_pdfplumber") as mock_check:
+            mock_plumber = MagicMock()
+            mock_plumber.open.return_value = pdf
+            mock_check.return_value = mock_plumber
+            df = parse_empregadores(_mock_pdf_data())
+
         assert len(df) == 5
         assert "empregador" in df.columns
         assert "uf" in df.columns
 
-    def test_golden_data_columns(self):
-        expected = json.loads(GOLDEN_DIR.joinpath("expected.json").read_text(encoding="utf-8"))
-        xlsx_data = _make_xlsx(_sample_df())
-        df = parse_empregadores(xlsx_data)
+    def test_empty_pdf(self):
+        page = MagicMock()
+        page.extract_table.return_value = None
+        pdf = MagicMock()
+        pdf.pages = [page]
+        pdf.close = MagicMock()
 
-        for col in expected["columns"]:
-            assert col in df.columns, f"Missing column: {col}"
+        with patch("agrobr.lista_suja.parser._check_pdfplumber") as mock_check:
+            mock_plumber = MagicMock()
+            mock_plumber.open.return_value = pdf
+            mock_check.return_value = mock_plumber
+            df = parse_empregadores(_mock_pdf_data())
 
-    def test_count_matches_golden(self):
-        expected = json.loads(GOLDEN_DIR.joinpath("expected.json").read_text(encoding="utf-8"))
-        xlsx_data = _make_xlsx(_sample_df())
-        df = parse_empregadores(xlsx_data)
-
-        assert len(df) == expected["count"]
-
-    def test_empty_xlsx(self):
-        empty = pd.DataFrame(columns=["EMPREGADOR", "CPF/CNPJ", "UF"])
-        xlsx_data = _make_xlsx(empty)
-        df = parse_empregadores(xlsx_data)
         assert len(df) == 0
 
-    def test_types_datetime(self):
-        xlsx_data = _make_xlsx(_sample_df())
-        df = parse_empregadores(xlsx_data)
-        assert pd.api.types.is_datetime64_any_dtype(df["data_inclusao"])
-
     def test_types_numeric(self):
-        xlsx_data = _make_xlsx(_sample_df())
-        df = parse_empregadores(xlsx_data)
+        pdf = _make_mock_pdf(_HEADER, _ROWS)
+        with patch("agrobr.lista_suja.parser._check_pdfplumber") as mock_check:
+            mock_plumber = MagicMock()
+            mock_plumber.open.return_value = pdf
+            mock_check.return_value = mock_plumber
+            df = parse_empregadores(_mock_pdf_data())
+
         assert pd.api.types.is_numeric_dtype(df["trabalhadores_resgatados"])
 
     def test_uf_uppercase(self):
-        xlsx_data = _make_xlsx(_sample_df())
-        df = parse_empregadores(xlsx_data)
+        pdf = _make_mock_pdf(_HEADER, _ROWS)
+        with patch("agrobr.lista_suja.parser._check_pdfplumber") as mock_check:
+            mock_plumber = MagicMock()
+            mock_plumber.open.return_value = pdf
+            mock_check.return_value = mock_plumber
+            df = parse_empregadores(_mock_pdf_data())
+
         for val in df["uf"].dropna():
             if val:
                 assert val == val.upper()
 
     def test_no_columns_raises(self):
-        bad_df = pd.DataFrame({"foo": [1], "bar": [2]})
-        xlsx_data = _make_xlsx(bad_df)
-        with pytest.raises(ParseError):
-            parse_empregadores(xlsx_data)
+        bad_header = ["ID", "foo", "bar"]
+        bad_rows = [["1", "x", "y"]]
+        pdf = _make_mock_pdf(bad_header, bad_rows)
+
+        with patch("agrobr.lista_suja.parser._check_pdfplumber") as mock_check:
+            mock_plumber = MagicMock()
+            mock_plumber.open.return_value = pdf
+            mock_check.return_value = mock_plumber
+            with pytest.raises(ParseError):
+                parse_empregadores(_mock_pdf_data())
 
     def test_output_columns_subset_of_schema(self):
-        xlsx_data = _make_xlsx(_sample_df())
-        df = parse_empregadores(xlsx_data)
+        pdf = _make_mock_pdf(_HEADER, _ROWS)
+        with patch("agrobr.lista_suja.parser._check_pdfplumber") as mock_check:
+            mock_plumber = MagicMock()
+            mock_plumber.open.return_value = pdf
+            mock_check.return_value = mock_plumber
+            df = parse_empregadores(_mock_pdf_data())
+
         for col in df.columns:
             assert col in COLUNAS_SAIDA, f"Unexpected column: {col}"

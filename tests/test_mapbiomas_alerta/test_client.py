@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -14,10 +13,14 @@ class TestGetToken:
         assert _get_token("my-token") == "my-token"
 
     def test_from_env(self):
-        with patch.dict(os.environ, {"AGROBR_MAPBIOMAS_ALERTA_TOKEN": "env-token"}):
-            assert _get_token() == "env-token"
+        import os
+
+        with patch.dict(os.environ, {"AGROBR_MAPBIOMAS_ALERTA_TOKEN": "env-tok"}):
+            assert _get_token() == "env-tok"
 
     def test_missing_raises(self):
+        import os
+
         with patch.dict(os.environ, {}, clear=True):
             os.environ.pop("AGROBR_MAPBIOMAS_ALERTA_TOKEN", None)
             with pytest.raises(SourceUnavailableError):
@@ -29,7 +32,12 @@ class TestFetchAlertas:
     async def test_single_page(self):
         from agrobr.mapbiomas_alerta import client
 
-        page_data = {"alerts": [{"alertCode": "A1"}, {"alertCode": "A2"}]}
+        page_data = {
+            "alerts": {
+                "collection": [{"alertCode": 1}, {"alertCode": 2}],
+                "metadata": {"currentPage": 1, "totalCount": 2, "totalPages": 1},
+            }
+        }
         mock_resp = MagicMock()
         mock_resp.status_code = 200
         mock_resp.json.return_value = {"data": page_data}
@@ -43,7 +51,7 @@ class TestFetchAlertas:
             records, url = await client.fetch_alertas(token="tok", limit=100)
 
         assert len(records) == 2
-        assert records[0]["alertCode"] == "A1"
+        assert records[0]["alertCode"] == 1
 
     @pytest.mark.asyncio
     async def test_empty_response(self):
@@ -51,7 +59,14 @@ class TestFetchAlertas:
 
         mock_resp = MagicMock()
         mock_resp.status_code = 200
-        mock_resp.json.return_value = {"data": {"alerts": []}}
+        mock_resp.json.return_value = {
+            "data": {
+                "alerts": {
+                    "collection": [],
+                    "metadata": {"currentPage": 1, "totalCount": 0, "totalPages": 0},
+                }
+            }
+        }
         mock_resp.raise_for_status = MagicMock()
 
         with patch(
@@ -67,8 +82,18 @@ class TestFetchAlertas:
     async def test_multi_page(self):
         from agrobr.mapbiomas_alerta import client
 
-        page1_data = {"alerts": [{"alertCode": f"A{i}"} for i in range(100)]}
-        page2_data = {"alerts": [{"alertCode": "A100"}]}
+        page1_data = {
+            "alerts": {
+                "collection": [{"alertCode": i} for i in range(100)],
+                "metadata": {"currentPage": 1, "totalCount": 101, "totalPages": 2},
+            }
+        }
+        page2_data = {
+            "alerts": {
+                "collection": [{"alertCode": 100}],
+                "metadata": {"currentPage": 2, "totalCount": 101, "totalPages": 2},
+            }
+        }
 
         mock_resp1 = MagicMock()
         mock_resp1.status_code = 200
@@ -95,7 +120,7 @@ class TestFetchAlertas:
 
         mock_resp = MagicMock()
         mock_resp.status_code = 200
-        mock_resp.json.return_value = {"errors": [{"message": "Auth failed"}]}
+        mock_resp.json.return_value = {"errors": [{"message": "Something failed"}]}
         mock_resp.raise_for_status = MagicMock()
 
         with (
@@ -108,6 +133,31 @@ class TestFetchAlertas:
         ):
             await client.fetch_alertas(token="tok")
 
+    @pytest.mark.asyncio
+    async def test_bounding_box_passthrough(self):
+        from agrobr.mapbiomas_alerta import client
+
+        page_data = {
+            "alerts": {
+                "collection": [{"alertCode": 1}],
+                "metadata": {"currentPage": 1, "totalCount": 1, "totalPages": 1},
+            }
+        }
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {"data": page_data}
+        mock_resp.raise_for_status = MagicMock()
+
+        bbox_input = [{"swLat": -10.0, "swLng": -55.0, "neLat": -5.0, "neLng": -50.0}]
+        with patch(
+            "agrobr.mapbiomas_alerta.client.retry_on_status",
+            new_callable=AsyncMock,
+            return_value=mock_resp,
+        ):
+            records, url = await client.fetch_alertas(token="tok", bounding_box=bbox_input)
+
+        assert len(records) == 1
+
 
 class TestFetchAlertDateRange:
     @pytest.mark.asyncio
@@ -117,7 +167,14 @@ class TestFetchAlertDateRange:
         mock_resp = MagicMock()
         mock_resp.status_code = 200
         mock_resp.json.return_value = {
-            "data": {"alertDateRange": {"minDate": "2020-01-01", "maxDate": "2024-12-31"}}
+            "data": {
+                "alertDateRange": {
+                    "minDetectedAt": "2020-01-15",
+                    "maxDetectedAt": "2024-12-31",
+                    "minPublishedAt": "2020-02-01",
+                    "maxPublishedAt": "2024-12-31",
+                }
+            }
         }
         mock_resp.raise_for_status = MagicMock()
 
@@ -128,8 +185,8 @@ class TestFetchAlertDateRange:
         ):
             result, url = await client.fetch_alert_date_range()
 
-        assert result["minDate"] == "2020-01-01"
-        assert result["maxDate"] == "2024-12-31"
+        assert result["minDetectedAt"] == "2020-01-15"
+        assert result["maxDetectedAt"] == "2024-12-31"
 
 
 class TestFetchLastPublication:
@@ -140,7 +197,7 @@ class TestFetchLastPublication:
         mock_resp = MagicMock()
         mock_resp.status_code = 200
         mock_resp.json.return_value = {
-            "data": {"lastAlertPublication": {"date": "2024-06-24", "alertsCount": 1000}}
+            "data": {"lastAlertPublication": {"publishedAt": "2024-06-24T12:00:00Z", "total": 1000}}
         }
         mock_resp.raise_for_status = MagicMock()
 
@@ -151,5 +208,5 @@ class TestFetchLastPublication:
         ):
             result, url = await client.fetch_last_publication()
 
-        assert result["date"] == "2024-06-24"
-        assert result["alertsCount"] == 1000
+        assert result["publishedAt"] == "2024-06-24T12:00:00Z"
+        assert result["total"] == 1000
