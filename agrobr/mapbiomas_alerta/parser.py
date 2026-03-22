@@ -18,10 +18,11 @@ _REQUIRED_FIELDS = {"alertCode", "areaHa", "detectedAt"}
 
 
 def _flatten_sources(sources: Any) -> str:
-    if not sources or not isinstance(sources, list):
+    if not sources:
         return ""
-    names = [s.get("name", "") for s in sources if isinstance(s, dict)]
-    return ", ".join(n for n in names if n)
+    if isinstance(sources, list):
+        return ", ".join(str(s) for s in sources if s)
+    return str(sources)
 
 
 def _normalize_records(

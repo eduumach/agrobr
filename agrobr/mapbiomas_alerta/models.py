@@ -23,7 +23,7 @@ query alerts(
       detectedAt
       publishedAt
       statusName
-      sources { name }
+      sources
       coordenates { latitude longitude }
       geometryWkt
     }

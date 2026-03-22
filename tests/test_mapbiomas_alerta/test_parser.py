@@ -56,11 +56,11 @@ class TestParseAlertas:
         assert "lon" in df.columns
         assert df["lat"].notna().all()
 
-    def test_sources_flattened(self):
+    def test_sources_as_string(self):
         records = _load_records()
         df = parse_alertas(records)
         assert df["fonte"].iloc[0] == "DETER"
-        assert "SAD, DETER" in df["fonte"].values
+        assert "SAD" in df["fonte"].values
 
     def test_golden_data_columns(self):
         records = _load_records()
@@ -90,7 +90,7 @@ class TestParseAlertas:
                 "detectedAt": "2024-01-01",
                 "publishedAt": "2024-01-05",
                 "statusName": "Publicado",
-                "sources": [{"name": "DETER"}],
+                "sources": "DETER",
                 "coordenates": None,
             }
         ]
@@ -176,7 +176,7 @@ class TestParseAlertasGeo:
                 "detectedAt": "2024-01-01",
                 "publishedAt": "2024-01-05",
                 "statusName": "Publicado",
-                "sources": [{"name": "DETER"}],
+                "sources": "DETER",
                 "coordenates": {"latitude": -3.0, "longitude": -52.0},
                 "geometryWkt": None,
             }
@@ -195,7 +195,7 @@ class TestParseAlertasGeo:
                 "detectedAt": "2024-01-01",
                 "publishedAt": "2024-01-05",
                 "statusName": "Publicado",
-                "sources": [{"name": "DETER"}],
+                "sources": "DETER",
                 "coordenates": {"latitude": -3.0, "longitude": -52.0},
                 "geometryWkt": "NOT_A_WKT",
             }
