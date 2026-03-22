@@ -249,8 +249,12 @@ async def fetch_arcgis_count(
         return_count_only=True,
         f="json",
     )
-    content = await fetch_wfs(url, source=source, timeout=timeout)
-    data = json.loads(content)
+    async with httpx.AsyncClient(
+        timeout=timeout, headers=UserAgentRotator.get_bot_headers(), follow_redirects=True
+    ) as http:
+        response = await retry_on_status(lambda: http.get(url), source=source)
+        response.raise_for_status()
+        data = response.json()
     count: int = data.get("count", 0)
     logger.info(f"{source}_arcgis_count", count=count, url=url[:120])
     return count
