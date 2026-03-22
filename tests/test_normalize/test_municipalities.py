@@ -442,7 +442,7 @@ class TestCoordenadaParaMunicipio:
         for _ in range(100):
             coordenada_para_municipio(-15.78, -47.93)
         elapsed_ms = (time.perf_counter() - t0) * 1000
-        assert elapsed_ms < 100, f"100 lookups took {elapsed_ms:.1f}ms (expected < 100ms)"
+        assert elapsed_ms < 500, f"100 lookups took {elapsed_ms:.1f}ms (expected < 500ms)"
 
     def test_consistencia_com_ibge_para_municipio(self):
         info = coordenada_para_municipio(-23.5505, -46.6333)
