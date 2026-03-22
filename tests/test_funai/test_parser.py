@@ -190,7 +190,7 @@ class TestParseTerrasIndigenasGeojson:
         assert len(geojson["features"]) >= MAX_FEATURES_GEO
         big_data = json.dumps(geojson).encode()
 
-        with patch("agrobr.funai.parser.logger") as mock_logger:
+        with patch("agrobr.utils.geo.logger") as mock_logger:
             gdf = parse_terras_indigenas_geojson(big_data)
 
         assert len(gdf) >= MAX_FEATURES_GEO

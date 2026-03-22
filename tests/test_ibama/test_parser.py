@@ -184,7 +184,7 @@ class TestParseEmbargosGeojson:
         assert len(geojson["features"]) >= MAX_FEATURES_GEO
         big_data = json.dumps(geojson).encode()
 
-        with patch("agrobr.ibama.parser.logger") as mock_logger:
+        with patch("agrobr.utils.geo.logger") as mock_logger:
             parse_embargos_geojson(big_data)
 
         truncation_calls = [
@@ -225,14 +225,12 @@ class TestParseEmbargosGeojson:
             }
         ).encode()
 
-        with patch("agrobr.ibama.parser.logger") as mock_logger:
+        with patch("agrobr.utils.geo.logger") as mock_logger:
             gdf = parse_embargos_geojson(data)
 
         assert len(gdf) == 2
         null_calls = [
-            c
-            for c in mock_logger.warning.call_args_list
-            if c[0][0] == "ibama_embargos_null_geometry"
+            c for c in mock_logger.warning.call_args_list if c[0][0] == "ibama_null_geometry"
         ]
         assert len(null_calls) == 1
         assert null_calls[0][1]["null_count"] == 1

@@ -214,7 +214,7 @@ class TestParseUcsGeojson:
         assert len(geojson["features"]) >= MAX_FEATURES_GEO
         big_data = json.dumps(geojson).encode()
 
-        with patch("agrobr.icmbio.parser.logger") as mock_logger:
+        with patch("agrobr.utils.geo.logger") as mock_logger:
             gdf = parse_ucs_geojson(big_data)
 
         assert len(gdf) >= MAX_FEATURES_GEO

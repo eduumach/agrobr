@@ -15,7 +15,11 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **incra** — territorios quilombolas via WFS (cmr.funai.gov.br). `quilombolas()` tabular + `quilombolas_geo()` GeoDataFrame. Filtros uf/fase/bbox. ~426 territorios. Dados publicos
 
 ### Improved
-- **utils/geo** — `check_geopandas()` extraido de desmatamento/sicar para `utils/geo.py` (dedup 2 copias). `validate_bbox()` canonica com checagem min<max (3 implementacoes inconsistentes consolidadas). `fetch_wfs()` agora aceita `base_delay` para throttle de paginacao
+- **utils/geo** — `check_geopandas()` extraido de desmatamento/sicar para `utils/geo.py` (dedup 2 copias). `validate_bbox()` canonica com checagem min<max (3 implementacoes inconsistentes consolidadas). `fetch_wfs()` agora aceita `base_delay` para throttle de paginacao e `client` opcional para connection reuse em paginacao
+- **utils/geo** — dedup WFS: `build_wfs_url()` centraliza construcao de URL WFS com dispatch automatico v1/v2 (typeNames/count vs typeName/maxFeatures), elimina 4 copias em funai/icmbio/incra/ibama. `parse_wfs_hits()` centraliza parsing de `numberMatched` (2 copias ibama+sicar). `parse_geojson_base()` centraliza boilerplate GeoJSON (json.loads, empty check, truncation warning, null geom, from_features, required cols) — 5 parsers migrados
+- **utils/validation** — `validate_uf()` com `UFS_VALIDAS` (27 UFs reais) substitui 10 copias de `_UF_RE` regex em 6 modulos WFS. Validacao mais rigorosa (rejeita "XX", "ZZ" que regex aceitava). Desmatamento ganha validacao de UF (antes aceitava qualquer string)
+- **utils/io** — `concat_csv_pages()` centraliza loop de concat paginado CSV (2 copias ibama+sicar eliminadas)
+- **ibama/sicar** — paginacao WFS agora reutiliza conexao HTTP (1 TLS handshake em vez de N). SICAR `_fetch_url` eliminado, migrado para `fetch_wfs()` compartilhado
 
 ## [1.0.2] - 2026-03-20
 

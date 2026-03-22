@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-import json
 from typing import Any
 
 import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
-from agrobr.utils.geo import check_geopandas
+from agrobr.utils.geo import check_geopandas, parse_geojson_base
 from agrobr.utils.io import read_csv_safe
 
 from .models import (
@@ -53,47 +52,23 @@ def parse_ucs_csv(data: bytes) -> pd.DataFrame:
 
 def parse_ucs_geojson(data: bytes) -> Any:
     gpd = check_geopandas()
-
-    try:
-        geojson = json.loads(data)
-    except (json.JSONDecodeError, UnicodeDecodeError) as e:
-        raise ParseError(
-            source="icmbio",
-            parser_version=PARSER_VERSION,
-            reason=f"Erro ao ler GeoJSON ICMBio: {e}",
-        ) from e
-
-    features = geojson.get("features", [])
-    if not features:
-        empty = gpd.GeoDataFrame(columns=COLUNAS_SAIDA_GEO)
-        empty = empty.set_geometry("geometry")
-        return empty
-
-    if len(features) >= MAX_FEATURES_GEO:
-        logger.warning(
-            "icmbio_ucs_geo_truncated",
-            features=len(features),
-            max_features=MAX_FEATURES_GEO,
-        )
-
-    gdf = gpd.GeoDataFrame.from_features(features, crs="EPSG:4326")
-
-    missing = _REQUIRED_COLS_RAW - set(gdf.columns)
-    if missing:
-        raise ParseError(
-            source="icmbio",
-            parser_version=PARSER_VERSION,
-            reason=f"Colunas obrigatorias ausentes: {missing}",
-        )
+    gdf = parse_geojson_base(
+        data,
+        gpd,
+        source="icmbio",
+        parser_version=PARSER_VERSION,
+        required_cols=_REQUIRED_COLS_RAW,
+        max_features=MAX_FEATURES_GEO,
+        output_cols_empty=COLUNAS_SAIDA_GEO,
+        truncation_event="icmbio_ucs_geo_truncated",
+    )
+    if gdf.empty:
+        return gdf
 
     gdf = gdf.rename(columns=RENAME_MAP)
-
     gdf["area_ha"] = pd.to_numeric(gdf["area_ha"], errors="coerce")
     gdf["ano_criacao"] = pd.to_numeric(gdf["ano_criacao"], errors="coerce").astype("Int64")
     gdf["grupo"] = gdf["grupo"].str.upper()
 
     output_cols = [c for c in COLUNAS_SAIDA_GEO if c in gdf.columns]
-    gdf = gdf[output_cols].reset_index(drop=True)
-
-    logger.info("icmbio_ucs_geojson_parse_ok", records=len(gdf))
-    return gdf
+    return gdf[output_cols].reset_index(drop=True)

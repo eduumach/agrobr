@@ -110,3 +110,27 @@ def read_csv_safe(
             parser_version=parser_version,
             reason=f"Erro ao ler {label}: {e}",
         ) from e
+
+
+def concat_csv_pages(
+    pages: list[bytes],
+    *,
+    source: str,
+    parser_version: int,
+    empty_columns: list[str],
+) -> pd.DataFrame:
+    if not pages:
+        return pd.DataFrame(columns=empty_columns)
+
+    dfs: list[pd.DataFrame] = []
+    for i, data in enumerate(pages):
+        df = read_csv_safe(
+            data, source=source, parser_version=parser_version, label=f"CSV pagina {i}"
+        )
+        if not df.empty:
+            dfs.append(df)
+
+    if not dfs:
+        return pd.DataFrame(columns=empty_columns)
+
+    return pd.concat(dfs, ignore_index=True)

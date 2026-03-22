@@ -1,14 +1,13 @@
 from __future__ import annotations
 
-import json
 from typing import Any
 
 import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
-from agrobr.utils.geo import check_geopandas
-from agrobr.utils.io import read_csv_safe
+from agrobr.utils.geo import check_geopandas, parse_geojson_base
+from agrobr.utils.io import concat_csv_pages
 
 from .models import COLUNAS_IMOVEIS, COLUNAS_IMOVEIS_GEO, MAX_FEATURES_GEO, RENAME_MAP
 
@@ -45,25 +44,20 @@ def _normalize_columns(df: pd.DataFrame, output_cols: list[str]) -> pd.DataFrame
     return df[cols].copy().reset_index(drop=True)
 
 
+_REQUIRED_COLS_RAW = {"cod_imovel", "status_imovel", "dat_criacao", "area", "uf"}
+
+
 def parse_imoveis_csv(pages: list[bytes]) -> pd.DataFrame:
-    if not pages:
-        return pd.DataFrame(columns=COLUNAS_IMOVEIS)
+    df = concat_csv_pages(
+        pages,
+        source="sicar",
+        parser_version=PARSER_VERSION,
+        empty_columns=COLUNAS_IMOVEIS,
+    )
+    if df.empty:
+        return df
 
-    dfs: list[pd.DataFrame] = []
-    for i, data in enumerate(pages):
-        df = read_csv_safe(
-            data, source="sicar", parser_version=PARSER_VERSION, label=f"CSV pagina {i}"
-        )
-        if not df.empty:
-            dfs.append(df)
-
-    if not dfs:
-        return pd.DataFrame(columns=COLUNAS_IMOVEIS)
-
-    df = pd.concat(dfs, ignore_index=True)
-
-    required = {"cod_imovel", "status_imovel", "dat_criacao", "area", "uf"}
-    missing = required - set(df.columns)
+    missing = _REQUIRED_COLS_RAW - set(df.columns)
     if missing:
         raise ParseError(
             source="sicar",
@@ -78,37 +72,18 @@ def parse_imoveis_csv(pages: list[bytes]) -> pd.DataFrame:
 
 def parse_imoveis_geojson(data: bytes) -> Any:
     gpd = check_geopandas()
-
-    try:
-        geojson = json.loads(data)
-    except (json.JSONDecodeError, UnicodeDecodeError) as e:
-        raise ParseError(
-            source="sicar",
-            parser_version=PARSER_VERSION,
-            reason=f"Erro ao ler GeoJSON SICAR: {e}",
-        ) from e
-
-    features = geojson.get("features", [])
-    if not features:
-        return gpd.GeoDataFrame(columns=COLUNAS_IMOVEIS_GEO)
-
-    if len(features) >= MAX_FEATURES_GEO:
-        logger.warning(
-            "sicar_geo_truncated",
-            features=len(features),
-            max_features=MAX_FEATURES_GEO,
-        )
-
-    gdf = gpd.GeoDataFrame.from_features(features, crs="EPSG:4326")
-
-    required = {"cod_imovel", "status_imovel", "dat_criacao", "area", "uf"}
-    missing = required - set(gdf.columns)
-    if missing:
-        raise ParseError(
-            source="sicar",
-            parser_version=PARSER_VERSION,
-            reason=f"Colunas obrigatorias ausentes: {missing}",
-        )
+    gdf = parse_geojson_base(
+        data,
+        gpd,
+        source="sicar",
+        parser_version=PARSER_VERSION,
+        required_cols=_REQUIRED_COLS_RAW,
+        max_features=MAX_FEATURES_GEO,
+        output_cols_empty=COLUNAS_IMOVEIS_GEO,
+        truncation_event="sicar_geo_truncated",
+    )
+    if gdf.empty:
+        return gdf
 
     gdf = _normalize_columns(gdf, COLUNAS_IMOVEIS_GEO)
     logger.info("sicar_geojson_parse_ok", records=len(gdf))

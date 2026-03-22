@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 import time
 from typing import TYPE_CHECKING, Any, Literal, overload
 
@@ -10,6 +9,7 @@ import structlog
 from agrobr.models import MetaInfo
 from agrobr.utils.geo import validate_bbox
 from agrobr.utils.result import build_source_meta, finalize_result
+from agrobr.utils.validation import validate_uf
 
 from . import client, parser
 from .models import GRUPOS_VALIDOS
@@ -18,17 +18,6 @@ if TYPE_CHECKING:
     import geopandas as gpd
 
 logger = structlog.get_logger()
-
-_UF_RE = re.compile(r"^[A-Z]{2}$")
-
-
-def _validate_uf(uf: str | None) -> str | None:
-    if uf is None:
-        return None
-    uf_upper = uf.strip().upper()
-    if not _UF_RE.match(uf_upper):
-        raise ValueError(f"UF invalida: {uf!r}")
-    return uf_upper
 
 
 def _validate_grupo(grupo: str | None) -> str | None:
@@ -74,7 +63,7 @@ async def ucs(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    uf = _validate_uf(uf)
+    uf = validate_uf(uf)
     grupo = _validate_grupo(grupo)
     validate_bbox(bbox)
     logger.info("icmbio_ucs", uf=uf, grupo=grupo, bioma=bioma, bbox=bbox)
@@ -132,7 +121,7 @@ async def ucs_geo(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> Any:
-    uf = _validate_uf(uf)
+    uf = validate_uf(uf)
     grupo = _validate_grupo(grupo)
     validate_bbox(bbox)
     logger.info("icmbio_ucs_geo", uf=uf, grupo=grupo, bioma=bioma, bbox=bbox)

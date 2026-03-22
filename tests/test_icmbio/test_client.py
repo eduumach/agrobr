@@ -6,60 +6,7 @@ from urllib.parse import unquote
 import pytest
 
 from agrobr.exceptions import SourceUnavailableError
-from agrobr.icmbio.client import _build_wfs_url, fetch_ucs, fetch_ucs_geo
-
-
-class TestBuildWfsUrl:
-    def test_url_contains_namespace_and_layer(self):
-        url = _build_wfs_url(["cnuc", "nomeuc"])
-        assert "ICMBio" in url
-        assert "limiteucsfederais_a" in url
-
-    def test_wfs_version_1_1_0(self):
-        url = _build_wfs_url(["cnuc"])
-        assert "version=1.1.0" in url
-
-    def test_typename_singular(self):
-        url = _build_wfs_url(["cnuc"])
-        assert "typeName=" in url
-        assert "typeNames=" not in url
-
-    def test_max_features_not_count(self):
-        url = _build_wfs_url(["cnuc"], max_features=100)
-        assert "maxFeatures=100" in url
-        assert "count=" not in url
-
-    def test_output_format_csv(self):
-        url = _build_wfs_url(["cnuc"], output_format="csv")
-        assert "outputFormat=csv" in url
-
-    def test_output_format_json(self):
-        url = _build_wfs_url(["cnuc"], output_format="application/json")
-        assert "outputFormat=application" in url
-
-    def test_bbox_in_url(self):
-        url = _build_wfs_url(["cnuc"], bbox=(-60.0, -20.0, -50.0, -10.0))
-        assert "BBOX=-60.0,-20.0,-50.0,-10.0,EPSG:4674" in url
-
-    def test_bbox_none_no_bbox(self):
-        url = _build_wfs_url(["cnuc"])
-        assert "BBOX" not in url
-
-    def test_cql_filter_uf_like(self):
-        url = _build_wfs_url(["cnuc"], cql_filter="ufabrang LIKE '%MT%'")
-        decoded = unquote(url)
-        assert "ufabrang LIKE '%MT%'" in decoded
-
-    def test_cql_filter_grupo(self):
-        url = _build_wfs_url(["cnuc"], cql_filter="grupouc='PI'")
-        decoded = unquote(url)
-        assert "grupouc='PI'" in decoded
-
-    def test_geom_column_in_property_name(self):
-        from agrobr.icmbio.models import PROPERTY_NAMES_GEO
-
-        url = _build_wfs_url(PROPERTY_NAMES_GEO)
-        assert "propertyName=the_geom," in url
+from agrobr.icmbio.client import fetch_ucs, fetch_ucs_geo
 
 
 class TestFetchUcs:

@@ -212,7 +212,7 @@ class TestParseQuilombolasGeojson:
         assert len(geojson["features"]) >= MAX_FEATURES_GEO
         big_data = json.dumps(geojson).encode()
 
-        with patch("agrobr.incra.parser.logger") as mock_logger:
+        with patch("agrobr.utils.geo.logger") as mock_logger:
             gdf = parse_quilombolas_geojson(big_data)
 
         assert len(gdf) >= MAX_FEATURES_GEO

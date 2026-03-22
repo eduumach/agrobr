@@ -6,44 +6,7 @@ from urllib.parse import unquote
 import pytest
 
 from agrobr.exceptions import SourceUnavailableError
-from agrobr.incra.client import _build_cql, _build_wfs_url
-from agrobr.incra.models import NAMESPACE, PROPERTY_NAMES, PROPERTY_NAMES_GEO
-
-
-class TestBuildWfsUrl:
-    def test_url_contains_namespace(self):
-        url = _build_wfs_url(PROPERTY_NAMES)
-        assert f"typeName={NAMESPACE}:" in url
-
-    def test_uses_typeName_singular(self):
-        url = _build_wfs_url(PROPERTY_NAMES)
-        assert "typeName=" in url
-        assert "typeNames=" not in url
-
-    def test_uses_maxFeatures(self):
-        url = _build_wfs_url(PROPERTY_NAMES, max_features=100)
-        assert "maxFeatures=100" in url
-        assert "count=" not in url
-
-    def test_output_format_csv(self):
-        url = _build_wfs_url(PROPERTY_NAMES, output_format="csv")
-        assert "outputFormat=csv" in url
-
-    def test_output_format_json(self):
-        url = _build_wfs_url(PROPERTY_NAMES, output_format="application/json")
-        assert "outputFormat=application/json" in url
-
-    def test_bbox_in_url(self):
-        url = _build_wfs_url(PROPERTY_NAMES, bbox=(-50.0, -15.0, -45.0, -10.0))
-        assert "BBOX=-50.0,-15.0,-45.0,-10.0,EPSG:4674" in url
-
-    def test_bbox_none_no_bbox(self):
-        url = _build_wfs_url(PROPERTY_NAMES, bbox=None)
-        assert "BBOX" not in url
-
-    def test_geom_column_in_geo_property_names(self):
-        url = _build_wfs_url(PROPERTY_NAMES_GEO)
-        assert "propertyName=the_geom," in url
+from agrobr.incra.client import _build_cql
 
 
 class TestBuildCql:
@@ -67,10 +30,6 @@ class TestBuildCql:
     def test_no_filters(self):
         cql = _build_cql()
         assert cql is None
-
-    def test_invalid_uf_raises(self):
-        with pytest.raises(ValueError, match="UF invalida"):
-            _build_cql(uf="INVALID")
 
 
 class TestFetchQuilombolas:

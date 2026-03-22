@@ -42,3 +42,41 @@ class TestReadCsvSafe:
         with pytest.raises(ParseError) as exc_info:
             read_csv_safe(b"", source="test", parser_version=3)
         assert exc_info.value.parser_version == 3
+
+
+class TestConcatCsvPages:
+    def test_empty_pages(self):
+        from agrobr.utils.io import concat_csv_pages
+
+        df = concat_csv_pages([], source="test", parser_version=1, empty_columns=["a", "b"])
+        assert len(df) == 0
+        assert list(df.columns) == ["a", "b"]
+
+    def test_single_page(self):
+        from agrobr.utils.io import concat_csv_pages
+
+        data = b"col1,col2\n1,2\n3,4"
+        df = concat_csv_pages(
+            [data], source="test", parser_version=1, empty_columns=["col1", "col2"]
+        )
+        assert len(df) == 2
+
+    def test_multi_page(self):
+        from agrobr.utils.io import concat_csv_pages
+
+        page1 = b"col1,col2\n1,2"
+        page2 = b"col1,col2\n3,4"
+        df = concat_csv_pages(
+            [page1, page2], source="test", parser_version=1, empty_columns=["col1", "col2"]
+        )
+        assert len(df) == 2
+
+    def test_page_with_empty_skipped(self):
+        from agrobr.utils.io import concat_csv_pages
+
+        page1 = b"col1,col2\n1,2"
+        empty_page = b"col1,col2\n"
+        df = concat_csv_pages(
+            [page1, empty_page], source="test", parser_version=1, empty_columns=["col1", "col2"]
+        )
+        assert len(df) == 1

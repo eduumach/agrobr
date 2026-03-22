@@ -312,9 +312,7 @@ class TestParseImoveisGeojson:
         geojson["features"] = geojson["features"][:MAX_FEATURES_GEO]
         data = json.dumps(geojson).encode()
 
-        from agrobr.alt.sicar import parser as _parser
-
-        with patch.object(_parser.logger, "warning") as mock_warn:
+        with patch("agrobr.utils.geo.logger") as mock_logger:
             parse(data)
-            mock_warn.assert_called_once()
-            assert mock_warn.call_args[0][0] == "sicar_geo_truncated"
+            mock_logger.warning.assert_called_once()
+            assert mock_logger.warning.call_args[0][0] == "sicar_geo_truncated"

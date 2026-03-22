@@ -3,6 +3,17 @@ from __future__ import annotations
 from datetime import datetime
 
 
+def validate_uf(uf: str | None) -> str | None:
+    if uf is None:
+        return None
+    uf_upper = uf.strip().upper()
+    from agrobr.normalize.regions import UFS_VALIDAS
+
+    if uf_upper not in UFS_VALIDAS:
+        raise ValueError(f"UF invalida: {uf!r}")
+    return uf_upper
+
+
 def validate_year_uf(
     *,
     uf: str | None = None,

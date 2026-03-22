@@ -93,17 +93,9 @@ class TestProdes:
         assert (df["uf"] == "PA").all()
 
     @pytest.mark.asyncio
-    async def test_empty_filter(self):
-        csv_bytes = _prodes_csv_bytes()
-        with patch.object(
-            api.client,
-            "fetch_prodes",
-            new_callable=AsyncMock,
-            return_value=(csv_bytes, "https://terrabrasilis.dpi.inpe.br/geoserver/prodes.csv"),
-        ):
-            df = await api.prodes(bioma="Cerrado", uf="XX")
-
-        assert len(df) == 0
+    async def test_invalid_uf_raises(self):
+        with pytest.raises(ValueError, match="UF invalida"):
+            await api.prodes(bioma="Cerrado", uf="XX")
 
     @pytest.mark.asyncio
     async def test_bioma_normalization(self):
@@ -287,21 +279,9 @@ class TestProdesGeo:
         assert (gdf["uf"] == "PA").all()
 
     @pytest.mark.asyncio
-    async def test_filter_uf_empty(self):
-        geojson_bytes = _prodes_geojson_bytes()
-        with patch.object(
-            api.client,
-            "fetch_prodes_geo",
-            new_callable=AsyncMock,
-            return_value=(
-                geojson_bytes,
-                "https://terrabrasilis.dpi.inpe.br/geoserver/prodes.geojson",
-            ),
-        ):
-            gdf = await api.prodes_geo(bioma="Cerrado", uf="XX")
-
-        assert len(gdf) == 0
-        assert isinstance(gdf, gpd.GeoDataFrame)
+    async def test_invalid_uf_raises(self):
+        with pytest.raises(ValueError, match="UF invalida"):
+            await api.prodes_geo(bioma="Cerrado", uf="XX")
 
     @pytest.mark.asyncio
     async def test_geometry_preserved_after_filter(self):

@@ -4,6 +4,155 @@ from unittest.mock import patch
 
 import pytest
 
+from agrobr.exceptions import ParseError
+from agrobr.utils.geo import parse_wfs_hits
+
+
+class TestParseWfsHits:
+    def test_quoted(self):
+        content = b'<wfs:FeatureCollection numberMatched="42" numberReturned="0"/>'
+        assert parse_wfs_hits(content, source="test") == 42
+
+    def test_unquoted(self):
+        content = b"<wfs:FeatureCollection numberMatched=100 numberReturned=0/>"
+        assert parse_wfs_hits(content, source="test") == 100
+
+    def test_missing_raises(self):
+        content = b"<wfs:FeatureCollection/>"
+        with pytest.raises(ParseError, match="numberMatched"):
+            parse_wfs_hits(content, source="test")
+
+
+class TestBuildWfsUrl:
+    def test_v2_uses_type_names_and_count(self):
+        from agrobr.utils.geo import build_wfs_url
+
+        url = build_wfs_url("http://base", "ns", "layer", "2.0.0", ["col1"], max_features=100)
+        assert "typeNames=ns:layer" in url
+        assert "count=100" in url
+        assert "typeName=" not in url.split("typeNames")[0]
+        assert "maxFeatures=" not in url
+
+    def test_v1_uses_type_name_and_max_features(self):
+        from agrobr.utils.geo import build_wfs_url
+
+        url = build_wfs_url("http://base", "ns", "layer", "1.0.0", ["col1"], max_features=100)
+        assert "typeName=ns:layer" in url
+        assert "maxFeatures=100" in url
+        assert "typeNames=" not in url
+        assert "count=" not in url
+
+    def test_v1_1_uses_type_name(self):
+        from agrobr.utils.geo import build_wfs_url
+
+        url = build_wfs_url("http://base", "ns", "layer", "1.1.0", ["col1"], max_features=50)
+        assert "typeName=ns:layer" in url
+        assert "maxFeatures=50" in url
+
+    def test_output_format_csv(self):
+        from agrobr.utils.geo import build_wfs_url
+
+        url = build_wfs_url("http://base", "ns", "layer", "2.0.0", ["c1"], max_features=10)
+        assert "outputFormat=csv" in url
+
+    def test_output_format_json_quoted(self):
+        from agrobr.utils.geo import build_wfs_url
+
+        url = build_wfs_url(
+            "http://base",
+            "ns",
+            "layer",
+            "2.0.0",
+            ["c1"],
+            max_features=10,
+            output_format="application/json",
+        )
+        assert "outputFormat=application" in url
+
+    def test_bbox(self):
+        from agrobr.utils.geo import build_wfs_url
+
+        url = build_wfs_url(
+            "http://base",
+            "ns",
+            "layer",
+            "2.0.0",
+            ["c1"],
+            max_features=10,
+            bbox=(-60.0, -15.0, -50.0, -10.0),
+        )
+        assert "BBOX=-60.0,-15.0,-50.0,-10.0,EPSG:4674" in url
+
+    def test_bbox_none(self):
+        from agrobr.utils.geo import build_wfs_url
+
+        url = build_wfs_url("http://base", "ns", "layer", "2.0.0", ["c1"], max_features=10)
+        assert "BBOX" not in url
+
+    def test_cql_filter(self):
+        from urllib.parse import unquote
+
+        from agrobr.utils.geo import build_wfs_url
+
+        url = build_wfs_url(
+            "http://base",
+            "ns",
+            "layer",
+            "2.0.0",
+            ["c1"],
+            max_features=10,
+            cql_filter="uf='MT'",
+        )
+        assert "CQL_FILTER=" in url
+        assert "uf='MT'" in unquote(url)
+
+    def test_start_index(self):
+        from agrobr.utils.geo import build_wfs_url
+
+        url = build_wfs_url(
+            "http://base",
+            "ns",
+            "layer",
+            "2.0.0",
+            ["c1"],
+            max_features=10,
+            start_index=5000,
+        )
+        assert "startIndex=5000" in url
+
+    def test_start_index_none_not_in_url(self):
+        from agrobr.utils.geo import build_wfs_url
+
+        url = build_wfs_url("http://base", "ns", "layer", "2.0.0", ["c1"], max_features=10)
+        assert "startIndex" not in url
+
+    def test_result_type(self):
+        from agrobr.utils.geo import build_wfs_url
+
+        url = build_wfs_url(
+            "http://base",
+            "ns",
+            "layer",
+            "2.0.0",
+            ["c1"],
+            max_features=10,
+            result_type="hits",
+        )
+        assert "resultType=hits" in url
+
+    def test_property_names_joined(self):
+        from agrobr.utils.geo import build_wfs_url
+
+        url = build_wfs_url(
+            "http://base",
+            "ns",
+            "layer",
+            "2.0.0",
+            ["col1", "col2", "col3"],
+            max_features=10,
+        )
+        assert "propertyName=col1,col2,col3" in url
+
 
 class TestCheckGeopandas:
     def test_returns_module(self):
@@ -21,3 +170,102 @@ class TestCheckGeopandas:
             pytest.raises(ImportError, match="agrobr\\[geo\\]"),
         ):
             geo.check_geopandas()
+
+
+gpd = pytest.importorskip("geopandas")
+
+
+class TestParseGeojsonBase:
+    def _make_geojson(self, features: list[dict]) -> bytes:
+        import json
+
+        return json.dumps({"type": "FeatureCollection", "features": features}).encode()
+
+    def _feature(self, **props: object) -> dict:
+        return {
+            "type": "Feature",
+            "geometry": {"type": "Point", "coordinates": [0, 0]},
+            "properties": props,
+        }
+
+    def test_normal(self):
+        from agrobr.utils.geo import parse_geojson_base
+
+        data = self._make_geojson([self._feature(col1="a", col2="b")])
+        gdf = parse_geojson_base(
+            data,
+            gpd,
+            source="test",
+            parser_version=1,
+            required_cols={"col1"},
+            max_features=100,
+            output_cols_empty=["col1", "geometry"],
+            truncation_event="test_truncated",
+        )
+        assert len(gdf) == 1
+        assert "col1" in gdf.columns
+
+    def test_empty_returns_gdf(self):
+        from agrobr.utils.geo import parse_geojson_base
+
+        data = self._make_geojson([])
+        gdf = parse_geojson_base(
+            data,
+            gpd,
+            source="test",
+            parser_version=1,
+            required_cols=set(),
+            max_features=100,
+            output_cols_empty=["col1", "geometry"],
+            truncation_event="test_truncated",
+        )
+        assert len(gdf) == 0
+        assert isinstance(gdf, gpd.GeoDataFrame)
+
+    def test_empty_raises(self):
+        from agrobr.utils.geo import parse_geojson_base
+
+        data = self._make_geojson([])
+        with pytest.raises(ParseError, match="sem features"):
+            parse_geojson_base(
+                data,
+                gpd,
+                source="test",
+                parser_version=1,
+                required_cols=set(),
+                max_features=100,
+                output_cols_empty=["col1", "geometry"],
+                truncation_event="test_truncated",
+                on_empty="raise",
+            )
+
+    def test_missing_required_cols(self):
+        from agrobr.utils.geo import parse_geojson_base
+
+        data = self._make_geojson([self._feature(col1="a")])
+        with pytest.raises(ParseError, match="Colunas obrigatorias"):
+            parse_geojson_base(
+                data,
+                gpd,
+                source="test",
+                parser_version=1,
+                required_cols={"missing_col"},
+                max_features=100,
+                output_cols_empty=["col1", "geometry"],
+                truncation_event="test_truncated",
+            )
+
+    def test_invalid_json(self):
+        from agrobr.utils.geo import parse_geojson_base
+
+        with pytest.raises(ParseError, match="GeoJSON"):
+            parse_geojson_base(
+                b"not json",
+                gpd,
+                source="test",
+                parser_version=1,
+                required_cols=set(),
+                max_features=100,
+                output_cols_empty=["col1", "geometry"],
+                truncation_event="test_truncated",
+            )

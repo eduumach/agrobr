@@ -2,7 +2,29 @@ from __future__ import annotations
 
 import pytest
 
-from agrobr.utils.validation import validate_year_uf
+from agrobr.utils.validation import validate_uf, validate_year_uf
+
+
+class TestValidateUf:
+    def test_valid_uf(self):
+        assert validate_uf("SP") == "SP"
+
+    def test_valid_uf_lowercase(self):
+        assert validate_uf("sp") == "SP"
+
+    def test_valid_uf_with_whitespace(self):
+        assert validate_uf("  SP  ") == "SP"
+
+    def test_invalid_uf(self):
+        with pytest.raises(ValueError, match="UF invalida"):
+            validate_uf("XX")
+
+    def test_uf_none_returns_none(self):
+        assert validate_uf(None) is None
+
+    def test_invalid_long_string(self):
+        with pytest.raises(ValueError, match="UF invalida"):
+            validate_uf("INVALID")
 
 
 class TestValidateYearUf:

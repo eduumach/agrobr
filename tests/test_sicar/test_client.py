@@ -64,14 +64,14 @@ class TestFetchHits:
         xml_response = (
             b'<?xml version="1.0"?><wfs:FeatureCollection numberMatched="42" numberReturned="0"/>'
         )
-        with patch.object(client, "_fetch_url", new_callable=AsyncMock, return_value=xml_response):
+        with patch.object(client, "fetch_wfs", new_callable=AsyncMock, return_value=xml_response):
             result = await fetch_hits("DF")
         assert result == 42
 
     @pytest.mark.asyncio
     async def test_parses_number_matched_no_quotes(self):
         xml_response = b"<wfs:FeatureCollection numberMatched=100 numberReturned=0/>"
-        with patch.object(client, "_fetch_url", new_callable=AsyncMock, return_value=xml_response):
+        with patch.object(client, "fetch_wfs", new_callable=AsyncMock, return_value=xml_response):
             result = await fetch_hits("MT")
         assert result == 100
 
@@ -79,7 +79,7 @@ class TestFetchHits:
     async def test_raises_on_missing_number_matched(self):
         xml_response = b"<wfs:FeatureCollection/>"
         with (
-            patch.object(client, "_fetch_url", new_callable=AsyncMock, return_value=xml_response),
+            patch.object(client, "fetch_wfs", new_callable=AsyncMock, return_value=xml_response),
             pytest.raises(ParseError, match="numberMatched"),
         ):
             await fetch_hits("SP")
@@ -88,7 +88,7 @@ class TestFetchHits:
     async def test_with_cql_filter(self):
         xml_response = b'<wfs:FeatureCollection numberMatched="15"/>'
         mock_fetch = AsyncMock(return_value=xml_response)
-        with patch.object(client, "_fetch_url", mock_fetch):
+        with patch.object(client, "fetch_wfs", mock_fetch):
             result = await fetch_hits("BA", "status_imovel='AT'")
         assert result == 15
         call_url = mock_fetch.call_args[0][0]
@@ -99,7 +99,7 @@ class TestFetchImoveis:
     @pytest.mark.asyncio
     async def test_empty_results(self):
         xml_hits = b'<wfs:FeatureCollection numberMatched="0"/>'
-        with patch.object(client, "_fetch_url", new_callable=AsyncMock, return_value=xml_hits):
+        with patch.object(client, "fetch_wfs", new_callable=AsyncMock, return_value=xml_hits):
             pages, url = await fetch_imoveis("DF")
         assert pages == []
         assert "sicar" in url
@@ -111,14 +111,14 @@ class TestFetchImoveis:
 
         call_count = 0
 
-        async def mock_fetch(url, *, base_delay=None):  # noqa: ARG001
+        async def mock_fetch(url, **_kwargs):
             nonlocal call_count
             call_count += 1
             if "resultType=hits" in url:
                 return xml_hits
             return csv_data
 
-        with patch.object(client, "_fetch_url", side_effect=mock_fetch):
+        with patch.object(client, "fetch_wfs", side_effect=mock_fetch):
             pages, url = await fetch_imoveis("DF")
 
         assert len(pages) == 1
@@ -132,14 +132,14 @@ class TestFetchImoveis:
 
         page_idx = 0
 
-        async def mock_fetch(url, *, base_delay=None):  # noqa: ARG001
+        async def mock_fetch(url, **_kwargs):
             nonlocal page_idx
             if "resultType=hits" in url:
                 return xml_hits
             page_idx += 1
             return csv_page1 if page_idx == 1 else csv_page2
 
-        with patch.object(client, "_fetch_url", side_effect=mock_fetch):
+        with patch.object(client, "fetch_wfs", side_effect=mock_fetch):
             pages, url = await fetch_imoveis("MT")
 
         assert len(pages) == 2
@@ -150,13 +150,13 @@ class TestFetchImoveis:
         csv_data = b"cod_imovel,status_imovel\nFOO,AT\n"
         delays: list[float | None] = []
 
-        async def mock_fetch(url, *, base_delay=None):
+        async def mock_fetch(url, **kwargs):
             if "resultType=hits" in url:
                 return xml_hits
-            delays.append(base_delay)
+            delays.append(kwargs.get("base_delay"))
             return csv_data
 
-        with patch.object(client, "_fetch_url", side_effect=mock_fetch):
+        with patch.object(client, "fetch_wfs", side_effect=mock_fetch):
             pages, url = await fetch_imoveis("BA")
 
         assert len(pages) == 7
@@ -172,13 +172,13 @@ class TestFetchImoveis:
         csv_data = b"cod_imovel,status_imovel\nFOO,AT\n"
         fetched_urls: list[str] = []
 
-        async def mock_fetch(url, *, base_delay=None):  # noqa: ARG001
+        async def mock_fetch(url, **_kwargs):
             fetched_urls.append(url)
             if "resultType=hits" in url:
                 return xml_hits
             return csv_data
 
-        with patch.object(client, "_fetch_url", side_effect=mock_fetch):
+        with patch.object(client, "fetch_wfs", side_effect=mock_fetch):
             await fetch_imoveis("GO", "status_imovel='AT'")
 
         # Both hits and data request should have the filter
@@ -190,7 +190,7 @@ class TestFetchImoveisGeo:
     @pytest.mark.asyncio
     async def test_successful_fetch(self):
         geojson = b'{"type":"FeatureCollection","features":[]}'
-        with patch.object(client, "_fetch_url", new_callable=AsyncMock, return_value=geojson):
+        with patch.object(client, "fetch_wfs", new_callable=AsyncMock, return_value=geojson):
             content, url = await fetch_imoveis_geo("DF")
         assert content == geojson
         assert "sicar" in url
@@ -199,7 +199,7 @@ class TestFetchImoveisGeo:
     async def test_url_output_format_json(self):
         geojson = b'{"type":"FeatureCollection","features":[]}'
         mock_fetch = AsyncMock(return_value=geojson)
-        with patch.object(client, "_fetch_url", mock_fetch):
+        with patch.object(client, "fetch_wfs", mock_fetch):
             await fetch_imoveis_geo("DF")
         call_url = mock_fetch.call_args[0][0]
         assert "outputFormat=application/json" in call_url
@@ -208,7 +208,7 @@ class TestFetchImoveisGeo:
     async def test_url_contains_geom_column(self):
         geojson = b'{"type":"FeatureCollection","features":[]}'
         mock_fetch = AsyncMock(return_value=geojson)
-        with patch.object(client, "_fetch_url", mock_fetch):
+        with patch.object(client, "fetch_wfs", mock_fetch):
             await fetch_imoveis_geo("DF")
         call_url = mock_fetch.call_args[0][0]
         assert "geo_area_imovel" in call_url
@@ -217,7 +217,7 @@ class TestFetchImoveisGeo:
     async def test_url_max_features(self):
         geojson = b'{"type":"FeatureCollection","features":[]}'
         mock_fetch = AsyncMock(return_value=geojson)
-        with patch.object(client, "_fetch_url", mock_fetch):
+        with patch.object(client, "fetch_wfs", mock_fetch):
             await fetch_imoveis_geo("MT")
         call_url = mock_fetch.call_args[0][0]
         assert f"count={MAX_FEATURES_GEO}" in call_url
@@ -226,7 +226,7 @@ class TestFetchImoveisGeo:
     async def test_url_with_cql_filter(self):
         geojson = b'{"type":"FeatureCollection","features":[]}'
         mock_fetch = AsyncMock(return_value=geojson)
-        with patch.object(client, "_fetch_url", mock_fetch):
+        with patch.object(client, "fetch_wfs", mock_fetch):
             await fetch_imoveis_geo("BA", cql_filter="status_imovel='AT'")
         call_url = mock_fetch.call_args[0][0]
         assert "CQL_FILTER=" in call_url
@@ -236,7 +236,7 @@ class TestFetchImoveisGeo:
     async def test_no_pagination(self):
         geojson = b'{"type":"FeatureCollection","features":[]}'
         mock_fetch = AsyncMock(return_value=geojson)
-        with patch.object(client, "_fetch_url", mock_fetch):
+        with patch.object(client, "fetch_wfs", mock_fetch):
             await fetch_imoveis_geo("SP")
         assert mock_fetch.call_count == 1
 

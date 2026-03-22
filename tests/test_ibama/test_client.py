@@ -1,82 +1,24 @@
 from __future__ import annotations
 
 from unittest.mock import AsyncMock, patch
-from urllib.parse import unquote
 
 import pytest
 
 from agrobr.exceptions import ParseError, SourceUnavailableError
 from agrobr.ibama.client import (
     _build_cql,
-    _build_wfs_url,
     fetch_embargos,
     fetch_embargos_geo,
     fetch_hits,
 )
-from agrobr.ibama.models import PROPERTY_NAMES
-
-
-class TestBuildWfsUrl:
-    def test_url_contains_namespace_and_layer(self):
-        url = _build_wfs_url(PROPERTY_NAMES)
-        assert "publica" in url
-        assert "vw_brasil_adm_embargo_a" in url
-
-    def test_url_uses_wfs_2_0_type_names(self):
-        url = _build_wfs_url(PROPERTY_NAMES)
-        assert "typeNames=" in url
-
-    def test_url_uses_count(self):
-        url = _build_wfs_url(PROPERTY_NAMES, count=500)
-        assert "count=500" in url
-
-    def test_url_uses_start_index(self):
-        url = _build_wfs_url(PROPERTY_NAMES, start_index=10000)
-        assert "startIndex=10000" in url
-
-    def test_output_format_csv(self):
-        url = _build_wfs_url(PROPERTY_NAMES, output_format="csv")
-        assert "outputFormat=csv" in url
-
-    def test_output_format_json(self):
-        url = _build_wfs_url(PROPERTY_NAMES, output_format="application/json")
-        assert "outputFormat=application" in url
-
-    def test_result_type_hits(self):
-        url = _build_wfs_url(PROPERTY_NAMES, result_type="hits")
-        assert "resultType=hits" in url
-
-    def test_bbox_format(self):
-        url = _build_wfs_url(PROPERTY_NAMES, bbox=(-60.0, -15.0, -50.0, -10.0))
-        assert "BBOX=-60.0,-15.0,-50.0,-10.0,EPSG:4674" in url
-
-    def test_bbox_none_no_bbox_in_url(self):
-        url = _build_wfs_url(PROPERTY_NAMES, bbox=None)
-        assert "BBOX" not in url
-
-    def test_cql_filter(self):
-        url = _build_wfs_url(PROPERTY_NAMES, cql_filter="sig_uf='MT'")
-        decoded = unquote(url)
-        assert "sig_uf='MT'" in decoded
-
-    def test_version_2_0_0(self):
-        url = _build_wfs_url(PROPERTY_NAMES)
-        assert "version=2.0.0" in url
 
 
 class TestBuildCql:
     def test_uf_filter(self):
         assert _build_cql(uf="MT") == "sig_uf='MT'"
 
-    def test_uf_case_insensitive(self):
-        assert _build_cql(uf="mt") == "sig_uf='MT'"
-
     def test_none_returns_none(self):
         assert _build_cql() is None
-
-    def test_invalid_uf_raises(self):
-        with pytest.raises(ValueError, match="UF invalida"):
-            _build_cql(uf="INVALID")
 
 
 class TestFetchHits:

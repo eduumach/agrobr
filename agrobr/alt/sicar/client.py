@@ -1,18 +1,15 @@
 from __future__ import annotations
 
 import math
-import re
 import ssl
 from urllib.parse import quote
 
 import httpx
 import structlog
 
-from agrobr.constants import MIN_WFS_SIZE
-from agrobr.exceptions import ParseError, SourceUnavailableError
-from agrobr.http.retry import retry_on_status
 from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
+from agrobr.utils.geo import fetch_wfs, parse_wfs_hits
 
 from .models import (
     MAX_FEATURES_GEO,
@@ -61,87 +58,59 @@ def _build_wfs_url(
     return url
 
 
-async def _fetch_url(url: str, *, base_delay: float | None = None) -> bytes:
+async def fetch_hits(
+    uf: str,
+    cql_filter: str | None = None,
+    *,
+    client: httpx.AsyncClient | None = None,
+) -> int:
+    url = _build_wfs_url(uf, cql_filter=cql_filter, result_type="hits")
+    content = await fetch_wfs(url, source="sicar", timeout=TIMEOUT, client=client)
+    return parse_wfs_hits(content, source="sicar")
+
+
+async def fetch_imoveis(uf: str, cql_filter: str | None = None) -> tuple[list[bytes], str]:
     async with httpx.AsyncClient(
         timeout=TIMEOUT,
         headers=UserAgentRotator.get_bot_headers(),
         follow_redirects=True,
         verify=_ssl_ctx,
-    ) as client:
-        logger.debug("sicar_request", url=url)
-        response = await retry_on_status(
-            lambda: client.get(url),
-            source="sicar",
-            base_delay=base_delay,
-        )
+    ) as http:
+        total = await fetch_hits(uf, cql_filter, client=http)
+        logger.info("sicar_hits", uf=uf, total=total, cql_filter=cql_filter)
 
-        if response.status_code == 404:
-            raise SourceUnavailableError(source="sicar", url=url, last_error="HTTP 404")
+        if total == 0:
+            url = _build_wfs_url(uf, cql_filter=cql_filter)
+            return [], url
 
-        response.raise_for_status()
+        n_pages = math.ceil(total / PAGE_SIZE)
+        pages: list[bytes] = []
+        base_url = _build_wfs_url(uf, cql_filter=cql_filter)
 
-        content = response.content
-        if len(content) < MIN_WFS_SIZE:
-            raise SourceUnavailableError(
-                source="sicar",
-                url=url,
-                last_error=(
-                    f"WFS response too small ({len(content)} bytes), expected CSV feature data"
-                ),
+        for i in range(n_pages):
+            start_index = i * PAGE_SIZE
+            url = _build_wfs_url(
+                uf,
+                cql_filter=cql_filter,
+                count=PAGE_SIZE,
+                start_index=start_index,
             )
-        return content
-
-
-async def fetch_hits(uf: str, cql_filter: str | None = None) -> int:
-    url = _build_wfs_url(uf, cql_filter=cql_filter, result_type="hits")
-    content = await _fetch_url(url)
-
-    text = content.decode("utf-8", errors="replace")
-    match = re.search(r'numberMatched="(\d+)"', text)
-    if match:
-        return int(match.group(1))
-
-    match = re.search(r"numberMatched=(\d+)", text)
-    if match:
-        return int(match.group(1))
-
-    raise ParseError(
-        source="sicar",
-        parser_version=1,
-        reason=f"Nao encontrou numberMatched na resposta hits: {text[:200]}",
-    )
-
-
-async def fetch_imoveis(uf: str, cql_filter: str | None = None) -> tuple[list[bytes], str]:
-    total = await fetch_hits(uf, cql_filter)
-    logger.info("sicar_hits", uf=uf, total=total, cql_filter=cql_filter)
-
-    if total == 0:
-        url = _build_wfs_url(uf, cql_filter=cql_filter)
-        return [], url
-
-    n_pages = math.ceil(total / PAGE_SIZE)
-    pages: list[bytes] = []
-    base_url = _build_wfs_url(uf, cql_filter=cql_filter)
-
-    for i in range(n_pages):
-        start_index = i * PAGE_SIZE
-        url = _build_wfs_url(
-            uf,
-            cql_filter=cql_filter,
-            count=PAGE_SIZE,
-            start_index=start_index,
-        )
-        delay = 2.0 if i >= 5 else None
-        content = await _fetch_url(url, base_delay=delay)
-        pages.append(content)
-        logger.debug(
-            "sicar_page",
-            uf=uf,
-            page=i + 1,
-            total_pages=n_pages,
-            size=len(content),
-        )
+            delay = 2.0 if i >= 5 else None
+            content = await fetch_wfs(
+                url,
+                source="sicar",
+                timeout=TIMEOUT,
+                base_delay=delay,
+                client=http,
+            )
+            pages.append(content)
+            logger.debug(
+                "sicar_page",
+                uf=uf,
+                page=i + 1,
+                total_pages=n_pages,
+                size=len(content),
+            )
 
     return pages, base_url
 
@@ -157,6 +126,12 @@ async def fetch_imoveis_geo(
         output_format="application/json",
         property_names=PROPERTY_NAMES_GEO,
     )
-    content = await _fetch_url(url)
+    async with httpx.AsyncClient(
+        timeout=TIMEOUT,
+        headers=UserAgentRotator.get_bot_headers(),
+        follow_redirects=True,
+        verify=_ssl_ctx,
+    ) as http:
+        content = await fetch_wfs(url, source="sicar", timeout=TIMEOUT, client=http)
     logger.info("sicar_imoveis_geojson", source="sicar", size=len(content), uf=uf)
     return content, url
