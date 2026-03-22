@@ -1,6 +1,6 @@
 # Fontes de Dados
 
-O agrobr integra dados de 31 fontes de dados agricolas.
+O agrobr integra dados de 35 fontes de dados agricolas.
 Todas as fontes suportam `return_meta=True` para rastreabilidade completa.
 
 ## Visao Geral
@@ -38,6 +38,10 @@ Todas as fontes suportam `return_meta=True` para rastreabilidade completa.
 | [ICMBio UCs Federais](icmbio.md) | Unidades de conservacao federais (WFS geo) | Continua | 344 UCs federais |
 | [INCRA Quilombolas](incra.md) | Territorios quilombolas (WFS geo) | Continua | ~426 territorios |
 | [IBAMA Embargos](ibama.md) | Embargos ambientais (WFS geo) | Continua | ~89K embargos, paginado |
+| [MapBiomas Alerta](mapbiomas_alerta.md) | Alertas de desmatamento (GraphQL) | Semanal | Nacional |
+| [Lista Suja](lista_suja.md) | Cadastro de trabalho escravo (XLSX) | Semestral | Nacional |
+| [ANA/SNIRH](ana.md) | Hidrografia, irrigacao, disponibilidade hidrica (ArcGIS REST) | Variavel | Nacional |
+| [SFB](sfb.md) | Florestas publicas, concessoes, IFN (ArcGIS REST) | Anual | Nacional |
 
 ## Proveniencia e Rastreabilidade
 

@@ -93,6 +93,7 @@ class _SyncAlt:
 
 _modules: dict[str, _SyncModule | None] = {
     "abiove": None,
+    "ana": None,
     "anda": None,
     "antaq": None,
     "b3": None,
@@ -112,10 +113,13 @@ _modules: dict[str, _SyncModule | None] = {
     "incra": None,
     "imea": None,
     "inmet": None,
+    "lista_suja": None,
     "mapbiomas": None,
+    "mapbiomas_alerta": None,
     "nasa_power": None,
     "noticias_agricolas": None,
     "queimadas": None,
+    "sfb": None,
     "usda": None,
     "zarc": None,
 }

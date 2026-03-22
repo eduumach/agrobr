@@ -154,6 +154,58 @@ class TestBuildWfsUrl:
         assert "propertyName=col1,col2,col3" in url
 
 
+class TestBuildArcgisQueryUrl:
+    def test_basic_url(self):
+        from agrobr.utils.geo import build_arcgis_query_url
+
+        url = build_arcgis_query_url("http://server/FeatureServer/0")
+        assert "http://server/FeatureServer/0/query?" in url
+        assert "where=1%3D1" in url or "where=1=1" in url
+        assert "outSR=4326" in url
+
+    def test_bbox(self):
+        from agrobr.utils.geo import build_arcgis_query_url
+
+        url = build_arcgis_query_url(
+            "http://server/0",
+            bbox=(-60.0, -15.0, -50.0, -10.0),
+        )
+        assert "geometry=-60.0" in url
+        assert "geometryType=esriGeometryEnvelope" in url
+        assert "spatialRel=esriSpatialRelIntersects" in url
+
+    def test_count_only(self):
+        from agrobr.utils.geo import build_arcgis_query_url
+
+        url = build_arcgis_query_url("http://server/0", return_count_only=True, f="json")
+        assert "returnCountOnly=true" in url
+        assert "f=json" in url
+
+    def test_pagination(self):
+        from agrobr.utils.geo import build_arcgis_query_url
+
+        url = build_arcgis_query_url(
+            "http://server/0",
+            result_record_count=1000,
+            result_offset=5000,
+        )
+        assert "resultRecordCount=1000" in url
+        assert "resultOffset=5000" in url
+
+    def test_no_bbox_no_geometry_param(self):
+        from agrobr.utils.geo import build_arcgis_query_url
+
+        url = build_arcgis_query_url("http://server/0")
+        assert "geometry=" not in url
+        assert "geometryType" not in url
+
+    def test_custom_where(self):
+        from agrobr.utils.geo import build_arcgis_query_url
+
+        url = build_arcgis_query_url("http://server/0", where="UF='MT'")
+        assert "UF" in url
+
+
 class TestCheckGeopandas:
     def test_returns_module(self):
         gpd = pytest.importorskip("geopandas")

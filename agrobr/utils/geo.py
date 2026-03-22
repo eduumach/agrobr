@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import json
 import re
-from typing import Any, Literal
-from urllib.parse import quote
+from typing import Any, Literal, TypedDict
+from urllib.parse import quote, urlencode
 
 import httpx
+import pandas as pd
 import structlog
 
 from agrobr.constants import MIN_WFS_SIZE
@@ -14,6 +15,15 @@ from agrobr.http.retry import retry_on_status
 from agrobr.http.user_agents import UserAgentRotator
 
 logger = structlog.get_logger()
+
+
+class LayerConfig(TypedDict):
+    service_path: str
+    max_record_count: int
+    fields: str
+    rename_map: dict[str, str]
+    colunas_saida: list[str]
+    required_cols: set[str]
 
 
 def check_geopandas() -> Any:
@@ -189,6 +199,63 @@ def parse_geojson_base(
     return gdf
 
 
+def build_arcgis_query_url(
+    base_url: str,
+    *,
+    where: str = "1=1",
+    out_fields: str = "*",
+    bbox: tuple[float, float, float, float] | None = None,
+    in_sr: int = 4326,
+    out_sr: int = 4326,
+    f: str = "geojson",
+    result_record_count: int | None = None,
+    result_offset: int | None = None,
+    return_count_only: bool = False,
+) -> str:
+    params: dict[str, str | int] = {
+        "where": where,
+        "outFields": out_fields,
+        "outSR": out_sr,
+        "f": f,
+    }
+    if bbox is not None:
+        minlon, minlat, maxlon, maxlat = bbox
+        params["geometry"] = f"{minlon},{minlat},{maxlon},{maxlat}"
+        params["geometryType"] = "esriGeometryEnvelope"
+        params["inSR"] = in_sr
+        params["spatialRel"] = "esriSpatialRelIntersects"
+    if return_count_only:
+        params["returnCountOnly"] = "true"
+    if result_record_count is not None:
+        params["resultRecordCount"] = result_record_count
+    if result_offset is not None:
+        params["resultOffset"] = result_offset
+
+    return f"{base_url}/query?{urlencode(params)}"
+
+
+async def fetch_arcgis_count(
+    base_url: str,
+    *,
+    where: str = "1=1",
+    bbox: tuple[float, float, float, float] | None = None,
+    source: str,
+    timeout: httpx.Timeout,
+) -> int:
+    url = build_arcgis_query_url(
+        base_url,
+        where=where,
+        bbox=bbox,
+        return_count_only=True,
+        f="json",
+    )
+    content = await fetch_wfs(url, source=source, timeout=timeout)
+    data = json.loads(content)
+    count: int = data.get("count", 0)
+    logger.info(f"{source}_arcgis_count", count=count, url=url[:120])
+    return count
+
+
 def parse_wfs_hits(content: bytes, *, source: str) -> int:
     text = content.decode("utf-8", errors="replace")
     match = re.search(r'numberMatched="(\d+)"', text)
@@ -202,3 +269,174 @@ def parse_wfs_hits(content: bytes, *, source: str) -> int:
         parser_version=1,
         reason=f"Nao encontrou numberMatched na resposta hits: {text[:200]}",
     )
+
+
+async def fetch_arcgis_layer(
+    base_url: str,
+    layer_config: LayerConfig,
+    *,
+    source: str,
+    timeout: httpx.Timeout,
+    where: str = "1=1",
+    bbox: tuple[float, float, float, float] | None = None,
+    max_features: int | None = None,
+    f: str = "geojson",
+    throttle_after_page: int = 5,
+    throttle_delay: float = 2.0,
+) -> tuple[list[bytes], str]:
+    import asyncio
+    import math
+
+    service_url = f"{base_url}/{layer_config['service_path']}"
+    max_record_count = layer_config["max_record_count"]
+    fields = layer_config["fields"]
+
+    total = await fetch_arcgis_count(
+        service_url,
+        where=where,
+        bbox=bbox,
+        source=source,
+        timeout=timeout,
+    )
+    logger.info(f"{source}_layer_count", total=total)
+
+    if total == 0:
+        return [], f"{service_url}/query"
+
+    if max_features and total > max_features:
+        total = max_features
+
+    n_pages = math.ceil(total / max_record_count)
+    pages: list[bytes] = []
+    first_url = ""
+
+    async with httpx.AsyncClient(
+        timeout=timeout,
+        headers=UserAgentRotator.get_bot_headers(),
+        follow_redirects=True,
+    ) as http:
+        for i in range(n_pages):
+            offset = i * max_record_count
+            url = build_arcgis_query_url(
+                service_url,
+                where=where,
+                bbox=bbox,
+                out_fields=fields,
+                out_sr=4326,
+                f=f,
+                result_record_count=max_record_count,
+                result_offset=offset,
+            )
+            if i == 0:
+                first_url = url
+            content = await fetch_wfs(url, source=source, timeout=timeout, client=http)
+            pages.append(content)
+            logger.debug(f"{source}_page", page=i + 1, total_pages=n_pages, size=len(content))
+            if i >= throttle_after_page:
+                await asyncio.sleep(throttle_delay)
+
+    return pages, first_url
+
+
+def parse_arcgis_tabular(
+    pages: list[bytes],
+    *,
+    source: str,
+    layer_config: LayerConfig,
+    parser_version: int,
+    numeric_cols: frozenset[str] | None = None,
+) -> pd.DataFrame:
+    colunas = layer_config["colunas_saida"]
+    rename_map = layer_config["rename_map"]
+
+    if not pages:
+        return pd.DataFrame(columns=colunas)
+
+    all_rows: list[dict[str, Any]] = []
+    for i, page_data in enumerate(pages):
+        try:
+            data = json.loads(page_data)
+        except (json.JSONDecodeError, UnicodeDecodeError) as e:
+            raise ParseError(
+                source=source,
+                parser_version=parser_version,
+                reason=f"Erro ao ler JSON pagina {i}: {e}",
+            ) from e
+        for feat in data.get("features", []):
+            row = feat.get("properties") or feat.get("attributes", {})
+            if row:
+                all_rows.append(row)
+
+    if not all_rows:
+        return pd.DataFrame(columns=colunas)
+
+    df = pd.DataFrame(all_rows)
+    df = df.rename(columns=rename_map)
+
+    if numeric_cols:
+        for col in numeric_cols:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
+    if "UF" in df.columns:
+        df["UF"] = df["UF"].fillna("").str.strip().str.upper()
+
+    output_cols = [c for c in colunas if c in df.columns]
+    df = df[output_cols].reset_index(drop=True)
+    logger.info(f"{source}_parse_tabular_ok", records=len(df))
+    return df
+
+
+def parse_arcgis_geojson(
+    pages: list[bytes],
+    *,
+    source: str,
+    layer_config: LayerConfig,
+    parser_version: int,
+    numeric_cols: frozenset[str] | None = None,
+) -> Any:
+    gpd = check_geopandas()
+    colunas_geo = layer_config["colunas_saida"] + ["geometry"]
+    rename_map = layer_config["rename_map"]
+    required = layer_config["required_cols"]
+    max_record_count = layer_config["max_record_count"]
+
+    if not pages:
+        empty = gpd.GeoDataFrame(columns=colunas_geo)
+        empty = empty.set_geometry("geometry")
+        return empty
+
+    gdfs = []
+    for page_data in pages:
+        gdf = parse_geojson_base(
+            page_data,
+            gpd,
+            source=source,
+            parser_version=parser_version,
+            required_cols=required,
+            max_features=max_record_count,
+            output_cols_empty=colunas_geo,
+            truncation_event=f"{source}_truncated",
+            warn_null_geom=True,
+        )
+        if not gdf.empty:
+            gdfs.append(gdf)
+
+    if not gdfs:
+        empty = gpd.GeoDataFrame(columns=colunas_geo)
+        empty = empty.set_geometry("geometry")
+        return empty
+
+    gdf = gpd.GeoDataFrame(pd.concat(gdfs, ignore_index=True), crs="EPSG:4326")
+    gdf = gdf.rename(columns=rename_map)
+
+    if numeric_cols:
+        for col in numeric_cols:
+            if col in gdf.columns:
+                gdf[col] = pd.to_numeric(gdf[col], errors="coerce")
+    if "UF" in gdf.columns:
+        gdf["UF"] = gdf["UF"].fillna("").str.strip().str.upper()
+
+    output_cols = [c for c in colunas_geo if c in gdf.columns]
+    gdf = gdf[output_cols].reset_index(drop=True)
+    logger.info(f"{source}_parse_geojson_ok", records=len(gdf))
+    return gdf

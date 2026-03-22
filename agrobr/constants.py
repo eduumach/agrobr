@@ -20,6 +20,7 @@ __all__ = [
 
 class Fonte(StrEnum):
     ABIOVE = "abiove"
+    ANA = "ana"
     ANDA = "anda"
     ANP_DIESEL = "anp_diesel"
     ANTAQ = "antaq"
@@ -39,11 +40,14 @@ class Fonte(StrEnum):
     IMEA = "imea"
     INCRA = "incra"
     INMET = "inmet"
+    LISTA_SUJA = "lista_suja"
+    MAPBIOMAS_ALERTA = "mapbiomas_alerta"
     NASA_POWER = "nasa_power"
     NOTICIAS_AGRICOLAS = "noticias_agricolas"
     DESMATAMENTO = "desmatamento"
     MAPBIOMAS = "mapbiomas"
     QUEIMADAS = "queimadas"
+    SFB = "sfb"
     SICAR = "sicar"
     USDA = "usda"
     ZARC = "zarc"
@@ -54,6 +58,10 @@ URLS = {
         "base": "https://abiove.org.br",
         "estatisticas": "https://abiove.org.br/estatisticas",
         "exportacao": "https://abiove.org.br/abiove_content/Abiove",
+    },
+    Fonte.ANA: {
+        "base": "https://portal1.snirh.gov.br",
+        "arcgis": "https://portal1.snirh.gov.br/server/rest/services/dados_abertos",
     },
     Fonte.ANDA: {
         "base": "https://anda.org.br",
@@ -108,6 +116,10 @@ URLS = {
         "api": "https://apisidra.ibge.gov.br",
         "ftp_censo_agro_1996": "https://ftp.ibge.gov.br/Censo_Agropecuario/Censo_Agropecuario_1995_96",
     },
+    Fonte.LISTA_SUJA: {
+        "base": "https://dados.gov.br",
+        "download": "https://portaldatransparencia.gov.br/download-de-dados/cadastro-empregadores-escravidao",
+    },
     Fonte.IMEA: {
         "base": "https://api1.imea.com.br/api",
         "cotacoes": "https://api1.imea.com.br/api/v2/mobile/cadeias",
@@ -156,9 +168,17 @@ URLS = {
         "biome_state_file_id": "457",
         "biome_state_municipality_file_id": "254",
     },
+    Fonte.MAPBIOMAS_ALERTA: {
+        "base": "https://plataforma.alerta.mapbiomas.org",
+        "graphql": "https://plataforma.alerta.mapbiomas.org/api/v2/graphql",
+    },
     Fonte.QUEIMADAS: {
         "base": "https://terrabrasilis.dpi.inpe.br/queimadas/portal/",
         "dados_abertos": "https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv",
+    },
+    Fonte.SFB: {
+        "base": "https://mapas.florestal.gov.br",
+        "arcgis": "https://mapas.florestal.gov.br/server/rest/services",
     },
     Fonte.SICAR: {
         "base": "https://www.car.gov.br",
@@ -301,6 +321,7 @@ class HTTPSettings(BaseSettings):
     retry_exponential_base: int = 2
 
     rate_limit_abiove: float = 3.0
+    rate_limit_ana: float = 2.0
     rate_limit_anda: float = 3.0
     rate_limit_anp_diesel: float = 2.0
     rate_limit_antaq: float = 1.0
@@ -314,6 +335,7 @@ class HTTPSettings(BaseSettings):
     rate_limit_deral: float = 3.0
     rate_limit_ibge: float = 1.0
     rate_limit_imea: float = 1.0
+    rate_limit_lista_suja: float = 2.0
     rate_limit_funai: float = 2.0
     rate_limit_ibama: float = 2.0
     rate_limit_icmbio: float = 2.0
@@ -323,7 +345,9 @@ class HTTPSettings(BaseSettings):
     rate_limit_noticias_agricolas: float = 2.0
     rate_limit_desmatamento: float = 2.0
     rate_limit_mapbiomas: float = 2.0
+    rate_limit_mapbiomas_alerta: float = 3.0
     rate_limit_queimadas: float = 1.0
+    rate_limit_sfb: float = 2.0
     rate_limit_sicar: float = 2.0
     rate_limit_usda: float = 1.0
     rate_limit_b3: float = 1.0
@@ -332,6 +356,7 @@ class HTTPSettings(BaseSettings):
     rate_limit_default: float = 1.0
 
     max_concurrent_default: int = 1
+    max_concurrent_ana: int = 1
     max_concurrent_b3: int = 3
     max_concurrent_ibge: int = 3
 

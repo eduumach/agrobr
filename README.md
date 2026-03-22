@@ -19,9 +19,9 @@
   </a>
 </p>
 
-Infraestrutura Python para dados agrícolas brasileiros com camada semântica sobre **31 fontes públicas**: CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA PSD, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento PRODES/DETER, MapBiomas, CONAB Progresso, B3 Futuros Agro, CONAB CEASA/PROHORT, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedágio, SICAR, ZARC, Agrofit/MAPA (Defensivos), FUNAI, ICMBio, INCRA e IBAMA.
+Infraestrutura Python para dados agrícolas brasileiros com camada semântica sobre **35 fontes públicas**: CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA PSD, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento PRODES/DETER, MapBiomas, CONAB Progresso, B3 Futuros Agro, CONAB CEASA/PROHORT, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedágio, SICAR, ZARC, Agrofit/MAPA (Defensivos), FUNAI, ICMBio, INCRA, IBAMA, MapBiomas Alerta, Lista Suja, ANA/SNIRH e SFB.
 
-**v1.0.2** — 5500+ testes, 88% cobertura, 31/31 fontes com golden tests, retry centralizado em 31/31 clients.
+**v1.0.2** — 5500+ testes, 88% cobertura, 35/35 fontes com golden tests, retry centralizado em 35/35 clients.
 
 ## Demo
 ![Animation](https://github.com/user-attachments/assets/40e1341e-f47b-4eb5-b18e-55b49c63ee97)
@@ -38,7 +38,7 @@ pip install agrobr[pdf]             # pdfplumber para ANDA (fertilizantes)
 pip install agrobr[polars]          # Suporte a Polars
 pip install agrobr[browser]         # Playwright (opcional, para fontes com JS)
 pip install agrobr[bigquery]        # Base dos Dados (fallback BCB/SICOR)
-pip install agrobr[geo]             # GeoPandas (geometria PRODES + DETER + SICAR + FUNAI + ICMBio + INCRA + IBAMA + Queimadas)
+pip install agrobr[geo]             # GeoPandas (geometria PRODES + DETER + SICAR + FUNAI + ICMBio + INCRA + IBAMA + Queimadas + MapBiomas Alerta + ANA + SFB)
 pip install agrobr[all]             # Tudo incluído
 ```
 
@@ -618,6 +618,10 @@ Use `agrobr health --all` para verificar localmente.
 | SICAR | Cadastro Ambiental Rural — imoveis rurais por UF (7.4M+ registros, WFS) | ✅ | Funcional |
 | ZARC | Zoneamento Agricola de Risco Climatico (janelas de plantio por municipio/cultura/solo) | ✅ | Funcional |
 | Agrofit/MAPA (Defensivos) | Agrotoxicos registrados — formulados, autorizacoes, tecnicos (~8K produtos) | ✅ | Funcional |
+| MapBiomas Alerta | Alertas de desmatamento via GraphQL (500K+ alertas, filtro data/fonte/bbox/uf) | ✅ | Requer token (`AGROBR_MAPBIOMAS_ALERTA_TOKEN`) |
+| Lista Suja | Cadastro de empregadores (trabalho escravo) via XLSX | ✅ | Funcional |
+| ANA/SNIRH | Hidrografia, pivos irrigacao, demanda irrigacao, disponibilidade hidrica (ArcGIS REST) | ✅ | Funcional |
+| SFB | Florestas publicas (CNFP), concessoes florestais, IFN conglomerados (ArcGIS REST) | ✅ | Funcional |
 
 > ¹ Golden test com dados sintéticos — `needs_real_data` para validação com API real.
 
@@ -677,8 +681,8 @@ normalizar_safra("24/25")             # "2024/25"
 
 ## Diferenciais
 
-- **30/30 fontes com golden tests** — validação automatizada contra dados de referência
-- **Resiliência HTTP completa** — retry centralizado em 27/27 clients, 429 handling, Retry-After
+- **35/35 fontes com golden tests** — validação automatizada contra dados de referência
+- **Resiliência HTTP completa** — retry centralizado em 35/35 clients, 429 handling, Retry-After
 - **5100+ testes, 88% cobertura** — benchmarks de escalabilidade (memory, volume, cache, async)
 - **Thread-safe cache** — DuckDB store com locking para uso em MCP servers e multi-thread
 - **Camada semântica** — datasets padronizados com fallback automático
@@ -726,7 +730,7 @@ Veja o [guia completo de pipelines](https://www.agrobr.dev/docs/advanced/pipelin
 
 - [Guia Rápido](https://www.agrobr.dev/docs/quickstart/)
 - [Datasets](https://www.agrobr.dev/docs/contracts/) — Contratos e garantias
-- [Fontes](https://www.agrobr.dev/docs/sources/) — 26 fontes documentadas
+- [Fontes](https://www.agrobr.dev/docs/sources/) — 35 fontes documentadas
 - [API Reference](https://www.agrobr.dev/docs/api/cepea/)
 - [Resiliência](https://www.agrobr.dev/docs/advanced/resilience/)
 - [Portabilidade](https://www.agrobr.dev/docs/porting/) — Guia para portar o agrobr para R, Julia ou outras linguagens

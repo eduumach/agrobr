@@ -13,6 +13,10 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **funai** — terras indigenas via WFS (geoserver.funai.gov.br). `terras_indigenas()` tabular + `terras_indigenas_geo()` GeoDataFrame. Filtros uf/fase/bbox. ~740 TIs. Licenca CC BY-ND 3.0
 - **icmbio** — unidades de conservacao federais via WFS (geoservicos.inde.gov.br). `ucs()` tabular + `ucs_geo()` GeoDataFrame. Filtros uf/grupo/bioma/bbox. 344 UCs. Dados publicos
 - **incra** — territorios quilombolas via WFS (cmr.funai.gov.br). `quilombolas()` tabular + `quilombolas_geo()` GeoDataFrame. Filtros uf/fase/bbox. ~426 territorios. Dados publicos
+- **mapbiomas_alerta** — modulo GraphQL para alertas de desmatamento MapBiomas, auth via token, paginacao, filtros por data/fonte/bbox/uf, suporte WKT geometry. Fonte: livre (citacao)
+- **lista_suja** — cadastro de empregadores (trabalho escravo) via download XLSX do Portal da Transparencia. Filtro por UF, warning PII automatico. Fonte: livre (Lei de Acesso a Informacao)
+- **ana** — 4 layers ArcGIS REST do SNIRH: hidrografia (620K polylines), pivos_irrigacao (19.9K polygons), demanda_irrigacao (265K polygons), disponibilidade_hidrica (42K polylines). Paginacao automatica. Fonte: livre
+- **sfb** — 3 layers ArcGIS REST do Servico Florestal: CNFP florestas publicas (20.8K polygons), concessoes florestais (8 polygons), IFN conglomerados (14.5K points). Fonte: livre
 
 ### Improved
 - **utils/geo** — `check_geopandas()` extraido de desmatamento/sicar para `utils/geo.py` (dedup 2 copias). `validate_bbox()` canonica com checagem min<max (3 implementacoes inconsistentes consolidadas). `fetch_wfs()` agora aceita `base_delay` para throttle de paginacao e `client` opcional para connection reuse em paginacao
@@ -20,6 +24,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **utils/validation** — `validate_uf()` com `UFS_VALIDAS` (27 UFs reais) substitui 10 copias de `_UF_RE` regex em 6 modulos WFS. Validacao mais rigorosa (rejeita "XX", "ZZ" que regex aceitava). Desmatamento ganha validacao de UF (antes aceitava qualquer string)
 - **utils/io** — `concat_csv_pages()` centraliza loop de concat paginado CSV (2 copias ibama+sicar eliminadas)
 - **ibama/sicar** — paginacao WFS agora reutiliza conexao HTTP (1 TLS handshake em vez de N). SICAR `_fetch_url` eliminado, migrado para `fetch_wfs()` compartilhado
+- **utils/geo** — `build_arcgis_query_url()` e `fetch_arcgis_count()` para infra ArcGIS REST compartilhada entre ANA e SFB
 
 ## [1.0.2] - 2026-03-20
 

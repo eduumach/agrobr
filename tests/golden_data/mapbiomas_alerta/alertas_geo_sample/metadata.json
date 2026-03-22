@@ -1,0 +1,1 @@
+{"dataset": "alertas_geo", "format": "graphql_wkt", "parser": "parse_alertas_geo", "source": "mapbiomas_alerta"}

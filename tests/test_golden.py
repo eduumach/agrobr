@@ -1329,3 +1329,91 @@ def test_incra_golden_parsing(_name: str, path: Path):
         return
 
     _assert_dataframe_golden(df, expected)
+
+
+# ============================================================================
+# MapBiomas Alerta Golden Tests
+# ============================================================================
+
+
+def _get_mapbiomas_alerta_cases() -> list[tuple[str, Path]]:
+    return _discover_cases(source_filter="mapbiomas_alerta")
+
+
+@pytest.mark.skipif(not _get_mapbiomas_alerta_cases(), reason="No MapBiomas Alerta golden data")
+@pytest.mark.parametrize("_name,path", _get_mapbiomas_alerta_cases())
+def test_mapbiomas_alerta_golden_parsing(_name: str, path: Path):
+    expected = _load_expected(path)
+    metadata = _load_metadata(path)
+    fmt = metadata.get("format", "graphql")
+
+    records = json.loads((path / "response.json").read_text(encoding="utf-8"))
+
+    if fmt in ("graphql", "graphql_wkt"):
+        if "geo" in metadata.get("dataset", ""):
+            pytest.importorskip("geopandas")
+            from agrobr.mapbiomas_alerta.parser import parse_alertas_geo
+
+            df = parse_alertas_geo(records)
+            assert df.crs.to_epsg() == expected.get("crs_epsg", 4326)
+        else:
+            from agrobr.mapbiomas_alerta.parser import parse_alertas
+
+            df = parse_alertas(records)
+    else:
+        pytest.skip(f"Unknown mapbiomas_alerta format: {fmt}")
+        return
+
+    _assert_dataframe_golden(df, expected)
+
+
+# ============================================================================
+# ANA Golden Tests
+# ============================================================================
+
+
+def _get_ana_cases() -> list[tuple[str, Path]]:
+    return _discover_cases(source_filter="ana")
+
+
+@pytest.mark.skipif(not _get_ana_cases(), reason="No ANA golden data")
+@pytest.mark.parametrize("_name,path", _get_ana_cases())
+def test_ana_golden_parsing(_name: str, path: Path):
+    expected = _load_expected(path)
+    metadata = _load_metadata(path)
+    layer_key = metadata.get("layer_key", metadata.get("dataset", "pivos_irrigacao"))
+
+    pytest.importorskip("geopandas")
+    from agrobr.ana.parser import parse_layer_geojson
+
+    data = (path / "response.geojson").read_bytes()
+    df = parse_layer_geojson([data], layer_key=layer_key)
+    assert df.crs.to_epsg() == expected.get("crs_epsg", 4326)
+    assert df.geometry.notna().all()
+    _assert_dataframe_golden(df, expected)
+
+
+# ============================================================================
+# SFB Golden Tests
+# ============================================================================
+
+
+def _get_sfb_cases() -> list[tuple[str, Path]]:
+    return _discover_cases(source_filter="sfb")
+
+
+@pytest.mark.skipif(not _get_sfb_cases(), reason="No SFB golden data")
+@pytest.mark.parametrize("_name,path", _get_sfb_cases())
+def test_sfb_golden_parsing(_name: str, path: Path):
+    expected = _load_expected(path)
+    metadata = _load_metadata(path)
+    layer_key = metadata.get("layer_key", metadata.get("dataset", "cnfp"))
+
+    pytest.importorskip("geopandas")
+    from agrobr.sfb.parser import parse_layer_geojson
+
+    data = (path / "response.geojson").read_bytes()
+    df = parse_layer_geojson([data], layer_key=layer_key)
+    assert df.crs.to_epsg() == expected.get("crs_epsg", 4326)
+    assert df.geometry.notna().all()
+    _assert_dataframe_golden(df, expected)

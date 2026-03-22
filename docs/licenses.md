@@ -40,10 +40,14 @@
 | **CONAB CEASA/PROHORT** | Credenciais públicas embutidas no frontend, API não documentada oficialmente | Verificar com CONAB | `zona_cinza` | [Portal CONAB](https://portaldeinformacoes.conab.gov.br) |
 | **MAPA Agrofit (Defensivos)** | CC-BY 4.0 | Sim | `livre` | [dados.agricultura.gov.br](https://dados.agricultura.gov.br/dataset/6c913699-e82e-4da3-a0a1-fb6c431e367f) |
 | **ZARC** | Dados públicos governo federal (CC-BY) | Sim | `livre` | [dados.agricultura.gov.br](https://dados.agricultura.gov.br/dataset/tabua-de-risco-zoneamento-agricola-de-risco-climatico) |
+| **ANA/SNIRH** | Dados publicos | Sim | `livre` | [SNIRH](https://portal1.snirh.gov.br) |
 | **FUNAI Terras Indigenas** | CC BY-ND 3.0 | Sim (com citacao, sem derivados) | `livre` | [geoserver.funai.gov.br](https://geoserver.funai.gov.br) |
 | **IBAMA Embargos** | ODbL (Open Database License) | Sim (com citacao) | `livre` | [Dados Abertos IBAMA](https://dadosabertos.ibama.gov.br) |
 | **ICMBio UCs Federais** | Dados publicos governo federal | Sim (dados publicos) | `livre` | [geoservicos.inde.gov.br](https://geoservicos.inde.gov.br) |
 | **INCRA Quilombolas** | Dados publicos governo federal | Sim (dados publicos) | `livre` | [cmr.funai.gov.br](https://cmr.funai.gov.br) |
+| **Lista Suja** | Lei de Acesso a Informacao | Sim | `livre` | [Portal Transparencia](https://portaldatransparencia.gov.br) |
+| **MapBiomas Alerta** | Livre (citacao obrigatoria) | Sim | `livre` | [MapBiomas Alerta](https://plataforma.alerta.mapbiomas.org) |
+| **SFB** | Dados publicos | Sim | `livre` | [SFB](https://mapas.florestal.gov.br) |
 
 ### Legenda de Classificação
 
@@ -129,7 +133,7 @@
 
 ### Fontes Governamentais Brasileiras
 
-CONAB (incluindo Progresso de Safra), IBGE, BCB, ComexStat, DERAL, INMET, INPE (Queimadas, PRODES/DETER), ANP, ANTT, SICAR (Serviço Florestal Brasileiro) e IBAMA são órgãos públicos brasileiros.
+CONAB (incluindo Progresso de Safra), IBGE, BCB, ComexStat, DERAL, INMET, INPE (Queimadas, PRODES/DETER), ANP, ANTT, SICAR (Serviço Florestal Brasileiro), IBAMA, ANA/SNIRH, SFB e Lista Suja (Ministério do Trabalho) são órgãos públicos brasileiros.
 MapBiomas é um projeto multi-institucional que disponibiliza dados abertos com citação obrigatória.
 Dados produzidos por órgãos públicos no exercício de suas funções são, em regra,
 de acesso público (Lei de Acesso à Informação — Lei 12.527/2011). Não há
