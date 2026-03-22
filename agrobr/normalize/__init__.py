@@ -21,6 +21,7 @@ from .dates import (
 from .encoding import decode_content, detect_encoding, detect_encoding_chain
 from .municipalities import (
     buscar_municipios,
+    coordenada_para_municipio,
     ibge_para_municipio,
     municipio_para_ibge,
     total_municipios,
@@ -56,6 +57,7 @@ __all__: list[str] = [
     "MESES_PT",
     "UFS_VALIDAS",
     "buscar_municipios",
+    "coordenada_para_municipio",
     "converter",
     "decode_content",
     "detect_encoding",

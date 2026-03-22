@@ -27,7 +27,7 @@ class TestConstants:
         assert NAMESPACE == "CMR-PUBLICO"
 
     def test_geom_column(self):
-        assert GEOM_COLUMN == "the_geom"
+        assert GEOM_COLUMN == "geom"
 
     def test_wfs_base_url(self):
         assert "cmr.funai.gov.br" in WFS_BASE

@@ -107,7 +107,7 @@ class TestFetchQuilombolasGeo:
             "agrobr.incra.client.fetch_wfs", new_callable=AsyncMock, return_value=b"x" * 5000
         ):
             _, url = await fetch_quilombolas_geo()
-        assert "propertyName=the_geom," in url
+        assert "propertyName=geom," in url
 
     @pytest.mark.asyncio
     async def test_max_features_500(self):

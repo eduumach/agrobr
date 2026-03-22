@@ -4,6 +4,7 @@ import pytest
 
 from agrobr.normalize.municipalities import (
     buscar_municipios,
+    coordenada_para_municipio,
     ibge_para_municipio,
     municipio_para_ibge,
     total_municipios,
@@ -363,3 +364,98 @@ class TestMunicipios100Amostra:
     def test_municipio_lower(self, nome, uf):
         code = municipio_para_ibge(nome.lower(), uf)
         assert code is not None, f"Municipio '{nome.lower()}/{uf}' not found"
+
+
+class TestCoordenadaParaMunicipio:
+    @pytest.mark.parametrize(
+        "lat,lon,expected_nome,expected_uf",
+        [
+            (-15.7801, -47.9292, "Brasília", "DF"),
+            (-23.5505, -46.6333, "São Paulo", "SP"),
+            (-22.93, -43.46, "Rio de Janeiro", "RJ"),
+            (-12.9714, -38.5124, "Salvador", "BA"),
+            (-2.63, -60.26, "Manaus", "AM"),
+            (-25.4284, -49.2733, "Curitiba", "PR"),
+            (-19.9167, -43.9345, "Belo Horizonte", "MG"),
+            (-8.04, -34.93, "Recife", "PE"),
+            (-30.0346, -51.2177, "Porto Alegre", "RS"),
+            (-15.51, -55.88, "Cuiabá", "MT"),
+        ],
+        ids=[
+            "brasilia",
+            "sao_paulo",
+            "rio_de_janeiro",
+            "salvador",
+            "manaus",
+            "curitiba",
+            "belo_horizonte",
+            "recife",
+            "porto_alegre",
+            "cuiaba",
+        ],
+    )
+    def test_capitais(self, lat, lon, expected_nome, expected_uf):
+        info = coordenada_para_municipio(lat, lon)
+        assert info is not None
+        assert info["nome"] == expected_nome
+        assert info["uf"] == expected_uf
+
+    @pytest.mark.parametrize(
+        "lat,lon,expected_nome,expected_uf",
+        [
+            (-12.74, -55.68, "Sorriso", "MT"),
+            (-13.0500, -55.9100, "Lucas do Rio Verde", "MT"),
+            (-17.7928, -50.9297, "Rio Verde", "GO"),
+            (-12.0964, -45.7897, "Luís Eduardo Magalhães", "BA"),
+            (-11.8700, -55.5100, "Sinop", "MT"),
+        ],
+        ids=["sorriso", "lucas_rio_verde", "rio_verde", "luis_eduardo", "sinop"],
+    )
+    def test_cidades_agro(self, lat, lon, expected_nome, expected_uf):
+        info = coordenada_para_municipio(lat, lon)
+        assert info is not None
+        assert info["nome"] == expected_nome
+        assert info["uf"] == expected_uf
+
+    @pytest.mark.parametrize(
+        "lat,lon",
+        [
+            (0, -30),
+            (-40, -60),
+            (10, -80),
+        ],
+        ids=["atlantic_equator", "south_atlantic", "caribbean"],
+    )
+    def test_oceano_retorna_none(self, lat, lon):
+        assert coordenada_para_municipio(lat, lon) is None
+
+    def test_fernando_de_noronha(self):
+        info = coordenada_para_municipio(-3.86, -32.43)
+        assert info is not None
+        assert info["uf"] == "PE"
+
+    def test_performance_sub_ms(self):
+        import time
+
+        coordenada_para_municipio(-15.78, -47.93)
+        t0 = time.perf_counter()
+        for _ in range(100):
+            coordenada_para_municipio(-15.78, -47.93)
+        elapsed_ms = (time.perf_counter() - t0) * 1000
+        assert elapsed_ms < 100, f"100 lookups took {elapsed_ms:.1f}ms (expected < 100ms)"
+
+    def test_consistencia_com_ibge_para_municipio(self):
+        info = coordenada_para_municipio(-23.5505, -46.6333)
+        assert info is not None
+        reverse = ibge_para_municipio(info["codigo_ibge"])
+        assert reverse is not None
+        assert reverse["nome"] == info["nome"]
+        assert reverse["uf"] == info["uf"]
+
+    def test_tipo_correto(self):
+        info = coordenada_para_municipio(-15.78, -47.93)
+        assert info is not None
+        assert isinstance(info["codigo_ibge"], int)
+        assert isinstance(info["nome"], str)
+        assert isinstance(info["uf"], str)
+        assert set(info.keys()) == {"codigo_ibge", "nome", "uf"}

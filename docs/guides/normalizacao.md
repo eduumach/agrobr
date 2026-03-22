@@ -1,6 +1,6 @@
 # Normalização
 
-O módulo `agrobr.normalize` padroniza dados agrícolas brasileiros para garantir cruzamento entre fontes diferentes. São 38 funções organizadas em 7 sub-módulos.
+O módulo `agrobr.normalize` padroniza dados agrícolas brasileiros para garantir cruzamento entre fontes diferentes. São 39 funções organizadas em 7 sub-módulos.
 
 ## Municípios IBGE
 
@@ -28,6 +28,35 @@ municipio_para_ibge("Brasília", "MG")      # 3108909 (Brasília de Minas)
 ```
 
 Dados da [API IBGE Localidades](https://servicodados.ibge.gov.br/api/docs/localidades) — livre para uso.
+
+## Geocodificação Reversa
+
+Lookup `(lat, lon) → município` via centroide mais próximo. Zero HTTP, sub-ms. 5571 municípios com centroides da [API IBGE Malhas](https://servicodados.ibge.gov.br/api/v3/malhas/).
+
+```python
+from agrobr.normalize import coordenada_para_municipio
+
+# Coordenada para município mais próximo
+coordenada_para_municipio(-12.74, -55.68)
+# {'codigo_ibge': 5107925, 'nome': 'Sorriso', 'uf': 'MT'}
+
+coordenada_para_municipio(-15.78, -47.93)
+# {'codigo_ibge': 5300108, 'nome': 'Brasília', 'uf': 'DF'}
+
+# Oceano / fora do Brasil → None (threshold 1.5° ~167km)
+coordenada_para_municipio(0, -30)
+# None
+```
+
+Caso de uso típico — filtrar SICAR por município a partir de coordenada:
+
+```python
+from agrobr.normalize import coordenada_para_municipio
+from agrobr.alt import sicar
+
+info = coordenada_para_municipio(lat, lon)
+gdf = await sicar.imoveis_geo(info["uf"], municipio=info["nome"])
+```
 
 ## Culturas
 
@@ -195,7 +224,7 @@ parse_numeric_br("abc")          # None (inválido retorna None)
 
 | Sub-módulo | Funções | Dados |
 |---|---|---|
-| `municipalities` | `municipio_para_ibge`, `ibge_para_municipio`, `buscar_municipios`, `total_municipios` | 5571 municípios |
+| `municipalities` | `municipio_para_ibge`, `ibge_para_municipio`, `buscar_municipios`, `coordenada_para_municipio`, `total_municipios` | 5571 municípios + centroides |
 | `crops` | `normalizar_cultura`, `listar_culturas`, `is_cultura_valida` | 144 variantes, 35 canônicas |
 | `regions` | `normalizar_uf`, `validar_uf`, `uf_para_nome`, `uf_para_regiao`, `uf_para_ibge`, `ibge_para_uf`, `listar_ufs`, `listar_regioes`, `normalizar_municipio`, `normalizar_praca`, `normalizar_bioma` | 27 UFs, 6 biomas |
 | `dates` | `safra_atual`, `normalizar_safra`, `validar_safra`, `safra_para_anos`, `anos_para_safra`, `safra_anterior`, `safra_posterior`, `periodo_safra`, `lista_safras` | Safras Jul-Jun |

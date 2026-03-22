@@ -28,7 +28,7 @@ def _load_municipios() -> list[Any]:
 @lru_cache(maxsize=1)
 def _build_lookup() -> dict[str, list[MunicipioInfo]]:
     lookup: dict[str, list[MunicipioInfo]] = {}
-    for codigo, nome, uf in _load_municipios():
+    for codigo, nome, uf, *_coords in _load_municipios():
         key = _remover_acentos(str(nome).lower().strip())
         entry: MunicipioInfo = {
             "codigo_ibge": int(codigo),
@@ -42,7 +42,7 @@ def _build_lookup() -> dict[str, list[MunicipioInfo]]:
 @lru_cache(maxsize=1)
 def _build_codigo_lookup() -> dict[int, MunicipioInfo]:
     result: dict[int, MunicipioInfo] = {}
-    for codigo, nome, uf in _load_municipios():
+    for codigo, nome, uf, *_coords in _load_municipios():
         result[int(codigo)] = {
             "codigo_ibge": int(codigo),
             "nome": str(nome),
@@ -93,9 +93,47 @@ def total_municipios() -> int:
     return len(_load_municipios())
 
 
+@lru_cache(maxsize=1)
+def _build_coord_index() -> tuple[list[float], list[float], list[MunicipioInfo]]:
+    lats: list[float] = []
+    lons: list[float] = []
+    infos: list[MunicipioInfo] = []
+    for entry in _load_municipios():
+        if len(entry) >= 5:
+            lats.append(float(entry[3]))
+            lons.append(float(entry[4]))
+            infos.append({"codigo_ibge": int(entry[0]), "nome": str(entry[1]), "uf": str(entry[2])})
+    return lats, lons, infos
+
+
+_MAX_DISTANCE_DEG_SQ = 1.5**2
+
+
+def coordenada_para_municipio(lat: float, lon: float) -> MunicipioInfo | None:
+    """Reverse geocode: find the nearest municipality for a (lat, lon) pair.
+
+    Uses brute-force Euclidean distance against ~5570 municipality centroids.
+    Returns None if the nearest centroid is more than 1.5 degrees away (~167km).
+    """
+    idx_lats, idx_lons, idx_infos = _build_coord_index()
+    min_dist_sq = float("inf")
+    best: MunicipioInfo | None = None
+    for elat, elon, info in zip(idx_lats, idx_lons, idx_infos):
+        dlat = elat - lat
+        dlon = elon - lon
+        dist_sq = dlat * dlat + dlon * dlon
+        if dist_sq < min_dist_sq:
+            min_dist_sq = dist_sq
+            best = info
+    if best is None or min_dist_sq > _MAX_DISTANCE_DEG_SQ:
+        return None
+    return best
+
+
 __all__ = [
     "MunicipioInfo",
     "buscar_municipios",
+    "coordenada_para_municipio",
     "ibge_para_municipio",
     "municipio_para_ibge",
     "total_municipios",
