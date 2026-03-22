@@ -56,7 +56,7 @@ class TestParseTabularCnfp:
         df = parse_layer_tabular([], layer_key="cnfp")
 
         assert len(df) == 0
-        assert "OBJECTID" in df.columns
+        assert "fid" in df.columns
 
 
 gpd = pytest.importorskip("geopandas")
@@ -84,12 +84,6 @@ class TestParseGeojsonCnfp:
     def test_crs_4326(self):
         gdf = self._parse()
         assert gdf.crs.to_epsg() == 4326
-
-    def test_uf_uppercase(self):
-        gdf = self._parse()
-        for val in gdf["UF"].dropna():
-            if val:
-                assert val == val.upper()
 
     def test_empty_pages(self):
         from agrobr.sfb.parser import parse_layer_geojson

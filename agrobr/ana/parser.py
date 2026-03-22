@@ -12,17 +12,13 @@ PARSER_VERSION = 1
 
 _NUMERIC_COLS = frozenset(
     {
-        "comprimento_m",
-        "area_m2",
-        "nivel_otto",
         "area_ha",
-        "ano_mapeamento",
-        "lat",
-        "lon",
-        "demanda_m3_s",
-        "demanda_m3_ano",
-        "q95_l_s",
-        "qmlt_l_s",
+        "area_montante_km2",
+        "disponibilidade_m3_s",
+        "vazao_max_mensal",
+        "vazao_mes_seco",
+        "vazao_mes_irrigacao",
+        "vazao_media_anual",
     }
 )
 

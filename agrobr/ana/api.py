@@ -18,23 +18,57 @@ if TYPE_CHECKING:
 
 logger = structlog.get_logger()
 
+_UF_TO_ESTADO: dict[str, str] = {
+    "AC": "Acre",
+    "AL": "Alagoas",
+    "AM": "Amazonas",
+    "AP": "Amapá",
+    "BA": "Bahia",
+    "CE": "Ceará",
+    "DF": "Distrito Federal",
+    "ES": "Espírito Santo",
+    "GO": "Goiás",
+    "MA": "Maranhão",
+    "MG": "Minas Gerais",
+    "MS": "Mato Grosso do Sul",
+    "MT": "Mato Grosso",
+    "PA": "Pará",
+    "PB": "Paraíba",
+    "PE": "Pernambuco",
+    "PI": "Piauí",
+    "PR": "Paraná",
+    "RJ": "Rio de Janeiro",
+    "RN": "Rio Grande do Norte",
+    "RO": "Rondônia",
+    "RR": "Roraima",
+    "RS": "Rio Grande do Sul",
+    "SC": "Santa Catarina",
+    "SE": "Sergipe",
+    "SP": "São Paulo",
+    "TO": "Tocantins",
+}
 
-def _build_where(*, uf: str | None = None) -> str:
-    if uf:
-        return f"UF='{uf}'"
-    return "1=1"
+
+def _build_where(*, uf: str | None = None, uf_field: str = "UF") -> str:
+    if not uf:
+        return "1=1"
+    if uf_field == "NM_ESTADO":
+        estado = _UF_TO_ESTADO.get(uf, uf)
+        return f"NM_ESTADO='{estado}'"
+    return f"{uf_field}='{uf}'"
 
 
 async def _fetch_and_parse_tabular(
     layer_key: str,
     *,
     uf: str | None = None,
+    uf_field: str = "UF",
     bbox: tuple[float, float, float, float] | None = None,
     max_features: int | None = None,
     as_polars: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    where = _build_where(uf=uf)
+    where = _build_where(uf=uf, uf_field=uf_field)
     logger.info(f"ana_{layer_key}", uf=uf, bbox=bbox)
 
     t0 = time.monotonic()
@@ -69,11 +103,12 @@ async def _fetch_and_parse_geo(
     layer_key: str,
     *,
     uf: str | None = None,
+    uf_field: str = "UF",
     bbox: tuple[float, float, float, float] | None = None,
     max_features: int | None = None,
     return_meta: bool = False,
 ) -> Any:
-    where = _build_where(uf=uf)
+    where = _build_where(uf=uf, uf_field=uf_field)
     logger.info(f"ana_{layer_key}_geo", uf=uf, bbox=bbox)
 
     t0 = time.monotonic()
@@ -224,6 +259,7 @@ async def pivos_irrigacao(
     return await _fetch_and_parse_tabular(
         "pivos_irrigacao",
         uf=uf,
+        uf_field="NM_ESTADO",
         bbox=bbox,
         max_features=max_features,
         as_polars=as_polars,
@@ -264,6 +300,7 @@ async def pivos_irrigacao_geo(
     return await _fetch_and_parse_geo(
         "pivos_irrigacao",
         uf=uf,
+        uf_field="NM_ESTADO",
         bbox=bbox,
         max_features=max_features,
         return_meta=return_meta,
@@ -348,14 +385,13 @@ async def demanda_irrigacao_geo(
 
 
 # ---------------------------------------------------------------------------
-# disponibilidade_hidrica (uf optional, bbox optional)
+# disponibilidade_hidrica (bbox optional, no UF field in service)
 # ---------------------------------------------------------------------------
 
 
 @overload
 async def disponibilidade_hidrica(
     *,
-    uf: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
     max_features: int | None = None,
     as_polars: bool = False,
@@ -366,7 +402,6 @@ async def disponibilidade_hidrica(
 @overload
 async def disponibilidade_hidrica(
     *,
-    uf: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
     max_features: int | None = None,
     as_polars: bool = False,
@@ -376,18 +411,15 @@ async def disponibilidade_hidrica(
 
 async def disponibilidade_hidrica(
     *,
-    uf: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
     max_features: int | None = None,
     as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    uf = validate_uf(uf)
     bbox = validate_bbox(bbox)
     return await _fetch_and_parse_tabular(
         "disponibilidade_hidrica",
-        uf=uf,
         bbox=bbox,
         max_features=max_features,
         as_polars=as_polars,
@@ -398,7 +430,6 @@ async def disponibilidade_hidrica(
 @overload
 async def disponibilidade_hidrica_geo(
     *,
-    uf: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
     max_features: int | None = None,
     return_meta: Literal[False] = False,
@@ -408,7 +439,6 @@ async def disponibilidade_hidrica_geo(
 @overload
 async def disponibilidade_hidrica_geo(
     *,
-    uf: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
     max_features: int | None = None,
     return_meta: Literal[True],
@@ -417,17 +447,14 @@ async def disponibilidade_hidrica_geo(
 
 async def disponibilidade_hidrica_geo(
     *,
-    uf: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
     max_features: int | None = None,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> Any:
-    uf = validate_uf(uf)
     bbox = validate_bbox(bbox)
     return await _fetch_and_parse_geo(
         "disponibilidade_hidrica",
-        uf=uf,
         bbox=bbox,
         max_features=max_features,
         return_meta=return_meta,

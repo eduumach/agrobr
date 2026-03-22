@@ -14,10 +14,7 @@ _NUMERIC_COLS = frozenset(
     {
         "area_ha",
         "ano_criacao",
-        "ano_contrato",
-        "lat",
-        "lon",
-        "numero",
+        "codigo_lote",
     }
 )
 

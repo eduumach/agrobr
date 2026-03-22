@@ -1,1 +1,1 @@
-{"count": 5, "columns": ["OBJECTID", "UF", "municipio", "area_ha"], "crs_epsg": 4326}
+{"count": 5, "columns": ["OBJECTID", "codigo_municipio", "municipio", "estado", "area_ha"], "crs_epsg": 4326}

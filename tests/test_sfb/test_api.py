@@ -37,7 +37,7 @@ class TestCnfp:
 
         assert len(df) == 5
         assert "nome" in df.columns
-        assert "UF" in df.columns
+        assert "uf" in df.columns
 
     @pytest.mark.asyncio
     async def test_cnfp_return_meta(self):
@@ -68,7 +68,7 @@ class TestCnfp:
             await api.cnfp(uf="PA")
 
         call_kwargs = mock_fetch.call_args[1]
-        assert "PA" in call_kwargs["where"]
+        assert "uf='PA'" in call_kwargs["where"]
 
     @pytest.mark.asyncio
     async def test_invalid_uf_raises(self):

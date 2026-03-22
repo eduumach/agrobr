@@ -37,7 +37,7 @@ class TestPivosIrrigacao:
 
         assert len(df) == 5
         assert "municipio" in df.columns
-        assert "UF" in df.columns
+        assert "estado" in df.columns
 
     @pytest.mark.asyncio
     async def test_pivos_return_meta(self):
@@ -68,7 +68,7 @@ class TestPivosIrrigacao:
             await api.pivos_irrigacao(uf="MT")
 
         call_kwargs = mock_fetch.call_args[1]
-        assert "MT" in call_kwargs["where"]
+        assert "NM_ESTADO='Mato Grosso'" in call_kwargs["where"]
 
     @pytest.mark.asyncio
     async def test_invalid_uf_raises(self):

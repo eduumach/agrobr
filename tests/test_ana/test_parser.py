@@ -85,12 +85,6 @@ class TestParseGeojsonPivos:
         gdf = self._parse()
         assert gdf.crs.to_epsg() == 4326
 
-    def test_uf_uppercase(self):
-        gdf = self._parse()
-        for val in gdf["UF"].dropna():
-            if val:
-                assert val == val.upper()
-
     def test_empty_pages(self):
         from agrobr.ana.parser import parse_layer_geojson
 

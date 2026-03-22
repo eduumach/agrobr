@@ -18,20 +18,31 @@ if TYPE_CHECKING:
 
 logger = structlog.get_logger()
 
+_WHERE_FIELDS: dict[str, dict[str, str]] = {
+    "cnfp": {"uf": "uf", "bioma": "bioma", "categoria": "categoria"},
+    "concessoes": {"uf": "uf"},
+    "ifn_conglomerados": {"uf": "no_uf", "bioma": "no_bioma"},
+}
+
 
 def _build_where(
+    layer_key: str,
     *,
     uf: str | None = None,
     bioma: str | None = None,
     categoria: str | None = None,
 ) -> str:
+    fields = _WHERE_FIELDS.get(layer_key, {})
     clauses: list[str] = []
     if uf:
-        clauses.append(f"UF='{uf}'")
+        field = fields.get("uf", "uf")
+        clauses.append(f"{field}='{uf}'")
     if bioma:
-        clauses.append(f"BIOMA='{bioma}'")
+        field = fields.get("bioma", "bioma")
+        clauses.append(f"{field}='{bioma}'")
     if categoria:
-        clauses.append(f"CATEGORIA='{categoria}'")
+        field = fields.get("categoria", "categoria")
+        clauses.append(f"{field}='{categoria}'")
     return " AND ".join(clauses) if clauses else "1=1"
 
 
@@ -45,7 +56,7 @@ async def _fetch_and_parse_tabular(
     as_polars: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    where = _build_where(uf=uf, bioma=bioma, categoria=categoria)
+    where = _build_where(layer_key, uf=uf, bioma=bioma, categoria=categoria)
     logger.info(f"sfb_{layer_key}", uf=uf, bbox=bbox)
 
     t0 = time.monotonic()
@@ -79,7 +90,7 @@ async def _fetch_and_parse_geo(
     bbox: tuple[float, float, float, float] | None = None,
     return_meta: bool = False,
 ) -> Any:
-    where = _build_where(uf=uf, bioma=bioma, categoria=categoria)
+    where = _build_where(layer_key, uf=uf, bioma=bioma, categoria=categoria)
     logger.info(f"sfb_{layer_key}_geo", uf=uf, bbox=bbox)
 
     t0 = time.monotonic()
