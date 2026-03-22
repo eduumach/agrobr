@@ -21,11 +21,11 @@ logger = structlog.get_logger()
 
 def _prepare_bbox(
     bbox: tuple[float, float, float, float] | None,
-) -> list[dict[str, float]] | None:
+) -> list[float] | None:
     if not bbox:
         return None
     xmin, ymin, xmax, ymax = bbox
-    return [{"swLat": ymin, "swLng": xmin, "neLat": ymax, "neLng": xmax}]
+    return [ymin, xmin, ymax, xmax]
 
 
 @overload

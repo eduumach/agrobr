@@ -97,7 +97,7 @@ class TestAlertas:
             await api.alertas(token="tok", bbox=(-55.0, -10.0, -50.0, -5.0))
         call_kwargs = mock_fetch.call_args[1]
         bb = call_kwargs["bounding_box"]
-        assert bb == [{"swLat": -10.0, "swLng": -55.0, "neLat": -5.0, "neLng": -50.0}]
+        assert bb == [-10.0, -55.0, -5.0, -50.0]
 
     @pytest.mark.asyncio
     async def test_token_passthrough(self):

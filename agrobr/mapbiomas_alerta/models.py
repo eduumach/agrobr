@@ -7,7 +7,7 @@ query alerts(
   $page: Int, $limit: Int,
   $startDate: BaseDate, $endDate: BaseDate,
   $sources: [SourceTypes!],
-  $boundingBox: [BoundingBoxInput!],
+  $boundingBox: [Float!],
   $territoryIds: [Int!]
 ) {
   alerts(

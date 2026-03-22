@@ -82,7 +82,7 @@ async def fetch_alertas(
     start_date: str | None = None,
     end_date: str | None = None,
     sources: list[str] | None = None,
-    bounding_box: list[dict[str, float]] | None = None,
+    bounding_box: list[float] | None = None,
     limit: int = 100,
     max_pages: int = 50,
 ) -> tuple[list[dict[str, Any]], str]:
