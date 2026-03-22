@@ -68,7 +68,7 @@ class TestPivosIrrigacao:
             await api.pivos_irrigacao(uf="MT")
 
         call_kwargs = mock_fetch.call_args[1]
-        assert "NM_ESTADO='Mato Grosso'" in call_kwargs["where"]
+        assert "NM_ESTADO='MATO GROSSO'" in call_kwargs["where"]
 
     @pytest.mark.asyncio
     async def test_invalid_uf_raises(self):

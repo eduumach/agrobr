@@ -53,7 +53,7 @@ def _build_where(*, uf: str | None = None, uf_field: str = "UF") -> str:
     if not uf:
         return "1=1"
     if uf_field == "NM_ESTADO":
-        estado = _UF_TO_ESTADO.get(uf, uf)
+        estado = _UF_TO_ESTADO.get(uf, uf).upper()
         return f"NM_ESTADO='{estado}'"
     return f"{uf_field}='{uf}'"
 
