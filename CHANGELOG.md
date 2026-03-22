@@ -7,11 +7,14 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-03-22
+
 ### Added
 - **normalize** — `coordenada_para_municipio(lat, lon)` geocodificação reversa offline. Lookup brute-force contra 5571 centroides IBGE (sub-ms, zero HTTP). Retorna `MunicipioInfo` ou `None` (threshold 1.5° ~167km)
 
 ### Fixed
 - **funai/ibama/incra/icmbio** — funcoes `_geo()` removem `CQL_FILTER` da request WFS GeoJSON (geoservers gov.br retornam HTTP 500 ou HTML de erro ao combinar `CQL_FILTER` + `BBOX` + `outputFormat=application/json`). Filtros uf/fase/grupo/bioma agora aplicados pos-download no GeoDataFrame. Funcoes CSV nao afetadas
+- **incra** — `GEOM_COLUMN` corrigido de `the_geom` para `geom`
 
 ## [1.0.3] - 2026-03-22
 
@@ -1088,7 +1091,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - Type hints completos
 - Logging estruturado com structlog
 
-[Unreleased]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.3...HEAD
+[Unreleased]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.4...HEAD
+[1.0.4]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.0...v1.0.1
