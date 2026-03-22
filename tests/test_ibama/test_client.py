@@ -101,23 +101,37 @@ class TestFetchEmbargos:
 class TestFetchEmbargosGeo:
     @pytest.mark.asyncio
     async def test_output_format_json(self):
-        calls: list[str] = []
-
-        async def mock_fetch_wfs(url, **_kwargs):
-            calls.append(url)
-            return b"x" * 100
-
-        with patch("agrobr.ibama.client.fetch_wfs", side_effect=mock_fetch_wfs):
+        with patch(
+            "agrobr.ibama.client.fetch_wfs", new_callable=AsyncMock, return_value=b"x" * 100
+        ):
             _, url = await fetch_embargos_geo()
 
         assert "outputFormat=application" in url
 
     @pytest.mark.asyncio
     async def test_geom_column_in_url(self):
-        async def mock_fetch_wfs(_url, **_kwargs):
-            return b"x" * 100
-
-        with patch("agrobr.ibama.client.fetch_wfs", side_effect=mock_fetch_wfs):
+        with patch(
+            "agrobr.ibama.client.fetch_wfs", new_callable=AsyncMock, return_value=b"x" * 100
+        ):
             _, url = await fetch_embargos_geo()
 
         assert "propertyName=geom," in url
+
+    @pytest.mark.asyncio
+    async def test_no_cql_in_geo_url(self):
+        with patch(
+            "agrobr.ibama.client.fetch_wfs", new_callable=AsyncMock, return_value=b"x" * 100
+        ):
+            _, url = await fetch_embargos_geo()
+
+        assert "CQL_FILTER" not in url
+
+    @pytest.mark.asyncio
+    async def test_bbox_only_no_cql(self):
+        with patch(
+            "agrobr.ibama.client.fetch_wfs", new_callable=AsyncMock, return_value=b"x" * 100
+        ):
+            _, url = await fetch_embargos_geo(bbox=(-60.0, -15.0, -50.0, -10.0))
+
+        assert "BBOX=" in url
+        assert "CQL_FILTER" not in url

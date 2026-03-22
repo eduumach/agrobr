@@ -164,6 +164,147 @@ class TestUcsGeo:
             await api.ucs_geo(grupo="XX")
 
     @pytest.mark.asyncio
+    async def test_client_receives_only_bbox(self):
+        geojson_bytes = _ucs_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_ucs_geo",
+            new_callable=AsyncMock,
+            return_value=(
+                geojson_bytes,
+                "https://geoservicos.inde.gov.br/geoserver/ICMBio/ows",
+            ),
+        ) as mock_fetch:
+            await api.ucs_geo(
+                uf="MT", grupo="PI", bioma="Cerrado", bbox=(-60.0, -15.0, -50.0, -10.0)
+            )
+
+        call_kwargs = mock_fetch.call_args[1]
+        assert "uf" not in call_kwargs
+        assert "grupo" not in call_kwargs
+        assert "bioma" not in call_kwargs
+        assert call_kwargs["bbox"] == (-60.0, -15.0, -50.0, -10.0)
+
+    @pytest.mark.asyncio
+    async def test_post_filter_by_uf_contains(self):
+        geojson_bytes = _ucs_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_ucs_geo",
+            new_callable=AsyncMock,
+            return_value=(
+                geojson_bytes,
+                "https://geoservicos.inde.gov.br/geoserver/ICMBio/ows",
+            ),
+        ):
+            gdf = await api.ucs_geo(uf="MT")
+
+        assert len(gdf) == 7
+        assert gdf["uf"].str.contains("MT").all()
+
+    @pytest.mark.asyncio
+    async def test_post_filter_by_uf_exact(self):
+        geojson_bytes = _ucs_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_ucs_geo",
+            new_callable=AsyncMock,
+            return_value=(
+                geojson_bytes,
+                "https://geoservicos.inde.gov.br/geoserver/ICMBio/ows",
+            ),
+        ):
+            gdf = await api.ucs_geo(uf="DF")
+
+        assert len(gdf) == 2
+
+    @pytest.mark.asyncio
+    async def test_post_filter_by_grupo(self):
+        geojson_bytes = _ucs_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_ucs_geo",
+            new_callable=AsyncMock,
+            return_value=(
+                geojson_bytes,
+                "https://geoservicos.inde.gov.br/geoserver/ICMBio/ows",
+            ),
+        ):
+            gdf = await api.ucs_geo(grupo="US")
+
+        assert len(gdf) == 4
+        assert (gdf["grupo"] == "US").all()
+
+    @pytest.mark.asyncio
+    async def test_post_filter_by_bioma(self):
+        geojson_bytes = _ucs_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_ucs_geo",
+            new_callable=AsyncMock,
+            return_value=(
+                geojson_bytes,
+                "https://geoservicos.inde.gov.br/geoserver/ICMBio/ows",
+            ),
+        ):
+            gdf = await api.ucs_geo(bioma="Pantanal")
+
+        assert len(gdf) == 1
+
+    @pytest.mark.asyncio
+    async def test_post_filter_combined(self):
+        geojson_bytes = _ucs_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_ucs_geo",
+            new_callable=AsyncMock,
+            return_value=(
+                geojson_bytes,
+                "https://geoservicos.inde.gov.br/geoserver/ICMBio/ows",
+            ),
+        ):
+            gdf = await api.ucs_geo(uf="MT", grupo="PI", bioma="Cerrado")
+
+        assert len(gdf) >= 1
+        assert gdf["uf"].str.contains("MT").all()
+        assert (gdf["grupo"] == "PI").all()
+        assert (gdf["bioma"] == "Cerrado").all()
+
+    @pytest.mark.asyncio
+    async def test_post_filter_no_match_returns_empty(self):
+        geojson_bytes = _ucs_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_ucs_geo",
+            new_callable=AsyncMock,
+            return_value=(
+                geojson_bytes,
+                "https://geoservicos.inde.gov.br/geoserver/ICMBio/ows",
+            ),
+        ):
+            gdf = await api.ucs_geo(uf="AC")
+
+        assert len(gdf) == 0
+        assert isinstance(gdf, gpd.GeoDataFrame)
+
+    @pytest.mark.asyncio
+    async def test_post_filter_meta_reflects_filtered_count(self):
+        geojson_bytes = _ucs_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_ucs_geo",
+            new_callable=AsyncMock,
+            return_value=(
+                geojson_bytes,
+                "https://geoservicos.inde.gov.br/geoserver/ICMBio/ows",
+            ),
+        ):
+            gdf, meta = await api.ucs_geo(grupo="US", return_meta=True)
+
+        assert len(gdf) == 4
+        assert meta.records_count == 4
+
+    @pytest.mark.asyncio
     async def test_geometry_preserved(self):
         geojson_bytes = _ucs_geojson_bytes()
         with patch.object(

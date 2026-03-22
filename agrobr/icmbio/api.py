@@ -127,14 +127,19 @@ async def ucs_geo(
     logger.info("icmbio_ucs_geo", uf=uf, grupo=grupo, bioma=bioma, bbox=bbox)
 
     t0 = time.monotonic()
-    geojson_bytes, source_url = await client.fetch_ucs_geo(
-        uf=uf, grupo=grupo, bioma=bioma, bbox=bbox
-    )
+    geojson_bytes, source_url = await client.fetch_ucs_geo(bbox=bbox)
     fetch_ms = int((time.monotonic() - t0) * 1000)
 
     t1 = time.monotonic()
     gdf = parser.parse_ucs_geojson(geojson_bytes)
     parse_ms = int((time.monotonic() - t1) * 1000)
+
+    if uf is not None and not gdf.empty:
+        gdf = gdf[gdf["uf"].str.contains(uf, na=False, regex=False)].reset_index(drop=True)
+    if grupo is not None and not gdf.empty:
+        gdf = gdf[gdf["grupo"] == grupo].reset_index(drop=True)
+    if bioma is not None and not gdf.empty:
+        gdf = gdf[gdf["bioma"] == bioma].reset_index(drop=True)
 
     if return_meta:
         meta = build_source_meta(

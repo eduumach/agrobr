@@ -7,6 +7,9 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+### Fixed
+- **funai/ibama/incra/icmbio** — funcoes `_geo()` removem `CQL_FILTER` da request WFS GeoJSON (geoservers gov.br retornam HTTP 500 ou HTML de erro ao combinar `CQL_FILTER` + `BBOX` + `outputFormat=application/json`). Filtros uf/fase/grupo/bioma agora aplicados pos-download no GeoDataFrame. Funcoes CSV nao afetadas
+
 ## [1.0.3] - 2026-03-22
 
 ### Added

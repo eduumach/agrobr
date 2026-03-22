@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from unittest.mock import AsyncMock, patch
-from urllib.parse import unquote
 
 import pytest
 
@@ -67,12 +66,18 @@ class TestFetchTerrasIndigenasGeo:
         assert "propertyName=the_geom," in url
 
     @pytest.mark.asyncio
-    async def test_cql_combined_uf_fase(self):
+    async def test_no_cql_in_geo_url(self):
         with patch(
             "agrobr.funai.client.fetch_wfs", new_callable=AsyncMock, return_value=b"x" * 100
         ):
-            _, url = await fetch_terras_indigenas_geo(uf="MT", fase="Regularizada")
-        decoded = unquote(url)
-        assert "uf_sigla='MT'" in decoded
-        assert "fase_ti='Regularizada'" in decoded
-        assert " AND " in decoded
+            _, url = await fetch_terras_indigenas_geo()
+        assert "CQL_FILTER" not in url
+
+    @pytest.mark.asyncio
+    async def test_bbox_only_no_cql(self):
+        with patch(
+            "agrobr.funai.client.fetch_wfs", new_callable=AsyncMock, return_value=b"x" * 100
+        ):
+            _, url = await fetch_terras_indigenas_geo(bbox=(-60.0, -15.0, -50.0, -10.0))
+        assert "BBOX=" in url
+        assert "CQL_FILTER" not in url

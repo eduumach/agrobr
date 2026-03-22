@@ -161,6 +161,96 @@ class TestTerrasIndigenasGeo:
         assert call_kwargs["bbox"] == (-60.0, -15.0, -50.0, -10.0)
 
     @pytest.mark.asyncio
+    async def test_client_receives_only_bbox(self):
+        geojson_bytes = _geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_terras_indigenas_geo",
+            new_callable=AsyncMock,
+            return_value=(geojson_bytes, "https://geoserver.funai.gov.br/geoserver/Funai/ows"),
+        ) as mock_fetch:
+            await api.terras_indigenas_geo(
+                uf="MT", fase="Regularizada", bbox=(-60.0, -15.0, -50.0, -10.0)
+            )
+
+        call_kwargs = mock_fetch.call_args[1]
+        assert "uf" not in call_kwargs
+        assert "fase" not in call_kwargs
+        assert call_kwargs["bbox"] == (-60.0, -15.0, -50.0, -10.0)
+
+    @pytest.mark.asyncio
+    async def test_post_filter_by_fase(self):
+        geojson_bytes = _geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_terras_indigenas_geo",
+            new_callable=AsyncMock,
+            return_value=(geojson_bytes, "https://geoserver.funai.gov.br/geoserver/Funai/ows"),
+        ):
+            gdf = await api.terras_indigenas_geo(fase="Regularizada")
+
+        assert len(gdf) == 6
+        assert (gdf["fase"] == "Regularizada").all()
+
+    @pytest.mark.asyncio
+    async def test_post_filter_by_fase_single(self):
+        geojson_bytes = _geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_terras_indigenas_geo",
+            new_callable=AsyncMock,
+            return_value=(geojson_bytes, "https://geoserver.funai.gov.br/geoserver/Funai/ows"),
+        ):
+            gdf = await api.terras_indigenas_geo(fase="Em Estudo")
+
+        assert len(gdf) == 1
+
+    @pytest.mark.asyncio
+    async def test_post_filter_no_match_returns_empty(self):
+        import geopandas as local_gpd
+
+        geojson_bytes = _geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_terras_indigenas_geo",
+            new_callable=AsyncMock,
+            return_value=(geojson_bytes, "https://geoserver.funai.gov.br/geoserver/Funai/ows"),
+        ):
+            gdf = await api.terras_indigenas_geo(uf="AC")
+
+        assert len(gdf) == 0
+        assert isinstance(gdf, local_gpd.GeoDataFrame)
+
+    @pytest.mark.asyncio
+    async def test_post_filter_combined_uf_fase(self):
+        geojson_bytes = _geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_terras_indigenas_geo",
+            new_callable=AsyncMock,
+            return_value=(geojson_bytes, "https://geoserver.funai.gov.br/geoserver/Funai/ows"),
+        ):
+            gdf = await api.terras_indigenas_geo(uf="MT", fase="Homologada")
+
+        assert len(gdf) == 2
+        assert (gdf["uf"] == "MT").all()
+        assert (gdf["fase"] == "Homologada").all()
+
+    @pytest.mark.asyncio
+    async def test_post_filter_meta_reflects_filtered_count(self):
+        geojson_bytes = _geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_terras_indigenas_geo",
+            new_callable=AsyncMock,
+            return_value=(geojson_bytes, "https://geoserver.funai.gov.br/geoserver/Funai/ows"),
+        ):
+            gdf, meta = await api.terras_indigenas_geo(fase="Declarada", return_meta=True)
+
+        assert len(gdf) == 1
+        assert meta.records_count == 1
+
+    @pytest.mark.asyncio
     async def test_geometry_preserved(self):
         geojson_bytes = _geojson_bytes()
         with patch.object(

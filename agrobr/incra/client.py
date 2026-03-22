@@ -57,11 +57,8 @@ async def fetch_quilombolas(
 
 async def fetch_quilombolas_geo(
     *,
-    uf: str | None = None,
-    fase: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
 ) -> tuple[bytes, str]:
-    cql = _build_cql(uf=uf, fase=fase)
     url = build_wfs_url(
         WFS_BASE,
         NAMESPACE,
@@ -70,7 +67,6 @@ async def fetch_quilombolas_geo(
         PROPERTY_NAMES_GEO,
         max_features=MAX_FEATURES_GEO,
         output_format="application/json",
-        cql_filter=cql,
         bbox=bbox,
     )
     content = await fetch_wfs(url, source="incra", timeout=TIMEOUT)

@@ -118,3 +118,24 @@ class TestFetchQuilombolasGeo:
         ):
             _, url = await fetch_quilombolas_geo()
         assert "maxFeatures=500" in url
+
+    @pytest.mark.asyncio
+    async def test_no_cql_in_geo_url(self):
+        from agrobr.incra.client import fetch_quilombolas_geo
+
+        with patch(
+            "agrobr.incra.client.fetch_wfs", new_callable=AsyncMock, return_value=b"x" * 5000
+        ):
+            _, url = await fetch_quilombolas_geo()
+        assert "CQL_FILTER" not in url
+
+    @pytest.mark.asyncio
+    async def test_bbox_only_no_cql(self):
+        from agrobr.incra.client import fetch_quilombolas_geo
+
+        with patch(
+            "agrobr.incra.client.fetch_wfs", new_callable=AsyncMock, return_value=b"x" * 5000
+        ):
+            _, url = await fetch_quilombolas_geo(bbox=(-60.0, -15.0, -50.0, -10.0))
+        assert "BBOX=" in url
+        assert "CQL_FILTER" not in url

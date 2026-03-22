@@ -167,7 +167,7 @@ class TestQuilombolasGeo:
         assert gdf.geometry.is_valid.all()
 
     @pytest.mark.asyncio
-    async def test_passes_uf_to_client(self):
+    async def test_client_receives_only_bbox(self):
         geojson_bytes = _geojson_bytes()
         with patch.object(
             api.client,
@@ -175,9 +175,83 @@ class TestQuilombolasGeo:
             new_callable=AsyncMock,
             return_value=(geojson_bytes, "https://cmr.funai.gov.br/geoserver/ows"),
         ) as mock_fetch:
-            await api.quilombolas_geo(uf="GO")
+            await api.quilombolas_geo(uf="GO", fase="Titulada", bbox=(-60.0, -15.0, -50.0, -10.0))
 
-        assert mock_fetch.call_args.kwargs["uf"] == "GO"
+        call_kwargs = mock_fetch.call_args.kwargs
+        assert "uf" not in call_kwargs
+        assert "fase" not in call_kwargs
+        assert call_kwargs["bbox"] == (-60.0, -15.0, -50.0, -10.0)
+
+    @pytest.mark.asyncio
+    async def test_post_filter_by_uf(self):
+        geojson_bytes = _geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_quilombolas_geo",
+            new_callable=AsyncMock,
+            return_value=(geojson_bytes, "https://cmr.funai.gov.br/geoserver/ows"),
+        ):
+            gdf = await api.quilombolas_geo(uf="GO")
+
+        assert len(gdf) == 2
+        assert (gdf["uf"] == "GO").all()
+
+    @pytest.mark.asyncio
+    async def test_post_filter_by_fase(self):
+        geojson_bytes = _geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_quilombolas_geo",
+            new_callable=AsyncMock,
+            return_value=(geojson_bytes, "https://cmr.funai.gov.br/geoserver/ows"),
+        ):
+            gdf = await api.quilombolas_geo(fase="Titulada")
+
+        assert len(gdf) == 5
+        assert (gdf["fase"] == "Titulada").all()
+
+    @pytest.mark.asyncio
+    async def test_post_filter_combined_uf_fase(self):
+        geojson_bytes = _geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_quilombolas_geo",
+            new_callable=AsyncMock,
+            return_value=(geojson_bytes, "https://cmr.funai.gov.br/geoserver/ows"),
+        ):
+            gdf = await api.quilombolas_geo(uf="GO", fase="Titulada")
+
+        assert len(gdf) == 1
+        assert (gdf["uf"] == "GO").all()
+        assert (gdf["fase"] == "Titulada").all()
+
+    @pytest.mark.asyncio
+    async def test_post_filter_no_match_returns_empty(self):
+        geojson_bytes = _geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_quilombolas_geo",
+            new_callable=AsyncMock,
+            return_value=(geojson_bytes, "https://cmr.funai.gov.br/geoserver/ows"),
+        ):
+            gdf = await api.quilombolas_geo(uf="AC")
+
+        assert len(gdf) == 0
+        assert isinstance(gdf, gpd.GeoDataFrame)
+
+    @pytest.mark.asyncio
+    async def test_post_filter_meta_reflects_filtered_count(self):
+        geojson_bytes = _geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_quilombolas_geo",
+            new_callable=AsyncMock,
+            return_value=(geojson_bytes, "https://cmr.funai.gov.br/geoserver/ows"),
+        ):
+            gdf, meta = await api.quilombolas_geo(uf="SP", return_meta=True)
+
+        assert len(gdf) == 2
+        assert meta.records_count == 2
 
     @pytest.mark.asyncio
     async def test_no_return_meta_returns_gdf_only(self):

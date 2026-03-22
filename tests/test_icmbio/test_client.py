@@ -99,3 +99,20 @@ class TestFetchUcsGeo:
         ):
             _, url = await fetch_ucs_geo()
         assert "propertyName=the_geom," in url
+
+    @pytest.mark.asyncio
+    async def test_no_cql_in_geo_url(self):
+        with patch(
+            "agrobr.icmbio.client.fetch_wfs", new_callable=AsyncMock, return_value=b"x" * 5000
+        ):
+            _, url = await fetch_ucs_geo()
+        assert "CQL_FILTER" not in url
+
+    @pytest.mark.asyncio
+    async def test_bbox_only_no_cql(self):
+        with patch(
+            "agrobr.icmbio.client.fetch_wfs", new_callable=AsyncMock, return_value=b"x" * 5000
+        ):
+            _, url = await fetch_ucs_geo(bbox=(-60.0, -15.0, -50.0, -10.0))
+        assert "BBOX=" in url
+        assert "CQL_FILTER" not in url
