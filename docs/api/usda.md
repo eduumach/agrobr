@@ -32,7 +32,7 @@ async def psd(
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `commodity` | `str` | Commodity: `"soja"`, `"milho"`, `"trigo"` ou codigo USDA |
+| `commodity` | `str` | Commodity: `"soja"`, `"milho"`, `"trigo"`, `"cafe"`, `"arroz"`, `"algodao"`, `"acucar"`, `"farelo_soja"`, `"oleo_soja"` ou codigo USDA |
 | `country` | `str` | Pais: `"BR"`, `"US"`, `"world"` (agregado), `"all"` (todos). Default: `"BR"` |
 | `market_year` | `int \| None` | Ano de comercializacao. None usa mais recente |
 | `attributes` | `list[str] \| None` | Filtrar atributos (ex: `["Production", "Exports"]`) |

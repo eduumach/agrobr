@@ -173,6 +173,9 @@ class TestNormalizeSafraHeader:
     def test_year_only(self):
         assert _normalize_safra_header("2023") == "2023/24"
 
+    def test_year_float_coercion(self):
+        assert _normalize_safra_header("2024.0") == "2024/25"
+
     def test_two_digit_format(self):
         assert _normalize_safra_header("23/24") == "2023/24"
 
@@ -202,6 +205,15 @@ class TestFindHeaderRow:
         rows = [
             ["TITULO", None, None, None],
             ["UF", "2020", "2021", "2022"],
+            ["MT", 10200.0, 10800.0, 11400.0],
+        ]
+        df = pd.DataFrame(rows)
+        assert _find_header_row(df) == 1
+
+    def test_finds_float_year_headers(self):
+        rows = [
+            ["TITULO", None, None, None],
+            ["UF", 2020.0, 2021.0, 2022.0],
             ["MT", 10200.0, 10800.0, 11400.0],
         ]
         df = pd.DataFrame(rows)

@@ -11,7 +11,17 @@ from agrobr.models import MetaInfo
 
 logger = structlog.get_logger()
 
-_PRODUCTS = ["acucar", "algodao", "arroz", "farelo_soja", "milho", "oleo_soja", "soja", "trigo"]
+_PRODUCTS = [
+    "acucar",
+    "algodao",
+    "arroz",
+    "cafe",
+    "farelo_soja",
+    "milho",
+    "oleo_soja",
+    "soja",
+    "trigo",
+]
 
 
 async def _fetch_usda_psd(produto: str, **kwargs: Any) -> tuple[pd.DataFrame, MetaInfo | None]:

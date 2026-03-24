@@ -252,3 +252,24 @@ class TestExtractSafraColumnsFallback:
         assert cols["2025"]["produtividade"] == 4
         assert cols["2024"]["producao"] == 5
         assert cols["2025"]["producao"] == 6
+
+    def test_safra_year_only_detected(self, parser):
+        df = pd.DataFrame(
+            [
+                ["REGIAO/UF", "ÁREA", None, "PRODUTIVIDADE", None, "PRODUÇÃO", None],
+                [
+                    "",
+                    "Safra 2024",
+                    "Safra 2025",
+                    "Safra 2024",
+                    "Safra 2025",
+                    "Safra 2024",
+                    "Safra 2025",
+                ],
+            ]
+        )
+        cols = parser._extract_safra_columns(df, 0)
+        assert "2024/25" in cols
+        assert "2025/26" in cols
+        assert cols["2024/25"]["area"] == 1
+        assert cols["2025/26"]["area"] == 2

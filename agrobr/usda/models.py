@@ -19,6 +19,8 @@ PSD_COMMODITIES: dict[str, str] = {
     "soybean_meal": "4233000",
     "oleo_soja": "4232000",
     "soybean_oil": "4232000",
+    "cafe": "0711100",
+    "coffee": "0711100",
 }
 
 _COMMODITY_NAMES: dict[str, str] = {
@@ -30,6 +32,7 @@ _COMMODITY_NAMES: dict[str, str] = {
     "0612000": "acucar",
     "4233000": "farelo_soja",
     "4232000": "oleo_soja",
+    "0711100": "cafe",
 }
 
 PSD_ATTRIBUTES: dict[int, str] = {

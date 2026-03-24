@@ -131,7 +131,7 @@ class TestOfertaDemandaGlobalInfo:
         assert OFERTA_DEMANDA_GLOBAL_INFO.sources[0].name == "usda"
 
     def test_products_count(self):
-        assert len(OFERTA_DEMANDA_GLOBAL_INFO.products) == 8
+        assert len(OFERTA_DEMANDA_GLOBAL_INFO.products) == 9
 
     def test_license_livre(self):
         assert OFERTA_DEMANDA_GLOBAL_INFO.license == "livre"

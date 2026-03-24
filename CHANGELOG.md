@@ -7,6 +7,15 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+### Added
+- **usda** — commodity `cafe`/`coffee` (Coffee, Green, PSD code `0711100`) adicionada a `PSD_COMMODITIES`, `_COMMODITY_NAMES` e dataset `oferta_demanda_global`
+- **imea** — aliases `boi`, `boi_gordo`, `bovinos` para cadeia bovinocultura (ID 2), consistente com nomenclatura canonica da lib
+
+### Fixed
+- **conab** — parser v1 agora detecta safras year-only (`"Safra 2024"` → `2024/25`). Antes, celulas sem `/` no `if "Safra" in cell` branch eram silenciosamente ignoradas, afetando 6 culturas de inverno (trigo, aveia, canola, centeio, cevada, triticale)
+- **conab** — serie historica: `_find_header_row` e `_normalize_safra_header` agora tratam float coercion do pandas (`2024.0` → `"2024"` → `"2024/25"`). Antes, `_YEAR_PATTERN` nao matchava `"2024.0"`
+- **mapa_psr** — filtro `cultura` agora e accent-insensitive via `remover_acentos`. Antes, `"cafe"` nao matchava `"CAFE ARABICA"` (silent data loss com 0 registros sem aviso)
+
 ## [1.0.4] - 2026-03-22
 
 ### Added

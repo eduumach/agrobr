@@ -36,6 +36,12 @@ class TestResolveCommodityCode:
     def test_acucar(self):
         assert resolve_commodity_code("acucar") == "0612000"
 
+    def test_cafe(self):
+        assert resolve_commodity_code("cafe") == "0711100"
+
+    def test_coffee_english(self):
+        assert resolve_commodity_code("coffee") == "0711100"
+
     def test_direct_code(self):
         assert resolve_commodity_code("2222000") == "2222000"
 
@@ -76,6 +82,9 @@ class TestCommodityName:
         assert commodity_name("2222000") == "soja"
         assert commodity_name("0440000") == "milho"
         assert commodity_name("0410000") == "trigo"
+
+    def test_cafe(self):
+        assert commodity_name("0711100") == "cafe"
 
     def test_unknown_returns_code(self):
         assert commodity_name("9999999") == "9999999"
@@ -121,6 +130,7 @@ class TestConstants:
         assert "arroz" in PSD_COMMODITIES
         assert "algodao" in PSD_COMMODITIES
         assert "acucar" in PSD_COMMODITIES
+        assert "cafe" in PSD_COMMODITIES
 
     def test_attributes_has_main_ids(self):
         assert 125 in PSD_ATTRIBUTES  # Production

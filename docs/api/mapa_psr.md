@@ -25,7 +25,7 @@ async def sinistros(
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `cultura` | `str \| None` | Filtro por cultura (busca parcial, ex: "SOJA") |
+| `cultura` | `str \| None` | Filtro por cultura (busca parcial, accent-insensitive, ex: "cafe" matcha "CAFE ARABICA") |
 | `uf` | `str \| None` | Filtro por UF (sigla, ex: "MT") |
 | `ano` | `int \| None` | Filtro de ano unico (ex: 2023) |
 | `ano_inicio` | `int \| None` | Ano inicial do range (inclusive) |
@@ -79,7 +79,7 @@ async def apolices(
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `cultura` | `str \| None` | Filtro por cultura (busca parcial, ex: "SOJA") |
+| `cultura` | `str \| None` | Filtro por cultura (busca parcial, accent-insensitive, ex: "cafe" matcha "CAFE ARABICA") |
 | `uf` | `str \| None` | Filtro por UF (sigla, ex: "MT") |
 | `ano` | `int \| None` | Filtro de ano unico (ex: 2023) |
 | `ano_inicio` | `int \| None` | Ano inicial do range (inclusive) |

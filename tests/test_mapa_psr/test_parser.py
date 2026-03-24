@@ -236,6 +236,58 @@ class TestParseApolices:
         assert len(df) == 2
         assert all(df["cultura"] == "SOJA")
 
+    def test_filtro_cultura_com_acento(self):
+        rows = [
+            {
+                "ANO_APOLICE": "2023",
+                "NR_APOLICE": "AP001",
+                "SG_UF_PROPRIEDADE": "MG",
+                "NM_MUNICIPIO_PROPRIEDADE": "PATROCINIO",
+                "CD_GEOCMU": "3148103",
+                "NM_CULTURA_GLOBAL": "CAF\u00c9 AR\u00c1BICA",
+                "NM_CLASSIF_PRODUTO": "AGRICOLA",
+                "NR_AREA_TOTAL": "100.0",
+                "VL_PREMIO_LIQUIDO": "5000.00",
+                "VL_SUBVENCAO_FEDERAL": "2000.00",
+                "VL_LIMITE_GARANTIA": "50000.00",
+                "VALOR_INDENIZACAO": "0",
+                "EVENTO_PREPONDERANTE": "",
+                "NR_PRODUTIVIDADE_ESTIMADA": "30.0",
+                "NR_PRODUTIVIDADE_SEGURADA": "24.0",
+                "NivelDeCobertura": "80",
+                "PE_TAXA": "5.0",
+                "NM_RAZAO_SOCIAL": "Seguradora ABC",
+            },
+            {
+                "ANO_APOLICE": "2023",
+                "NR_APOLICE": "AP002",
+                "SG_UF_PROPRIEDADE": "MT",
+                "NM_MUNICIPIO_PROPRIEDADE": "SORRISO",
+                "CD_GEOCMU": "5107925",
+                "NM_CULTURA_GLOBAL": "ALGOD\u00c3O",
+                "NM_CLASSIF_PRODUTO": "AGRICOLA",
+                "NR_AREA_TOTAL": "500.0",
+                "VL_PREMIO_LIQUIDO": "15000.00",
+                "VL_SUBVENCAO_FEDERAL": "6000.00",
+                "VL_LIMITE_GARANTIA": "250000.00",
+                "VALOR_INDENIZACAO": "0",
+                "EVENTO_PREPONDERANTE": "",
+                "NR_PRODUTIVIDADE_ESTIMADA": "60.0",
+                "NR_PRODUTIVIDADE_SEGURADA": "48.0",
+                "NivelDeCobertura": "80",
+                "PE_TAXA": "7.5",
+                "NM_RAZAO_SOCIAL": "Seguradora XYZ",
+            },
+        ]
+        csv_bytes = _make_csv(rows=rows)
+        df_cafe = parse_apolices(csv_bytes, cultura="cafe")
+        assert len(df_cafe) == 1
+        assert "CAF" in df_cafe.iloc[0]["cultura"]
+
+        df_algodao = parse_apolices(csv_bytes, cultura="algodao")
+        assert len(df_algodao) == 1
+        assert "ALGOD" in df_algodao.iloc[0]["cultura"]
+
     def test_filtro_ano(self):
         csv_bytes = _make_csv()
         df = parse_apolices(csv_bytes, ano=2022)

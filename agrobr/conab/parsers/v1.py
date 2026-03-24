@@ -455,6 +455,14 @@ class ConabParserV1:
                         safra_full = f"{ano1}/{ano2}"
                         if safra_full not in safras_encontradas:
                             safras_encontradas.append(safra_full)
+                else:
+                    year_str = safra_match.replace(".0", "").strip()
+                    if re.match(r"^\d{4}$", year_str):
+                        from agrobr.normalize.dates import anos_para_safra
+
+                        safra_full = anos_para_safra(int(year_str))
+                        if safra_full not in safras_encontradas:
+                            safras_encontradas.append(safra_full)
             else:
                 year_str = cell.replace(".0", "").strip()
                 if re.match(r"^\d{4}$", year_str) and year_str not in safras_encontradas:

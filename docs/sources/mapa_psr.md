@@ -51,7 +51,7 @@ df = alt.mapa_psr.apolices(uf="MT")
 
 | Parametro | Tipo | Default | Descricao |
 |---|---|---|---|
-| `cultura` | str \| None | None | Filtro por cultura (busca parcial, ex: "SOJA") |
+| `cultura` | str \| None | None | Filtro por cultura (busca parcial, accent-insensitive, ex: "cafe" matcha "CAFE ARABICA") |
 | `uf` | str \| None | None | Filtro por UF (sigla, ex: "MT") |
 | `ano` | int \| None | None | Filtro de ano unico (ex: 2023) |
 | `ano_inicio` | int \| None | None | Ano inicial do range (inclusive) |
@@ -86,7 +86,7 @@ df = alt.mapa_psr.apolices(uf="MT")
 
 | Parametro | Tipo | Default | Descricao |
 |---|---|---|---|
-| `cultura` | str \| None | None | Filtro por cultura |
+| `cultura` | str \| None | None | Filtro por cultura (busca parcial, accent-insensitive) |
 | `uf` | str \| None | None | Filtro por UF |
 | `ano` | int \| None | None | Filtro de ano unico |
 | `ano_inicio` | int \| None | None | Ano inicial do range |

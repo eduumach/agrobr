@@ -51,6 +51,15 @@ class TestResolveCadeiaId:
         assert resolve_cadeia_id("3") == 3
         assert resolve_cadeia_id("1") == 1
 
+    def test_boi(self):
+        assert resolve_cadeia_id("boi") == 2
+
+    def test_boi_gordo(self):
+        assert resolve_cadeia_id("boi_gordo") == 2
+
+    def test_bovinos(self):
+        assert resolve_cadeia_id("bovinos") == 2
+
     def test_unknown_raises(self):
         with pytest.raises(ValueError, match="Cadeia desconhecida"):
             resolve_cadeia_id("cafe")
@@ -126,6 +135,9 @@ class TestImeaCadeias:
         assert "milho" in IMEA_CADEIAS
         assert "algodao" in IMEA_CADEIAS
         assert "bovinocultura" in IMEA_CADEIAS
+        assert "boi" in IMEA_CADEIAS
+        assert "suinocultura" in IMEA_CADEIAS
+        assert "leite" in IMEA_CADEIAS
 
     def test_english_aliases(self):
         assert "soybeans" in IMEA_CADEIAS

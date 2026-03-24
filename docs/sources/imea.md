@@ -53,9 +53,9 @@ df = await imea.cotacoes("bovinocultura")
 | `soja` | Soja |
 | `milho` | Milho |
 | `algodao` | Algodão |
-| `bovinocultura` / `boi` | Bovinocultura |
-| `arroz` | Arroz |
-| `feijao` | Feijão |
+| `bovinocultura` / `boi` / `boi_gordo` / `bovinos` | Bovinocultura |
+| `suinocultura` | Suinocultura |
+| `leite` | Leite |
 
 ## MetaInfo
 

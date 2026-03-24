@@ -48,9 +48,20 @@ def _detect_metric_from_sheet_name(name: str) -> str | None:
     return None
 
 
+def _clean_numeric_str(v: Any) -> str:
+    s = str(v).strip()
+    try:
+        f = float(s)
+        if f == int(f):
+            return str(int(f))
+    except (ValueError, OverflowError):
+        pass
+    return s
+
+
 def _find_header_row(df_raw: pd.DataFrame) -> int:
     for idx in range(min(20, len(df_raw))):
-        row_values = [str(v).strip() for v in df_raw.iloc[idx] if pd.notna(v)]
+        row_values = [_clean_numeric_str(v) for v in df_raw.iloc[idx] if pd.notna(v)]
         safra_count = sum(
             1 for v in row_values if _SAFRA_PATTERN.search(v) or _YEAR_PATTERN.match(v)
         )
@@ -65,7 +76,7 @@ def _find_header_row(df_raw: pd.DataFrame) -> int:
 
 
 def _normalize_safra_header(value: str) -> str | None:
-    value = str(value).strip()
+    value = _clean_numeric_str(value)
 
     match = re.match(r"(\d{4})/(\d{4})$", value)
     if match:

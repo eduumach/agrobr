@@ -8,6 +8,7 @@ import structlog
 from agrobr.exceptions import ParseError
 from agrobr.normalize.encoding import detect_encoding_chain
 from agrobr.normalize.numeric import parse_numeric_br
+from agrobr.normalize.regions import remover_acentos
 
 logger = structlog.get_logger()
 
@@ -143,7 +144,12 @@ def parse_apolices(
         df = df[df["uf"] == uf.upper()]
 
     if cultura:
-        mask = df["cultura"].str.contains(cultura.upper(), na=False)
+        cultura_norm = remover_acentos(cultura.upper())
+        mask = df["cultura"].apply(
+            lambda x, cn=cultura_norm: (
+                cn in remover_acentos(str(x).upper()) if pd.notna(x) else False
+            )
+        )
         df = df[mask]
 
     if ano and "ano_apolice" in df.columns:

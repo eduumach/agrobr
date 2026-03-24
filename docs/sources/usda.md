@@ -64,8 +64,10 @@ df = await usda.psd("soja", pivot=True)
 | `trigo` | Wheat |
 | `algodao` | Cotton |
 | `arroz` | Rice, Milled |
-| `cafe` | Coffee, Green |
-| `acucar` | Sugar, Centrifugal |
+| `cafe` / `coffee` | Coffee, Green |
+| `acucar` / `sugar` | Sugar, Centrifugal |
+| `farelo_soja` / `soybean_meal` | Soybean Meal |
+| `oleo_soja` / `soybean_oil` | Soybean Oil |
 
 ## MetaInfo
 
