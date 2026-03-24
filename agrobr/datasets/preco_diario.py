@@ -17,11 +17,11 @@ async def _fetch_cepea(produto: str, **kwargs: Any) -> tuple[pd.DataFrame, MetaI
     from agrobr import cepea
 
     if is_deterministic():
-        result = await cepea.indicador(produto, offline=True, return_meta=True, **kwargs)
+        raw = await cepea.indicador(produto, offline=True, return_meta=True, **kwargs)
     else:
-        result = await cepea.indicador(produto, return_meta=True, **kwargs)
+        raw = await cepea.indicador(produto, return_meta=True, **kwargs)
 
-    return _unpack_result(result)
+    return _unpack_result(raw)  # type: ignore[arg-type]
 
 
 async def _fetch_cache(produto: str, **kwargs: Any) -> tuple[pd.DataFrame, None]:
@@ -140,6 +140,7 @@ class PrecoDiarioDataset(BaseDataset):
             df["fonte"] = "cepea"
 
         df = df.sort_values("data", ascending=False).reset_index(drop=True)
+        df = df.drop_duplicates(subset=["data", "produto"], keep="first")
 
         return df
 

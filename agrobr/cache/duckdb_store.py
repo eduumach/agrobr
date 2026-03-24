@@ -190,7 +190,7 @@ class DuckDBStore:
     def _to_row(ind: dict[str, Any], now: datetime) -> tuple[Any, ...]:
         return (
             ind.get("produto", "").lower(),
-            ind.get("praca"),
+            ind.get("praca") or "",
             ind["data"],
             float(ind["valor"]),
             ind.get("unidade", "BRL/unidade"),

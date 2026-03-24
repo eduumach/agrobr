@@ -48,21 +48,27 @@ def sample_html_cepea() -> str:
     <head><title>CEPEA - Indicador</title></head>
     <body>
         <div id="content">
-            <table class="indicador" id="tblIndicador">
+            <table class="indicador" id="imagenet-indicador1">
                 <tr>
-                    <th>Data</th>
-                    <th>Valor (R$/sc 60kg)</th>
-                    <th>Variação</th>
+                    <th></th>
+                    <th>Valor R$*</th>
+                    <th>Var./Dia</th>
+                    <th>Var./Mês</th>
+                    <th>Valor US$*</th>
                 </tr>
                 <tr>
                     <td>01/02/2024</td>
                     <td>145,50</td>
                     <td>+0,5%</td>
+                    <td>+1,2%</td>
+                    <td>28,50</td>
                 </tr>
                 <tr>
                     <td>31/01/2024</td>
                     <td>144,78</td>
                     <td>-0,3%</td>
+                    <td>-0,1%</td>
+                    <td>28,30</td>
                 </tr>
             </table>
         </div>

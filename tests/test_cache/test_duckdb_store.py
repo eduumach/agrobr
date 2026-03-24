@@ -207,10 +207,21 @@ class TestToRow:
         }
         row = DuckDBStore._to_row(ind, now)
         assert row[0] == "soja"
-        assert row[1] is None
+        assert row[1] == ""
         assert row[4] == "BRL/unidade"
         assert row[5] == "unknown"
         assert row[9] == 1
+
+    def test_null_praca_normalized_to_empty(self):
+        now = datetime(2024, 1, 1)
+        ind = {
+            "produto": "soja",
+            "praca": None,
+            "data": datetime(2024, 6, 15),
+            "valor": 100.0,
+        }
+        row = DuckDBStore._to_row(ind, now)
+        assert row[1] == ""
 
     def test_full_values(self):
         now = datetime(2024, 1, 1)
@@ -231,6 +242,24 @@ class TestToRow:
         assert row[6] == "media"
         assert row[7] == 1.5
         assert row[9] == 2
+
+
+class TestUpsertDedup:
+    def test_upsert_dedup_empty_praca(self, tmp_store: DuckDBStore):
+        base = {
+            "produto": "soja",
+            "praca": None,
+            "data": datetime(2024, 6, 15),
+            "valor": 100.0,
+            "unidade": "BRL/sc",
+            "fonte": "cepea",
+        }
+        tmp_store.indicadores_upsert([base])
+        tmp_store.indicadores_upsert([{**base, "valor": 200.0}])
+
+        results = tmp_store.indicadores_query("soja")
+        assert len(results) == 1
+        assert float(results[0]["valor"]) == 200.0
 
 
 class TestGetStore:

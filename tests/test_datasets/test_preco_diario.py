@@ -296,6 +296,43 @@ class TestPrecoDiarioFallback:
             dataset.info.sources[0].enabled = True
 
 
+class TestPrecoDiarioDedup:
+    @pytest.mark.asyncio
+    async def test_normalize_dedup_data_produto(self):
+        df = pd.DataFrame(
+            [
+                {
+                    "data": pd.Timestamp("2025-01-15"),
+                    "valor": 145.30,
+                    "unidade": "R$/saca 60kg",
+                    "produto": "soja",
+                    "fonte": "cepea",
+                },
+                {
+                    "data": pd.Timestamp("2025-01-15"),
+                    "valor": 145.00,
+                    "unidade": "R$/saca 60kg",
+                    "produto": "soja",
+                    "fonte": "cache",
+                },
+                {
+                    "data": pd.Timestamp("2025-01-14"),
+                    "valor": 144.80,
+                    "unidade": "R$/saca 60kg",
+                    "produto": "soja",
+                    "fonte": "cepea",
+                },
+            ]
+        )
+        dataset = PrecoDiarioDataset()
+        dataset.info.sources[0].fetch_fn = make_source(df)
+
+        result = await dataset.fetch("soja")
+
+        assert not result.duplicated(subset=["data", "produto"]).any()
+        assert len(result) == 2
+
+
 class TestPrecoDiarioPublicAPI:
     @pytest.mark.asyncio
     async def test_public_function_delegates(self):

@@ -12,6 +12,10 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **imea** — aliases `boi`, `boi_gordo`, `bovinos` para cadeia bovinocultura (ID 2), consistente com nomenclatura canonica da lib
 
 ### Fixed
+- **cepea** — parser v1: coluna USD (`Valor US$*`) sobrescrevia valor BRL (100% dos precos no cache estavam errados). Reordenado condicionais: `var` antes de `data` (evita `Var./Dia` poluir data_value), exclusao explicita de colunas US$/USD
+- **cepea** — parser v1: praca agora populada via dict `PRACAS` (20 produtos mapeados). Antes, `praca=None` hardcoded em todos os indicadores
+- **cache** — `_to_row` normaliza `praca=None` para `""` (SQL UNIQUE constraint `NULL != NULL` causava duplicatas). Migration 5 limpa 338 linhas corrompidas com `praca IS NULL`
+- **preco_diario** — `drop_duplicates(["data", "produto"])` em `_normalize` garante contrato PK 1 preco por (data, produto). Sem isso, dados mistos CEPEA+cache causavam `ContractViolationError`
 - **conab** — parser v1 agora detecta safras year-only (`"Safra 2024"` → `2024/25`). Antes, celulas sem `/` no `if "Safra" in cell` branch eram silenciosamente ignoradas, afetando 6 culturas de inverno (trigo, aveia, canola, centeio, cevada, triticale)
 - **conab** — serie historica: `_find_header_row` e `_normalize_safra_header` agora tratam float coercion do pandas (`2024.0` → `"2024"` → `"2024/25"`). Antes, `_YEAR_PATTERN` nao matchava `"2024.0"`
 - **mapa_psr** — filtro `cultura` agora e accent-insensitive via `remover_acentos`. Antes, `"cafe"` nao matchava `"CAFE ARABICA"` (silent data loss com 0 registros sem aviso)

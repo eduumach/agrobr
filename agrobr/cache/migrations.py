@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 logger = structlog.get_logger()
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 
 MIGRATIONS: dict[int, str] = {
     1: """
@@ -38,6 +38,9 @@ MIGRATIONS: dict[int, str] = {
             checked_at TIMESTAMP NOT NULL DEFAULT current_timestamp
         );
         CREATE INDEX IF NOT EXISTS idx_hc_composite ON health_checks(source, checked_at, status);
+    """,
+    5: """
+        DELETE FROM indicadores WHERE praca IS NULL;
     """,
 }
 
@@ -75,6 +78,8 @@ def migrate(conn: duckdb.DuckDBPyConnection) -> None:
                             if "duplicate" in err_msg:
                                 continue
                             if "depend on it" in err_msg:
+                                continue
+                            if "does not exist" in err_msg:
                                 continue
                             raise
 

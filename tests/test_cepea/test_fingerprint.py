@@ -61,4 +61,4 @@ class TestFingerprint:
         """Test fingerprint captures relevant IDs."""
         fp = extract_fingerprint(sample_html_cepea, Fonte.CEPEA, "test_url")
 
-        assert "tblIndicador" in fp.key_ids
+        assert "imagenet-indicador1" in fp.key_ids

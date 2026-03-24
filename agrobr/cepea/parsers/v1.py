@@ -17,6 +17,28 @@ from .fingerprint import extract_fingerprint
 
 logger = structlog.get_logger()
 
+PRACAS: dict[str, str] = {
+    "soja": "Paranaguá/PR",
+    "milho": "Campinas/SP",
+    "cafe": "São Paulo/SP",
+    "cafe_arabica": "São Paulo/SP",
+    "boi": "São Paulo/SP",
+    "boi_gordo": "São Paulo/SP",
+    "boi-gordo": "São Paulo/SP",
+    "trigo": "Paraná",
+    "algodao": "São Paulo/SP",
+    "arroz": "Rio Grande do Sul",
+    "acucar": "São Paulo/SP",
+    "frango_congelado": "São Paulo/SP",
+    "frango_resfriado": "São Paulo/SP",
+    "suino": "São Paulo/SP",
+    "etanol_hidratado": "São Paulo/SP",
+    "etanol_anidro": "São Paulo/SP",
+    "leite": "São Paulo/SP",
+    "laranja_industria": "São Paulo/SP",
+    "laranja_in_natura": "São Paulo/SP",
+}
+
 
 class CepeaParserV1(BaseParser):
     version = 1
@@ -178,12 +200,16 @@ class CepeaParserV1(BaseParser):
         for _i, (header, cell_text) in enumerate(zip(headers, cell_texts)):
             header_lower = header.lower()
 
-            if any(kw in header_lower for kw in ["data", "dia", "date"]):
-                data_value = self._parse_date(cell_text)
-            elif any(kw in header_lower for kw in ["valor", "preço", "preco", "r$", "price"]):
-                valor_value = self._parse_decimal(cell_text)
-            elif "var" in header_lower or "%" in header_lower:
+            if "var" in header_lower or "%" in header_lower:
                 variacao_value = cell_text
+            elif any(kw in header_lower for kw in ["data", "dia", "date"]):
+                data_value = self._parse_date(cell_text)
+            elif (
+                any(kw in header_lower for kw in ["valor", "preço", "preco", "r$", "price"])
+                and "us$" not in header_lower
+                and "usd" not in header_lower
+            ):
+                valor_value = self._parse_decimal(cell_text)
 
         if not data_value and cell_texts:
             data_value = self._parse_date(cell_texts[0])
@@ -203,7 +229,7 @@ class CepeaParserV1(BaseParser):
         return Indicador(
             fonte=Fonte.CEPEA,
             produto=produto,
-            praca=None,
+            praca=PRACAS.get(produto.lower()),
             data=data_value,
             valor=valor_value,
             unidade=unidade,

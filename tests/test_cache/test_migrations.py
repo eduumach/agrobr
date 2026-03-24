@@ -124,3 +124,41 @@ class TestMigrate:
         }
         assert "idx_history_key_date" in indexes
         assert "idx_history_parser" in indexes
+
+    def test_migration_5_deletes_null_praca(self):
+        conn = _fresh_conn()
+        _seed_base_tables(conn)
+        conn.execute(
+            """
+            CREATE SEQUENCE IF NOT EXISTS seq_indicadores_id START 1;
+            CREATE TABLE IF NOT EXISTS indicadores (
+                id INTEGER DEFAULT nextval('seq_indicadores_id') PRIMARY KEY,
+                produto TEXT NOT NULL,
+                praca TEXT,
+                data DATE NOT NULL,
+                valor DECIMAL(18,4) NOT NULL,
+                unidade TEXT NOT NULL,
+                fonte TEXT NOT NULL,
+                metodologia TEXT,
+                variacao_percentual DECIMAL(8,4),
+                collected_at TIMESTAMP NOT NULL,
+                parser_version INTEGER DEFAULT 1,
+                UNIQUE(produto, praca, data, fonte)
+            )
+            """
+        )
+        conn.execute(
+            "INSERT INTO indicadores (produto, praca, data, valor, unidade, fonte, collected_at) "
+            "VALUES ('soja', NULL, '2024-01-01', 24.82, 'BRL/sc', 'cepea', CURRENT_TIMESTAMP)"
+        )
+        conn.execute(
+            "INSERT INTO indicadores (produto, praca, data, valor, unidade, fonte, collected_at) "
+            "VALUES ('soja', 'Paranaguá/PR', '2024-01-01', 145.50, 'BRL/sc', 'cepea', CURRENT_TIMESTAMP)"
+        )
+        _seed_version(conn, 4)
+
+        migrate(conn)
+
+        rows = conn.execute("SELECT * FROM indicadores").fetchall()
+        assert len(rows) == 1
+        assert rows[0][2] == "Paranaguá/PR"
