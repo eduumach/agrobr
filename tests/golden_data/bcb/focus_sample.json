@@ -1,0 +1,9 @@
+{
+    "value": [
+        {"Indicador": "PIB Agropecuário", "Data": "2026-03-21", "DataReferencia": "2026", "Media": 3.5, "Mediana": 3.48, "DesvioPadrao": 0.25, "Minimo": 2.8, "Maximo": 4.2, "numeroRespondentes": 85, "baseCalculo": 0},
+        {"Indicador": "PIB Agropecuário", "Data": "2026-03-14", "DataReferencia": "2026", "Media": 3.45, "Mediana": 3.42, "DesvioPadrao": 0.24, "Minimo": 2.7, "Maximo": 4.1, "numeroRespondentes": 83, "baseCalculo": 0},
+        {"Indicador": "PIB Agropecuário", "Data": "2026-03-07", "DataReferencia": "2026", "Media": 3.4, "Mediana": 3.38, "DesvioPadrao": 0.23, "Minimo": 2.65, "Maximo": 4.0, "numeroRespondentes": 80, "baseCalculo": 0},
+        {"Indicador": "PIB Agropecuário", "Data": "2026-02-28", "DataReferencia": "2026", "Media": 3.35, "Mediana": 3.33, "DesvioPadrao": 0.22, "Minimo": 2.6, "Maximo": 3.9, "numeroRespondentes": 78, "baseCalculo": 0},
+        {"Indicador": "PIB Agropecuário", "Data": "2026-02-21", "DataReferencia": "2026", "Media": 3.3, "Mediana": 3.28, "DesvioPadrao": 0.21, "Minimo": 2.55, "Maximo": 3.85, "numeroRespondentes": 76, "baseCalculo": 0}
+    ]
+}

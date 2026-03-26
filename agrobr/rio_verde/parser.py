@@ -79,19 +79,29 @@ def _extract_records(pages: list[str], safra: str) -> list[dict[str, Any]]:
         if done:
             break
         for line in text.split("\n"):
-            if "Competição de Cultivares de Soja" in line and "Resultados" not in line:
-                in_summary = True
-                continue
-            if "Resultados" in line:
-                in_summary = False
-                done = True
-                break
-            if in_summary and line.strip():
-                if line.strip().startswith(_SKIP_PREFIXES):
+            lower = line.lower()
+            if not in_summary:
+                if (
+                    "competi" in lower
+                    and "soja" in lower
+                    and not lower.lstrip().startswith("resultado")
+                ):
+                    in_summary = True
                     continue
-                record = _parse_summary_line(line, safra)
-                if record is not None:
-                    records.append(record)
+            else:
+                if lower.lstrip().startswith("resultado"):
+                    in_summary = False
+                    done = True
+                    break
+                if line.strip():
+                    if line.strip().startswith(_SKIP_PREFIXES):
+                        continue
+                    record = _parse_summary_line(line, safra)
+                    if record is not None:
+                        records.append(record)
+
+    if not records:
+        logger.warning("rio_verde_empty_extraction", safra=safra, pages=len(pages))
 
     return records
 

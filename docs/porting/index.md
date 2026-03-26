@@ -201,12 +201,13 @@ Funções: `normalizar_uf()`, `uf_para_nome()`, `uf_para_regiao()`,
 
 ### Municípios (`normalize/municipalities.py`)
 
-- 5.570 municípios com código IBGE de 7 dígitos
+- 5.571 municípios com código IBGE de 7 dígitos + centroides
 - Busca por nome (case/accent-insensitive) com desambiguação por UF
-- Arquivo: `normalize/_municipios_ibge.json` (164 KB)
+- Geocodificação reversa offline: `(lat, lon)` → município mais próximo (sub-ms)
+- Arquivo: `normalize/_municipios_ibge.json` (259 KB)
 
 Funções: `municipio_para_ibge()`, `ibge_para_municipio()`,
-`buscar_municipios()`, `total_municipios()`
+`buscar_municipios()`, `coordenada_para_municipio()`, `total_municipios()`
 
 ### Encoding (`normalize/encoding.py`)
 
@@ -245,7 +246,7 @@ para validar parsers em qualquer linguagem:
 2. Compare o output com o `expected.json`
 3. Se bater, seu parser está correto
 
-### Conjuntos de teste disponíveis (21 fontes, 30 casos)
+### Conjuntos de teste disponíveis (23 fontes, 35 casos)
 
 | Fonte | Caso de teste | Arquivos |
 |-------|--------------|----------|
@@ -278,6 +279,11 @@ para validar parsers em qualquer linguagem:
 | NASA POWER | `daily_sample` | response.json, expected.json |
 | Queimadas | `focos_sample` | response.csv, expected.json |
 | USDA | `psd_soja_sample` | response.json, expected.json |
+| RNC | `registradas_sample` | registradas_sample.csv (25 rows), expected.json |
+| Rio Verde | `ensaio_soja_pages` | ensaio_soja_pages.json (5 pages), expected.json |
+| BCB SGS | `sgs_sample` | sgs_sample.json (10 rows), expected.json |
+| BCB PTAX | `ptax_sample` | ptax_sample.json (5 rows), expected.json |
+| BCB Focus | `focus_sample` | focus_sample.json (5 rows), expected.json |
 | ZARC | `tabua_risco_sample` | response.csv, expected.json |
 
 Cada diretório também contém `metadata.json` com contexto do teste.

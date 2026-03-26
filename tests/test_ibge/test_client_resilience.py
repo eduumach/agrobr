@@ -55,12 +55,20 @@ class TestIbgeSidraEmptyResponse:
             assert len(result) == 0
 
     @pytest.mark.asyncio
-    async def test_header_n_removes_first_row(self):
+    async def test_header_n_preserves_all_rows(self):
         with patch("agrobr.ibge.client.sidrapy.get_table") as mock_sidra:
-            mock_sidra.return_value = pd.DataFrame({"V": ["header", "100", "200"]})
+            mock_sidra.return_value = pd.DataFrame({"V": ["100", "200"]})
             result = await client.fetch_sidra(table_code="5457", header="n")
             assert len(result) == 2
             assert result["V"].iloc[0] == "100"
+            assert result["V"].iloc[1] == "200"
+
+    @pytest.mark.asyncio
+    async def test_header_y_preserves_all_rows(self):
+        with patch("agrobr.ibge.client.sidrapy.get_table") as mock_sidra:
+            mock_sidra.return_value = pd.DataFrame({"V": ["Valor", "100", "200"]})
+            result = await client.fetch_sidra(table_code="5457", header="y")
+            assert len(result) == 3
 
 
 class TestSidraAsyncNonBlocking:

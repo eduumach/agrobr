@@ -206,6 +206,52 @@ class TestBuildArcgisQueryUrl:
         assert "UF" in url
 
 
+class TestFetchWfsHtmlGuard:
+    def _mock_resp(self, status: int, body: bytes):
+        import httpx
+
+        req = httpx.Request("GET", "http://example.com/wfs")
+        return httpx.Response(status, content=body, request=req)
+
+    @pytest.mark.asyncio
+    async def test_html_response_raises_source_unavailable(self):
+        import httpx
+
+        from agrobr.exceptions import SourceUnavailableError
+        from agrobr.utils.geo import fetch_wfs
+
+        resp = self._mock_resp(200, b"<!DOCTYPE html><html><body>maintenance</body></html>")
+
+        with patch.object(httpx.AsyncClient, "get", return_value=resp):
+            client = httpx.AsyncClient(timeout=httpx.Timeout(10))
+            with pytest.raises(SourceUnavailableError, match="HTML"):
+                await fetch_wfs(
+                    "http://example.com/wfs?service=WFS",
+                    source="test",
+                    timeout=httpx.Timeout(10),
+                    client=client,
+                )
+
+    @pytest.mark.asyncio
+    async def test_valid_wfs_response_passes(self):
+        import httpx
+
+        from agrobr.utils.geo import fetch_wfs
+
+        wfs_body = b'<?xml version="1.0"?>' + b"x" * 100
+        resp = self._mock_resp(200, wfs_body)
+
+        with patch.object(httpx.AsyncClient, "get", return_value=resp):
+            client = httpx.AsyncClient(timeout=httpx.Timeout(10))
+            content = await fetch_wfs(
+                "http://example.com/wfs?service=WFS",
+                source="test",
+                timeout=httpx.Timeout(10),
+                client=client,
+            )
+            assert content == wfs_body
+
+
 class TestCheckGeopandas:
     def test_returns_module(self):
         gpd = pytest.importorskip("geopandas")

@@ -117,6 +117,12 @@ async def fetch_wfs(
         response.raise_for_status()
 
         content = response.content
+        if content[:50].lstrip().lower().startswith((b"<!doctype", b"<html")):
+            raise SourceUnavailableError(
+                source=source,
+                url=url,
+                last_error="WFS returned HTML instead of feature data (possible maintenance or URL redirect)",
+            )
         if len(content) < MIN_WFS_SIZE:
             raise SourceUnavailableError(
                 source=source,

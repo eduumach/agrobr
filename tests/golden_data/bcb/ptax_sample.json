@@ -1,0 +1,9 @@
+{
+    "value": [
+        {"cotacaoCompra": 6.0513, "cotacaoVenda": 6.0519, "dataHoraCotacao": "2026-01-02 13:09:20.817"},
+        {"cotacaoCompra": 6.0345, "cotacaoVenda": 6.0351, "dataHoraCotacao": "2026-01-03 13:11:05.123"},
+        {"cotacaoCompra": 6.0178, "cotacaoVenda": 6.0184, "dataHoraCotacao": "2026-01-06 13:08:45.456"},
+        {"cotacaoCompra": 6.0012, "cotacaoVenda": 6.0018, "dataHoraCotacao": "2026-01-07 13:10:30.789"},
+        {"cotacaoCompra": 5.9845, "cotacaoVenda": 5.9851, "dataHoraCotacao": "2026-01-08 13:09:15.321"}
+    ]
+}

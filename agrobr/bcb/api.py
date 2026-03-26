@@ -118,7 +118,7 @@ async def credito_rural(
     )
 
     meta = build_source_meta(
-        "bcb",
+        "bcb_credito",
         f"{client.BASE_URL}/{client.ENDPOINT_MAP.get(finalidade.lower(), 'CusteioMunicipio')}",
         source_method,
         fetch_ms,

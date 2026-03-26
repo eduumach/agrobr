@@ -656,8 +656,6 @@ async def fetch_sidra(
 
         async def _do_fetch() -> pd.DataFrame:
             df = await asyncio.to_thread(sidrapy.get_table, **kwargs)
-            if header == "n" and len(df) > 1:
-                df = df.iloc[1:].reset_index(drop=True)
             return pd.DataFrame(df)
 
         df = await retry_async(

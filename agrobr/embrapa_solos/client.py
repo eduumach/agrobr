@@ -27,15 +27,8 @@ logger = structlog.get_logger()
 TIMEOUT = get_timeout(read=180.0)
 
 
-def _build_cql_uf(uf: str | None) -> str | None:
-    if uf is None:
-        return None
-    return f"uf='{uf}'"
-
-
 async def fetch_perfis(
     *,
-    uf: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
 ) -> tuple[list[bytes], str]:
     return await fetch_wfs_paginated(
@@ -47,14 +40,12 @@ async def fetch_perfis(
         PERFIS_PAGE_SIZE,
         source="embrapa_solos",
         timeout=TIMEOUT,
-        cql=_build_cql_uf(uf),
         bbox=bbox,
     )
 
 
 async def fetch_perfis_geo(
     *,
-    uf: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
 ) -> tuple[bytes, str]:
     url = build_wfs_url(
@@ -65,7 +56,6 @@ async def fetch_perfis_geo(
         PERFIS_PROPERTY_NAMES_GEO,
         max_features=PERFIS_MAX_FEATURES_GEO,
         output_format="application/json",
-        cql_filter=_build_cql_uf(uf),
         bbox=bbox,
     )
     content = await fetch_wfs(url, source="embrapa_solos", timeout=TIMEOUT)

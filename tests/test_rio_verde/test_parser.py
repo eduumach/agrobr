@@ -63,5 +63,31 @@ class TestParseEnsaioSoja:
             parse_ensaio_soja_from_text(["no data here"], "2025/2026")
 
 
+_DATA_LINE = "Brasmax BRMX Guepardo IPRO 6.7 7.1 103 97,9 98,8 92,6 84,7 93,5"
+
+
+class TestSectionDetectionResilience:
+    def test_case_insensitive_entry(self):
+        pages = ["competição de cultivares de SOJA\n" + _DATA_LINE]
+        df = parse_ensaio_soja_from_text(pages, "2025/2026")
+        assert len(df) == 1
+
+    def test_accent_free_entry(self):
+        pages = ["Competicao de Cultivares de Soja\n" + _DATA_LINE]
+        df = parse_ensaio_soja_from_text(pages, "2025/2026")
+        assert len(df) == 1
+
+    def test_resultados_midline_no_exit(self):
+        pages = [
+            "Competição de Cultivares de Soja\n"
+            + _DATA_LINE
+            + "\n"
+            + "Tabela com Resultados parciais da safra\n"
+            + _DATA_LINE.replace("Guepardo", "Ativa")
+        ]
+        df = parse_ensaio_soja_from_text(pages, "2025/2026")
+        assert len(df) == 2
+
+
 def test_parser_version():
     assert PARSER_VERSION == 1

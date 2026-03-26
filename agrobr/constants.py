@@ -86,6 +86,9 @@ URLS = {
     },
     Fonte.BCB: {
         "base": "https://olinda.bcb.gov.br/olinda/servico/SICOR/versao/v2/odata",
+        "ptax": "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata",
+        "sgs": "https://api.bcb.gov.br/dados/serie/bcdata.sgs",
+        "focus": "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata",
     },
     Fonte.CEPEA: {
         "base": "https://www.cepea.org.br",
@@ -116,7 +119,7 @@ URLS = {
     },
     Fonte.EMBRAPA_SOLOS: {
         "base": "https://geoinfo.dados.embrapa.br",
-        "geoserver": "https://geoinfo.dados.embrapa.br/geoserver",
+        "geoserver": "https://geoinfo.dados.embrapa.br/geoserver/ows",
     },
     Fonte.IBGE: {
         "base": "https://sidra.ibge.gov.br",

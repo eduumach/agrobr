@@ -155,11 +155,6 @@ async def fetch_credito_rural(
     return filtered
 
 
-def _match_produto(nome_api: str, produto_upper: str) -> bool:
-    cleaned = nome_api.strip().strip('"').upper()
-    return cleaned == produto_upper
-
-
 async def fetch_credito_rural_with_fallback(
     finalidade: str = "custeio",
     produto_sicor: str | None = None,

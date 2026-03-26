@@ -103,12 +103,6 @@ asyncio.run(main())
 | gdegrupo2 | str | Grande grupo 2 |
 | legenda_sinotica | str | Legenda sinotica |
 | classe_dom | str | Classe dominante |
-| fase | str | Fase de vegetacao |
-| area_km2 | float | Area do poligono (km2) |
-| uf | str | UF predominante |
-| bioma | str | Bioma |
-| bacia | str | Bacia hidrografica |
-| legenda | str | Legenda do mapa |
 
 ## Particularidades
 

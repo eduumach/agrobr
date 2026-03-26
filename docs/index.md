@@ -17,7 +17,7 @@ Infraestrutura Python para dados agrícolas brasileiros com **camada semântica*
 - **CONAB**: Safras, balanço oferta/demanda, custos de produção e série histórica
 - **IBGE/SIDRA**: PAM (anual), LSPA (mensal), PPM, Abate, PEVS (silvicultura + extracao vegetal), Leite Trimestral, PIB Agro, Censo Agro
 - **NASA POWER**: Climatologia gridded diária (temperatura, precipitação, radiação, umidade, vento)
-- **BCB/SICOR**: Crédito rural por cultura e UF com dimensões SICOR (programa, fonte, seguro, modalidade, atividade) + fallback BigQuery
+- **BCB/SICOR**: Crédito rural por cultura e UF + séries temporais SGS (Selic, IPCA, PIB agro) + cotação PTAX + expectativas Focus
 - **ComexStat**: Exportações agrícolas por NCM
 - **ANDA**: Entregas de fertilizantes por UF
 - **ABIOVE**: Exportação do complexo soja (volume e receita mensal)

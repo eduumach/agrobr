@@ -14,6 +14,12 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **rnc** — Registro Nacional de Cultivares (CultivarWeb/MAPA). `registradas()` ~37K cultivares. `protegidas()` ~5K cultivares protegidas. Filtros cultivar, especie, grupo, mantenedor. CSV nativo, licenca `livre`
 - **embrapa_solos** — Perfis de solo EMBRAPA/PronaSolos via WFS. `perfis()` tabular + `perfis_geo()` GeoDataFrame (34K+ pontos). `mapa_solos()` + `mapa_solos_geo()` classificacao SiBCS (2.8K poligonos). Licenca `nc`
 - **rio_verde** — Ensaios cultivares Fundacao Rio Verde (MT). `ensaio_soja()` ~97 cultivares x 4 epocas. PDF parsing via pdfplumber. Licenca `zona_cinza`
+- **bcb.sgs** — Series temporais BCB/SGS. `sgs(codigo)` com 17 series agricolas pre-mapeadas (Selic, IPCA, PIB agro, credito rural, cambio, IGP-M). Resolve nome ou codigo numerico. Sem auth, sem paginacao
+- **bcb.ptax** — Cotacao dolar PTAX (compra/venda). `ptax()` ultimo mes, `ptax(data="15/01/2026")` dia especifico, `ptax(data_inicial=..., data_final=...)` periodo
+- **bcb.focus** — Expectativas Focus/BCB. `focus("PIB Agropecuário")` projecoes consenso de mercado (media, mediana, min, max, respondentes). 9 indicadores economicos
+
+### Improved
+- **utils/geo** — `fetch_wfs` detecta resposta HTML (manutencao/redirect) e lanca `SourceUnavailableError` em vez de cascatear para `ParseError` confuso. Beneficia todas as fontes WFS (embrapa, ibama, sicar, funai, icmbio, incra)
 
 ### Fixed
 - **cepea** — parser v1: coluna USD (`Valor US$*`) sobrescrevia valor BRL (100% dos precos no cache estavam errados). Reordenado condicionais: `var` antes de `data` (evita `Var./Dia` poluir data_value), exclusao explicita de colunas US$/USD
@@ -23,6 +29,9 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **conab** — parser v1 agora detecta safras year-only (`"Safra 2024"` → `2024/25`). Antes, celulas sem `/` no `if "Safra" in cell` branch eram silenciosamente ignoradas, afetando 6 culturas de inverno (trigo, aveia, canola, centeio, cevada, triticale)
 - **conab** — serie historica: `_find_header_row` e `_normalize_safra_header` agora tratam float coercion do pandas (`2024.0` → `"2024"` → `"2024/25"`). Antes, `_YEAR_PATTERN` nao matchava `"2024.0"`
 - **mapa_psr** — filtro `cultura` agora e accent-insensitive via `remover_acentos`. Antes, `"cafe"` nao matchava `"CAFE ARABICA"` (silent data loss com 0 registros sem aviso)
+- **embrapa_solos** — URL WFS corrigida (`geoserver` → `geoserver/ows`), `CQL_FILTER` removido (mesmo fix de FUNAI/IBAMA/ICMBio v1.0.4), filtro UF pos-download
+- **ibge** — `fetch_sidra` `iloc[1:]` removia silenciosamente a primeira UF (Rondonia) em toda query SIDRA multi-UF. Afetava 12 funcoes (abate, PAM, LSPA, PPM, PEVS, leite, PIB, censo). Em single-UF, causava 0 registros
+- **rio_verde** — parser secao-sumario agora case-insensitive e accent-resilient. Exit trigger so em inicio de linha (evita falso positivo mid-line)
 
 ## [1.0.4] - 2026-03-22
 

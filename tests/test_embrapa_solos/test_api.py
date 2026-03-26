@@ -80,6 +80,29 @@ async def test_mapa_solos_filter_ordem():
 
 
 @pytest.mark.asyncio
+async def test_perfis_uf_filter_post_download():
+    with patch("agrobr.embrapa_solos.client.fetch_perfis", new_callable=AsyncMock) as mock:
+        mock.return_value = (_perfis_pages(), "https://example.com")
+
+        from agrobr.embrapa_solos import perfis
+
+        df = await perfis(uf="SC")
+        assert len(df) > 0
+        assert (df["uf"] == "SC").all()
+
+
+@pytest.mark.asyncio
+async def test_perfis_uf_filter_no_match():
+    with patch("agrobr.embrapa_solos.client.fetch_perfis", new_callable=AsyncMock) as mock:
+        mock.return_value = (_perfis_pages(), "https://example.com")
+
+        from agrobr.embrapa_solos import perfis
+
+        df = await perfis(uf="AM")
+        assert len(df) == 0
+
+
+@pytest.mark.asyncio
 async def test_warn_once_fires():
     import warnings
 

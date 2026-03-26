@@ -1,6 +1,6 @@
 # Fontes de Dados
 
-O agrobr integra dados de 35 fontes de dados agricolas.
+O agrobr integra dados de 38 fontes de dados agricolas.
 Todas as fontes suportam `return_meta=True` para rastreabilidade completa.
 
 ## Visao Geral
@@ -11,7 +11,7 @@ Todas as fontes suportam `return_meta=True` para rastreabilidade completa.
 | [CONAB](conab.md) | Safras, custos, serie historica | Mensal | Producao nacional |
 | [IBGE/SIDRA](ibge.md) | Estatisticas | Anual/Mensal/Trimestral | Dados oficiais (PAM, LSPA, PPM, Abate, PEVS, Leite, PIB, Censo) |
 | [NASA POWER](nasa_power.md) | Climatologia | Diaria | Global, grid 0.5 grau |
-| [BCB/SICOR](bcb.md) | Credito rural | Mensal | Cultura/UF (+ BigQuery) |
+| [BCB/SICOR](bcb.md) | Credito rural, series temporais, cambio, expectativas | Mensal | Cultura/UF (+ BigQuery) |
 | [ComexStat](comexstat.md) | Exportacoes | Semanal | NCM/UF |
 | [ANDA](anda.md) | Fertilizantes | Mensal | UF/mes |
 | [ABIOVE](abiove.md) | Exportacao complexo soja | Mensal | Volume/receita |
@@ -42,6 +42,9 @@ Todas as fontes suportam `return_meta=True` para rastreabilidade completa.
 | [Lista Suja](lista_suja.md) | Cadastro de trabalho escravo (XLSX) | Semestral | Nacional |
 | [ANA/SNIRH](ana.md) | Hidrografia, irrigacao, disponibilidade hidrica (ArcGIS REST) | Variavel | Nacional |
 | [SFB](sfb.md) | Florestas publicas, concessoes, IFN (ArcGIS REST) | Anual | Nacional |
+| [RNC/CultivarWeb](rnc.md) | Cultivares registradas/protegidas | Contínua | ~37K registradas, ~5K protegidas |
+| [EMBRAPA Solos](embrapa_solos.md) | Perfis de solo e mapa pedológico | Contínua | 34K perfis, 2.8K polígonos |
+| [Fundação Rio Verde](rio_verde.md) | Ensaios cultivares soja MT | Anual | ~97 cultivares x 4 épocas |
 
 ## Proveniencia e Rastreabilidade
 

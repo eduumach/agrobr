@@ -56,12 +56,15 @@ async def perfis(
     logger.info("embrapa_solos_perfis", uf=uf, bbox=bbox)
 
     t0 = time.monotonic()
-    pages, source_url = await client.fetch_perfis(uf=uf, bbox=bbox)
+    pages, source_url = await client.fetch_perfis(bbox=bbox)
     fetch_ms = int((time.monotonic() - t0) * 1000)
 
     t1 = time.monotonic()
     df = parser.parse_perfis_csv(pages)
     parse_ms = int((time.monotonic() - t1) * 1000)
+
+    if uf is not None and not df.empty:
+        df = df[df["uf"] == uf].reset_index(drop=True)
 
     meta = build_source_meta(
         "embrapa_solos",
@@ -108,7 +111,7 @@ async def perfis_geo(
     logger.info("embrapa_solos_perfis_geo", uf=uf, bbox=bbox)
 
     t0 = time.monotonic()
-    geojson_bytes, source_url = await client.fetch_perfis_geo(uf=uf, bbox=bbox)
+    geojson_bytes, source_url = await client.fetch_perfis_geo(bbox=bbox)
     fetch_ms = int((time.monotonic() - t0) * 1000)
 
     t1 = time.monotonic()

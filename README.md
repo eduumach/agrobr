@@ -623,7 +623,7 @@ Use `agrobr health --all` para verificar localmente.
 | CONAB | Safras, balanço, custos, série histórica | ✅ | Funcional |
 | IBGE | PAM, LSPA, PPM, Abate, PEVS, Leite, PIB, Censo Agro | ✅ | Funcional |
 | NASA POWER | Climatologia diária/mensal (grid 0.5°) | ✅ | Funcional |
-| BCB/SICOR | Crédito rural por cultura + dimensões SICOR (+ fallback BigQuery) | ✅¹ | Funcional |
+| BCB/SICOR | Crédito rural por cultura + séries temporais SGS + cotação PTAX + expectativas Focus | ✅¹ | Funcional |
 | ComexStat | Exportações e importações por NCM/UF | ✅¹ | Funcional |
 | ANDA | Entregas de fertilizantes | ✅ | Funcional |
 | ABIOVE | Exportação complexo soja (volume/receita) | ✅ | Funcional |
@@ -650,6 +650,13 @@ Use `agrobr health --all` para verificar localmente.
 | Lista Suja | Cadastro de empregadores (trabalho escravo) via XLSX | ✅ | Funcional |
 | ANA/SNIRH | Hidrografia, pivos irrigacao, demanda irrigacao, disponibilidade hidrica (ArcGIS REST) | ✅ | Funcional |
 | SFB | Florestas publicas (CNFP), concessoes florestais, IFN conglomerados (ArcGIS REST) | ✅ | Funcional |
+| FUNAI | Terras indigenas (WFS geoserver.funai.gov.br) — ~740 TIs, filtros uf/fase/bbox | ✅ | Funcional |
+| IBAMA | Embargos ambientais (WFS siscom.ibama.gov.br) — ~89K features, filtro uf/bbox | ✅ | Funcional |
+| ICMBio | Unidades de conservacao federais (WFS geoservicos.inde.gov.br) — 344 UCs | ✅ | Funcional |
+| INCRA | Territorios quilombolas (WFS cmr.funai.gov.br) — ~426 territorios | ✅ | Funcional |
+| RNC/CultivarWeb | Cultivares registradas (~37K) e protegidas (~5K) — MAPA/SNPC | ✅ | Funcional |
+| EMBRAPA Solos | Perfis de solo PronaSolos (34K+) + mapa pedologico SiBCS (2.8K poligonos) | ✅ | Funcional |
+| Fundacao Rio Verde | Ensaios cultivares soja MT — ~97 cultivares x 4 epocas (PDF) | ✅ | Funcional |
 
 > ¹ Golden test com dados sintéticos — `needs_real_data` para validação com API real.
 
@@ -713,9 +720,9 @@ normalizar_safra("24/25")             # "2024/25"
 
 ## Diferenciais
 
-- **35/35 fontes com golden tests** — validação automatizada contra dados de referência
-- **Resiliência HTTP completa** — retry centralizado em 35/35 clients, 429 handling, Retry-After
-- **5100+ testes, 88% cobertura** — benchmarks de escalabilidade (memory, volume, cache, async)
+- **38/38 fontes com golden tests** — validação automatizada contra dados de referência
+- **Resiliência HTTP completa** — retry centralizado em 38/38 clients, 429 handling, Retry-After
+- **5800+ testes, 88% cobertura** — benchmarks de escalabilidade (memory, volume, cache, async)
 - **Thread-safe cache** — DuckDB store com locking para uso em MCP servers e multi-thread
 - **Camada semântica** — datasets padronizados com fallback automático
 - **Contratos formais** — schema versionado com validação automática, primary keys e constraints
@@ -762,7 +769,7 @@ Veja o [guia completo de pipelines](https://www.agrobr.dev/docs/advanced/pipelin
 
 - [Guia Rápido](https://www.agrobr.dev/docs/quickstart/)
 - [Datasets](https://www.agrobr.dev/docs/contracts/) — Contratos e garantias
-- [Fontes](https://www.agrobr.dev/docs/sources/) — 35 fontes documentadas
+- [Fontes](https://www.agrobr.dev/docs/sources/) — 38 fontes documentadas
 - [API Reference](https://www.agrobr.dev/docs/api/cepea/)
 - [Resiliência](https://www.agrobr.dev/docs/advanced/resilience/)
 - [Portabilidade](https://www.agrobr.dev/docs/porting/) — Guia para portar o agrobr para R, Julia ou outras linguagens
