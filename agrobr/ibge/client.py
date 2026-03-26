@@ -140,6 +140,7 @@ TABELAS_CENSO_AGRO: dict[str, dict[str, str]] = {
     "agrotoxicos": {"2006": "1459", "2017": "6851"},
     "praticas_agricolas": {"2006": "837", "2017": "8561"},
     "irrigacao": {"2006": "855", "2017": "6857"},
+    "despesa_adubos": {"2017": "6899"},
 }
 
 VARIAVEIS_CENSO_AGRO: dict[str, dict[str, dict[str, str]]] = {
@@ -189,6 +190,9 @@ VARIAVEIS_CENSO_AGRO: dict[str, dict[str, dict[str, str]]] = {
     "irrigacao": {
         "2006": {"estabelecimentos": "183"},
         "2017": {"estabelecimentos": "183", "area": "184"},
+    },
+    "despesa_adubos": {
+        "2017": {"estabelecimentos": "2", "valor_mil_reais": "1996"},
     },
 }
 

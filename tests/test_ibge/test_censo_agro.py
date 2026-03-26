@@ -61,8 +61,8 @@ class TestTabelasCensoAgro:
     def test_lavoura_permanente_1995(self):
         assert client.TABELAS_CENSO_AGRO["lavoura_permanente"]["1995"] == "509"
 
-    def test_has_10_themes(self):
-        assert len(client.TABELAS_CENSO_AGRO) == 10
+    def test_theme_count(self):
+        assert len(client.TABELAS_CENSO_AGRO) == 11
 
     def test_all_themes_have_at_least_one_year(self):
         for tema, anos in client.TABELAS_CENSO_AGRO.items():
@@ -120,8 +120,8 @@ class TestVariaveisCensoAgro:
 
 
 class TestTemasCensoAgro:
-    def test_has_10_themes(self):
-        assert len(client.TEMAS_CENSO_AGRO) == 10
+    def test_theme_count(self):
+        assert len(client.TEMAS_CENSO_AGRO) == 11
 
     def test_efetivo_in_temas(self):
         assert "efetivo_rebanho" in client.TEMAS_CENSO_AGRO
@@ -1354,7 +1354,7 @@ class TestTemasCensoAgroFunc:
 
         result = await temas_censo_agro()
         assert isinstance(result, list)
-        assert len(result) == 10
+        assert len(result) == 11
 
     @pytest.mark.asyncio
     async def test_contains_all_themes(self):

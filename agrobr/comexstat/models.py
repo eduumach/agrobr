@@ -38,6 +38,16 @@ NCM_PRODUTOS: dict[str, str] = {
     "carne_bovina": "02023000",
     "carne_frango": "02071400",
     "carne_suina": "02032900",
+    "fertilizantes": "31",
+    "ureia": "31021010",
+    "sulfato_amonio": "31022100",
+    "nitrato_amonio": "31023000",
+    "ssp": "31031900",
+    "tsp": "31031100",
+    "kcl": "31042090",
+    "map": "31054000",
+    "dap": "31053000",
+    "npk": "3105",
 }
 
 

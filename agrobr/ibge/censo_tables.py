@@ -67,6 +67,12 @@ _CLASSIFICACOES_CENSO_AGRO: dict[tuple[str, str], dict[str, str]] = {
     ("irrigacao", "2017"): {
         "12604": "all",
     },
+    ("despesa_adubos", "2017"): {
+        "829": "46302",
+        "210": "45953",
+        "218": "46502",
+        "12517": "113601",
+    },
 }
 
 _CENSO_VAR_NOME: dict[str, str] = {
@@ -127,6 +133,7 @@ _CENSO_CATEGORIA_COL_INDEX: dict[tuple[str, str], int] = {
     ("praticas_agricolas", "2017"): 3,
     ("irrigacao", "2006"): 3,
     ("irrigacao", "2017"): 3,
+    ("despesa_adubos", "2017"): 3,
 }
 
 _VAR_AS_CATEGORIA: dict[tuple[str, str], dict[str, tuple[str, str, str]]] = {
@@ -137,6 +144,10 @@ _VAR_AS_CATEGORIA: dict[tuple[str, str], dict[str, tuple[str, str, str]]] = {
         "9565": ("Cultivo mínimo", "estabelecimentos", "unidades"),
         "2016": ("Plantio direto na palha", "estabelecimentos", "unidades"),
         "2018": ("Plantio direto na palha", "area", "hectares"),
+    },
+    ("despesa_adubos", "2017"): {
+        "2": ("Estabelecimentos com despesa", "estabelecimentos", "unidades"),
+        "1996": ("Valor da despesa", "valor_mil_reais", "mil reais"),
     },
 }
 
