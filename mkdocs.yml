@@ -170,6 +170,7 @@ nav:
     - Normalização: guides/normalizacao.md
     - Snapshots: guides/snapshots.md
     - Dependências: guides/dependencies.md
+    - Docker: guides/docker.md
   - Avançado:
     - Reprodutibilidade: advanced/reproducibility.md
     - Integração Pipelines: advanced/pipelines.md

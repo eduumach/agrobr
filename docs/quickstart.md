@@ -16,6 +16,15 @@ pip install agrobr[browser]
 playwright install chromium
 ```
 
+### Via Docker (sem Python local)
+
+```bash
+docker build -t agrobr .
+docker run -it --rm agrobr
+```
+
+Veja o [guia Docker](docker.md) para extras e opções avançadas.
+
 ## CEPEA - Indicadores de Preços
 
 O CEPEA (Centro de Estudos Avançados em Economia Aplicada) publica indicadores diários de preços agrícolas.

@@ -8,6 +8,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 ## [Unreleased]
 
 ### Added
+- **docker** — Dockerfile multi-stage (`python:3.11-slim`, non-root, ~400MB) + `.dockerignore` whitelist. `docker build -t agrobr .` + `docker run -it --rm agrobr`. Extras via `--build-arg EXTRAS=polars,pdf`. Fecha #54
 - **usda** — commodity `cafe`/`coffee` (Coffee, Green, PSD code `0711100`) adicionada a `PSD_COMMODITIES`, `_COMMODITY_NAMES` e dataset `oferta_demanda_global`
 - **imea** — aliases `boi`, `boi_gordo`, `bovinos` para cadeia bovinocultura (ID 2), consistente com nomenclatura canonica da lib
 

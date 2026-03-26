@@ -42,6 +42,34 @@ pip install agrobr[geo]             # GeoPandas (geometria PRODES + DETER + SICA
 pip install agrobr[all]             # Tudo incluído
 ```
 
+### Docker
+
+```bash
+docker build -t agrobr .
+docker run -it --rm agrobr
+```
+
+```python
+>>> from agrobr.sync import cepea
+>>> df = cepea.indicador('soja', inicio='2024-01-01')
+```
+
+```bash
+# CLI
+docker run --rm agrobr agrobr cepea indicador boi
+
+# Persistir cache entre execuções
+docker run -it --rm -v agrobr-cache:/home/agrobr/.agrobr agrobr
+
+# Com extras (polars, pdf, bigquery)
+docker build --build-arg EXTRAS=polars,pdf -t agrobr:extras .
+
+# Rodar script local
+docker run --rm -v "$(pwd)":/work agrobr python /work/analise.py
+```
+
+> **Nota:** O extra `browser` requer dependências de sistema não incluídas na imagem base. Veja o [guia Docker](https://www.agrobr.dev/docs/guides/docker/) para compatibilidade de extras.
+
 ## Uso Rápido
 
 ### CEPEA - Indicadores de Preços
@@ -663,7 +691,8 @@ Funções para padronizar dados entre fontes:
 
 ```python
 from agrobr.normalize import (
-    normalizar_cultura, municipio_para_ibge, normalizar_uf, normalizar_safra,
+    normalizar_cultura, municipio_para_ibge, coordenada_para_municipio,
+    normalizar_uf, normalizar_safra,
 )
 
 normalizar_cultura("Soja em Grão")    # "soja"
@@ -673,11 +702,14 @@ normalizar_cultura("coffee")          # "cafe"
 municipio_para_ibge("Sorriso", "MT")  # 5107925
 municipio_para_ibge("SAO PAULO", "SP")  # 3550308
 
+coordenada_para_municipio(-12.74, -55.68)
+# {'codigo_ibge': 5107925, 'nome': 'Sorriso', 'uf': 'MT'}
+
 normalizar_uf("São Paulo")            # "SP"
 normalizar_safra("24/25")             # "2024/25"
 ```
 
-5571 municípios IBGE, 35 culturas canônicas, 27 UFs. Dados de municípios via API IBGE Localidades (livre para uso).
+5571 municípios IBGE com centroides (geocodificação reversa offline), 35 culturas canônicas, 27 UFs. Dados via API IBGE Localidades e Malhas (livre para uso).
 
 ## Diferenciais
 
