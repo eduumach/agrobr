@@ -91,7 +91,7 @@ class TestCreditoRural:
         ):
             df, meta = await api.credito_rural("soja", safra="2023/24", return_meta=True)
 
-        assert meta.source == "bcb"
+        assert meta.source == "bcb_credito"
         assert meta.attempted_sources == ["bcb_odata"]
         assert meta.selected_source == "bcb_odata"
         assert meta.source_method == "httpx"
@@ -108,7 +108,7 @@ class TestCreditoRural:
         ):
             df, meta = await api.credito_rural("soja", safra="2023/24", return_meta=True)
 
-        assert meta.source == "bcb"
+        assert meta.source == "bcb_credito"
         assert meta.attempted_sources == ["bcb_odata", "bcb_bigquery"]
         assert meta.selected_source == "bcb_bigquery"
         assert meta.source_method == "bigquery"
