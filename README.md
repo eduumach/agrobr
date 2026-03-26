@@ -61,14 +61,14 @@ docker run --rm agrobr agrobr cepea indicador boi
 # Persistir cache entre execuções
 docker run -it --rm -v agrobr-cache:/home/agrobr/.agrobr agrobr
 
-# Com extras (polars, pdf, bigquery)
-docker build --build-arg EXTRAS=polars,pdf -t agrobr:extras .
+# Com extras adicionais (EXTRAS substitui o default "browser,pdf")
+docker build --build-arg EXTRAS="browser,pdf,polars" -t agrobr:extras .
 
 # Rodar script local
 docker run --rm -v "$(pwd)":/work agrobr python /work/analise.py
 ```
 
-> **Nota:** O extra `browser` requer dependências de sistema não incluídas na imagem base. Veja o [guia Docker](https://www.agrobr.dev/docs/guides/docker/) para compatibilidade de extras.
+> A imagem default inclui Playwright + Chromium (CONAB) e pdfplumber (ANDA). Veja o [guia Docker](https://www.agrobr.dev/docs/guides/docker/) para extras adicionais.
 
 ## Uso Rápido
 

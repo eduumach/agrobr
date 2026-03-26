@@ -3,6 +3,18 @@ from __future__ import annotations
 import random
 from collections.abc import Sequence
 
+
+def _build_accept_encoding() -> str:
+    encodings = ["gzip", "deflate"]
+    try:
+        import brotli  # noqa: F401
+
+        encodings.append("br")
+    except ImportError:
+        pass
+    return ", ".join(encodings)
+
+
 USER_AGENT_POOL: Sequence[str] = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
@@ -19,7 +31,7 @@ USER_AGENT_POOL: Sequence[str] = (
 DEFAULT_HEADERS: dict[str, str] = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
     "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-    "Accept-Encoding": "gzip, deflate, br",
+    "Accept-Encoding": _build_accept_encoding(),
     "Connection": "keep-alive",
     "Upgrade-Insecure-Requests": "1",
     "Sec-Fetch-Dest": "document",

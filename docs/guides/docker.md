@@ -52,25 +52,26 @@ docker run --rm -v "$(pwd)":/work agrobr python /work/meu_script.py
 
 ## Extras
 
-Build com extras opcionais via `--build-arg`:
+A imagem default ja inclui os extras `browser` (Playwright + Chromium) e `pdf` (pdfplumber), necessarios para CONAB e ANDA respectivamente.
+
+O `--build-arg EXTRAS` **substitui** o default. Para adicionar extras, inclua os defaults:
 
 ```bash
-docker build --build-arg EXTRAS=polars,pdf -t agrobr:extras .
+docker build --build-arg EXTRAS="browser,pdf,polars" -t agrobr:extras .
 ```
 
 ### Compatibilidade
 
 | Extra | Docker | Notas |
 |---|---|---|
-| `pdf` | sim | pdfplumber, puro Python |
+| `browser` | sim (default) | Playwright + Chromium. Necessario para CONAB |
+| `pdf` | sim (default) | pdfplumber, puro Python. Necessario para ANDA |
 | `polars` | sim | Wheels manylinux pre-built |
 | `bigquery` | sim | Google Cloud client |
-| `browser` | **nao** | Playwright precisa Chromium + system libs nao presentes na imagem |
 | `geo` | **incerto** | geopandas/pyogrio pode funcionar (GDAL bundled no wheel). Nao verificado |
 | `app` | sim | Streamlit funciona, mas adiciona ~200MB e requer `-p 8501:8501` |
 | `dev` | nao usar | Ferramentas de dev (pytest, ruff, mypy) |
 | `docs` | nao usar | mkdocs |
-| `all` | **nunca** | Inclui dev + docs + browser. Quebra |
 
 ## Python version
 
@@ -105,5 +106,5 @@ docker run -it --rm \
 
 - **`agrobr health` / `agrobr doctor`** retornam `ImportError` no container. Esses modulos sao privados e excluidos do wheel. Mesmo comportamento de `pip install agrobr` do PyPI.
 - **Cache efemero** sem volume mount. Use `-v agrobr-cache:/home/agrobr/.agrobr`.
-- **Imagem ~400-500MB** (pandas ~100MB + duckdb ~80MB + demais deps core).
+- **Imagem ~2.3GB** (Chromium ~1.5GB + pandas ~100MB + duckdb ~80MB + demais deps).
 - **`agrobr/data/censo_1985/`** — 11MB de CSVs estaticos incluidos na imagem (dados runtime do `ibge.censo_municipal_1985()`).
