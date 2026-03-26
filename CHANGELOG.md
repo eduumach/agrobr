@@ -11,6 +11,9 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **docker** — Dockerfile multi-stage (`python:3.11-slim`, non-root) com Playwright + Chromium + pdfplumber inclusos (default `EXTRAS="browser,pdf"`). `docker build -t agrobr .` + `docker run -it --rm agrobr`. Extras adicionais via `--build-arg EXTRAS="browser,pdf,polars"`. Fecha #54
 - **usda** — commodity `cafe`/`coffee` (Coffee, Green, PSD code `0711100`) adicionada a `PSD_COMMODITIES`, `_COMMODITY_NAMES` e dataset `oferta_demanda_global`
 - **imea** — aliases `boi`, `boi_gordo`, `bovinos` para cadeia bovinocultura (ID 2), consistente com nomenclatura canonica da lib
+- **rnc** — Registro Nacional de Cultivares (CultivarWeb/MAPA). `registradas()` ~37K cultivares. `protegidas()` ~5K cultivares protegidas. Filtros cultivar, especie, grupo, mantenedor. CSV nativo, licenca `livre`
+- **embrapa_solos** — Perfis de solo EMBRAPA/PronaSolos via WFS. `perfis()` tabular + `perfis_geo()` GeoDataFrame (34K+ pontos). `mapa_solos()` + `mapa_solos_geo()` classificacao SiBCS (2.8K poligonos). Licenca `nc`
+- **rio_verde** — Ensaios cultivares Fundacao Rio Verde (MT). `ensaio_soja()` ~97 cultivares x 4 epocas. PDF parsing via pdfplumber. Licenca `zona_cinza`
 
 ### Fixed
 - **cepea** — parser v1: coluna USD (`Valor US$*`) sobrescrevia valor BRL (100% dos precos no cache estavam errados). Reordenado condicionais: `var` antes de `data` (evita `Var./Dia` poluir data_value), exclusao explicita de colunas US$/USD

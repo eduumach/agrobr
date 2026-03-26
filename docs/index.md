@@ -9,9 +9,9 @@
 
 ## O que é o agrobr?
 
-Infraestrutura Python para dados agrícolas brasileiros com **camada semântica** sobre 27 fontes públicas.
+Infraestrutura Python para dados agrícolas brasileiros com **camada semântica** sobre 38 fontes públicas.
 
-**v1.0.2** — 5190+ testes | 88% cobertura | 27/27 golden tests | retry centralizado 27/27 clients
+**v1.0.4** — 5500+ testes | 88% cobertura | 38/38 golden tests | retry centralizado 38/38 clients
 
 - **CEPEA/ESALQ**: 20 indicadores de preços (soja, milho, boi, café, algodão, trigo, arroz, açúcar, etanol, frango, suíno, leite, laranja)
 - **CONAB**: Safras, balanço oferta/demanda, custos de produção e série histórica
@@ -40,6 +40,17 @@ Infraestrutura Python para dados agrícolas brasileiros com **camada semântica*
 - **SICAR**: Cadastro Ambiental Rural — registros de imoveis rurais por UF via WFS (7.4M+ imoveis, 27 UFs)
 - **ZARC**: Zoneamento Agricola de Risco Climatico — janelas de plantio por municipio/cultura/solo/ciclo (MAPA/Embrapa, CC-BY)
 - **Agrofit/MAPA (Defensivos)**: Agrotoxicos registrados no Brasil — produtos formulados, autorizacoes de uso e produtos tecnicos (CC-BY)
+- **FUNAI**: Terras indigenas via WFS (~740 TIs, CC BY-ND 3.0)
+- **ICMBio**: Unidades de conservacao federais via WFS (344 UCs)
+- **INCRA**: Territorios quilombolas via WFS (~426 territorios)
+- **IBAMA**: Embargos ambientais via WFS (~89K embargos, ODbL)
+- **MapBiomas Alerta**: Alertas de desmatamento via GraphQL (citacao obrigatoria)
+- **Lista Suja**: Cadastro de empregadores (trabalho escravo) via PDF (Lei de Acesso a Informacao)
+- **ANA/SNIRH**: Hidrografia, pivos de irrigacao, demanda e disponibilidade hidrica via ArcGIS REST
+- **SFB**: Florestas publicas, concessoes florestais e IFN via ArcGIS REST
+- **RNC/CultivarWeb**: Registro Nacional de Cultivares — ~37K registradas + ~5K protegidas (MAPA, dados publicos)
+- **EMBRAPA Solos**: Perfis de solo PronaSolos (34K+ pontos) + mapa pedologico SiBCS (2.8K poligonos) via WFS (CC BY-NC 3.0 BR)
+- **Fundacao Rio Verde**: Ensaios de cultivares de soja — ~97 cultivares x 4 epocas de semeio (PDF, pdfplumber)
 
 ## Datasets — Camada Semântica
 
@@ -143,17 +154,17 @@ df = nasa_power.clima_uf('MT', ano=2025)
 
 | Métrica | Valor |
 |---------|-------|
-| Testes | 5190+ passando |
+| Testes | 5500+ passando |
 | Cobertura | 88% |
-| Golden tests | 27/27 fontes |
+| Golden tests | 38/38 fontes |
 | Resiliência HTTP | Retry centralizado + 429/Retry-After |
 | Benchmarks | Memory, volume, cache, async, rate limiting |
 | Bugs corrigidos (v1.0.1) | Parser NA 3 layouts, B3 ISO date, SICAR WFS field, BCB timeout |
 
 ## Features
 
-- **27 fontes públicas** — CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento, MapBiomas, CONAB Progresso, CONAB CEASA/PROHORT, B3 Futuros Agro, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedagio, SICAR, ZARC, Agrofit/MAPA (Defensivos)
-- **27/27 golden tests** — validação automatizada contra dados de referência
+- **38 fontes públicas** — CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento, MapBiomas, CONAB Progresso, CONAB CEASA/PROHORT, B3 Futuros Agro, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedagio, SICAR, ZARC, Agrofit/MAPA (Defensivos), FUNAI, ICMBio, INCRA, IBAMA, MapBiomas Alerta, Lista Suja, ANA/SNIRH, SFB, RNC/CultivarWeb, EMBRAPA Solos, Fundação Rio Verde
+- **38/38 golden tests** — validação automatizada contra dados de referência
 - **Resiliência HTTP** — `retry_on_status()`/`retry_async()` centralizado, Retry-After, 429 handling
 - **Camada semântica** — datasets com fallback automático entre fontes
 - **Contratos públicos** — schema versionado com garantias de estabilidade

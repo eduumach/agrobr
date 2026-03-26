@@ -4,12 +4,11 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from agrobr.exceptions import ParseError, SourceUnavailableError
+from agrobr.exceptions import SourceUnavailableError
 from agrobr.ibama.client import (
     _build_cql,
     fetch_embargos,
     fetch_embargos_geo,
-    fetch_hits,
 )
 
 
@@ -19,32 +18,6 @@ class TestBuildCql:
 
     def test_none_returns_none(self):
         assert _build_cql() is None
-
-
-class TestFetchHits:
-    @pytest.mark.asyncio
-    async def test_parse_number_matched(self):
-        xml = b'<?xml version="1.0"?><wfs:FeatureCollection numberMatched="89214" numberReturned="0"/>'
-        with patch(
-            "agrobr.ibama.client.fetch_wfs",
-            new_callable=AsyncMock,
-            return_value=xml,
-        ):
-            count = await fetch_hits()
-        assert count == 89214
-
-    @pytest.mark.asyncio
-    async def test_no_number_matched_raises(self):
-        xml = b'<?xml version="1.0"?><wfs:FeatureCollection/>'
-        with (
-            patch(
-                "agrobr.ibama.client.fetch_wfs",
-                new_callable=AsyncMock,
-                return_value=xml,
-            ),
-            pytest.raises(ParseError, match="numberMatched"),
-        ):
-            await fetch_hits()
 
 
 class TestFetchEmbargos:
@@ -62,7 +35,7 @@ class TestFetchEmbargos:
                 return hits_xml
             return page_content
 
-        with patch("agrobr.ibama.client.fetch_wfs", side_effect=mock_fetch_wfs):
+        with patch("agrobr.utils.geo.fetch_wfs", side_effect=mock_fetch_wfs):
             pages, base_url = await fetch_embargos()
 
         assert len(pages) == 2
@@ -75,7 +48,7 @@ class TestFetchEmbargos:
         )
 
         with patch(
-            "agrobr.ibama.client.fetch_wfs",
+            "agrobr.utils.geo.fetch_wfs",
             new_callable=AsyncMock,
             return_value=hits_xml,
         ):
@@ -87,7 +60,7 @@ class TestFetchEmbargos:
     async def test_404_raises(self):
         with (
             patch(
-                "agrobr.ibama.client.fetch_wfs",
+                "agrobr.utils.geo.fetch_wfs",
                 new_callable=AsyncMock,
                 side_effect=SourceUnavailableError(
                     source="ibama", url="test", last_error="HTTP 404"

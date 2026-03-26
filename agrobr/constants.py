@@ -33,6 +33,7 @@ class Fonte(StrEnum):
     CONAB = "conab"
     DEFENSIVOS = "defensivos"
     DERAL = "deral"
+    EMBRAPA_SOLOS = "embrapa_solos"
     FUNAI = "funai"
     IBAMA = "ibama"
     IBGE = "ibge"
@@ -50,6 +51,8 @@ class Fonte(StrEnum):
     SFB = "sfb"
     SICAR = "sicar"
     USDA = "usda"
+    RNC = "rnc"
+    RIO_VERDE = "rio_verde"
     ZARC = "zarc"
 
 
@@ -110,6 +113,10 @@ URLS = {
     Fonte.DERAL: {
         "base": "https://www.agricultura.pr.gov.br/deral",
         "downloads": "https://www.agricultura.pr.gov.br/system/files/publico/Safras",
+    },
+    Fonte.EMBRAPA_SOLOS: {
+        "base": "https://geoinfo.dados.embrapa.br",
+        "geoserver": "https://geoinfo.dados.embrapa.br/geoserver",
     },
     Fonte.IBGE: {
         "base": "https://sidra.ibge.gov.br",
@@ -188,6 +195,14 @@ URLS = {
         "base": "https://www.b3.com.br",
         "ajustes_zip": "https://www.b3.com.br/pesquisapregao/download",
         "arquivos": "https://arquivos.b3.com.br/api/download",
+    },
+    Fonte.RNC: {
+        "base": "https://sistemas.agricultura.gov.br/snpc",
+        "cultivarweb": "https://sistemas.agricultura.gov.br/snpc/cultivarweb",
+    },
+    Fonte.RIO_VERDE: {
+        "base": "https://fundacaorioverde.com.br",
+        "publicacoes": "https://fundacaorioverde.com.br/publicacoes/",
     },
     Fonte.ZARC: {
         "base": "https://dados.agricultura.gov.br",
@@ -351,6 +366,9 @@ class HTTPSettings(BaseSettings):
     rate_limit_sicar: float = 2.0
     rate_limit_usda: float = 1.0
     rate_limit_b3: float = 1.0
+    rate_limit_embrapa_solos: float = 2.0
+    rate_limit_rnc: float = 3.0
+    rate_limit_rio_verde: float = 3.0
     rate_limit_zarc: float = 2.0
     rate_limit_conab_ceasa: float = 2.0
     rate_limit_default: float = 1.0

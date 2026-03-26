@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 from typing import Any, Literal, TypedDict
 from urllib.parse import quote, urlencode
@@ -273,6 +274,92 @@ def parse_wfs_hits(content: bytes, *, source: str) -> int:
         parser_version=1,
         reason=f"Nao encontrou numberMatched na resposta hits: {text[:200]}",
     )
+
+
+async def fetch_wfs_paginated(
+    base: str,
+    namespace: str,
+    layer: str,
+    version: str,
+    property_names: list[str],
+    page_size: int,
+    *,
+    source: str,
+    timeout: httpx.Timeout,
+    cql: str | None = None,
+    bbox: tuple[float, float, float, float] | None = None,
+    throttle_after_page: int = 5,
+    throttle_delay: float = 2.0,
+) -> tuple[list[bytes], str]:
+    hits_url = build_wfs_url(
+        base,
+        namespace,
+        layer,
+        version,
+        [],
+        max_features=1,
+        cql_filter=cql,
+        result_type="hits",
+    )
+    hits_content = await fetch_wfs(hits_url, source=source, timeout=timeout)
+    total = parse_wfs_hits(hits_content, source=source)
+    logger.info("wfs_paginated_hits", source=source, layer=layer, total=total)
+
+    if total == 0:
+        url = build_wfs_url(
+            base,
+            namespace,
+            layer,
+            version,
+            property_names,
+            max_features=page_size,
+            cql_filter=cql,
+            bbox=bbox,
+        )
+        return [], url
+
+    n_pages = math.ceil(total / page_size)
+    pages: list[bytes] = []
+    first_url = ""
+
+    async with httpx.AsyncClient(
+        timeout=timeout,
+        headers=UserAgentRotator.get_bot_headers(),
+        follow_redirects=True,
+    ) as http:
+        for i in range(n_pages):
+            url = build_wfs_url(
+                base,
+                namespace,
+                layer,
+                version,
+                property_names,
+                max_features=page_size,
+                cql_filter=cql,
+                start_index=i * page_size,
+                bbox=bbox,
+            )
+            if i == 0:
+                first_url = url
+            delay = throttle_delay if i >= throttle_after_page else None
+            content = await fetch_wfs(
+                url,
+                source=source,
+                timeout=timeout,
+                base_delay=delay,
+                client=http,
+            )
+            pages.append(content)
+            logger.debug(
+                "wfs_paginated_page",
+                source=source,
+                layer=layer,
+                page=i + 1,
+                total_pages=n_pages,
+                size=len(content),
+            )
+
+    return pages, first_url
 
 
 async def fetch_arcgis_layer(
