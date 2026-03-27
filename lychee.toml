@@ -19,7 +19,7 @@ user_agent = "Mozilla/5.0 (compatible; agrobr-link-checker/1.0; +https://github.
 # ── Escopo ───────────────────────────────────────────────────
 include_fragments = false
 exclude_all_private = true
-exclude_mail = true
+include_mail = false
 
 # ── Excludes (regex) ─────────────────────────────────────────
 exclude = [

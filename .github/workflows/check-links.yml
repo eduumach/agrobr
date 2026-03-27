@@ -12,6 +12,9 @@ concurrency:
 permissions:
   issues: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   check-links:
     runs-on: ubuntu-latest
