@@ -170,3 +170,49 @@ class TestProgressoSafraPublicAPI:
             _, kwargs = mock_fetch.call_args
             assert kwargs["estado"] == "PR"
             assert kwargs["operacao"] == "Colheita"
+
+
+class TestProgressoSafraFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_conab_normalizes_and_forwards(self):
+        meta = mock_source_meta()
+        mock_df = _make_df()
+        with (
+            patch(
+                "agrobr.conab.progresso.api.progresso_safra",
+                new_callable=AsyncMock,
+                return_value=(mock_df, meta),
+            ) as mock_fn,
+            patch(
+                "agrobr.conab.progresso.models.normalizar_cultura",
+                return_value="Soja",
+            ) as mock_norm,
+        ):
+            from agrobr.datasets.progresso_safra import _fetch_conab
+
+            await _fetch_conab("soja", estado="PR", operacao="plantio")
+        mock_norm.assert_called_once_with("soja")
+        mock_fn.assert_called_once_with(
+            cultura="Soja", estado="PR", operacao="plantio", return_meta=True
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_conab_forwards_semana_url(self):
+        meta = mock_source_meta()
+        mock_df = _make_df()
+        with (
+            patch(
+                "agrobr.conab.progresso.api.progresso_safra",
+                new_callable=AsyncMock,
+                return_value=(mock_df, meta),
+            ) as mock_fn,
+            patch(
+                "agrobr.conab.progresso.models.normalizar_cultura",
+                return_value="Soja",
+            ),
+        ):
+            from agrobr.datasets.progresso_safra import _fetch_conab
+
+            await _fetch_conab("soja", semana_url="https://example.com")
+        _, kwargs = mock_fn.call_args
+        assert kwargs["semana_url"] == "https://example.com"

@@ -159,3 +159,31 @@ class TestEstimativaSafraPublicAPI:
             assert isinstance(result, tuple)
             assert len(result) == 2
             assert isinstance(result[0], pd.DataFrame)
+
+
+class TestEstimativaSafraFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_conab_forwards_params(self):
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.conab.safras",
+            new_callable=AsyncMock,
+            return_value=(_mock_df(), meta),
+        ) as mock_fn:
+            from agrobr.datasets.estimativa_safra import _fetch_conab
+
+            await _fetch_conab("soja", safra="2024/25", uf="PR")
+        mock_fn.assert_called_once_with("soja", safra="2024/25", uf="PR", return_meta=True)
+
+    @pytest.mark.asyncio
+    async def test_fetch_ibge_lspa_safra_to_ano(self):
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.ibge.lspa",
+            new_callable=AsyncMock,
+            return_value=(_mock_df(), meta),
+        ) as mock_fn:
+            from agrobr.datasets.estimativa_safra import _fetch_ibge_lspa
+
+            await _fetch_ibge_lspa("soja", safra="2024/25", uf="PR")
+        mock_fn.assert_called_once_with("soja", ano=2024, uf="PR", return_meta=True)

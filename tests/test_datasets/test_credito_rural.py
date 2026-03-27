@@ -189,3 +189,34 @@ class TestCreditoRuralPublicAPI:
             assert isinstance(result, tuple)
             assert len(result) == 2
             assert isinstance(result[0], pd.DataFrame)
+
+
+class TestCreditoRuralFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_bcb_odata_forwards_params(self):
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.bcb.credito_rural", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.credito_rural import _fetch_bcb_odata
+
+            await _fetch_bcb_odata(
+                "soja",
+                safra="2024/2025",
+                finalidade="investimento",
+                uf="PR",
+                agregacao="uf",
+                programa="PRONAF",
+                tipo_seguro="PROAGRO",
+            )
+        mock_fn.assert_called_once_with(
+            "soja",
+            safra="2024/2025",
+            finalidade="investimento",
+            uf="PR",
+            agregacao="uf",
+            programa="PRONAF",
+            tipo_seguro="PROAGRO",
+            return_meta=True,
+        )

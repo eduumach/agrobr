@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import httpx
 import pandas as pd
@@ -8,7 +8,7 @@ from agrobr.datasets.deterministic import deterministic
 from agrobr.datasets.pecuaria_municipal import PecuariaMunicipalDataset
 from agrobr.exceptions import SourceUnavailableError
 
-from .conftest import make_source
+from .conftest import make_source, mock_source_meta
 
 
 def _mock_df():
@@ -116,3 +116,30 @@ class TestPecuariaMunicipalSourceFail:
 
         with pytest.raises(SourceUnavailableError):
             await dataset.fetch("bovino")
+
+
+class TestPecuariaMunicipalFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_ibge_ppm_forwards_params(self):
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch("agrobr.ibge.ppm", new_callable=AsyncMock, return_value=(df, meta)) as mock_fn:
+            from agrobr.datasets.pecuaria_municipal import _fetch_ibge_ppm
+
+            await _fetch_ibge_ppm("bovino", ano=2022, nivel="municipio", uf="MT")
+        mock_fn.assert_called_once_with(
+            "bovino", ano=2022, nivel="municipio", uf="MT", return_meta=True
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_ibge_ppm_defaults(self):
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch("agrobr.ibge.ppm", new_callable=AsyncMock, return_value=(df, meta)) as mock_fn:
+            from agrobr.datasets.pecuaria_municipal import _fetch_ibge_ppm
+
+            await _fetch_ibge_ppm("leite")
+        _, kwargs = mock_fn.call_args
+        assert kwargs["ano"] is None
+        assert kwargs["nivel"] == "uf"
+        assert kwargs["uf"] is None

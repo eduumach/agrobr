@@ -10,7 +10,7 @@ from agrobr.datasets.futuros_agricolas import (
 )
 from agrobr.exceptions import SourceUnavailableError
 
-from .conftest import make_source
+from .conftest import make_source, mock_source_meta
 
 
 def _mock_ajustes_df():
@@ -261,3 +261,58 @@ class TestFuturosValidateProduto:
     def test_empty_produto_allowed(self):
         dataset = FuturosAgricolasDataset()
         dataset._validate_produto("")
+
+
+class TestFuturosAgricolasFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_b3_ajustes_default(self):
+        df = _mock_ajustes_df()
+        meta = mock_source_meta()
+        with patch("agrobr.b3.ajustes", new_callable=AsyncMock, return_value=(df, meta)) as mock_fn:
+            from agrobr.datasets.futuros_agricolas import _fetch_b3
+
+            result_df, result_meta = await _fetch_b3("boi", data="2025-03-05")
+        mock_fn.assert_called_once_with(data="2025-03-05", contrato="boi", return_meta=True)
+        assert len(result_df) == 1
+
+    @pytest.mark.asyncio
+    async def test_fetch_b3_historico(self):
+        df = _mock_ajustes_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.b3.historico", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.futuros_agricolas import _fetch_b3
+
+            await _fetch_b3(
+                "boi", tipo="historico", inicio="2025-01-01", fim="2025-03-05", vencimento="G25"
+            )
+        mock_fn.assert_called_once_with(
+            contrato="boi",
+            inicio="2025-01-01",
+            fim="2025-03-05",
+            vencimento="G25",
+            return_meta=True,
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_b3_posicoes(self):
+        df = _mock_posicoes_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.b3.posicoes_abertas", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.futuros_agricolas import _fetch_b3
+
+            await _fetch_b3("boi", tipo="posicoes", data="2025-03-05")
+        mock_fn.assert_called_once_with(data="2025-03-05", contrato="boi", return_meta=True)
+
+    @pytest.mark.asyncio
+    async def test_fetch_b3_empty_produto(self):
+        df = _mock_ajustes_df()
+        meta = mock_source_meta()
+        with patch("agrobr.b3.ajustes", new_callable=AsyncMock, return_value=(df, meta)) as mock_fn:
+            from agrobr.datasets.futuros_agricolas import _fetch_b3
+
+            await _fetch_b3("", data="2025-03-05")
+        mock_fn.assert_called_once_with(data="2025-03-05", contrato=None, return_meta=True)

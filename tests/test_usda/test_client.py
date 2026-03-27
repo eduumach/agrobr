@@ -163,3 +163,44 @@ class TestUsdaRetryBackoff:
         assert len(sleep_calls) >= 2
         for i in range(1, len(sleep_calls)):
             assert sleep_calls[i] > sleep_calls[i - 1]
+
+
+class TestPsdWrappers:
+    @pytest.mark.asyncio
+    async def test_fetch_psd_country(self):
+        resp_ok = make_mock_response(200, json_data=[{"commodity": "Soybeans"}])
+        mock_client = make_mock_async_client()
+        mock_client.get = AsyncMock(return_value=resp_ok)
+
+        with patch("agrobr.usda.client.httpx.AsyncClient", return_value=mock_client):
+            result = await client.fetch_psd_country("2222000", "BR", 2025, api_key="test-key")
+
+        assert result == [{"commodity": "Soybeans"}]
+        called_url = mock_client.get.call_args[0][0]
+        assert "/psd/commodity/2222000/country/BR/year/2025" in called_url
+
+    @pytest.mark.asyncio
+    async def test_fetch_psd_world(self):
+        resp_ok = make_mock_response(200, json_data=[{"world": True}])
+        mock_client = make_mock_async_client()
+        mock_client.get = AsyncMock(return_value=resp_ok)
+
+        with patch("agrobr.usda.client.httpx.AsyncClient", return_value=mock_client):
+            result = await client.fetch_psd_world("2222000", 2025, api_key="test-key")
+
+        assert result == [{"world": True}]
+        called_url = mock_client.get.call_args[0][0]
+        assert "/psd/commodity/2222000/world/year/2025" in called_url
+
+    @pytest.mark.asyncio
+    async def test_fetch_psd_all_countries(self):
+        resp_ok = make_mock_response(200, json_data=[{"all": True}])
+        mock_client = make_mock_async_client()
+        mock_client.get = AsyncMock(return_value=resp_ok)
+
+        with patch("agrobr.usda.client.httpx.AsyncClient", return_value=mock_client):
+            result = await client.fetch_psd_all_countries("2222000", 2025, api_key="test-key")
+
+        assert result == [{"all": True}]
+        called_url = mock_client.get.call_args[0][0]
+        assert "/psd/commodity/2222000/country/all/year/2025" in called_url

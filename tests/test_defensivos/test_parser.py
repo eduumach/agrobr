@@ -9,6 +9,7 @@ import pytest
 from agrobr.defensivos.parser import (
     PARSER_VERSION,
     _fix_encoding,
+    _split_composite_ia,
     _strip_all_str_cols,
     parse_formulados_csv,
     parse_tecnicos_csv,
@@ -148,3 +149,54 @@ class TestHelpers:
         result = _strip_all_str_cols(df)
         assert result["a"].tolist() == ["hello", "world"]
         assert result["b"].tolist() == [1, 2]
+
+
+class TestSplitCompositeIA:
+    def test_composite_format_splits(self):
+        ia, grupo = _split_composite_ia("Glifosato (Fosfonometilglicina) (480)")
+        assert ia == "Glifosato"
+        assert grupo == "Fosfonometilglicina"
+
+    def test_plain_value_returns_empty_grupo(self):
+        ia, grupo = _split_composite_ia("Glifosato")
+        assert ia == "Glifosato"
+        assert grupo == ""
+
+    def test_no_match_strips_value(self):
+        ia, grupo = _split_composite_ia("  Glifosato  ")
+        assert ia == "Glifosato"
+        assert grupo == ""
+
+
+class TestParseTecnicosCompositeIA:
+    def test_composite_ia_column_split(self):
+        csv = (
+            b"INGREDIENTE_ATIVO(GRUPO_QUIMICI)(CONCENTRACAO);CLASSE;NR_REGISTRO;"
+            b"MARCA_COMERCIAL;TITULAR_DE_REGISTRO\n"
+            b"Glifosato (Fosfonometilglicina) (480);Herbicida;T00001;PRODUTO X;EMPRESA Y\n"
+        )
+        df = parse_tecnicos_csv(csv)
+        assert "ingrediente_ativo" in df.columns
+        assert "grupo_quimico" in df.columns
+        assert df.iloc[0]["ingrediente_ativo"] == "Glifosato"
+        assert df.iloc[0]["grupo_quimico"] == "Fosfonometilglicina"
+
+    def test_drop_cols_applied(self):
+        csv = (
+            b"CLASSE;NR_REGISTRO;MARCA_COMERCIAL;TITULAR_DE_REGISTRO;"
+            b"EMPRESA_PAIS_TIPO;INGREDIENTE_ATIVO\n"
+            b"Herbicida;T00001;PRODUTO X;EMPRESA Y;Brasil/Fabricante;2,4-D\n"
+        )
+        df = parse_tecnicos_csv(csv)
+        assert "EMPRESA_PAIS_TIPO" not in df.columns
+
+
+class TestFormulados_NoDrop:
+    def test_no_drop_cols_present(self):
+        csv = (
+            b"MARCA_COMERCIAL;INGREDIENTE_ATIVO;CULTURA;NR_REGISTRO\n"
+            b"PRODUTO X;Glifosato;Soja;001598\n"
+        )
+        form_df, auth_df = parse_formulados_csv(csv)
+        assert len(form_df) == 1
+        assert form_df.iloc[0]["marca_comercial"] == "PRODUTO X"

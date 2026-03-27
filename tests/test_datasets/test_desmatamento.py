@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 import httpx
 import pandas as pd
@@ -10,7 +10,7 @@ from agrobr.datasets.desmatamento import (
 )
 from agrobr.exceptions import SourceUnavailableError
 
-from .conftest import make_source
+from .conftest import make_source, mock_source_meta
 
 
 def _make_prodes_df(**overrides):
@@ -177,3 +177,55 @@ class TestDesmatamentoInfo:
 
     def test_license(self):
         assert DESMATAMENTO_INFO.license == "livre"
+
+
+class TestDesmatamentoFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_desmatamento_prodes(self):
+        df = _make_prodes_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.desmatamento.prodes", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.desmatamento import _fetch_desmatamento
+
+            await _fetch_desmatamento("Cerrado", tipo="prodes", ano=2022, uf="MT")
+        mock_fn.assert_called_once_with(bioma="Cerrado", ano=2022, uf="MT", return_meta=True)
+
+    @pytest.mark.asyncio
+    async def test_fetch_desmatamento_deter(self):
+        df = _make_deter_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.desmatamento.deter", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.desmatamento import _fetch_desmatamento
+
+            await _fetch_desmatamento(
+                "Amazônia",
+                tipo="deter",
+                uf="PA",
+                data_inicio="2024-01-01",
+                data_fim="2024-06-30",
+                classe="DESMATAMENTO_CR",
+            )
+        mock_fn.assert_called_once_with(
+            bioma="Amazônia",
+            uf="PA",
+            data_inicio="2024-01-01",
+            data_fim="2024-06-30",
+            classe="DESMATAMENTO_CR",
+            return_meta=True,
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_desmatamento_prodes_defaults(self):
+        df = _make_prodes_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.desmatamento.prodes", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.desmatamento import _fetch_desmatamento
+
+            await _fetch_desmatamento("Cerrado")
+        mock_fn.assert_called_once_with(bioma="Cerrado", ano=None, uf=None, return_meta=True)

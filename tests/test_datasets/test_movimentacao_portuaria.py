@@ -108,3 +108,65 @@ class TestMovimentacaoPortuariaInfo:
 
     def test_contract_version(self):
         assert MOVIMENTACAO_PORTUARIA_INFO.contract_version == "1.0"
+
+
+class TestMovimentacaoPortuariaFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_antaq_forwards_params(self):
+        from unittest.mock import AsyncMock, patch
+
+        from .conftest import mock_source_meta
+
+        df = _make_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.antaq.movimentacao",
+            new_callable=AsyncMock,
+            return_value=(df, meta),
+        ) as mock_fn:
+            from agrobr.datasets.movimentacao_portuaria import _fetch_antaq
+
+            await _fetch_antaq(
+                "",
+                ano=2024,
+                tipo_navegacao="Longo Curso",
+                natureza_carga="Granel Sólido",
+                mercadoria="Soja",
+                porto="Santos",
+                uf="SP",
+                sentido="Embarcados",
+            )
+        mock_fn.assert_called_once_with(
+            ano=2024,
+            tipo_navegacao="Longo Curso",
+            natureza_carga="Granel Sólido",
+            mercadoria="Soja",
+            porto="Santos",
+            uf="SP",
+            sentido="Embarcados",
+            return_meta=True,
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_antaq_defaults(self):
+        from unittest.mock import AsyncMock, patch
+
+        from .conftest import mock_source_meta
+
+        df = _make_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.antaq.movimentacao",
+            new_callable=AsyncMock,
+            return_value=(df, meta),
+        ) as mock_fn:
+            from agrobr.datasets.movimentacao_portuaria import _fetch_antaq
+
+            await _fetch_antaq("", ano=2024)
+        _, kwargs = mock_fn.call_args
+        assert kwargs["tipo_navegacao"] is None
+        assert kwargs["natureza_carga"] is None
+        assert kwargs["mercadoria"] is None
+        assert kwargs["porto"] is None
+        assert kwargs["uf"] is None
+        assert kwargs["sentido"] is None

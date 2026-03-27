@@ -1,4 +1,5 @@
-from unittest.mock import AsyncMock, patch
+from datetime import datetime
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
 import pandas as pd
@@ -8,6 +9,8 @@ from agrobr.datasets.deterministic import deterministic
 from agrobr.datasets.preco_diario import (
     PRECO_DIARIO_INFO,
     PrecoDiarioDataset,
+    _fetch_cache,
+    _fetch_cepea,
     preco_diario,
 )
 from agrobr.exceptions import ParseError, SourceUnavailableError
@@ -355,3 +358,50 @@ class TestPrecoDiarioPublicAPI:
             assert len(result) == 2
             assert isinstance(result[0], pd.DataFrame)
             mock_fetch.assert_called_once_with("soja", inicio=None, fim=None, return_meta=True)
+
+
+class TestPrecoDiarioFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_cepea_online(self):
+        mock_df = _mock_df()
+        meta = mock_source_meta()
+        with patch("agrobr.cepea.indicador", new_callable=AsyncMock, return_value=(mock_df, meta)):
+            df, m = await _fetch_cepea("soja")
+        assert len(df) == 2
+        assert m is not None
+
+    @pytest.mark.asyncio
+    async def test_fetch_cepea_deterministic_offline(self):
+        mock_df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.cepea.indicador", new_callable=AsyncMock, return_value=(mock_df, meta)
+        ) as mock_ind:
+            async with deterministic("2025-01-15"):
+                await _fetch_cepea("soja")
+            _, kwargs = mock_ind.call_args
+            assert kwargs.get("offline") is True
+
+    @pytest.mark.asyncio
+    async def test_fetch_cache_str_dates(self):
+        mock_store = MagicMock()
+        mock_store.indicadores_query.return_value = [
+            {"data": "2025-01-15", "valor": 145.0, "unidade": "R$/sc60kg", "produto": "soja"}
+        ]
+        with patch("agrobr.cache.duckdb_store.get_store", return_value=mock_store):
+            df, meta = await _fetch_cache("soja", inicio="2025-01-01", fim="2025-01-31")
+        assert len(df) == 1
+        assert meta is None
+        call_kwargs = mock_store.indicadores_query.call_args[1]
+        assert isinstance(call_kwargs["inicio"], datetime)
+        assert isinstance(call_kwargs["fim"], datetime)
+
+    @pytest.mark.asyncio
+    async def test_fetch_cache_empty_raises(self):
+        mock_store = MagicMock()
+        mock_store.indicadores_query.return_value = []
+        with (
+            patch("agrobr.cache.duckdb_store.get_store", return_value=mock_store),
+            pytest.raises(ValueError, match="No cached data"),
+        ):
+            await _fetch_cache("soja")

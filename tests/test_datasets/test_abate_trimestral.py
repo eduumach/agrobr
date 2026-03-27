@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import httpx
 import pandas as pd
@@ -7,7 +7,7 @@ import pytest
 from agrobr.datasets.abate_trimestral import AbateTrimestralDataset
 from agrobr.exceptions import SourceUnavailableError
 
-from .conftest import make_source
+from .conftest import make_source, mock_source_meta
 
 
 def _mock_df():
@@ -90,3 +90,27 @@ class TestAbateTrimestralSourceFail:
 
         with pytest.raises(SourceUnavailableError):
             await dataset.fetch("bovino")
+
+
+class TestAbateTrimestralFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_ibge_abate_forwards_params(self):
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch("agrobr.ibge.abate", new_callable=AsyncMock, return_value=(df, meta)) as mock_fn:
+            from agrobr.datasets.abate_trimestral import _fetch_ibge_abate
+
+            await _fetch_ibge_abate("bovino", trimestre="202303", uf="SP")
+        mock_fn.assert_called_once_with("bovino", trimestre="202303", uf="SP", return_meta=True)
+
+    @pytest.mark.asyncio
+    async def test_fetch_ibge_abate_defaults(self):
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch("agrobr.ibge.abate", new_callable=AsyncMock, return_value=(df, meta)) as mock_fn:
+            from agrobr.datasets.abate_trimestral import _fetch_ibge_abate
+
+            await _fetch_ibge_abate("suino")
+        _, kwargs = mock_fn.call_args
+        assert kwargs["trimestre"] is None
+        assert kwargs["uf"] is None

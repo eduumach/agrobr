@@ -10,7 +10,7 @@ from agrobr.datasets.serie_historica_safra import (
 )
 from agrobr.exceptions import SourceUnavailableError
 
-from .conftest import make_source
+from .conftest import make_source, mock_source_meta
 
 
 def _mock_df():
@@ -121,3 +121,36 @@ class TestSerieHistoricaSafraInfo:
 
     def test_license(self):
         assert SERIE_HISTORICA_SAFRA_INFO.license == "livre"
+
+
+class TestSerieHistoricaSafraFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_conab_serie_forwards_params(self):
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.conab.serie_historica",
+            new_callable=AsyncMock,
+            return_value=(df, meta),
+        ) as mock_fn:
+            from agrobr.datasets.serie_historica_safra import _fetch_conab_serie
+
+            await _fetch_conab_serie("soja", inicio=2020, fim=2024, uf="MT")
+        mock_fn.assert_called_once_with("soja", inicio=2020, fim=2024, uf="MT", return_meta=True)
+
+    @pytest.mark.asyncio
+    async def test_fetch_conab_serie_defaults(self):
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.conab.serie_historica",
+            new_callable=AsyncMock,
+            return_value=(df, meta),
+        ) as mock_fn:
+            from agrobr.datasets.serie_historica_safra import _fetch_conab_serie
+
+            await _fetch_conab_serie("milho")
+        _, kwargs = mock_fn.call_args
+        assert kwargs["inicio"] is None
+        assert kwargs["fim"] is None
+        assert kwargs["uf"] is None

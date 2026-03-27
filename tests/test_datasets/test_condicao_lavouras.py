@@ -1,3 +1,5 @@
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import httpx
 import pandas as pd
 import pytest
@@ -5,8 +7,11 @@ import pytest
 from agrobr.datasets.condicao_lavouras import (
     CONDICAO_LAVOURAS_INFO,
     CondicaoLavourasDataset,
+    _fetch_deral,
+    condicao_lavouras,
 )
 from agrobr.exceptions import SourceUnavailableError
+from agrobr.models import MetaInfo
 
 from .conftest import make_source
 
@@ -180,3 +185,56 @@ class TestCondicaoLavourasInfo:
 
     def test_license(self):
         assert CONDICAO_LAVOURAS_INFO.license == "livre"
+
+
+class TestFetchDeral:
+    @pytest.mark.asyncio
+    async def test_fetch_deral_calls_deral_api(self):
+        mock_meta = MagicMock(spec=MetaInfo)
+        expected_df = _make_full_df()
+        mock_deral = MagicMock()
+        mock_deral.condicao_lavouras = AsyncMock(
+            return_value=(expected_df, mock_meta),
+        )
+        import agrobr
+
+        with patch.object(agrobr, "deral", mock_deral, create=True):
+            df, meta = await _fetch_deral("soja")
+
+        assert len(df) == len(expected_df)
+        mock_deral.condicao_lavouras.assert_called_once_with(
+            produto="soja",
+            return_meta=True,
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_deral_empty_produto_passes_none(self):
+        mock_meta = MagicMock(spec=MetaInfo)
+        mock_deral = MagicMock()
+        mock_deral.condicao_lavouras = AsyncMock(
+            return_value=(_make_df(), mock_meta),
+        )
+        import agrobr
+
+        with patch.object(agrobr, "deral", mock_deral, create=True):
+            await _fetch_deral("")
+
+        mock_deral.condicao_lavouras.assert_called_once_with(
+            produto=None,
+            return_meta=True,
+        )
+
+
+class TestCondicaoLavourasPublicApi:
+    @pytest.mark.asyncio
+    async def test_condicao_lavouras_delegates_to_dataset(self):
+        expected_df = _make_df()
+        with patch.object(
+            CondicaoLavourasDataset,
+            "fetch",
+            new_callable=AsyncMock,
+            return_value=expected_df,
+        ):
+            result = await condicao_lavouras(produto="soja")
+
+        assert isinstance(result, pd.DataFrame)

@@ -342,3 +342,47 @@ class TestClimaPublicAPI:
                 agregacao="diario",
                 return_meta=False,
             )
+
+
+class TestClimaFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_inmet_adds_fonte_and_nullable_cols(self):
+        df = pd.DataFrame(
+            {
+                "mes": [pd.Timestamp("2024-01-01")],
+                "uf": ["SP"],
+                "precip_acum_mm": [150.0],
+                "temp_media": [25.0],
+            }
+        )
+        meta = mock_source_meta()
+        with patch("agrobr.inmet.clima_uf", new_callable=AsyncMock, return_value=(df, meta)):
+            from agrobr.datasets.clima import _fetch_inmet
+
+            result_df, _ = await _fetch_inmet("SP", ano=2024)
+        assert result_df["fonte"].iloc[0] == "inmet"
+        assert "umidade_media" in result_df.columns
+        assert "radiacao_media_mj" in result_df.columns
+        assert "vento_medio_ms" in result_df.columns
+
+    @pytest.mark.asyncio
+    async def test_fetch_nasa_drops_lat_lon_adds_fonte(self):
+        df = pd.DataFrame(
+            {
+                "mes": [pd.Timestamp("2024-01-01")],
+                "uf": ["SP"],
+                "precip_acum_mm": [150.0],
+                "temp_media": [25.0],
+                "lat": [-23.5],
+                "lon": [-46.6],
+            }
+        )
+        meta = mock_source_meta()
+        with patch("agrobr.nasa_power.clima_uf", new_callable=AsyncMock, return_value=(df, meta)):
+            from agrobr.datasets.clima import _fetch_nasa
+
+            result_df, _ = await _fetch_nasa("SP", ano=2024)
+        assert "lat" not in result_df.columns
+        assert "lon" not in result_df.columns
+        assert result_df["fonte"].iloc[0] == "nasa_power"
+        assert "num_estacoes" in result_df.columns

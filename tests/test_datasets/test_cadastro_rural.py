@@ -1,11 +1,13 @@
 """Testes para o dataset cadastro_rural (SICAR)."""
 
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import pandas as pd
 import pytest
 
 from agrobr.datasets.cadastro_rural import CadastroRuralDataset
+
+from .conftest import mock_source_meta
 
 
 def _mock_df():
@@ -164,8 +166,6 @@ class TestCadastroRuralNormalize:
 class TestCadastroRuralPublicAPI:
     @pytest.mark.asyncio
     async def test_public_function_delegates(self):
-        from unittest.mock import patch
-
         from agrobr.datasets.cadastro_rural import cadastro_rural
 
         with patch.object(CadastroRuralDataset, "fetch", new_callable=AsyncMock) as mock_fetch:
@@ -201,3 +201,34 @@ class TestCadastroRuralRegistered:
         c1 = get_contract("cadastro_rural")
         c2 = get_contract("sicar_imoveis")
         assert c1 is c2
+
+
+class TestCadastroRuralFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_sicar_forwards_all_params(self):
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.alt.sicar.imoveis", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.cadastro_rural import _fetch_sicar
+
+            await _fetch_sicar(
+                "PR",
+                municipio="Londrina",
+                status="ativo",
+                tipo="rural",
+                area_min=10.0,
+                area_max=1000.0,
+                criado_apos="2024-01-01",
+            )
+        mock_fn.assert_called_once_with(
+            "PR",
+            municipio="Londrina",
+            status="ativo",
+            tipo="rural",
+            area_min=10.0,
+            area_max=1000.0,
+            criado_apos="2024-01-01",
+            return_meta=True,
+        )

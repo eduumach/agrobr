@@ -97,3 +97,55 @@ class TestQueimadasInfo:
 
     def test_license(self):
         assert QUEIMADAS_INFO.license == "livre"
+
+
+class TestQueimadasFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_queimadas_forwards_params(self):
+        from unittest.mock import AsyncMock, patch
+
+        from .conftest import mock_source_meta
+
+        df = _make_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.queimadas.focos",
+            new_callable=AsyncMock,
+            return_value=(df, meta),
+        ) as mock_fn:
+            from agrobr.datasets.queimadas import _fetch_queimadas
+
+            await _fetch_queimadas(
+                "", ano=2024, mes=8, dia=15, uf="TO", bioma="Cerrado", satelite="NOAA-20"
+            )
+        mock_fn.assert_called_once_with(
+            ano=2024,
+            mes=8,
+            dia=15,
+            uf="TO",
+            bioma="Cerrado",
+            satelite="NOAA-20",
+            return_meta=True,
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_queimadas_defaults(self):
+        from unittest.mock import AsyncMock, patch
+
+        from .conftest import mock_source_meta
+
+        df = _make_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.queimadas.focos",
+            new_callable=AsyncMock,
+            return_value=(df, meta),
+        ) as mock_fn:
+            from agrobr.datasets.queimadas import _fetch_queimadas
+
+            await _fetch_queimadas("", ano=2024, mes=8)
+        _, kwargs = mock_fn.call_args
+        assert kwargs["dia"] is None
+        assert kwargs["uf"] is None
+        assert kwargs["bioma"] is None
+        assert kwargs["satelite"] is None

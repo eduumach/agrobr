@@ -23,6 +23,72 @@ def _arcgis_json_bytes() -> bytes:
     return json.dumps(arcgis).encode()
 
 
+def _concessoes_geojson_bytes() -> bytes:
+    data = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {
+                    "fid": 1,
+                    "nome_uc": "Flona Jamari",
+                    "uf": "RO",
+                    "bioma": "Amazonia",
+                    "hectares": 220000,
+                    "criacao": 1984,
+                    "grupo": "Uso Sustentavel",
+                    "cat_nome": "FLONA",
+                },
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [[-63.0, -9.0], [-62.8, -9.0], [-62.8, -8.8], [-63.0, -8.8], [-63.0, -9.0]]
+                    ],
+                },
+            },
+        ],
+    }
+    return json.dumps(data).encode()
+
+
+def _concessoes_arcgis_bytes() -> bytes:
+    data = json.loads(_concessoes_geojson_bytes())
+    arcgis: dict[str, list[dict[str, object]]] = {"features": []}
+    for feat in data["features"]:
+        arcgis["features"].append({"attributes": feat["properties"]})
+    return json.dumps(arcgis).encode()
+
+
+def _ifn_geojson_bytes() -> bytes:
+    data = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {
+                    "co_pontos_lote": 1,
+                    "co_lote": 10,
+                    "no_lote": "Lote A",
+                    "no_conglomerado": "CG-01",
+                    "no_uf": "PA",
+                    "no_municipio": "Belterra",
+                    "no_bioma": "Amazonia",
+                },
+                "geometry": {"type": "Point", "coordinates": [-55.0, -3.0]},
+            },
+        ],
+    }
+    return json.dumps(data).encode()
+
+
+def _ifn_arcgis_bytes() -> bytes:
+    data = json.loads(_ifn_geojson_bytes())
+    arcgis: dict[str, list[dict[str, object]]] = {"features": []}
+    for feat in data["features"]:
+        arcgis["features"].append({"attributes": feat["properties"]})
+    return json.dumps(arcgis).encode()
+
+
 class TestCnfp:
     @pytest.mark.asyncio
     async def test_cnfp_returns_dataframe(self):
@@ -131,7 +197,7 @@ class TestCnfpGeo:
 class TestConcessoes:
     @pytest.mark.asyncio
     async def test_concessoes_dataframe(self):
-        arcgis = _arcgis_json_bytes()
+        arcgis = _concessoes_arcgis_bytes()
         with patch.object(
             api.client,
             "fetch_layer",
@@ -140,4 +206,117 @@ class TestConcessoes:
         ):
             df = await api.concessoes()
 
-        assert len(df) > 0
+        assert len(df) == 1
+        assert {"nome", "uf", "bioma"}.issubset(df.columns)
+
+    @pytest.mark.asyncio
+    async def test_concessoes_return_meta(self):
+        arcgis = _concessoes_arcgis_bytes()
+        with patch.object(
+            api.client,
+            "fetch_layer",
+            new_callable=AsyncMock,
+            return_value=([arcgis], "https://mapas.florestal.gov.br/arcgis"),
+        ):
+            result = await api.concessoes(return_meta=True)
+
+        assert isinstance(result, tuple)
+        df, meta = result
+        assert meta.source == "sfb"
+        assert "sfb_concessoes" in meta.attempted_sources
+
+
+class TestConcessoesGeo:
+    @pytest.mark.asyncio
+    async def test_concessoes_geo_returns_geodataframe(self):
+        geopandas = pytest.importorskip("geopandas")
+        geojson = _concessoes_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_layer",
+            new_callable=AsyncMock,
+            return_value=([geojson], "https://mapas.florestal.gov.br/arcgis"),
+        ):
+            gdf = await api.concessoes_geo()
+
+        assert isinstance(gdf, geopandas.GeoDataFrame)
+
+    @pytest.mark.asyncio
+    async def test_concessoes_geo_return_meta(self):
+        geopandas = pytest.importorskip("geopandas")
+        geojson = _concessoes_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_layer",
+            new_callable=AsyncMock,
+            return_value=([geojson], "https://mapas.florestal.gov.br/arcgis"),
+        ):
+            gdf, meta = await api.concessoes_geo(return_meta=True)
+
+        assert isinstance(gdf, geopandas.GeoDataFrame)
+        assert meta.source == "sfb"
+        assert "sfb_concessoes_geo" in meta.attempted_sources
+
+
+class TestIfnConglomerados:
+    @pytest.mark.asyncio
+    async def test_ifn_conglomerados_returns_dataframe(self):
+        arcgis = _ifn_arcgis_bytes()
+        with patch.object(
+            api.client,
+            "fetch_layer",
+            new_callable=AsyncMock,
+            return_value=([arcgis], "https://mapas.florestal.gov.br/arcgis"),
+        ):
+            df = await api.ifn_conglomerados()
+
+        assert len(df) == 1
+        assert {"uf", "bioma", "conglomerado"}.issubset(df.columns)
+
+    @pytest.mark.asyncio
+    async def test_ifn_conglomerados_return_meta(self):
+        arcgis = _ifn_arcgis_bytes()
+        with patch.object(
+            api.client,
+            "fetch_layer",
+            new_callable=AsyncMock,
+            return_value=([arcgis], "https://mapas.florestal.gov.br/arcgis"),
+        ):
+            result = await api.ifn_conglomerados(return_meta=True)
+
+        assert isinstance(result, tuple)
+        df, meta = result
+        assert meta.source == "sfb"
+        assert "sfb_ifn_conglomerados" in meta.attempted_sources
+
+
+class TestIfnConglomeradosGeo:
+    @pytest.mark.asyncio
+    async def test_ifn_conglomerados_geo_returns_geodataframe(self):
+        geopandas = pytest.importorskip("geopandas")
+        geojson = _ifn_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_layer",
+            new_callable=AsyncMock,
+            return_value=([geojson], "https://mapas.florestal.gov.br/arcgis"),
+        ):
+            gdf = await api.ifn_conglomerados_geo()
+
+        assert isinstance(gdf, geopandas.GeoDataFrame)
+
+    @pytest.mark.asyncio
+    async def test_ifn_conglomerados_geo_return_meta(self):
+        geopandas = pytest.importorskip("geopandas")
+        geojson = _ifn_geojson_bytes()
+        with patch.object(
+            api.client,
+            "fetch_layer",
+            new_callable=AsyncMock,
+            return_value=([geojson], "https://mapas.florestal.gov.br/arcgis"),
+        ):
+            gdf, meta = await api.ifn_conglomerados_geo(return_meta=True)
+
+        assert isinstance(gdf, geopandas.GeoDataFrame)
+        assert meta.source == "sfb"
+        assert "sfb_ifn_conglomerados_geo" in meta.attempted_sources

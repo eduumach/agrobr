@@ -127,3 +127,63 @@ class TestZoneamentoAgricolaContract:
         assert len(dec_cols) == 36
         assert "dec1" in dec_cols
         assert "dec36" in dec_cols
+
+
+class TestZoneamentoAgricolaFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_zarc_forwards_params(self):
+        from unittest.mock import AsyncMock, patch
+
+        from .conftest import mock_source_meta
+
+        df = _make_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.zarc.zoneamento",
+            new_callable=AsyncMock,
+            return_value=(df, meta),
+        ) as mock_fn:
+            from agrobr.datasets.zoneamento_agricola import _fetch_zarc
+
+            await _fetch_zarc(
+                "",
+                cultura="SOJA",
+                uf="MT",
+                municipio=5103403,
+                safra="2024/2025",
+                solo=2,
+                ciclo=1,
+            )
+        mock_fn.assert_called_once_with(
+            cultura="SOJA",
+            uf="MT",
+            municipio=5103403,
+            safra="2024/2025",
+            solo=2,
+            ciclo=1,
+            return_meta=True,
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_zarc_defaults(self):
+        from unittest.mock import AsyncMock, patch
+
+        from .conftest import mock_source_meta
+
+        df = _make_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.zarc.zoneamento",
+            new_callable=AsyncMock,
+            return_value=(df, meta),
+        ) as mock_fn:
+            from agrobr.datasets.zoneamento_agricola import _fetch_zarc
+
+            await _fetch_zarc("")
+        _, kwargs = mock_fn.call_args
+        assert kwargs["cultura"] is None
+        assert kwargs["uf"] is None
+        assert kwargs["municipio"] is None
+        assert kwargs["safra"] is None
+        assert kwargs["solo"] is None
+        assert kwargs["ciclo"] is None

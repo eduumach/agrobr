@@ -190,5 +190,6 @@ exclude_lines = [
     "raise NotImplementedError",
     "if TYPE_CHECKING:",
     "if __name__ == .__main__.:",
+    "@overload",
 ]
-fail_under = 85
+fail_under = 92

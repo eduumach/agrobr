@@ -158,3 +158,42 @@ class TestSilviculturaPublicAPI:
             assert isinstance(result, tuple)
             assert len(result) == 2
             assert isinstance(result[0], pd.DataFrame)
+
+
+class TestSilviculturaFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_ibge_silvicultura_forwards_params(self):
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.ibge.silvicultura", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.silvicultura import _fetch_ibge_silvicultura
+
+            await _fetch_ibge_silvicultura(
+                "eucalipto_folha", ano=2022, nivel="municipio", uf="MG", variavel="valor_producao"
+            )
+        mock_fn.assert_called_once_with(
+            "eucalipto_folha",
+            ano=2022,
+            nivel="municipio",
+            uf="MG",
+            variavel="valor_producao",
+            return_meta=True,
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_ibge_silvicultura_defaults(self):
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.ibge.silvicultura", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.silvicultura import _fetch_ibge_silvicultura
+
+            await _fetch_ibge_silvicultura("carvao")
+        _, kwargs = mock_fn.call_args
+        assert kwargs["ano"] is None
+        assert kwargs["nivel"] == "uf"
+        assert kwargs["uf"] is None
+        assert kwargs["variavel"] == "quantidade_produzida"

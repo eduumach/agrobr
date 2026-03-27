@@ -104,3 +104,45 @@ class TestPibAgroInfo:
     def test_products(self):
         assert "agropecuaria" in PIB_AGRO_INFO.products
         assert "pib_total" in PIB_AGRO_INFO.products
+
+
+class TestPibAgroFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_ibge_forwards_params(self):
+        from unittest.mock import AsyncMock, patch
+
+        from .conftest import mock_source_meta
+
+        df = _make_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.ibge.pesquisas_api.pib_agro",
+            new_callable=AsyncMock,
+            return_value=(df, meta),
+        ) as mock_fn:
+            from agrobr.datasets.pib_agro import _fetch_ibge
+
+            await _fetch_ibge("industria", trimestre="202401", precos="real_1995")
+        mock_fn.assert_called_once_with(
+            trimestre="202401", precos="real_1995", setor="industria", return_meta=True
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_ibge_defaults(self):
+        from unittest.mock import AsyncMock, patch
+
+        from .conftest import mock_source_meta
+
+        df = _make_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.ibge.pesquisas_api.pib_agro",
+            new_callable=AsyncMock,
+            return_value=(df, meta),
+        ) as mock_fn:
+            from agrobr.datasets.pib_agro import _fetch_ibge
+
+            await _fetch_ibge("agropecuaria")
+        _, kwargs = mock_fn.call_args
+        assert kwargs["trimestre"] is None
+        assert kwargs["precos"] == "corrente"

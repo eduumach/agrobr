@@ -19,6 +19,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **bcb.focus** — Expectativas Focus/BCB. `focus("PIB Agropecuário")` projecoes consenso de mercado (media, mediana, min, max, respondentes). 9 indicadores economicos
 
 ### Improved
+- **testes** — cobertura 88% → 92% (+110 testes). Dataset `_fetch_*` fetchers (23 datasets), CEPEA parser v1 edge cases (fallback de tabela, date 2-digit year, unidade detection), RNC filter branches, SFB endpoints, USDA client wrappers, base.py error paths (ContractViolation/Exception), anda/client, cepea/consensus, b3/parser, antt_pedagio/client, defensivos/parser, normalize/encoding. `@overload` excluido de coverage (artefato de medicao). `fail_under` 85 → 92
 - **utils/geo** — `fetch_wfs` detecta resposta HTML (manutencao/redirect) e lanca `SourceUnavailableError` em vez de cascatear para `ParseError` confuso. Beneficia todas as fontes WFS (embrapa, ibama, sicar, funai, icmbio, incra)
 
 ### Fixed

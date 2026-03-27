@@ -93,3 +93,102 @@ async def test_protegidas_filter_situacao():
         assert isinstance(df, pd.DataFrame)
         for v in df["situacao"].values:
             assert "DEFINITIVA" in v
+
+
+@pytest.mark.asyncio
+async def test_registradas_filter_especie():
+    with (
+        patch("agrobr.rnc.cache.read_cached", return_value=None),
+        patch("agrobr.rnc.client.fetch_registradas", new_callable=AsyncMock) as mock,
+    ):
+        mock.return_value = (_registradas_bytes(), "https://example.com")
+        from agrobr.rnc import registradas
+
+        df = await registradas(especie="Abacaxi")
+        assert len(df) > 0
+        assert all("Abacaxi" in v for v in df["nome_comum"].values)
+
+
+@pytest.mark.asyncio
+async def test_registradas_filter_grupo():
+    with (
+        patch("agrobr.rnc.cache.read_cached", return_value=None),
+        patch("agrobr.rnc.client.fetch_registradas", new_callable=AsyncMock) as mock,
+    ):
+        mock.return_value = (_registradas_bytes(), "https://example.com")
+        from agrobr.rnc import registradas
+
+        df = await registradas(grupo="FLORESTAIS")
+        assert len(df) > 0
+        assert all("FLORESTAIS" in v for v in df["grupo"].values)
+
+
+@pytest.mark.asyncio
+async def test_registradas_filter_mantenedor():
+    with (
+        patch("agrobr.rnc.cache.read_cached", return_value=None),
+        patch("agrobr.rnc.client.fetch_registradas", new_callable=AsyncMock) as mock,
+    ):
+        mock.return_value = (_registradas_bytes(), "https://example.com")
+        from agrobr.rnc import registradas
+
+        df = await registradas(mantenedor="IAC")
+        assert len(df) > 0
+        assert all("IAC" in v for v in df["mantenedor"].values)
+
+
+@pytest.mark.asyncio
+async def test_protegidas_filter_cultivar():
+    with (
+        patch("agrobr.rnc.cache.read_cached", return_value=None),
+        patch("agrobr.rnc.client.fetch_protegidas", new_callable=AsyncMock) as mock,
+    ):
+        mock.return_value = (_protegidas_bytes(), "https://example.com")
+        from agrobr.rnc import protegidas
+
+        df = await protegidas(cultivar="BRS")
+        assert len(df) > 0
+        assert all("BRS" in v for v in df["cultivar"].values)
+
+
+@pytest.mark.asyncio
+async def test_protegidas_filter_especie():
+    with (
+        patch("agrobr.rnc.cache.read_cached", return_value=None),
+        patch("agrobr.rnc.client.fetch_protegidas", new_callable=AsyncMock) as mock,
+    ):
+        mock.return_value = (_protegidas_bytes(), "https://example.com")
+        from agrobr.rnc import protegidas
+
+        df = await protegidas(especie="ALFACE")
+        assert len(df) > 0
+        assert all("ALFACE" in v for v in df["nome_comum"].values)
+
+
+@pytest.mark.asyncio
+async def test_protegidas_filter_titular():
+    with (
+        patch("agrobr.rnc.cache.read_cached", return_value=None),
+        patch("agrobr.rnc.client.fetch_protegidas", new_callable=AsyncMock) as mock,
+    ):
+        mock.return_value = (_protegidas_bytes(), "https://example.com")
+        from agrobr.rnc import protegidas
+
+        df = await protegidas(titular="SAKATA")
+        assert len(df) > 0
+        assert all("SAKATA" in v for v in df["titular"].values)
+
+
+@pytest.mark.asyncio
+async def test_registradas_combined_filters():
+    with (
+        patch("agrobr.rnc.cache.read_cached", return_value=None),
+        patch("agrobr.rnc.client.fetch_registradas", new_callable=AsyncMock) as mock,
+    ):
+        mock.return_value = (_registradas_bytes(), "https://example.com")
+        from agrobr.rnc import registradas
+
+        df = await registradas(especie="Abacate", cultivar="Bonella")
+        assert len(df) > 0
+        assert all("Abacate" in v for v in df["nome_comum"].values)
+        assert all("Bonella" in v for v in df["cultivar"].values)

@@ -1,8 +1,13 @@
 """Testes parametrizados comuns a todos os datasets."""
 
+from unittest.mock import AsyncMock
+
+import pandas as pd
 import pytest
 
 from agrobr.datasets import registry
+from agrobr.exceptions import ContractViolationError, SourceUnavailableError
+from tests.test_datasets.conftest import make_source
 
 ALL_DATASETS = sorted(registry.list_datasets())
 
@@ -94,3 +99,67 @@ class TestDatasetRegistry:
         assert isinstance(products, list)
         if dataset_name not in DYNAMIC_PRODUCTS_DATASETS:
             assert len(products) > 0
+
+
+_VALID_DF = pd.DataFrame(
+    [
+        {
+            "data": pd.Timestamp("2025-01-15"),
+            "valor": 145.0,
+            "unidade": "R$/sc60kg",
+        }
+    ]
+)
+_DUMMY_DF = pd.DataFrame()
+
+
+class TestTrySourcesErrorPaths:
+    @pytest.mark.asyncio
+    async def test_contract_violation_triggers_fallback(self):
+        from agrobr.datasets.preco_diario import PrecoDiarioDataset
+
+        dataset = PrecoDiarioDataset()
+        dataset.info.sources[0].fetch_fn = make_source(
+            _DUMMY_DF,
+            raises=ContractViolationError("test_dataset", "test_field", "expected X", "got Y"),
+        )
+        dataset.info.sources[1].fetch_fn = make_source(_VALID_DF)
+
+        df, meta = await dataset.fetch("soja", return_meta=True)
+        assert meta.attempted_sources == ["cepea", "cache"]
+        assert meta.selected_source == "cache"
+
+    @pytest.mark.asyncio
+    async def test_unexpected_exception_triggers_fallback(self):
+        from agrobr.datasets.preco_diario import PrecoDiarioDataset
+
+        dataset = PrecoDiarioDataset()
+        dataset.info.sources[0].fetch_fn = AsyncMock(
+            side_effect=RuntimeError("unexpected boom"),
+        )
+        dataset.info.sources[1].fetch_fn = make_source(_VALID_DF)
+
+        df, meta = await dataset.fetch("soja", return_meta=True)
+        assert meta.attempted_sources == ["cepea", "cache"]
+        assert meta.selected_source == "cache"
+
+    @pytest.mark.asyncio
+    async def test_all_fail_mixed_errors(self):
+        from agrobr.datasets.preco_diario import PrecoDiarioDataset
+
+        dataset = PrecoDiarioDataset()
+        dataset.info.sources[0].fetch_fn = make_source(
+            _DUMMY_DF,
+            raises=ContractViolationError("test", "field", "exp", "got"),
+        )
+        dataset.info.sources[1].fetch_fn = AsyncMock(
+            side_effect=RuntimeError("boom"),
+        )
+
+        with pytest.raises(SourceUnavailableError) as exc_info:
+            await dataset.fetch("soja")
+
+        errors = exc_info.value.errors
+        assert len(errors) == 2
+        assert errors[0][1] == "contract"
+        assert errors[1][1] == "unexpected"

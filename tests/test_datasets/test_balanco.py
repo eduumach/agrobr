@@ -92,3 +92,30 @@ class TestBalancoSourceFail:
 
         with pytest.raises(SourceUnavailableError):
             await dataset.fetch("soja")
+
+
+class TestBalancoFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_conab_forwards_params(self):
+        from unittest.mock import patch
+
+        df = _mock_df()
+        with patch("agrobr.conab.balanco", new_callable=AsyncMock, return_value=df) as mock_fn:
+            from agrobr.datasets.balanco import _fetch_conab
+
+            result_df, result_meta = await _fetch_conab("soja", safra="2023/24")
+        mock_fn.assert_called_once_with(produto="soja", safra="2023/24")
+        assert len(result_df) == 1
+        assert result_meta is not None
+
+    @pytest.mark.asyncio
+    async def test_fetch_conab_defaults(self):
+        from unittest.mock import patch
+
+        df = _mock_df()
+        with patch("agrobr.conab.balanco", new_callable=AsyncMock, return_value=df) as mock_fn:
+            from agrobr.datasets.balanco import _fetch_conab
+
+            await _fetch_conab("milho")
+        _, kwargs = mock_fn.call_args
+        assert kwargs["safra"] is None

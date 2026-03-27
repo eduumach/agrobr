@@ -172,3 +172,37 @@ class TestProducaoAnualPublicAPI:
             assert isinstance(result, tuple)
             assert len(result) == 2
             assert isinstance(result[0], pd.DataFrame)
+
+
+class TestProducaoAnualFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_ibge_pam_forwards_nivel(self):
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.ibge.pam",
+            new_callable=AsyncMock,
+            return_value=(_mock_df(), meta),
+        ) as mock_fn:
+            from agrobr.datasets.producao_anual import _fetch_ibge_pam
+
+            await _fetch_ibge_pam("soja", ano=2024, nivel="municipio", uf="PR")
+        mock_fn.assert_called_once_with(
+            "soja", ano=2024, nivel="municipio", uf="PR", return_meta=True
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_conab_renames_produtividade(self):
+        df = pd.DataFrame(
+            {
+                "produtividade": [3000.0],
+                "area_plantada": [1000.0],
+                "producao": [3000000.0],
+            }
+        )
+        meta = mock_source_meta()
+        with patch("agrobr.conab.safras", new_callable=AsyncMock, return_value=(df, meta)):
+            from agrobr.datasets.producao_anual import _fetch_conab
+
+            result_df, _ = await _fetch_conab("soja")
+        assert "rendimento" in result_df.columns
+        assert "produtividade" not in result_df.columns

@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
+import pandas as pd
 import pytest
 
 from agrobr.ana import api
@@ -128,6 +129,20 @@ class TestPivosIrrigacaoGeo:
         assert "ana_pivos_irrigacao_geo" in meta.attempted_sources
 
 
+class TestBuildWhere:
+    def test_nm_estado_field(self):
+        where = api._build_where(uf="MT", uf_field="NM_ESTADO")
+        assert where == "NM_ESTADO='MATO GROSSO'"
+
+    def test_uf_field_default(self):
+        where = api._build_where(uf="SP")
+        assert where == "UF='SP'"
+
+    def test_no_uf_returns_1_eq_1(self):
+        where = api._build_where()
+        assert where == "1=1"
+
+
 class TestHidrografia:
     @pytest.mark.asyncio
     async def test_hidrografia_requires_bbox(self):
@@ -143,3 +158,99 @@ class TestHidrografia:
 
         call_kwargs = mock_fetch.call_args[1]
         assert call_kwargs["bbox"] == bbox
+
+
+class TestHidrografiaGeo:
+    @pytest.fixture(autouse=True)
+    def _skip_no_geopandas(self):
+        pytest.importorskip("geopandas")
+
+    @pytest.mark.asyncio
+    async def test_hidrografia_geo_returns_geodataframe(self):
+        import geopandas as local_gpd
+
+        mock_gdf = local_gpd.GeoDataFrame({"col": [1]})
+        bbox = (-50.0, -15.0, -45.0, -10.0)
+        with patch.object(
+            api,
+            "_fetch_and_parse_geo",
+            new_callable=AsyncMock,
+            return_value=mock_gdf,
+        ):
+            gdf = await api.hidrografia_geo(bbox=bbox)
+
+        assert isinstance(gdf, local_gpd.GeoDataFrame)
+
+
+class TestDemandaIrrigacao:
+    @pytest.mark.asyncio
+    async def test_demanda_irrigacao_returns_dataframe(self):
+        mock_df = pd.DataFrame({"col": [1]})
+        bbox = (-50.0, -15.0, -45.0, -10.0)
+        with patch.object(
+            api,
+            "_fetch_and_parse_tabular",
+            new_callable=AsyncMock,
+            return_value=mock_df,
+        ):
+            df = await api.demanda_irrigacao(bbox=bbox)
+
+        assert isinstance(df, pd.DataFrame)
+
+
+class TestDemandaIrrigacaoGeo:
+    @pytest.fixture(autouse=True)
+    def _skip_no_geopandas(self):
+        pytest.importorskip("geopandas")
+
+    @pytest.mark.asyncio
+    async def test_demanda_irrigacao_geo_returns_geodataframe(self):
+        import geopandas as local_gpd
+
+        mock_gdf = local_gpd.GeoDataFrame({"col": [1]})
+        bbox = (-50.0, -15.0, -45.0, -10.0)
+        with patch.object(
+            api,
+            "_fetch_and_parse_geo",
+            new_callable=AsyncMock,
+            return_value=mock_gdf,
+        ):
+            gdf = await api.demanda_irrigacao_geo(bbox=bbox)
+
+        assert isinstance(gdf, local_gpd.GeoDataFrame)
+
+
+class TestDisponibilidadeHidrica:
+    @pytest.mark.asyncio
+    async def test_disponibilidade_hidrica_returns_dataframe(self):
+        mock_df = pd.DataFrame({"col": [1]})
+        with patch.object(
+            api,
+            "_fetch_and_parse_tabular",
+            new_callable=AsyncMock,
+            return_value=mock_df,
+        ):
+            df = await api.disponibilidade_hidrica()
+
+        assert isinstance(df, pd.DataFrame)
+
+
+class TestDisponibilidadeHidricaGeo:
+    @pytest.fixture(autouse=True)
+    def _skip_no_geopandas(self):
+        pytest.importorskip("geopandas")
+
+    @pytest.mark.asyncio
+    async def test_disponibilidade_hidrica_geo_returns_geodataframe(self):
+        import geopandas as local_gpd
+
+        mock_gdf = local_gpd.GeoDataFrame({"col": [1]})
+        with patch.object(
+            api,
+            "_fetch_and_parse_geo",
+            new_callable=AsyncMock,
+            return_value=mock_gdf,
+        ):
+            gdf = await api.disponibilidade_hidrica_geo()
+
+        assert isinstance(gdf, local_gpd.GeoDataFrame)

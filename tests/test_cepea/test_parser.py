@@ -147,3 +147,133 @@ class TestCepeaParserV1:
         """
         indicadores = self.parser.parse(html, "desconhecido")
         assert indicadores[0].praca is None
+
+
+class TestCepeaParserV1EdgeCases:
+    def setup_method(self):
+        self.parser = CepeaParserV1()
+
+    def test_find_data_table_no_match_raises(self):
+        html = """
+        <html><body>
+        <table><tr><td>A</td></tr></table>
+        <table><tr><td>X</td></tr><tr><td>Y</td></tr></table>
+        <p>CEPEA ESALQ indicador</p>
+        </body></html>
+        """
+        with pytest.raises(ParseError, match="Could not identify data table"):
+            self.parser.parse(html, "soja")
+
+    def test_find_data_table_class_match(self):
+        html = """
+        <html><body>
+        <table class="cotacao">
+            <tr><th>Data</th><th>Valor R$</th></tr>
+            <tr><td>01/02/2024</td><td>145,50</td></tr>
+        </table>
+        <p>CEPEA ESALQ indicador</p>
+        </body></html>
+        """
+        indicadores = self.parser.parse(html, "soja")
+        assert len(indicadores) == 1
+        assert indicadores[0].valor == Decimal("145.50")
+
+    def test_find_data_table_header_text_match(self):
+        html = """
+        <html><body>
+        <table>
+            <tr><th>Data</th><th>Valor</th></tr>
+            <tr><td>01/02/2024</td><td>145,50</td></tr>
+        </table>
+        <p>CEPEA ESALQ indicador</p>
+        </body></html>
+        """
+        indicadores = self.parser.parse(html, "soja")
+        assert len(indicadores) == 1
+
+    def test_find_data_table_largest_table_fallback(self):
+        html = """
+        <html><body>
+        <table><tr><td>x</td></tr></table>
+        <table>
+            <tr><td>Col1</td><td>Col2</td></tr>
+            <tr><td>01/02/2024</td><td>145,50</td></tr>
+            <tr><td>02/02/2024</td><td>146,00</td></tr>
+            <tr><td>03/02/2024</td><td>147,00</td></tr>
+        </table>
+        <p>CEPEA ESALQ indicador</p>
+        </body></html>
+        """
+        indicadores = self.parser.parse(html, "soja")
+        assert len(indicadores) >= 2
+
+    def test_parse_row_valor_fallback_scans_cells(self):
+        html = """
+        <html><body>
+        <table class="indicador">
+            <tr><th>Periodo</th><th>Cotacao</th></tr>
+            <tr><td>01/02/2024</td><td>145,50</td></tr>
+        </table>
+        <p>CEPEA ESALQ indicador</p>
+        </body></html>
+        """
+        indicadores = self.parser.parse(html, "soja")
+        assert len(indicadores) == 1
+        assert indicadores[0].valor == Decimal("145.50")
+
+    def test_parse_row_validation_error_skipped(self):
+        html = """
+        <html><body>
+        <table class="indicador">
+            <tr><th>Data</th><th>Valor R$</th></tr>
+            <tr><td>01/02/2024</td><td>145,50</td></tr>
+        </table>
+        <p>CEPEA ESALQ indicador</p>
+        </body></html>
+        """
+        with pytest.raises(ParseError, match="No valid indicators"):
+            self.parser.parse(html, "x")
+
+    def test_parse_date_two_digit_year(self):
+        assert self.parser._parse_date("01/02/24") == date(2024, 2, 1)
+
+    def test_parse_date_invalid_value_continues(self):
+        assert self.parser._parse_date("31/02/2024") is None
+
+    def test_parse_decimal_empty(self):
+        assert self.parser._parse_decimal("") is None
+
+    def test_parse_decimal_dash(self):
+        assert self.parser._parse_decimal("-") is None
+
+    def test_parse_decimal_dot_only(self):
+        assert self.parser._parse_decimal(".") is None
+
+    def test_parse_decimal_dot_separator(self):
+        assert self.parser._parse_decimal("145.50") == Decimal("145.50")
+
+    def test_parse_decimal_invalid_operation(self):
+        assert self.parser._parse_decimal("...") is None
+
+    def test_detect_unidade_header_saca(self):
+        assert self.parser._detect_unidade("desconhecido", ["saca 60kg"]) == "BRL/sc60kg"
+
+    def test_detect_unidade_header_sc50(self):
+        assert self.parser._detect_unidade("desconhecido", ["sc 50kg"]) == "BRL/sc50kg"
+
+    def test_detect_unidade_header_arroba(self):
+        assert self.parser._detect_unidade("desconhecido", ["arroba"]) == "BRL/@"
+
+    def test_detect_unidade_header_kg(self):
+        assert self.parser._detect_unidade("desconhecido", ["kg"]) == "BRL/kg"
+
+    def test_detect_unidade_header_litro(self):
+        assert self.parser._detect_unidade("desconhecido", ["litro"]) == "BRL/L"
+
+    def test_detect_unidade_header_unknown_default(self):
+        assert self.parser._detect_unidade("desconhecido", ["xpto"]) == "BRL/sc60kg"
+
+    def test_extract_fingerprint(self, sample_html_cepea):
+        result = self.parser.extract_fingerprint(sample_html_cepea)
+        assert isinstance(result, dict)
+        assert "table_count" in result or "row_count" in result or len(result) > 0

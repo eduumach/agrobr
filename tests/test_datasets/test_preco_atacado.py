@@ -99,3 +99,43 @@ class TestPrecoAtacadoInfo:
 
     def test_license_zona_cinza(self):
         assert PRECO_ATACADO_INFO.license == "zona_cinza"
+
+
+class TestPrecoAtacadoFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_ceasa_forwards_params(self):
+        from unittest.mock import AsyncMock, patch
+
+        from .conftest import mock_source_meta
+
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.conab.ceasa.precos",
+            new_callable=AsyncMock,
+            return_value=(df, meta),
+        ) as mock_fn:
+            from agrobr.datasets.preco_atacado import _fetch_ceasa
+
+            await _fetch_ceasa("TOMATE", ceasa="CEAGESP")
+        mock_fn.assert_called_once_with(produto="TOMATE", ceasa="CEAGESP", return_meta=True)
+
+    @pytest.mark.asyncio
+    async def test_fetch_ceasa_defaults(self):
+        from unittest.mock import AsyncMock, patch
+
+        from .conftest import mock_source_meta
+
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.conab.ceasa.precos",
+            new_callable=AsyncMock,
+            return_value=(df, meta),
+        ) as mock_fn:
+            from agrobr.datasets.preco_atacado import _fetch_ceasa
+
+            await _fetch_ceasa("")
+        _, kwargs = mock_fn.call_args
+        assert kwargs["produto"] is None
+        assert kwargs["ceasa"] is None

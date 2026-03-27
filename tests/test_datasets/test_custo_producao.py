@@ -165,3 +165,38 @@ class TestCustoProducaoPublicAPI:
             assert isinstance(result, tuple)
             assert len(result) == 2
             assert isinstance(result[0], pd.DataFrame)
+
+
+class TestCustoProducaoFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_conab_forwards_params(self):
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.conab.custo_producao.api.custo_producao",
+            new_callable=AsyncMock,
+            return_value=(df, meta),
+        ) as mock_fn:
+            from agrobr.datasets.custo_producao import _fetch_conab
+
+            await _fetch_conab("soja", uf="MT", safra="2024/25", tecnologia="media")
+        mock_fn.assert_called_once_with(
+            "soja", uf="MT", safra="2024/25", tecnologia="media", return_meta=True
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_conab_defaults(self):
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.conab.custo_producao.api.custo_producao",
+            new_callable=AsyncMock,
+            return_value=(df, meta),
+        ) as mock_fn:
+            from agrobr.datasets.custo_producao import _fetch_conab
+
+            await _fetch_conab("milho")
+        _, kwargs = mock_fn.call_args
+        assert kwargs["uf"] is None
+        assert kwargs["safra"] is None
+        assert kwargs["tecnologia"] == "alta"

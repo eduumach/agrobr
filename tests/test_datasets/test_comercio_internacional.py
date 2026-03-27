@@ -1,3 +1,5 @@
+from unittest.mock import AsyncMock, patch
+
 import httpx
 import pandas as pd
 import pytest
@@ -8,7 +10,7 @@ from agrobr.datasets.comercio_internacional import (
 )
 from agrobr.exceptions import SourceUnavailableError
 
-from .conftest import make_source
+from .conftest import make_source, mock_source_meta
 
 
 def _make_df(**overrides):
@@ -120,3 +122,49 @@ class TestComercioInternacionalInfo:
 
     def test_license_livre(self):
         assert COMERCIO_INTERNACIONAL_INFO.license == "livre"
+
+
+class TestComercioInternacionalFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_comtrade_forwards_params(self):
+        df = _make_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.comtrade.comercio", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.comercio_internacional import _fetch_comtrade
+
+            await _fetch_comtrade(
+                "soja",
+                reporter="US",
+                partner="BR",
+                fluxo="M",
+                periodo=2024,
+                freq="M",
+                api_key="key123",
+            )
+        mock_fn.assert_called_once_with(
+            "soja",
+            reporter="US",
+            partner="BR",
+            fluxo="M",
+            periodo=2024,
+            freq="M",
+            api_key="key123",
+            return_meta=True,
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_comtrade_defaults(self):
+        df = _make_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.comtrade.comercio", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.comercio_internacional import _fetch_comtrade
+
+            await _fetch_comtrade("soja")
+        _, kwargs = mock_fn.call_args
+        assert kwargs["reporter"] == "BR"
+        assert kwargs["fluxo"] == "X"
+        assert kwargs["freq"] == "A"

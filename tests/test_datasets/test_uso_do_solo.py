@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 import httpx
 import pandas as pd
@@ -10,7 +10,7 @@ from agrobr.datasets.uso_do_solo import (
 )
 from agrobr.exceptions import SourceUnavailableError
 
-from .conftest import make_source
+from .conftest import make_source, mock_source_meta
 
 
 def _make_cobertura_df(**overrides):
@@ -184,3 +184,44 @@ class TestUsodoSoloInfo:
 
     def test_license(self):
         assert USO_DO_SOLO_INFO.license == "livre"
+
+
+class TestUsodoSoloFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_mapbiomas_cobertura(self):
+        df = _make_cobertura_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.mapbiomas.cobertura", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.uso_do_solo import _fetch_mapbiomas
+
+            await _fetch_mapbiomas("soja", tipo="cobertura", bioma="Cerrado", estado="GO", ano=2020)
+        mock_fn.assert_called_once_with(
+            bioma="Cerrado",
+            estado="GO",
+            ano=2020,
+            classe_id=None,
+            nivel="estado",
+            municipio=None,
+            return_meta=True,
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_mapbiomas_transicao(self):
+        df = _make_transicao_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.mapbiomas.transicao", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.uso_do_solo import _fetch_mapbiomas
+
+            await _fetch_mapbiomas("soja", tipo="transicao", bioma="Amazonia", estado="PA")
+        mock_fn.assert_called_once_with(
+            bioma="Amazonia",
+            estado="PA",
+            periodo=None,
+            classe_de_id=None,
+            classe_para_id=None,
+            return_meta=True,
+        )

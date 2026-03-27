@@ -161,3 +161,47 @@ class TestExportacaoPublicAPI:
             assert isinstance(result, tuple)
             assert len(result) == 2
             assert isinstance(result[0], pd.DataFrame)
+
+
+class TestExportacaoFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_comexstat_forwards_params(self):
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.comexstat.exportacao",
+            new_callable=AsyncMock,
+            return_value=(_mock_export_df(), meta),
+        ) as mock_fn:
+            from agrobr.datasets.exportacao import _fetch_comexstat
+
+            await _fetch_comexstat("soja", ano=2024, uf="PR")
+        mock_fn.assert_called_once_with("soja", ano=2024, uf="PR", return_meta=True)
+
+    @pytest.mark.asyncio
+    async def test_fetch_abiove_column_transform(self):
+        df = pd.DataFrame({"volume_ton": [100.0], "receita_usd_mil": [50.0]})
+        meta = mock_source_meta()
+        with patch("agrobr.abiove.exportacao", new_callable=AsyncMock, return_value=(df, meta)):
+            from agrobr.datasets.exportacao import _fetch_abiove
+
+            result_df, _ = await _fetch_abiove("soja", ano=2024)
+        assert result_df["kg_liquido"].iloc[0] == 100000.0
+        assert result_df["valor_fob_usd"].iloc[0] == 50000.0
+
+    @pytest.mark.asyncio
+    async def test_fetch_abiove_skip_transform_if_cols_exist(self):
+        df = pd.DataFrame(
+            {
+                "volume_ton": [100.0],
+                "kg_liquido": [999.0],
+                "receita_usd_mil": [50.0],
+                "valor_fob_usd": [888.0],
+            }
+        )
+        meta = mock_source_meta()
+        with patch("agrobr.abiove.exportacao", new_callable=AsyncMock, return_value=(df, meta)):
+            from agrobr.datasets.exportacao import _fetch_abiove
+
+            result_df, _ = await _fetch_abiove("soja", ano=2024)
+        assert result_df["kg_liquido"].iloc[0] == 999.0
+        assert result_df["valor_fob_usd"].iloc[0] == 888.0

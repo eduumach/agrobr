@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import httpx
 import pandas as pd
@@ -7,7 +7,7 @@ import pytest
 from agrobr.datasets.censo_agropecuario_legado import CensoAgropecuarioLegadoDataset
 from agrobr.exceptions import SourceUnavailableError
 
-from .conftest import make_source
+from .conftest import make_source, mock_source_meta
 
 
 def _mock_df():
@@ -92,3 +92,35 @@ class TestCensoAgropecuarioLegadoSourceFail:
 
         with pytest.raises(SourceUnavailableError):
             await dataset.fetch("tecnologia")
+
+
+class TestCensoAgropecuarioLegadoFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_ibge_censo_agro_legado_forwards_params(self):
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.ibge.legacy_api.censo_agro_legado",
+            new_callable=AsyncMock,
+            return_value=(df, meta),
+        ) as mock_fn:
+            from agrobr.datasets.censo_agropecuario_legado import _fetch_ibge_censo_agro_legado
+
+            await _fetch_ibge_censo_agro_legado("tecnologia", uf="RS", nivel="municipio")
+        mock_fn.assert_called_once_with("tecnologia", uf="RS", nivel="municipio", return_meta=True)
+
+    @pytest.mark.asyncio
+    async def test_fetch_ibge_censo_agro_legado_defaults(self):
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.ibge.legacy_api.censo_agro_legado",
+            new_callable=AsyncMock,
+            return_value=(df, meta),
+        ) as mock_fn:
+            from agrobr.datasets.censo_agropecuario_legado import _fetch_ibge_censo_agro_legado
+
+            await _fetch_ibge_censo_agro_legado("tecnologia")
+        _, kwargs = mock_fn.call_args
+        assert kwargs["uf"] is None
+        assert kwargs["nivel"] == "uf"

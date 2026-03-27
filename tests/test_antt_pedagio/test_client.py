@@ -8,6 +8,7 @@ import httpx
 import pytest
 
 from agrobr.alt.antt_pedagio.client import (
+    _get_ckan_resources,
     _match_pracas_resource,
     _match_trafego_resource,
     download_csv,
@@ -15,6 +16,7 @@ from agrobr.alt.antt_pedagio.client import (
     fetch_trafego,
     fetch_trafego_anos,
 )
+from agrobr.exceptions import SourceUnavailableError
 from tests.helpers import make_mock_async_client, make_mock_response
 
 # ============================================================================
@@ -247,3 +249,120 @@ class TestFetchPracas:
             mock_ckan.return_value = []
             with pytest.raises(ValueError, match="nao encontrado"):
                 await fetch_pracas()
+
+
+# ============================================================================
+# _get_ckan_resources (lines 23-67)
+# ============================================================================
+
+
+class TestGetCkanResources:
+    @pytest.mark.asyncio
+    async def test_valid_response_extracts_resources(self):
+        json_data = {
+            "result": {
+                "resources": [
+                    {
+                        "id": "r1",
+                        "name": "volume_2023.csv",
+                        "url": "https://example.com/2023.csv",
+                        "format": "CSV",
+                    },
+                    {
+                        "id": "r2",
+                        "name": "volume_2024.csv",
+                        "url": "https://example.com/2024.csv",
+                        "format": "CSV",
+                    },
+                ]
+            }
+        }
+        mock_response = make_mock_response(200, json_data=json_data)
+
+        with patch("agrobr.alt.antt_pedagio.client.httpx.AsyncClient") as mock_client_cls:
+            mock_client = make_mock_async_client()
+            mock_client_cls.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+            mock_client_cls.return_value.__aexit__ = AsyncMock(return_value=False)
+
+            with patch(
+                "agrobr.alt.antt_pedagio.client.retry_on_status", new_callable=AsyncMock
+            ) as mock_retry:
+                mock_retry.return_value = mock_response
+                resources = await _get_ckan_resources("volume-trafego-praca-pedagio")
+
+        assert len(resources) == 2
+        assert resources[0]["id"] == "r1"
+        assert resources[0]["name"] == "volume_2023.csv"
+        assert resources[1]["url"] == "https://example.com/2024.csv"
+
+    @pytest.mark.asyncio
+    async def test_missing_result_key_raises(self):
+        json_data = {"error": "not found"}
+        mock_response = make_mock_response(200, json_data=json_data)
+
+        with patch("agrobr.alt.antt_pedagio.client.httpx.AsyncClient") as mock_client_cls:
+            mock_client = make_mock_async_client()
+            mock_client_cls.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+            mock_client_cls.return_value.__aexit__ = AsyncMock(return_value=False)
+
+            with patch(
+                "agrobr.alt.antt_pedagio.client.retry_on_status", new_callable=AsyncMock
+            ) as mock_retry:
+                mock_retry.return_value = mock_response
+                with pytest.raises(SourceUnavailableError, match="missing 'result' key"):
+                    await _get_ckan_resources("some-slug")
+
+    @pytest.mark.asyncio
+    async def test_empty_resources_list(self):
+        json_data = {"result": {"resources": []}}
+        mock_response = make_mock_response(200, json_data=json_data)
+
+        with patch("agrobr.alt.antt_pedagio.client.httpx.AsyncClient") as mock_client_cls:
+            mock_client = make_mock_async_client()
+            mock_client_cls.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+            mock_client_cls.return_value.__aexit__ = AsyncMock(return_value=False)
+
+            with patch(
+                "agrobr.alt.antt_pedagio.client.retry_on_status", new_callable=AsyncMock
+            ) as mock_retry:
+                mock_retry.return_value = mock_response
+                resources = await _get_ckan_resources("some-slug")
+
+        assert resources == []
+
+    @pytest.mark.asyncio
+    async def test_resource_fields_default_to_empty_string(self):
+        json_data = {"result": {"resources": [{"extra_field": "ignored"}]}}
+        mock_response = make_mock_response(200, json_data=json_data)
+
+        with patch("agrobr.alt.antt_pedagio.client.httpx.AsyncClient") as mock_client_cls:
+            mock_client = make_mock_async_client()
+            mock_client_cls.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+            mock_client_cls.return_value.__aexit__ = AsyncMock(return_value=False)
+
+            with patch(
+                "agrobr.alt.antt_pedagio.client.retry_on_status", new_callable=AsyncMock
+            ) as mock_retry:
+                mock_retry.return_value = mock_response
+                resources = await _get_ckan_resources("some-slug")
+
+        assert resources[0] == {"id": "", "name": "", "url": "", "format": ""}
+
+
+class TestDownloadCsvSmall:
+    @pytest.mark.asyncio
+    async def test_small_csv_raises_source_unavailable(self):
+        content = b"tiny"
+        mock_response = make_mock_response(200, content=content)
+
+        with patch("agrobr.alt.antt_pedagio.client.httpx.AsyncClient") as mock_client_cls:
+            mock_client = make_mock_async_client()
+            mock_client_cls.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+            mock_client_cls.return_value.__aexit__ = AsyncMock(return_value=False)
+
+            with patch(
+                "agrobr.alt.antt_pedagio.client.retry_on_status", new_callable=AsyncMock
+            ) as mock_retry:
+                mock_retry.return_value = mock_response
+                with pytest.raises(SourceUnavailableError, match="too small"):
+                    await download_csv("https://example.com/test.csv")

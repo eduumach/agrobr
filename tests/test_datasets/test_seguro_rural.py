@@ -269,3 +269,68 @@ class TestSeguroRuralPublicAPI:
             _, kwargs = mock_fetch.call_args
             assert kwargs["tipo"] == "sinistros"
             assert kwargs["evento"] == "SECA"
+
+
+class TestSeguroRuralFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_psr_apolices_default(self):
+        df = pd.DataFrame({"ano": [2024], "cultura": ["soja"], "valor_segurado": [100000.0]})
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.alt.mapa_psr.apolices", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.seguro_rural import _fetch_psr
+
+            result_df, _ = await _fetch_psr("soja")
+        mock_fn.assert_called_once_with(
+            cultura="soja",
+            uf=None,
+            ano=None,
+            ano_inicio=None,
+            ano_fim=None,
+            municipio=None,
+            return_meta=True,
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_psr_sinistros_branch(self):
+        df = pd.DataFrame({"ano": [2024], "cultura": ["soja"], "valor_indenizacao": [50000.0]})
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.alt.mapa_psr.sinistros", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.seguro_rural import _fetch_psr
+
+            await _fetch_psr("soja", tipo="sinistros", evento="seca", uf="PR")
+        mock_fn.assert_called_once_with(
+            cultura="soja",
+            evento="seca",
+            uf="PR",
+            ano=None,
+            ano_inicio=None,
+            ano_fim=None,
+            municipio=None,
+            return_meta=True,
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_psr_forwards_all_params(self):
+        df = pd.DataFrame({"ano": [2024], "cultura": ["soja"]})
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.alt.mapa_psr.apolices", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.seguro_rural import _fetch_psr
+
+            await _fetch_psr(
+                "milho", uf="SP", ano=2024, ano_inicio=2020, ano_fim=2024, municipio="Campinas"
+            )
+        mock_fn.assert_called_once_with(
+            cultura="milho",
+            uf="SP",
+            ano=2024,
+            ano_inicio=2020,
+            ano_fim=2024,
+            municipio="Campinas",
+            return_meta=True,
+        )

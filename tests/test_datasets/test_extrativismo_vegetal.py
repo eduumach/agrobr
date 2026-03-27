@@ -158,3 +158,42 @@ class TestExtrativsmoVegetalPublicAPI:
             assert isinstance(result, tuple)
             assert len(result) == 2
             assert isinstance(result[0], pd.DataFrame)
+
+
+class TestExtrativsmoVegetalFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_ibge_extracao_vegetal_forwards_params(self):
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.ibge.extracao_vegetal", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.extrativismo_vegetal import _fetch_ibge_extracao_vegetal
+
+            await _fetch_ibge_extracao_vegetal(
+                "acai", ano=2022, nivel="municipio", uf="PA", variavel="valor_producao"
+            )
+        mock_fn.assert_called_once_with(
+            "acai",
+            ano=2022,
+            nivel="municipio",
+            uf="PA",
+            variavel="valor_producao",
+            return_meta=True,
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_ibge_extracao_vegetal_defaults(self):
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.ibge.extracao_vegetal", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.extrativismo_vegetal import _fetch_ibge_extracao_vegetal
+
+            await _fetch_ibge_extracao_vegetal("castanha_para")
+        _, kwargs = mock_fn.call_args
+        assert kwargs["ano"] is None
+        assert kwargs["nivel"] == "uf"
+        assert kwargs["uf"] is None
+        assert kwargs["variavel"] == "quantidade_produzida"

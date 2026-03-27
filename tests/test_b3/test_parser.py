@@ -7,11 +7,15 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+from lxml import etree
 
 from agrobr.b3.models import COLUNAS_OI_SAIDA, COLUNAS_SAIDA, TICKERS_AGRO_OI
 from agrobr.b3.parser import (
     PARSER_VERSION_OI,
     PARSER_VERSION_ZIP,
+    _attr_float,
+    _classificar_tipo,
+    _extract_record,
     parse_ajustes_zip,
     parse_posicoes_abertas,
 )
@@ -285,3 +289,258 @@ class TestParsePosicoesAbertasPK:
     def test_posicoes_abertas_non_negative(self):
         df = parse_posicoes_abertas(_golden_oi_csv())
         assert (df["posicoes_abertas"] >= 0).all()
+
+
+# ============================================================================
+# Coverage: edge cases for parse_ajustes_zip inner errors
+# ============================================================================
+
+
+class TestParseAjustesZipEdgeCases:
+    def test_no_inner_zip_raises(self):
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w") as zf:
+            zf.writestr("readme.txt", "no zip inside")
+        with pytest.raises(ParseError, match="ZIP interno nao encontrado"):
+            parse_ajustes_zip(buf.getvalue())
+
+    def test_no_xml_in_inner_zip_raises(self):
+        inner_buf = io.BytesIO()
+        with zipfile.ZipFile(inner_buf, "w") as zf:
+            zf.writestr("readme.txt", "no xml here")
+
+        outer_buf = io.BytesIO()
+        with zipfile.ZipFile(outer_buf, "w") as zf:
+            zf.writestr("inner.zip", inner_buf.getvalue())
+
+        with pytest.raises(ParseError, match="Nenhum XML encontrado"):
+            parse_ajustes_zip(outer_buf.getvalue())
+
+    def test_corrupted_inner_zip_raises(self):
+        outer_buf = io.BytesIO()
+        with zipfile.ZipFile(outer_buf, "w") as zf:
+            zf.writestr("inner.zip", b"not a valid zip file")
+
+        with pytest.raises(ParseError, match="ZIP interno corrompido"):
+            parse_ajustes_zip(outer_buf.getvalue())
+
+
+class TestExtractRecordEdgeCases:
+    def _make_elem(self, ticker_symb: str, *, with_attrs: bool = True) -> etree._Element:
+        from lxml import etree
+
+        ns = "urn:bvmf.217.01.xsd"
+        xml_str = (
+            f'<PricRpt xmlns="{ns}">'
+            f"<TradDt><Dt>2026-02-27</Dt></TradDt>"
+            f"<SctyId><TckrSymb>{ticker_symb}</TckrSymb></SctyId>"
+        )
+        if with_attrs:
+            xml_str += (
+                "<FinInstrmAttrbts>"
+                "<PrvsAdjstdQt>100.0</PrvsAdjstdQt>"
+                "<AdjstdQt>101.0</AdjstdQt>"
+                "<VartnPts>1.0</VartnPts>"
+                "<AdjstdValCtrct>330.0</AdjstdValCtrct>"
+                "</FinInstrmAttrbts>"
+            )
+        xml_str += "</PricRpt>"
+        return etree.fromstring(xml_str)
+
+    def test_non_agro_ticker_returns_none(self):
+        elem = self._make_elem("DI1F26")
+        assert _extract_record(elem) is None
+
+    def test_non_future_ticker_returns_none(self):
+        elem = self._make_elem("NOTFUT")
+        assert _extract_record(elem) is None
+
+    def test_bad_vencimento_returns_none(self):
+        elem = self._make_elem("BGIZ99")
+        from unittest.mock import patch
+
+        with patch.dict("agrobr.b3.models.MONTH_CODES", {}, clear=True):
+            result = _extract_record(elem)
+        assert result is None
+
+    def test_missing_attrs_returns_none(self):
+        elem = self._make_elem("BGIH27", with_attrs=False)
+        assert _extract_record(elem) is None
+
+
+class TestAttrFloat:
+    def test_none_element(self):
+        from lxml import etree
+
+        parent = etree.fromstring("<root/>")
+        assert _attr_float(parent, "missing") is None
+
+    def test_empty_text(self):
+        from lxml import etree
+
+        parent = etree.fromstring("<root><val></val></root>")
+        assert _attr_float(parent, "val") is None
+
+    def test_non_numeric_text(self):
+        from lxml import etree
+
+        parent = etree.fromstring("<root><val>abc</val></root>")
+        assert _attr_float(parent, "val") is None
+
+    def test_valid_float(self):
+        from lxml import etree
+
+        parent = etree.fromstring("<root><val>42.5</val></root>")
+        assert _attr_float(parent, "val") == 42.5
+
+
+class TestClassificarTipo:
+    def test_futuro(self):
+        assert _classificar_tipo("BGIH27") == "futuro"
+
+    def test_opcao_pattern(self):
+        assert _classificar_tipo("BGIH27C350") == "opcao"
+
+    def test_long_ticker_default_opcao(self):
+        assert _classificar_tipo("ABCDEFGH") == "opcao"
+
+    def test_short_ticker_default_futuro(self):
+        assert _classificar_tipo("ABCDEF") == "futuro"
+
+
+class TestParsePosicoesAbertasMoreEdges:
+    def test_empty_data_error_returns_empty(self):
+        df = parse_posicoes_abertas(b"\n\n  \n")
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) == 0
+
+    def test_pandas_empty_data_error_returns_empty(self):
+        from unittest.mock import patch
+
+        with patch(
+            "agrobr.b3.parser.pd.read_csv", side_effect=pd.errors.EmptyDataError("No columns")
+        ):
+            df = parse_posicoes_abertas(b"some content")
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) == 0
+
+    def test_agro_segment_no_matching_tickers(self):
+        csv = (
+            b"RptDt;TckrSymb;ISIN;Asst;XprtnCd;SgmtNm;OpnIntrst;VartnOpnIntrst;"
+            b"DstrbtnId;CvrdQty;TtlBlckdPos;UcvrdQty;TtlPos;BrrwrQty;LndrQty;CurQty;FwdPric\n"
+            b"2025-12-19;ZZZZF26;BRZZZZACNPR6;ZZZZ;F26;AGRIBUSINESS;1000;50;;;;;;;;\n"
+        )
+        df = parse_posicoes_abertas(csv)
+        assert len(df) == 0
+        for col in COLUNAS_OI_SAIDA:
+            assert col in df.columns
+
+
+class TestExtractRecordNonAgroTicker:
+    def test_valid_future_pattern_but_not_agro_returns_none(self):
+        from lxml import etree
+
+        ns = "urn:bvmf.217.01.xsd"
+        xml_str = (
+            f'<PricRpt xmlns="{ns}">'
+            f"<TradDt><Dt>2026-02-27</Dt></TradDt>"
+            f"<SctyId><TckrSymb>ABCF27</TckrSymb></SctyId>"
+            f"<FinInstrmAttrbts>"
+            f"<PrvsAdjstdQt>100.0</PrvsAdjstdQt>"
+            f"<AdjstdQt>101.0</AdjstdQt>"
+            f"<VartnPts>1.0</VartnPts>"
+            f"<AdjstdValCtrct>330.0</AdjstdValCtrct>"
+            f"</FinInstrmAttrbts>"
+            f"</PricRpt>"
+        )
+        elem = etree.fromstring(xml_str)
+        assert _extract_record(elem) is None
+
+
+class TestParseBvmfXmlMemoryCleanup:
+    def test_multiple_records_triggers_parent_cleanup(self):
+        xml = _make_bvmf_xml(
+            _make_pric_rpt("BGIH27"),
+            _make_pric_rpt("CCMK26"),
+            _make_pric_rpt("ICFN27"),
+            _make_pric_rpt("BGIF28"),
+        )
+        zip_bytes = _make_nested_zip(xml)
+        df = parse_ajustes_zip(zip_bytes)
+        assert len(df) == 4
+        tickers = set(df["ticker"])
+        assert tickers == {"BGI", "CCM", "ICF"}
+
+    def test_only_non_agro_records_returns_empty(self):
+        xml = _make_bvmf_xml(
+            _make_pric_rpt("ABCF27"),
+            _make_pric_rpt("XYZH26"),
+        )
+        zip_bytes = _make_nested_zip(xml)
+        df = parse_ajustes_zip(zip_bytes)
+        assert len(df) == 0
+
+    def test_grandparent_cleanup_with_preceding_siblings(self):
+        ns = "urn:bvmf.217.01.xsd"
+        body = "".join(
+            [
+                _make_pric_rpt("BGIH27"),
+                _make_pric_rpt("CCMK26"),
+            ]
+        )
+        xml = (
+            f'<?xml version="1.0" encoding="utf-8"?>'
+            f'<Envelope xmlns="urn:bvmf.052.01.xsd">'
+            f'<Header xmlns="urn:bvmf.052.01.xsd">info</Header>'
+            f'<Body xmlns="{ns}">{body}</Body>'
+            f"</Envelope>"
+        ).encode()
+        zip_bytes = _make_nested_zip(xml)
+        df = parse_ajustes_zip(zip_bytes)
+        assert len(df) == 2
+
+
+class TestParseBvmfXmlRootElement:
+    def test_pric_rpt_as_root_parent_is_none(self):
+        from agrobr.b3.parser import _parse_bvmf_xml
+
+        ns = "urn:bvmf.217.01.xsd"
+        xml = (
+            f'<?xml version="1.0"?>'
+            f'<PricRpt xmlns="{ns}">'
+            f"<TradDt><Dt>2026-02-27</Dt></TradDt>"
+            f"<SctyId><TckrSymb>BGIH27</TckrSymb></SctyId>"
+            f"<FinInstrmAttrbts>"
+            f"<PrvsAdjstdQt>100.0</PrvsAdjstdQt>"
+            f"<AdjstdQt>101.0</AdjstdQt>"
+            f"<VartnPts>1.0</VartnPts>"
+            f"<AdjstdValCtrct>330.0</AdjstdValCtrct>"
+            f"</FinInstrmAttrbts>"
+            f"</PricRpt>"
+        ).encode()
+        records = _parse_bvmf_xml(io.BytesIO(xml))
+        assert len(records) == 1
+        assert records[0]["ticker"] == "BGI"
+
+    def test_pric_rpt_with_parent_no_grandparent(self):
+        from agrobr.b3.parser import _parse_bvmf_xml
+
+        ns = "urn:bvmf.217.01.xsd"
+        xml = (
+            f'<?xml version="1.0"?>'
+            f'<Body xmlns="{ns}">'
+            f"<PricRpt>"
+            f"<TradDt><Dt>2026-02-27</Dt></TradDt>"
+            f"<SctyId><TckrSymb>CCMK26</TckrSymb></SctyId>"
+            f"<FinInstrmAttrbts>"
+            f"<PrvsAdjstdQt>70.0</PrvsAdjstdQt>"
+            f"<AdjstdQt>71.0</AdjstdQt>"
+            f"<VartnPts>1.0</VartnPts>"
+            f"<AdjstdValCtrct>135.0</AdjstdValCtrct>"
+            f"</FinInstrmAttrbts>"
+            f"</PricRpt>"
+            f"</Body>"
+        ).encode()
+        records = _parse_bvmf_xml(io.BytesIO(xml))
+        assert len(records) == 1
+        assert records[0]["ticker"] == "CCM"

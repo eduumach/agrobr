@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 import httpx
 import pandas as pd
@@ -10,7 +10,7 @@ from agrobr.datasets.oferta_demanda_global import (
 )
 from agrobr.exceptions import SourceUnavailableError
 
-from .conftest import make_source
+from .conftest import make_source, mock_source_meta
 
 
 def _make_df(**overrides):
@@ -135,3 +135,45 @@ class TestOfertaDemandaGlobalInfo:
 
     def test_license_livre(self):
         assert OFERTA_DEMANDA_GLOBAL_INFO.license == "livre"
+
+
+class TestOfertaDemandaGlobalFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_usda_psd_forwards_all_params(self):
+        df = _make_df()
+        meta = mock_source_meta()
+        with patch("agrobr.usda.psd", new_callable=AsyncMock, return_value=(df, meta)) as mock_fn:
+            from agrobr.datasets.oferta_demanda_global import _fetch_usda_psd
+
+            await _fetch_usda_psd(
+                "soja",
+                country="US",
+                market_year=2023,
+                attributes=["Production"],
+                pivot=True,
+                api_key="key123",
+            )
+        mock_fn.assert_called_once_with(
+            "soja",
+            country="US",
+            market_year=2023,
+            attributes=["Production"],
+            pivot=True,
+            api_key="key123",
+            return_meta=True,
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_usda_psd_defaults(self):
+        df = _make_df()
+        meta = mock_source_meta()
+        with patch("agrobr.usda.psd", new_callable=AsyncMock, return_value=(df, meta)) as mock_fn:
+            from agrobr.datasets.oferta_demanda_global import _fetch_usda_psd
+
+            await _fetch_usda_psd("soja")
+        _, kwargs = mock_fn.call_args
+        assert kwargs["country"] == "BR"
+        assert kwargs["market_year"] is None
+        assert kwargs["attributes"] is None
+        assert kwargs["pivot"] is False
+        assert kwargs["api_key"] is None

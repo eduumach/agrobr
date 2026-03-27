@@ -98,3 +98,43 @@ class TestLeiteIndustrialSourceFail:
 
         with pytest.raises(SourceUnavailableError):
             await dataset.fetch("leite")
+
+
+class TestLeiteIndustrialFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_ibge_leite_trimestral_forwards_params(self):
+        from unittest.mock import patch
+
+        from .conftest import mock_source_meta
+
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.ibge.leite_trimestral",
+            new_callable=AsyncMock,
+            return_value=(df, meta),
+        ) as mock_fn:
+            from agrobr.datasets.leite_industrial import _fetch_ibge_leite_trimestral
+
+            await _fetch_ibge_leite_trimestral("leite", trimestre="202301", uf="MG")
+        mock_fn.assert_called_once_with(trimestre="202301", uf="MG", return_meta=True)
+
+    @pytest.mark.asyncio
+    async def test_fetch_ibge_leite_trimestral_defaults(self):
+        from unittest.mock import patch
+
+        from .conftest import mock_source_meta
+
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.ibge.leite_trimestral",
+            new_callable=AsyncMock,
+            return_value=(df, meta),
+        ) as mock_fn:
+            from agrobr.datasets.leite_industrial import _fetch_ibge_leite_trimestral
+
+            await _fetch_ibge_leite_trimestral("leite")
+        _, kwargs = mock_fn.call_args
+        assert kwargs["trimestre"] is None
+        assert kwargs["uf"] is None

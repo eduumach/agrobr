@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import httpx
 import pandas as pd
@@ -7,7 +7,7 @@ import pytest
 from agrobr.datasets.censo_agropecuario import CensoAgropecuarioDataset
 from agrobr.exceptions import SourceUnavailableError
 
-from .conftest import make_source
+from .conftest import make_source, mock_source_meta
 
 
 def _mock_df():
@@ -92,3 +92,33 @@ class TestCensoAgropecuarioSourceFail:
 
         with pytest.raises(SourceUnavailableError):
             await dataset.fetch("efetivo_rebanho")
+
+
+class TestCensoAgropecuarioFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_ibge_censo_agro_forwards_params(self):
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.ibge.censo_agro", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.censo_agropecuario import _fetch_ibge_censo_agro
+
+            await _fetch_ibge_censo_agro("efetivo_rebanho", uf="MG", nivel="municipio")
+        mock_fn.assert_called_once_with(
+            "efetivo_rebanho", uf="MG", nivel="municipio", return_meta=True
+        )
+
+    @pytest.mark.asyncio
+    async def test_fetch_ibge_censo_agro_defaults(self):
+        df = _mock_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.ibge.censo_agro", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.censo_agropecuario import _fetch_ibge_censo_agro
+
+            await _fetch_ibge_censo_agro("uso_terra")
+        _, kwargs = mock_fn.call_args
+        assert kwargs["uf"] is None
+        assert kwargs["nivel"] == "uf"

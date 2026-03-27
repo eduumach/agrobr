@@ -166,6 +166,62 @@ class TestAndaRetryBackoff:
             assert sleep_calls[i] > sleep_calls[i - 1]
 
 
+class TestFetchEstatisticasPage:
+    @pytest.mark.asyncio
+    async def test_valid_html_returns_text(self):
+        valid_html = "<html><body>" + "<a href='link'>x</a>" * 50 + "</body></html>"
+        resp = make_mock_response(200, text=valid_html, content=b"data", url="https://anda.org.br")
+        mock_client = make_mock_async_client()
+        mock_client.get = AsyncMock(return_value=resp)
+
+        with patch("agrobr.anda.client.httpx.AsyncClient", return_value=mock_client):
+            result = await client.fetch_estatisticas_page()
+
+        assert "<a" in result
+
+    @pytest.mark.asyncio
+    async def test_html_without_links_raises(self):
+        html_no_links = "x" * 600
+        resp = make_mock_response(
+            200, text=html_no_links, content=b"data", url="https://anda.org.br"
+        )
+        mock_client = make_mock_async_client()
+        mock_client.get = AsyncMock(return_value=resp)
+
+        with (
+            patch("agrobr.anda.client.httpx.AsyncClient", return_value=mock_client),
+            pytest.raises(SourceUnavailableError, match="missing links"),
+        ):
+            await client.fetch_estatisticas_page()
+
+
+class TestDownloadFile:
+    @pytest.mark.asyncio
+    async def test_valid_file_returns_bytes(self):
+        content = b"x" * 600
+        resp = make_mock_response(200, text="ok", content=content, url="https://anda.org.br/f.pdf")
+        mock_client = make_mock_async_client()
+        mock_client.get = AsyncMock(return_value=resp)
+
+        with patch("agrobr.anda.client.httpx.AsyncClient", return_value=mock_client):
+            result = await client.download_file("https://anda.org.br/f.pdf")
+
+        assert result == content
+
+    @pytest.mark.asyncio
+    async def test_small_file_raises_source_unavailable(self):
+        content = b"tiny"
+        resp = make_mock_response(200, text="ok", content=content, url="https://anda.org.br/f.pdf")
+        mock_client = make_mock_async_client()
+        mock_client.get = AsyncMock(return_value=resp)
+
+        with (
+            patch("agrobr.anda.client.httpx.AsyncClient", return_value=mock_client),
+            pytest.raises(SourceUnavailableError, match="too small"),
+        ):
+            await client.download_file("https://anda.org.br/f.pdf")
+
+
 class TestFetchEntregasPdf:
     @pytest.mark.asyncio
     async def test_no_pdf_found_raises(self):
@@ -177,3 +233,133 @@ class TestFetchEntregasPdf:
         ):
             mock_page.return_value = "<html><body>no links</body></html>"
             await client.fetch_entregas_pdf(2024)
+
+    @pytest.mark.asyncio
+    async def test_finds_pdf_by_text_match(self):
+        html = (
+            "<html><body>"
+            '<a href="https://anda.org.br/docs/entregas_2024.pdf">Entregas fertilizantes 2024</a>'
+            "</body></html>"
+        )
+        pdf_content = b"x" * 600
+
+        with (
+            patch(
+                "agrobr.anda.client.fetch_estatisticas_page", new_callable=AsyncMock
+            ) as mock_page,
+            patch("agrobr.anda.client.download_file", new_callable=AsyncMock) as mock_dl,
+        ):
+            mock_page.return_value = html
+            mock_dl.return_value = pdf_content
+            result_bytes, ano_real = await client.fetch_entregas_pdf(2024)
+
+        assert result_bytes == pdf_content
+        assert ano_real == 2024
+
+    @pytest.mark.asyncio
+    async def test_finds_pdf_by_url_when_text_has_no_year(self):
+        html = (
+            "<html><body>"
+            '<a href="https://anda.org.br/docs/report_2023.pdf">Report PDF</a>'
+            "</body></html>"
+        )
+        pdf_content = b"x" * 600
+
+        with (
+            patch(
+                "agrobr.anda.client.fetch_estatisticas_page", new_callable=AsyncMock
+            ) as mock_page,
+            patch("agrobr.anda.client.download_file", new_callable=AsyncMock) as mock_dl,
+        ):
+            mock_page.return_value = html
+            mock_dl.return_value = pdf_content
+            result_bytes, ano_real = await client.fetch_entregas_pdf(2023)
+
+        assert result_bytes == pdf_content
+        assert ano_real == 2023
+
+    @pytest.mark.asyncio
+    async def test_priority_selects_entrega_keyword(self):
+        html = (
+            "<html><body>"
+            '<a href="https://anda.org.br/docs/other_2024.pdf">Relatorio 2024</a>'
+            '<a href="https://anda.org.br/docs/entregas_2024.pdf">Entregas fertilizantes 2024</a>'
+            "</body></html>"
+        )
+        pdf_content = b"x" * 600
+
+        with (
+            patch(
+                "agrobr.anda.client.fetch_estatisticas_page", new_callable=AsyncMock
+            ) as mock_page,
+            patch("agrobr.anda.client.download_file", new_callable=AsyncMock) as mock_dl,
+        ):
+            mock_page.return_value = html
+            mock_dl.return_value = pdf_content
+            await client.fetch_entregas_pdf(2024)
+
+        mock_dl.assert_called_once_with("https://anda.org.br/docs/entregas_2024.pdf")
+
+    @pytest.mark.asyncio
+    async def test_fallback_to_latest_year_when_requested_not_found(self):
+        html = (
+            "<html><body>"
+            '<a href="https://anda.org.br/docs/entregas_2023.pdf">Entregas 2023</a>'
+            "</body></html>"
+        )
+        pdf_content = b"x" * 600
+
+        with (
+            patch(
+                "agrobr.anda.client.fetch_estatisticas_page", new_callable=AsyncMock
+            ) as mock_page,
+            patch("agrobr.anda.client.download_file", new_callable=AsyncMock) as mock_dl,
+        ):
+            mock_page.return_value = html
+            mock_dl.return_value = pdf_content
+            result_bytes, ano_real = await client.fetch_entregas_pdf(2025)
+
+        assert result_bytes == pdf_content
+        assert ano_real == 2023
+
+    @pytest.mark.asyncio
+    async def test_year_extracted_from_url_when_text_has_no_year(self):
+        html = (
+            "<html><body>"
+            '<a href="https://anda.org.br/docs/entregas_2024.pdf">Download entrega</a>'
+            "</body></html>"
+        )
+        pdf_content = b"x" * 600
+
+        with (
+            patch(
+                "agrobr.anda.client.fetch_estatisticas_page", new_callable=AsyncMock
+            ) as mock_page,
+            patch("agrobr.anda.client.download_file", new_callable=AsyncMock) as mock_dl,
+        ):
+            mock_page.return_value = html
+            mock_dl.return_value = pdf_content
+            _, ano_real = await client.fetch_entregas_pdf(2024)
+
+        assert ano_real == 2024
+
+    @pytest.mark.asyncio
+    async def test_ano_real_defaults_when_no_year_in_text_or_filename(self):
+        html = (
+            "<html><body>"
+            '<a href="https://anda.org.br/2024/report.pdf">Download report</a>'
+            "</body></html>"
+        )
+        pdf_content = b"x" * 600
+
+        with (
+            patch(
+                "agrobr.anda.client.fetch_estatisticas_page", new_callable=AsyncMock
+            ) as mock_page,
+            patch("agrobr.anda.client.download_file", new_callable=AsyncMock) as mock_dl,
+        ):
+            mock_page.return_value = html
+            mock_dl.return_value = pdf_content
+            _, ano_real = await client.fetch_entregas_pdf(2024)
+
+        assert ano_real == 2024

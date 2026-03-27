@@ -1,3 +1,5 @@
+from unittest.mock import AsyncMock, patch
+
 import httpx
 import pandas as pd
 import pytest
@@ -5,7 +7,7 @@ import pytest
 from agrobr.datasets.importacao import IMPORTACAO_INFO, ImportacaoDataset
 from agrobr.exceptions import SourceUnavailableError
 
-from .conftest import make_source
+from .conftest import make_source, mock_source_meta
 
 
 def _make_df(**overrides):
@@ -83,3 +85,31 @@ class TestImportacaoInfo:
     def test_products(self):
         assert "soja" in IMPORTACAO_INFO.products
         assert "milho" in IMPORTACAO_INFO.products
+
+
+class TestImportacaoFetchFunctions:
+    @pytest.mark.asyncio
+    async def test_fetch_comexstat_forwards_params(self):
+        df = _make_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.comexstat.importacao", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.importacao import _fetch_comexstat
+
+            await _fetch_comexstat("soja", ano=2023, uf="SP")
+        mock_fn.assert_called_once_with("soja", ano=2023, uf="SP", return_meta=True)
+
+    @pytest.mark.asyncio
+    async def test_fetch_comexstat_defaults(self):
+        df = _make_df()
+        meta = mock_source_meta()
+        with patch(
+            "agrobr.comexstat.importacao", new_callable=AsyncMock, return_value=(df, meta)
+        ) as mock_fn:
+            from agrobr.datasets.importacao import _fetch_comexstat
+
+            await _fetch_comexstat("milho")
+        _, kwargs = mock_fn.call_args
+        assert kwargs["ano"] is None
+        assert kwargs["uf"] is None

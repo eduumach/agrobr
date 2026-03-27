@@ -88,12 +88,14 @@ class TestDecodeContentWindows1252:
 
 
 class TestDecodeContentChardetFallback:
-    def test_chardet_used_when_chain_fails(self):
+    def test_utf16_bom_decoded_via_chain(self):
         content = b"\xff\xfe" + "teste".encode("utf-16-le")
 
         text, enc = decode_content(content)
 
-        assert "teste" in text or isinstance(text, str)
+        assert isinstance(text, str)
+        assert len(text) > 0
+        assert enc in ("iso-8859-1", "windows-1252")
 
     def test_chardet_low_confidence_falls_to_chain(self):
         bad_bytes = bytes(range(128, 256))
@@ -244,3 +246,60 @@ class TestDetectEncodingChainStress:
             content = text.encode(encoding)
             enc = detect_encoding_chain(content)
             assert isinstance(enc, str)
+
+
+class TestDecodeContentChardetSuccessPath:
+    def test_chardet_decode_succeeds_after_chain_exhausted(self):
+        content = "café São Paulo".encode("utf-16-le")
+        with (
+            mock.patch("agrobr.normalize.encoding.ENCODING_CHAIN", ("utf-8",)),
+            mock.patch(
+                "agrobr.normalize.encoding.chardet.detect",
+                return_value={"encoding": "utf-16-le", "confidence": 0.95},
+            ),
+        ):
+            text, enc = decode_content(content)
+
+        assert "caf" in text
+        assert enc == "utf-16-le"
+
+    def test_chardet_decode_fails_falls_to_replace(self):
+        bad_bytes = bytes([0x80, 0x81, 0x82, 0xFE, 0xFF])
+        with (
+            mock.patch("agrobr.normalize.encoding.ENCODING_CHAIN", ()),
+            mock.patch(
+                "agrobr.normalize.encoding.chardet.detect",
+                return_value={"encoding": "ascii", "confidence": 0.9},
+            ),
+        ):
+            text, enc = decode_content(bad_bytes)
+
+        assert enc == "utf-8-replaced"
+        assert isinstance(text, str)
+
+    def test_chardet_low_confidence_falls_to_replace(self):
+        bad_bytes = bytes([0x80, 0x81])
+        with (
+            mock.patch("agrobr.normalize.encoding.ENCODING_CHAIN", ()),
+            mock.patch(
+                "agrobr.normalize.encoding.chardet.detect",
+                return_value={"encoding": "ascii", "confidence": 0.3},
+            ),
+        ):
+            text, enc = decode_content(bad_bytes)
+
+        assert enc == "utf-8-replaced"
+
+
+class TestDetectEncodingChainChardetFallback:
+    def test_chardet_returns_encoding_value(self):
+        content = bytes(range(128, 256))
+        enc = detect_encoding_chain(content)
+        assert enc in ("windows-1252", "iso-8859-1")
+        assert isinstance(enc, str)
+
+    def test_iso_8859_1_always_succeeds_so_chardet_unreachable(self):
+        for byte_val in range(256):
+            content = bytes([byte_val])
+            enc = detect_encoding_chain(content)
+            assert enc in ("utf-8", "utf-8-sig", "windows-1252", "iso-8859-1")
