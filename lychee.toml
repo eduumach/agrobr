@@ -1,0 +1,89 @@
+# ── Rede e retry ─────────────────────────────────────────────
+max_retries = 3
+retry_wait_time = 10
+timeout = 30
+max_concurrency = 4
+max_redirects = 10
+
+# ── Cache ────────────────────────────────────────────────────
+cache = true
+max_cache_age = "1d"
+
+# ── Aceitar status codes que não indicam link morto ──────────
+# 200-204 = OK, 429 = rate limit, 403 = bloqueio de bot
+accept = ["200..=204", "429", "403"]
+
+# ── Identidade ───────────────────────────────────────────────
+user_agent = "Mozilla/5.0 (compatible; agrobr-link-checker/1.0; +https://github.com/bruno-portfolio/agrobr)"
+
+# ── Escopo ───────────────────────────────────────────────────
+include_fragments = false
+exclude_all_private = true
+exclude_mail = true
+
+# ── Excludes (regex) ─────────────────────────────────────────
+exclude = [
+  # --- APIs de dados governamentais BR (endpoints, não páginas web) ---
+  "olinda\\.bcb\\.gov\\.br",
+  "api\\.bcb\\.gov\\.br",
+  "apisidra\\.ibge\\.gov\\.br",
+  "sidra\\.ibge\\.gov\\.br",
+  "biblioteca\\.ibge\\.gov\\.br",
+  "servicodados\\.ibge\\.gov\\.br",
+  "apitempo\\.inmet\\.gov\\.br",
+  "portal\\.inmet\\.gov\\.br",
+  "portaldeinformacoes\\.conab\\.gov\\.br",
+  "pentahoportaldeinformacoes\\.conab\\.gov\\.br",
+  "portaldatransparencia\\.gov\\.br",
+  "dados\\.antt\\.gov\\.br",
+  "balanca\\.economia\\.gov\\.br",
+  "sistemas\\.agricultura\\.gov\\.br",
+
+  # --- WFS/OGC endpoints (retornam XML/HTML, não páginas web) ---
+  "geoserver\\.funai\\.gov\\.br",
+  "cmr\\.funai\\.gov\\.br",
+  "siscom\\.ibama\\.gov\\.br",
+  "dadosabertos\\.ibama\\.gov\\.br",
+  "geoservicos\\.inde\\.gov\\.br",
+  "geoserver\\.car\\.gov\\.br",
+  "portal1\\.snirh\\.gov\\.br",
+  "mapas\\.florestal\\.gov\\.br",
+  "geoinfo\\.dados\\.embrapa\\.br",
+  "terrabrasilis\\.dpi\\.inpe\\.br",
+  "dataserver-coids\\.inpe\\.br",
+  "queimadas\\.dgi\\.inpe\\.br",
+  "plataforma\\.alerta\\.mapbiomas\\.org",
+
+  # --- Sites com Cloudflare agressivo ou bloqueio de bots ---
+  "cepea\\.org\\.br",
+  "cepea\\.esalq\\.usp\\.br",
+  "noticiasagricolas\\.com\\.br",
+
+  # --- APIs externas que exigem auth ou bloqueiam bots ---
+  "api1\\.imea\\.com\\.br",
+  "apps\\.fas\\.usda\\.gov",
+  "comtradeapi\\.un\\.org",
+  "comtradeplus\\.un\\.org",
+  "api\\.data\\.gov",
+  "arquivos\\.b3\\.com\\.br",
+  "www\\.b3\\.com\\.br/pesquisapregao",
+  "power\\.larc\\.nasa\\.gov/api",
+
+  # --- URLs placeholder/exemplo nos docs ---
+  "hooks\\.slack\\.com",
+  "discord\\.com/api/webhooks",
+  "www\\.gov\\.br/conab/\\.\\.\\.",
+  "www\\.gov\\.br/anp",
+
+  # --- Badges e serviços de imagem (rate limit agressivo) ---
+  "img\\.shields\\.io",
+  "badge\\.fury\\.io",
+  "static\\.pepy\\.tech",
+
+  # --- CDN efêmero / imagens ---
+  "github\\.com/user-attachments",
+  "images\\.unsplash\\.com",
+
+  # --- Colab (403 sem sessão Google) ---
+  "colab\\.research\\.google\\.com",
+]
