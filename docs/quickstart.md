@@ -23,7 +23,7 @@ docker build -t agrobr .
 docker run -it --rm agrobr
 ```
 
-Veja o [guia Docker](docker.md) para extras e opções avançadas.
+Veja o [guia Docker](guides/docker.md) para extras e opções avançadas.
 
 ## CEPEA - Indicadores de Preços
 

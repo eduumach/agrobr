@@ -45,7 +45,7 @@ exclude = [
   "siscom\\.ibama\\.gov\\.br",
   "dadosabertos\\.ibama\\.gov\\.br",
   "geoservicos\\.inde\\.gov\\.br",
-  "geoserver\\.car\\.gov\\.br",
+  "car\\.gov\\.br",
   "portal1\\.snirh\\.gov\\.br",
   "mapas\\.florestal\\.gov\\.br",
   "geoinfo\\.dados\\.embrapa\\.br",
