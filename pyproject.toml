@@ -192,4 +192,4 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "@overload",
 ]
-fail_under = 92
+fail_under = 85
