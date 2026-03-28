@@ -39,7 +39,7 @@ class TestFetchPrecos:
 
         assert isinstance(data, dict)
         assert "resultset" in data
-        assert PENTAHO_BASE in url
+        assert url == PENTAHO_BASE
 
     @pytest.mark.asyncio
     async def test_404_raises_source_unavailable(self):
@@ -95,7 +95,7 @@ class TestFetchCeasas:
 
         assert isinstance(data, dict)
         assert "resultset" in data
-        assert "MDXceasa" in url
+        assert url == PENTAHO_BASE
 
 
 class TestBuildUrl:
