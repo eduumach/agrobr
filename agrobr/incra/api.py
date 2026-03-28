@@ -12,11 +12,20 @@ from agrobr.utils.result import build_source_meta, finalize_result
 from agrobr.utils.validation import validate_uf
 
 from . import client, parser
+from .models import FASES_VALIDAS
 
 if TYPE_CHECKING:
     import geopandas as gpd
 
 logger = structlog.get_logger()
+
+
+def _validate_fase(fase: str | None) -> str | None:
+    if fase is None:
+        return None
+    if fase not in FASES_VALIDAS:
+        raise ValueError(f"Fase invalida: {fase!r}. Valores aceitos: {sorted(FASES_VALIDAS)}")
+    return fase
 
 
 @overload
@@ -51,6 +60,7 @@ async def quilombolas(
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
     uf = validate_uf(uf)
+    fase = _validate_fase(fase)
     bbox = validate_bbox(bbox)
     logger.info("incra_quilombolas", uf=uf, fase=fase, bbox=bbox)
 
@@ -105,6 +115,7 @@ async def quilombolas_geo(
     **kwargs: Any,  # noqa: ARG001
 ) -> Any:
     uf = validate_uf(uf)
+    fase = _validate_fase(fase)
     bbox = validate_bbox(bbox)
     logger.info("incra_quilombolas_geo", uf=uf, fase=fase, bbox=bbox)
 

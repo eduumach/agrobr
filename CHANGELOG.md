@@ -22,6 +22,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **testes** — cobertura 88% → 92% (+110 testes). Dataset `_fetch_*` fetchers (23 datasets), CEPEA parser v1 edge cases (fallback de tabela, date 2-digit year, unidade detection), RNC filter branches, SFB endpoints, USDA client wrappers, base.py error paths (ContractViolation/Exception), anda/client, cepea/consensus, b3/parser, antt_pedagio/client, defensivos/parser, normalize/encoding. `@overload` excluido de coverage (artefato de medicao). `fail_under` 85 → 92
 - **utils/geo** — `fetch_wfs` detecta resposta HTML (manutencao/redirect) e lanca `SourceUnavailableError` em vez de cascatear para `ParseError` confuso. Beneficia todas as fontes WFS (embrapa, ibama, sicar, funai, icmbio, incra)
 
+### Security
+- **conab/ceasa** — credenciais Pentaho removidas de logs, exceções e `MetaInfo.source_url`. URL segura (`PENTAHO_BASE`) usada em todos os vetores de exposição
+- **b3** — token de sessão removido de logs e exceções em `fetch_posicoes_abertas()` (3 pontos de leak)
+- **sicar** — wildcard escaping (`%`, `_`) adicionado ao filtro ILIKE de município para prevenir CQL wildcard injection
+- **incra** — validação de `fase` via `FASES_VALIDAS` frozenset, mesmo padrão de FUNAI. Previne CQL injection via parâmetro não validado
+- **deps** — bump `playwright>=1.55.1` (CVE-2025-59288 SSL bypass) e `streamlit>=1.54.0` (CVE-2024-42474, CVE-2025-1684, CVE-2026-33682)
+
 ### Fixed
 - **cepea** — parser v1: coluna USD (`Valor US$*`) sobrescrevia valor BRL (100% dos precos no cache estavam errados). Reordenado condicionais: `var` antes de `data` (evita `Var./Dia` poluir data_value), exclusao explicita de colunas US$/USD
 - **cepea** — parser v1: praca agora populada via dict `PRACAS` (20 produtos mapeados). Antes, `praca=None` hardcoded em todos os indicadores

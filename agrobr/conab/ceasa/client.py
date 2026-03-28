@@ -36,7 +36,7 @@ def _build_url(cda_path: str, query_id: str) -> str:
 
 async def _fetch_query(cda_path: str, query_id: str) -> tuple[dict[str, Any], str]:
     url = _build_url(cda_path, query_id)
-    logger.debug("conab_ceasa_fetch", query=query_id, url=url)
+    logger.debug("conab_ceasa_fetch", query=query_id)
 
     headers = UserAgentRotator.get_headers(source="conab_ceasa")
     headers["Accept"] = "application/json"
@@ -54,12 +54,12 @@ async def _fetch_query(cda_path: str, query_id: str) -> tuple[dict[str, Any], st
     if resp.status_code != 200:
         raise SourceUnavailableError(
             source="conab_ceasa",
-            url=url,
+            url=PENTAHO_BASE,
             last_error=f"HTTP {resp.status_code}",
         )
 
     resp.raise_for_status()
-    return resp.json(), url
+    return resp.json(), PENTAHO_BASE
 
 
 async def fetch_precos() -> tuple[dict[str, Any], str]:

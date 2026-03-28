@@ -7,6 +7,8 @@ from agrobr.constants import URLS, Fonte
 
 PENTAHO_BASE = URLS[Fonte.CONAB]["ceasa_prohort"]
 
+# Credenciais públicas do Pentaho CONAB CEASA/PROHORT.
+# Configuráveis via env vars para ambientes que requerem credenciais próprias.
 PENTAHO_AUTH = {
     "userid": os.environ.get("AGROBR_CONAB_CEASA_USER", "pentaho"),
     "password": os.environ.get("AGROBR_CONAB_CEASA_PASS", "password"),

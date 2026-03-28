@@ -43,7 +43,7 @@ def _build_cql_filter(
     if cod_municipio is not None:
         parts.append(f"cod_municipio_ibge={cod_municipio}")
     elif municipio:
-        escaped = municipio.replace("'", "''")
+        escaped = municipio.replace("'", "''").replace("%", r"\%").replace("_", r"\_")
         parts.append(f"municipio ILIKE '%{escaped}%'")
 
     if status:

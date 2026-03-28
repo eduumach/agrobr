@@ -81,7 +81,7 @@ async def fetch_posicoes_abertas(data: str) -> tuple[bytes, str]:
             )
 
         download_url = f"{BASE_URL_ARQUIVOS}?token={token}"
-        logger.debug("b3_oi_download", url=download_url)
+        logger.debug("b3_oi_download", url=BASE_URL_ARQUIVOS)
         csv_resp = await retry_on_status(
             lambda: http.get(download_url),
             source="b3",
@@ -89,7 +89,7 @@ async def fetch_posicoes_abertas(data: str) -> tuple[bytes, str]:
 
         if csv_resp.status_code in (400, 404):
             raise SourceUnavailableError(
-                source="b3", url=download_url, last_error=f"HTTP {csv_resp.status_code}"
+                source="b3", url=BASE_URL_ARQUIVOS, last_error=f"HTTP {csv_resp.status_code}"
             )
         csv_resp.raise_for_status()
 
@@ -97,7 +97,7 @@ async def fetch_posicoes_abertas(data: str) -> tuple[bytes, str]:
         if len(csv_bytes) < MIN_CSV_SIZE:
             raise SourceUnavailableError(
                 source="b3",
-                url=download_url,
+                url=BASE_URL_ARQUIVOS,
                 last_error=(
                     f"Posicoes abertas CSV too small ({len(csv_bytes)} bytes), "
                     f"expected derivative position data"

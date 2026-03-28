@@ -69,7 +69,7 @@ dependencies = [
 
 [project.optional-dependencies]
 browser = [
-    "playwright>=1.40.0",
+    "playwright>=1.55.1",
 ]
 pdf = [
     "pdfplumber>=0.10.0",
@@ -84,7 +84,7 @@ geo = [
     "geopandas>=0.14.0",
 ]
 app = [
-    "streamlit>=1.30",
+    "streamlit>=1.54.0",
 ]
 dev = [
     "pytest>=7.4.0",

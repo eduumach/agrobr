@@ -52,3 +52,13 @@ COLUNAS_SAIDA = [
 ]
 
 COLUNAS_SAIDA_GEO = COLUNAS_SAIDA + ["geometry"]
+
+FASES_VALIDAS = frozenset(
+    {
+        "Titulada",
+        "Em Titulacao",
+        "Decreto Publicado",
+        "RTID em Elaboracao",
+        "RTID Publicado",
+    }
+)
