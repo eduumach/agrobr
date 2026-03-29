@@ -29,13 +29,6 @@ def parse_prodes_csv(data: bytes, bioma: str) -> pd.DataFrame:
         data, source="desmatamento", parser_version=PARSER_VERSION, label="CSV PRODES"
     )
 
-    if df.empty:
-        raise ParseError(
-            source="desmatamento",
-            parser_version=PARSER_VERSION,
-            reason="CSV PRODES vazio",
-        )
-
     required = {"year", "area_km", "state"}
     missing = required - set(df.columns)
     if missing:
@@ -44,6 +37,9 @@ def parse_prodes_csv(data: bytes, bioma: str) -> pd.DataFrame:
             parser_version=PARSER_VERSION,
             reason=f"Colunas obrigatorias ausentes: {missing}",
         )
+
+    if df.empty:
+        return pd.DataFrame(columns=COLUNAS_SAIDA_PRODES)
 
     df["ano"] = pd.to_numeric(df["year"], errors="coerce").astype("Int64")
     df["area_km2"] = pd.to_numeric(df["area_km"], errors="coerce")
@@ -66,13 +62,6 @@ def parse_deter_csv(data: bytes, bioma: str) -> pd.DataFrame:
         data, source="desmatamento", parser_version=PARSER_VERSION, label="CSV DETER"
     )
 
-    if df.empty:
-        raise ParseError(
-            source="desmatamento",
-            parser_version=PARSER_VERSION,
-            reason="CSV DETER vazio",
-        )
-
     required = {"view_date", "areamunkm", "uf"}
     missing = required - set(df.columns)
     if missing:
@@ -81,6 +70,9 @@ def parse_deter_csv(data: bytes, bioma: str) -> pd.DataFrame:
             parser_version=PARSER_VERSION,
             reason=f"Colunas obrigatorias ausentes: {missing}",
         )
+
+    if df.empty:
+        return pd.DataFrame(columns=COLUNAS_SAIDA_DETER)
 
     df["data"] = pd.to_datetime(df["view_date"], errors="coerce").dt.date
     df["area_km2"] = pd.to_numeric(df["areamunkm"], errors="coerce")

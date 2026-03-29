@@ -123,6 +123,7 @@ _modules: dict[str, _SyncModule | None] = {
     "rio_verde": None,
     "rnc": None,
     "sfb": None,
+    "sicar": None,
     "usda": None,
     "zarc": None,
 }
@@ -144,7 +145,8 @@ def __getattr__(name: str) -> Any:
     if _modules[name] is None:
         import importlib
 
-        async_module = importlib.import_module(f"agrobr.{name}")
+        path = f"agrobr.alt.{name}" if name == "sicar" else f"agrobr.{name}"
+        async_module = importlib.import_module(path)
         _modules[name] = _SyncModule(async_module)
 
     return _modules[name]

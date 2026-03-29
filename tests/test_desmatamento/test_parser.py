@@ -73,9 +73,18 @@ class TestParseProdesCsv:
 
         assert pd.api.types.is_integer_dtype(df["ano"])
 
-    def test_empty_csv_raises(self):
-        with pytest.raises(ParseError):
-            parse_prodes_csv(b"year,area_km,state\n", "Cerrado")
+    def test_empty_csv_returns_empty_df(self):
+        df = parse_prodes_csv(b"year,area_km,state\n", "Cerrado")
+        assert df.empty
+        assert list(df.columns) == [
+            "ano",
+            "uf",
+            "classe",
+            "area_km2",
+            "satelite",
+            "sensor",
+            "bioma",
+        ]
 
     def test_invalid_csv_raises(self):
         with pytest.raises(ParseError):
@@ -153,9 +162,20 @@ class TestParseDeterCsv:
         for mid in valid_ids:
             assert mid > 1000000
 
-    def test_empty_csv_raises(self):
-        with pytest.raises(ParseError):
-            parse_deter_csv(b"view_date,areamunkm,uf\n", "Amazônia")
+    def test_empty_csv_returns_empty_df(self):
+        df = parse_deter_csv(b"view_date,areamunkm,uf\n", "Amazônia")
+        assert df.empty
+        assert list(df.columns) == [
+            "data",
+            "classe",
+            "uf",
+            "municipio",
+            "municipio_id",
+            "area_km2",
+            "satelite",
+            "sensor",
+            "bioma",
+        ]
 
     def test_invalid_csv_raises(self):
         with pytest.raises(ParseError):

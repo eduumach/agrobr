@@ -40,6 +40,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - **embrapa_solos** — URL WFS corrigida (`geoserver` → `geoserver/ows`), `CQL_FILTER` removido (mesmo fix de FUNAI/IBAMA/ICMBio v1.0.4), filtro UF pos-download
 - **ibge** — `fetch_sidra` `iloc[1:]` removia silenciosamente a primeira UF (Rondonia) em toda query SIDRA multi-UF. Afetava 12 funcoes (abate, PAM, LSPA, PPM, PEVS, leite, PIB, censo). Em single-UF, causava 0 registros
 - **rio_verde** — parser secao-sumario agora case-insensitive e accent-resilient. Exit trigger so em inicio de linha (evita falso positivo mid-line)
+- **desmatamento** — `parse_deter_csv`/`parse_prodes_csv` agora retornam DataFrame vazio com schema correto em vez de `ParseError` quando WFS retorna header-only CSV (filtro sem resultados). Validacao de colunas mantida (CSV invalido ainda raisa)
+- **sync** — `agrobr.sync.sicar` agora resolve diretamente (antes so acessivel via `sync.alt.sicar`). Wrapper sync aplicado corretamente
 
 ## [1.0.4] - 2026-03-22
 
