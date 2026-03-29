@@ -7,6 +7,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-03-29
+
 ### Added
 - **docker** — Dockerfile multi-stage (`python:3.11-slim`, non-root) com Playwright + Chromium + pdfplumber inclusos (default `EXTRAS="browser,pdf"`). `docker build -t agrobr .` + `docker run -it --rm agrobr`. Extras adicionais via `--build-arg EXTRAS="browser,pdf,polars"`. Fecha #54
 - **usda** — commodity `cafe`/`coffee` (Coffee, Green, PSD code `0711100`) adicionada a `PSD_COMMODITIES`, `_COMMODITY_NAMES` e dataset `oferta_demanda_global`
@@ -1127,7 +1129,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - Type hints completos
 - Logging estruturado com structlog
 
-[Unreleased]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.4...HEAD
+[Unreleased]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.5...HEAD
+[1.0.5]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/bruno-portfolio/agrobr/compare/v1.0.1...v1.0.2
