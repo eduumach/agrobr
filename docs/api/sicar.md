@@ -194,9 +194,9 @@ gdf, meta = await agrobr.alt.sicar.imoveis_geo("DF", return_meta=True)
 ```python
 from agrobr import sync
 
-df = sync.alt.sicar.imoveis("DF")
-gdf = sync.alt.sicar.imoveis_geo("DF")
-df = sync.alt.sicar.resumo("MT", municipio="Sorriso")
+df = sync.sicar.imoveis("DF")
+gdf = sync.sicar.imoveis_geo("DF")
+df = sync.sicar.resumo("MT", municipio="Sorriso")
 ```
 
 ## Fonte de dados
