@@ -1,0 +1,33 @@
+{
+  "count": 3,
+  "columns": [
+    "gid",
+    "cd_sipra",
+    "nome_projeto",
+    "municipio",
+    "area_hectare_declarada",
+    "capacidade",
+    "num_familias",
+    "fase",
+    "data_de_criacao",
+    "forma_obtencao",
+    "data_obtencao",
+    "area_calc_ha",
+    "sr",
+    "descricao_fase"
+  ],
+  "non_null_columns": [
+    "gid",
+    "cd_sipra",
+    "nome_projeto",
+    "municipio",
+    "area_hectare_declarada",
+    "capacidade",
+    "num_familias",
+    "fase",
+    "data_de_criacao",
+    "forma_obtencao",
+    "data_obtencao",
+    "area_calc_ha"
+  ]
+}

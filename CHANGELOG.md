@@ -7,6 +7,9 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Unreleased]
 
+### Added
+- **acervo_fundiario** — Acervo Fundiario INCRA via WFS GML2. `sigef()` + `sigef_geo()` parcelas certificadas pos-2013 (particular/publico). `snci()` + `snci_geo()` parcelas certificadas pre-2013 (privado/publico). `assentamentos()` + `assentamentos_geo()` projetos de reforma agraria. Filtros: uf (obrigatorio), tipo, bbox. Parser GML2 com lxml + shapely. Licenca `nc`
+
 ## [1.0.5] - 2026-03-29
 
 ### Added

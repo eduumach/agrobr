@@ -20,6 +20,7 @@ __all__ = [
 
 class Fonte(StrEnum):
     ABIOVE = "abiove"
+    ACERVO_FUNDIARIO = "acervo_fundiario"
     ANA = "ana"
     ANDA = "anda"
     ANP_DIESEL = "anp_diesel"
@@ -61,6 +62,10 @@ URLS = {
         "base": "https://abiove.org.br",
         "estatisticas": "https://abiove.org.br/estatisticas",
         "exportacao": "https://abiove.org.br/abiove_content/Abiove",
+    },
+    Fonte.ACERVO_FUNDIARIO: {
+        "base": "https://acervofundiario.incra.gov.br",
+        "wfs": "https://acervofundiario.incra.gov.br/i3geo/ogc.php",
     },
     Fonte.ANA: {
         "base": "https://portal1.snirh.gov.br",
@@ -339,6 +344,7 @@ class HTTPSettings(BaseSettings):
     retry_exponential_base: int = 2
 
     rate_limit_abiove: float = 3.0
+    rate_limit_acervo_fundiario: float = 3.0
     rate_limit_ana: float = 2.0
     rate_limit_anda: float = 3.0
     rate_limit_anp_diesel: float = 2.0

@@ -7,6 +7,7 @@ __author__ = "Bruno"
 
 from agrobr import (
     abiove,
+    acervo_fundiario,
     alt,
     ana,
     anda,
@@ -54,6 +55,7 @@ from agrobr.models import MetaInfo
 
 __all__ = [
     "abiove",
+    "acervo_fundiario",
     "alt",
     "ana",
     "anda",

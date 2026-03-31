@@ -93,6 +93,7 @@ class _SyncAlt:
 
 _modules: dict[str, _SyncModule | None] = {
     "abiove": None,
+    "acervo_fundiario": None,
     "ana": None,
     "anda": None,
     "antaq": None,

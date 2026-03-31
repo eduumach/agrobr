@@ -19,9 +19,9 @@
   </a>
 </p>
 
-Infraestrutura Python para dados agrícolas brasileiros com camada semântica sobre **38 fontes públicas**: CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA PSD, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento PRODES/DETER, MapBiomas, CONAB Progresso, B3 Futuros Agro, CONAB CEASA/PROHORT, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedágio, SICAR, ZARC, Agrofit/MAPA (Defensivos), FUNAI, ICMBio, INCRA, IBAMA, MapBiomas Alerta, Lista Suja, ANA/SNIRH, SFB, RNC/CultivarWeb, EMBRAPA Solos e Fundação Rio Verde.
+Infraestrutura Python para dados agrícolas brasileiros com camada semântica sobre **39 fontes públicas**: CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA PSD, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento PRODES/DETER, MapBiomas, CONAB Progresso, B3 Futuros Agro, CONAB CEASA/PROHORT, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedágio, SICAR, ZARC, Agrofit/MAPA (Defensivos), FUNAI, ICMBio, INCRA, IBAMA, MapBiomas Alerta, Lista Suja, ANA/SNIRH, SFB, RNC/CultivarWeb, EMBRAPA Solos, Fundação Rio Verde e Acervo Fundiário/INCRA.
 
-**v1.0.5** — 6000+ testes, 92% cobertura, 38/38 fontes com golden tests, retry centralizado em 38/38 clients.
+**v1.0.5** — 6000+ testes, 92% cobertura, 39/39 fontes com golden tests, retry centralizado em 39/39 clients.
 
 ## Demo
 ![Animation](https://github.com/user-attachments/assets/40e1341e-f47b-4eb5-b18e-55b49c63ee97)
@@ -38,7 +38,7 @@ pip install agrobr[pdf]             # pdfplumber para ANDA, Lista Suja, Rio Verd
 pip install agrobr[polars]          # Suporte a Polars
 pip install agrobr[browser]         # Playwright (opcional, para fontes com JS)
 pip install agrobr[bigquery]        # Base dos Dados (fallback BCB/SICOR)
-pip install agrobr[geo]             # GeoPandas (geometria PRODES + DETER + SICAR + FUNAI + ICMBio + INCRA + IBAMA + Queimadas + MapBiomas Alerta + ANA + SFB + EMBRAPA Solos)
+pip install agrobr[geo]             # GeoPandas (geometria PRODES + DETER + SICAR + FUNAI + ICMBio + INCRA + IBAMA + Queimadas + MapBiomas Alerta + ANA + SFB + EMBRAPA Solos + Acervo Fundiário)
 pip install agrobr[all]             # Tudo incluído
 ```
 
@@ -654,6 +654,7 @@ Use `agrobr health --all` para verificar localmente.
 | IBAMA | Embargos ambientais (WFS siscom.ibama.gov.br) — ~89K features, filtro uf/bbox | ✅ | Funcional |
 | ICMBio | Unidades de conservacao federais (WFS geoservicos.inde.gov.br) — 344 UCs | ✅ | Funcional |
 | INCRA | Territorios quilombolas (WFS cmr.funai.gov.br) — ~426 territorios | ✅ | Funcional |
+| Acervo Fundiario/INCRA | Parcelas certificadas SIGEF/SNCI + assentamentos (WFS geo) — filtro uf/tipo/bbox | ✅ | Funcional |
 | RNC/CultivarWeb | Cultivares registradas (~37K) e protegidas (~5K) — MAPA/SNPC | ✅ | Funcional |
 | EMBRAPA Solos | Perfis de solo PronaSolos (34K+) + mapa pedologico SiBCS (2.8K poligonos) | ✅ | Funcional |
 | Fundacao Rio Verde | Ensaios cultivares soja MT — ~97 cultivares x 4 epocas (PDF) | ✅ | Funcional |
@@ -720,9 +721,9 @@ normalizar_safra("24/25")             # "2024/25"
 
 ## Diferenciais
 
-- **38/38 fontes com golden tests** — validação automatizada contra dados de referência
-- **Resiliência HTTP completa** — retry centralizado em 38/38 clients, 429 handling, Retry-After
-- **5800+ testes, 88% cobertura** — benchmarks de escalabilidade (memory, volume, cache, async)
+- **39/39 fontes com golden tests** — validação automatizada contra dados de referência
+- **Resiliência HTTP completa** — retry centralizado em 39/39 clients, 429 handling, Retry-After
+- **6000+ testes, 92% cobertura** — benchmarks de escalabilidade (memory, volume, cache, async)
 - **Thread-safe cache** — DuckDB store com locking para uso em MCP servers e multi-thread
 - **Camada semântica** — datasets padronizados com fallback automático
 - **Contratos formais** — schema versionado com validação automática, primary keys e constraints
@@ -769,7 +770,7 @@ Veja o [guia completo de pipelines](https://www.agrobr.dev/docs/advanced/pipelin
 
 - [Guia Rápido](https://www.agrobr.dev/docs/quickstart/)
 - [Datasets](https://www.agrobr.dev/docs/contracts/) — Contratos e garantias
-- [Fontes](https://www.agrobr.dev/docs/sources/) — 38 fontes documentadas
+- [Fontes](https://www.agrobr.dev/docs/sources/) — 39 fontes documentadas
 - [API Reference](https://www.agrobr.dev/docs/api/cepea/)
 - [Resiliência](https://www.agrobr.dev/docs/advanced/resilience/)
 - [Portabilidade](https://www.agrobr.dev/docs/porting/) — Guia para portar o agrobr para R, Julia ou outras linguagens

@@ -1,0 +1,30 @@
+{
+  "count": 5,
+  "columns": [
+    "parcela_codigo",
+    "rt",
+    "art",
+    "situacao_informada",
+    "codigo_imovel",
+    "data_submissao",
+    "data_aprovacao",
+    "status",
+    "nome_area",
+    "registro_matricula",
+    "registro_data",
+    "codigo_municipio"
+  ],
+  "non_null_columns": [
+    "parcela_codigo",
+    "rt",
+    "art",
+    "situacao_informada",
+    "codigo_imovel",
+    "data_submissao",
+    "data_aprovacao",
+    "status",
+    "nome_area",
+    "registro_matricula",
+    "codigo_municipio"
+  ]
+}
