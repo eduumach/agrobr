@@ -48,10 +48,9 @@ class TestSigef:
 
     @patch.object(api.client, "fetch_sigef", new_callable=AsyncMock)
     async def test_as_polars(self, mock_fetch):
+        pl = pytest.importorskip("polars")
         mock_fetch.return_value = (_sigef_bytes(), "https://test")
         result = await api.sigef("GO", as_polars=True)
-        import polars as pl
-
         assert isinstance(result, pl.DataFrame)
 
     @patch.object(api.client, "fetch_sigef", new_callable=AsyncMock)

@@ -99,8 +99,8 @@ class TestParseSigefGml:
     def test_string_columns(self):
         data = (GOLDEN / "sigef_sample" / "response.gml").read_bytes()
         df = parser.parse_sigef_gml(data)
-        assert df["codigo_parcela"].dtype == object
-        assert df["status"].dtype == object
+        assert pd.api.types.is_string_dtype(df["codigo_parcela"])
+        assert pd.api.types.is_string_dtype(df["status"])
 
     def test_empty_gml(self):
         df = parser.parse_sigef_gml(EMPTY_GML)
