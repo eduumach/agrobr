@@ -21,6 +21,7 @@
 | **MAPA PSR** | Dados públicos governo federal (CC-BY) | Sim (dados públicos) | `livre` | [SISSER/MAPA](https://dados.agricultura.gov.br/dataset/sisser3) |
 | **SICAR** | Dados públicos governo federal (CC-BY) | Sim (dados públicos) | `livre` | [CAR](https://www.car.gov.br) |
 | **ABIOVE** | Sem termos públicos; autorização solicitada (fev/2026) | Aguardando resposta | `zona_cinza` | [abiove.org.br](https://abiove.org.br) |
+| **ANEC** | Sem termos públicos localizados; sem contato formal | Verificar com a associação | `zona_cinza` | [anec.com.br](https://anec.com.br) |
 | **USDA PSD** | U.S. Public Domain | Sim (governo EUA) | `livre` | [Ag Data Commons](https://data.nal.usda.gov/dataset/usda-foreign-agricultural-service-production-supply-and-distribution-database) |
 | **UN Comtrade** | Dados publicos ONU | Sim (dados publicos) | `livre` | [Comtrade](https://comtradeplus.un.org) |
 | **IMEA** | Restritivo: redistribuição proibida sem autorização escrita | Não | `restrito` | [Termo de Uso](https://imea.com.br/imea-site/termo-de-uso.html) |
@@ -99,6 +100,16 @@
 - **Situação:** Associação setorial que publica dados de exportação do complexo soja.
   Sem página de termos de uso pública localizada.
 - **Ação:** Autorização formal solicitada em fevereiro/2026. Aguardando resposta.
+
+### ANEC
+
+- **Classificação:** `zona_cinza`
+- **Situação:** Associação Nacional dos Exportadores de Cereais. Publica relatórios
+  semanais em PDF de embarques por porto (soja, farelo, milho, DDGS, sorgo, trigo).
+  Sem página de termos de uso pública localizada.
+- **Decisão no agrobr:** Módulo emite `UserWarning` na primeira chamada por sessão
+  alertando o usuário sobre o status. Não incluído em fallback automático de
+  outros datasets. Sem contato formal estabelecido com a associação.
 
 ### Notícias Agrícolas
 

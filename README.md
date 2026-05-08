@@ -19,9 +19,9 @@
   </a>
 </p>
 
-Infraestrutura Python para dados agrícolas brasileiros com camada semântica sobre **39 fontes públicas**: CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA PSD, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento PRODES/DETER, MapBiomas, CONAB Progresso, B3 Futuros Agro, CONAB CEASA/PROHORT, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedágio, SICAR, ZARC, Agrofit/MAPA (Defensivos), FUNAI, ICMBio, INCRA, IBAMA, MapBiomas Alerta, Lista Suja, ANA/SNIRH, SFB, RNC/CultivarWeb, EMBRAPA Solos, Fundação Rio Verde e Acervo Fundiário/INCRA.
+Infraestrutura Python para dados agrícolas brasileiros com camada semântica sobre **40 fontes públicas**: CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, ANEC, USDA PSD, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento PRODES/DETER, MapBiomas, CONAB Progresso, B3 Futuros Agro, CONAB CEASA/PROHORT, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedágio, SICAR, ZARC, Agrofit/MAPA (Defensivos), FUNAI, ICMBio, INCRA, IBAMA, MapBiomas Alerta, Lista Suja, ANA/SNIRH, SFB, RNC/CultivarWeb, EMBRAPA Solos, Fundação Rio Verde e Acervo Fundiário/INCRA.
 
-**v1.0.5** — 6000+ testes, 92% cobertura, 39/39 fontes com golden tests, retry centralizado em 39/39 clients.
+**v1.0.5** — 6000+ testes, 92% cobertura, 40/40 fontes com golden tests, retry centralizado em 40/40 clients.
 
 ## Demo
 ![Animation](https://github.com/user-attachments/assets/40e1341e-f47b-4eb5-b18e-55b49c63ee97)
@@ -627,6 +627,7 @@ Use `agrobr health --all` para verificar localmente.
 | ComexStat | Exportações e importações por NCM/UF | ✅¹ | Funcional |
 | ANDA | Entregas de fertilizantes | ✅ | Funcional |
 | ABIOVE | Exportação complexo soja (volume/receita) | ✅ | Funcional |
+| ANEC | Embarques semanais por porto (soja, farelo, milho, DDGS, sorgo, trigo) | ✅ | Funcional (2026+) |
 | USDA PSD | Estimativas internacionais (produção/oferta/demanda) | ✅¹ | Funcional |
 | IMEA | Cotações e indicadores Mato Grosso | ✅ | Funcional |
 | DERAL | Condição das lavouras Paraná | ✅ | Funcional |
@@ -721,8 +722,8 @@ normalizar_safra("24/25")             # "2024/25"
 
 ## Diferenciais
 
-- **39/39 fontes com golden tests** — validação automatizada contra dados de referência
-- **Resiliência HTTP completa** — retry centralizado em 39/39 clients, 429 handling, Retry-After
+- **40/40 fontes com golden tests** — validação automatizada contra dados de referência
+- **Resiliência HTTP completa** — retry centralizado em 40/40 clients, 429 handling, Retry-After
 - **6000+ testes, 92% cobertura** — benchmarks de escalabilidade (memory, volume, cache, async)
 - **Thread-safe cache** — DuckDB store com locking para uso em MCP servers e multi-thread
 - **Camada semântica** — datasets padronizados com fallback automático
@@ -770,7 +771,7 @@ Veja o [guia completo de pipelines](https://www.agrobr.dev/docs/advanced/pipelin
 
 - [Guia Rápido](https://www.agrobr.dev/docs/quickstart/)
 - [Datasets](https://www.agrobr.dev/docs/contracts/) — Contratos e garantias
-- [Fontes](https://www.agrobr.dev/docs/sources/) — 39 fontes documentadas
+- [Fontes](https://www.agrobr.dev/docs/sources/) — 40 fontes documentadas
 - [API Reference](https://www.agrobr.dev/docs/api/cepea/)
 - [Resiliência](https://www.agrobr.dev/docs/advanced/resilience/)
 - [Portabilidade](https://www.agrobr.dev/docs/porting/) — Guia para portar o agrobr para R, Julia ou outras linguagens

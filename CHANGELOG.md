@@ -9,6 +9,14 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ### Added
 - **acervo_fundiario** — Acervo Fundiario INCRA via WFS GML2. `sigef()` + `sigef_geo()` parcelas certificadas pos-2013 (particular/publico). `snci()` + `snci_geo()` parcelas certificadas pre-2013 (privado/publico). `assentamentos()` + `assentamentos_geo()` projetos de reforma agraria. Filtros: uf (obrigatorio), tipo, bbox. Parser GML2 com lxml + shapely. Licenca `nc`
+- **anec** — Embarques semanais por porto x produto (ANEC). 5 funcoes publicas: `embarques()` (porto x produto x last/current week), `embarques_mensais()`, `comparacao_anual()` (2025 x 2026), `destinos()` (top importadores), `articles_disponiveis()`. Dataset `embarques_anec` no registry. Parser PDF via pdfplumber (extract_words com x_tolerance=12, multi-section YoY parsing). 19 portos x 6 produtos x 2 periodos = 228 rows/semana. Cache filesystem com SHA256 + atomic write + asyncio.Lock por cuid + TTL listagem em memoria (`AGROBR_ANEC_LIST_TTL`, default 300s). MIN_YEAR=2026 (anos antigos `NotImplementedError`). Licenca `zona_cinza` com `UserWarning` na primeira chamada
+
+### Improved
+- **incra** — `MAX_FEATURES_TABULAR` e `MAX_FEATURES_GEO` aumentados de 500 para 1500 (~250% margem em cima dos 431 territorios atuais). Geometrias invalidas no GeoJSON sao reparadas automaticamente via `shapely.validation.make_valid()` no parser, com log `incra_quilombolas_geo_repaired` indicando quantas foram reparadas (atualmente 1/431, polygon degenerado, area preservada)
+- **utils/result** — `build_source_meta()` aceita `raw_content_hash` como kwarg, eliminando o anti-pattern de mutacao pos-construcao (`meta.raw_content_hash = ...`) usado em `cepea/api.py` e `anec/api.py`
+
+### Fixed
+- **incra (breaking)** — Filtros `uf`/`fase` em `quilombolas()`/`quilombolas_geo()` migrados para client-side: o servidor CMR/FUNAI nao respeita `CQL_FILTER` nesses campos e retornava o dataset completo silenciosamente, mascarando os filtros. `FASES_VALIDAS` realinhado com os valores reais do servidor: `CCDRU`, `DECRETO`, `PORTARIA`, `RTID`, `TITULADO`, `TITULO ANULADO`, `TITULO PARCIAL`. Chamadas com fases antigas (`"Titulada"`, `"Em Titulacao"`, `"Decreto Publicado"`, `"RTID em Elaboracao"`, `"RTID Publicado"`) agora levantam `ValueError` — migrar para os novos valores. Adicionado log `incra_quilombolas_truncated` quando o resultado tabular atinge `MAX_FEATURES_TABULAR` (espelhando o ja existente para o GeoJSON)
 
 ## [1.0.5] - 2026-03-29
 

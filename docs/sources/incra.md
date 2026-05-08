@@ -36,6 +36,12 @@ async def main():
     # Filtrar por UF
     df = await incra.quilombolas(uf="BA")
 
+    # Filtrar por fase do processo
+    df = await incra.quilombolas(fase="TITULADO")
+
+    # Combinar filtros
+    df = await incra.quilombolas(uf="BA", fase="TITULADO")
+
     # Com geometria (requer geopandas)
     gdf = await incra.quilombolas_geo(bbox=(-42, -15, -40, -13))
 
@@ -44,6 +50,36 @@ async def main():
 
 asyncio.run(main())
 ```
+
+## Filtros
+
+Parametros aceitos por `quilombolas()` e `quilombolas_geo()`:
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `uf` | str \| None | Sigla da UF (case-insensitive) |
+| `fase` | str \| None | Fase do processo (ver tabela abaixo) |
+| `bbox` | tuple\[float, float, float, float\] \| None | (minlon, minlat, maxlon, maxlat) em EPSG:4674 |
+
+### Fases validas
+
+| Valor | Significado |
+|-------|-------------|
+| `CCDRU` | Concessao de Direito Real de Uso |
+| `DECRETO` | Decreto de desapropriacao publicado |
+| `PORTARIA` | Portaria de reconhecimento publicada |
+| `RTID` | Relatorio Tecnico de Identificacao e Delimitacao |
+| `TITULADO` | Territorio com titulo definitivo emitido |
+| `TITULO ANULADO` | Titulo anulado por decisao judicial |
+| `TITULO PARCIAL` | Titulacao parcial (parte do territorio) |
+
+Valores fora dessa lista levantam `ValueError`.
+
+!!! note "Filtros aplicados client-side"
+    Os filtros `uf` e `fase` sao aplicados **depois** do download (o servidor
+    CMR/FUNAI nao respeita `CQL_FILTER` nesses campos). O dataset completo
+    (~426 territorios) e baixado a cada chamada, independente dos filtros.
+    Use `bbox` para reduzir o tamanho da resposta no servidor.
 
 ## Colunas
 
@@ -63,5 +99,13 @@ asyncio.run(main())
 ## Limitacoes
 
 - Dados hospedados em servidor FUNAI/CMR, nao INCRA
+- Limite de 1500 features por requisicao. Quando atingido, log
+  `incra_quilombolas_truncated` (ou `incra_quilombolas_geo_truncated`) e emitido
+- Filtros `uf`/`fase` sao client-side (nao reduzem trafego de rede)
 - Algumas datas podem estar ausentes (nullable)
 - Campo `familias` e nullable (nem todos os registros tem essa informacao)
+- Campo `codigo` (cd_quilomb) e nullable: ~63% dos registros sao territorios em
+  pre-cadastro identificados pelo CMR/FUNAI que ainda nao receberam codigo INCRA
+  oficial. Use `df["codigo"].notna()` para filtrar apenas territorios cadastrados
+- Geometrias invalidas no GeoJSON sao reparadas via `shapely.validation.make_valid`
+  com log `incra_quilombolas_geo_repaired`

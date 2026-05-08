@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>agrobr — Dados agrícolas brasileiros em uma linha de código</title>
-<meta name="description" content="Infraestrutura Python para dados agrícolas brasileiros. 39 fontes públicas — CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, USDA, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento, MapBiomas, CONAB Progresso, CONAB CEASA/PROHORT, B3 Futuros Agro, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedagio, SICAR, ZARC, Agrofit/MAPA (Defensivos), FUNAI, ICMBio, INCRA, IBAMA, MapBiomas Alerta, Lista Suja, ANA/SNIRH, SFB, RNC/CultivarWeb, EMBRAPA Solos, Fundação Rio Verde, Acervo Fundiário/INCRA — uma API, fallback automático, cache DuckDB.">
+<meta name="description" content="Infraestrutura Python para dados agrícolas brasileiros. 40 fontes públicas — CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, ANEC, USDA, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento, MapBiomas, CONAB Progresso, CONAB CEASA/PROHORT, B3 Futuros Agro, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedagio, SICAR, ZARC, Agrofit/MAPA (Defensivos), FUNAI, ICMBio, INCRA, IBAMA, MapBiomas Alerta, Lista Suja, ANA/SNIRH, SFB, RNC/CultivarWeb, EMBRAPA Solos, Fundação Rio Verde, Acervo Fundiário/INCRA — uma API, fallback automático, cache DuckDB.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -848,7 +848,7 @@
 <section id="sources">
   <div class="reveal">
     <p class="section-label">Fontes de dados</p>
-    <h2 class="section-title">39 origens. Uma API.</h2>
+    <h2 class="section-title">40 origens. Uma API.</h2>
     <p class="section-desc">Cada fonte tem seu próprio parser com versionamento, fingerprinting e tratamento de encoding. Você só vê o DataFrame.</p>
   </div>
 
@@ -1056,6 +1056,12 @@
       <div class="source-detail">Ensaios de cultivares de soja em Lucas do Rio Verde, MT (PDF parsing)</div>
       <div class="source-badge nc">Zona cinza</div>
     </div>
+    <div class="source-card">
+      <div class="source-name">ANEC</div>
+      <div class="source-count">19 portos × 6 produtos</div>
+      <div class="source-detail">Embarques semanais de soja, farelo, milho, DDGS, sorgo e trigo (PDF parsing)</div>
+      <div class="source-badge nc">Zona cinza</div>
+    </div>
   </div>
 </section>
 
@@ -1064,7 +1070,7 @@
   <div class="reveal">
     <p class="section-label">Começar</p>
     <h2 class="section-title">pip install agrobr</h2>
-    <p class="section-desc" style="margin: 0 auto 0;">MIT License (código). 5500+ testes. 39 fontes. 34 datasets. <a href="https://www.agrobr.dev/docs/licenses/" style="color: var(--accent-gold-dim);">Licenças dos dados →</a></p>
+    <p class="section-desc" style="margin: 0 auto 0;">MIT License (código). 6000+ testes. 40 fontes. 35 datasets. <a href="https://www.agrobr.dev/docs/licenses/" style="color: var(--accent-gold-dim);">Licenças dos dados →</a></p>
     <div class="cta-links">
       <a href="https://www.agrobr.dev/docs/" class="cta-btn primary">Documentação →</a>
       <a href="https://colab.research.google.com/github/bruno-portfolio/agrobr/blob/main/examples/agrobr_demo.ipynb" class="cta-btn secondary">Abrir no Colab ↗</a>
