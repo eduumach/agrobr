@@ -65,12 +65,17 @@ async def quilombolas(
     logger.info("incra_quilombolas", uf=uf, fase=fase, bbox=bbox)
 
     t0 = time.monotonic()
-    csv_bytes, source_url = await client.fetch_quilombolas(uf=uf, fase=fase, bbox=bbox)
+    csv_bytes, source_url = await client.fetch_quilombolas(bbox=bbox)
     fetch_ms = int((time.monotonic() - t0) * 1000)
 
     t1 = time.monotonic()
     df = parser.parse_quilombolas_csv(csv_bytes)
     parse_ms = int((time.monotonic() - t1) * 1000)
+
+    if uf is not None and not df.empty:
+        df = df[df["uf"] == uf].reset_index(drop=True)
+    if fase is not None and not df.empty:
+        df = df[df["fase"] == fase].reset_index(drop=True)
 
     meta = build_source_meta(
         "incra",

@@ -21,25 +21,10 @@ logger = structlog.get_logger()
 TIMEOUT = get_timeout(read=120.0)
 
 
-def _build_cql(
-    uf: str | None = None,
-    fase: str | None = None,
-) -> str | None:
-    filters: list[str] = []
-    if uf is not None:
-        filters.append(f"sg_uf='{uf}'")
-    if fase is not None:
-        filters.append(f"ds_fase='{fase}'")
-    return " AND ".join(filters) if filters else None
-
-
 async def fetch_quilombolas(
     *,
-    uf: str | None = None,
-    fase: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
 ) -> tuple[bytes, str]:
-    cql = _build_cql(uf=uf, fase=fase)
     url = build_wfs_url(
         WFS_BASE,
         NAMESPACE,
@@ -47,7 +32,6 @@ async def fetch_quilombolas(
         WFS_VERSION,
         PROPERTY_NAMES,
         max_features=MAX_FEATURES_TABULAR,
-        cql_filter=cql,
         bbox=bbox,
     )
     content = await fetch_wfs(url, source="incra", timeout=TIMEOUT)

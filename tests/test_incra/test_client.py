@@ -1,35 +1,10 @@
 from __future__ import annotations
 
 from unittest.mock import AsyncMock, patch
-from urllib.parse import unquote
 
 import pytest
 
 from agrobr.exceptions import SourceUnavailableError
-from agrobr.incra.client import _build_cql
-
-
-class TestBuildCql:
-    def test_uf_filter(self):
-        cql = _build_cql(uf="MT")
-        assert cql is not None
-        assert "sg_uf='MT'" in cql
-
-    def test_fase_filter(self):
-        cql = _build_cql(fase="Titulada")
-        assert cql is not None
-        assert "ds_fase='Titulada'" in cql
-
-    def test_combined_filter(self):
-        cql = _build_cql(uf="MT", fase="Titulada")
-        assert cql is not None
-        assert "sg_uf='MT'" in cql
-        assert "ds_fase='Titulada'" in cql
-        assert " AND " in cql
-
-    def test_no_filters(self):
-        cql = _build_cql()
-        assert cql is None
 
 
 class TestFetchQuilombolas:
@@ -45,16 +20,25 @@ class TestFetchQuilombolas:
         assert "CMR-PUBLICO" in url
 
     @pytest.mark.asyncio
-    async def test_with_uf_and_fase(self):
+    async def test_no_cql_in_url(self):
         from agrobr.incra.client import fetch_quilombolas
 
         with patch(
             "agrobr.incra.client.fetch_wfs", new_callable=AsyncMock, return_value=b"x" * 5000
         ):
-            content, url = await fetch_quilombolas(uf="MT", fase="Titulada")
-        decoded = unquote(url)
-        assert "sg_uf='MT'" in decoded
-        assert "ds_fase='Titulada'" in decoded
+            _, url = await fetch_quilombolas()
+        assert "CQL_FILTER" not in url
+
+    @pytest.mark.asyncio
+    async def test_bbox_in_url(self):
+        from agrobr.incra.client import fetch_quilombolas
+
+        with patch(
+            "agrobr.incra.client.fetch_wfs", new_callable=AsyncMock, return_value=b"x" * 5000
+        ):
+            _, url = await fetch_quilombolas(bbox=(-60.0, -15.0, -50.0, -10.0))
+        assert "BBOX=" in url
+        assert "CQL_FILTER" not in url
 
     @pytest.mark.asyncio
     async def test_404_raises(self):
@@ -110,14 +94,15 @@ class TestFetchQuilombolasGeo:
         assert "propertyName=geom," in url
 
     @pytest.mark.asyncio
-    async def test_max_features_500(self):
+    async def test_max_features_in_url(self):
         from agrobr.incra.client import fetch_quilombolas_geo
+        from agrobr.incra.models import MAX_FEATURES_GEO
 
         with patch(
             "agrobr.incra.client.fetch_wfs", new_callable=AsyncMock, return_value=b"x" * 5000
         ):
             _, url = await fetch_quilombolas_geo()
-        assert "maxFeatures=500" in url
+        assert f"maxFeatures={MAX_FEATURES_GEO}" in url
 
     @pytest.mark.asyncio
     async def test_no_cql_in_geo_url(self):

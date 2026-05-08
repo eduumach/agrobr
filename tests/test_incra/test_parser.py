@@ -8,7 +8,12 @@ import pandas as pd
 import pytest
 
 from agrobr.exceptions import ParseError
-from agrobr.incra.models import COLUNAS_SAIDA, COLUNAS_SAIDA_GEO, MAX_FEATURES_GEO
+from agrobr.incra.models import (
+    COLUNAS_SAIDA,
+    COLUNAS_SAIDA_GEO,
+    MAX_FEATURES_GEO,
+    MAX_FEATURES_TABULAR,
+)
 from agrobr.incra.parser import PARSER_VERSION, parse_quilombolas_csv
 
 QUILOMBOLAS_DIR = Path(__file__).parent.parent / "golden_data" / "incra" / "quilombolas_sample"
@@ -114,6 +119,20 @@ class TestParseQuilombolasCsv:
         for col in COLUNAS_SAIDA:
             assert col in df.columns, f"Missing column: {col}"
 
+    def test_truncation_warning(self):
+        csv_bytes = QUILOMBOLAS_DIR.joinpath("response.csv").read_bytes()
+        header, *rows = csv_bytes.decode("utf-8").splitlines()
+        n_repeats = MAX_FEATURES_TABULAR // len(rows) + 1
+        big_csv = (header + "\n" + "\n".join(rows * n_repeats)).encode()
+
+        with patch("agrobr.incra.parser.logger") as mock_logger:
+            df = parse_quilombolas_csv(big_csv)
+
+        assert len(df) >= MAX_FEATURES_TABULAR
+        mock_logger.warning.assert_called_once()
+        call_args = mock_logger.warning.call_args
+        assert call_args[0][0] == "incra_quilombolas_truncated"
+
 
 gpd = pytest.importorskip("geopandas")
 
@@ -201,6 +220,49 @@ class TestParseQuilombolasGeojson:
             pytest.raises(ImportError, match="agrobr\\[geo\\]"),
         ):
             parse_quilombolas_geojson(b"{}")
+
+    def test_repair_invalid_geometry(self):
+        from agrobr.incra.parser import parse_quilombolas_geojson
+
+        bowtie = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [[0.0, 0.0], [2.0, 2.0], [0.0, 2.0], [2.0, 0.0], [0.0, 0.0]]
+                        ],
+                    },
+                    "properties": {
+                        "cd_quilomb": "TEST001",
+                        "no_comunidade": "Test",
+                        "no_municipio": "Test",
+                        "sg_uf": "BA",
+                        "nu_area_ha": 100.0,
+                        "nu_familia": "10",
+                        "ds_fase": "TITULADO",
+                        "st_titulad": "T",
+                        "dt_publica": "2020-01-01",
+                        "dt_titulo": "2020-01-01",
+                    },
+                },
+            ],
+        }
+        data = json.dumps(bowtie).encode()
+
+        with patch("agrobr.incra.parser.logger") as mock_logger:
+            gdf = parse_quilombolas_geojson(data)
+
+        assert gdf.geometry.is_valid.all()
+        repaired_calls = [
+            c
+            for c in mock_logger.warning.call_args_list
+            if c[0][0] == "incra_quilombolas_geo_repaired"
+        ]
+        assert len(repaired_calls) == 1
+        assert repaired_calls[0][1]["invalid"] == 1
 
     def test_truncation_warning(self):
         from agrobr.incra.parser import parse_quilombolas_geojson

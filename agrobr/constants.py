@@ -23,6 +23,7 @@ class Fonte(StrEnum):
     ACERVO_FUNDIARIO = "acervo_fundiario"
     ANA = "ana"
     ANDA = "anda"
+    ANEC = "anec"
     ANP_DIESEL = "anp_diesel"
     ANTAQ = "antaq"
     ANTT_PEDAGIO = "antt_pedagio"
@@ -74,6 +75,11 @@ URLS = {
     Fonte.ANDA: {
         "base": "https://anda.org.br",
         "estatisticas": "https://anda.org.br/recursos/",
+    },
+    Fonte.ANEC: {
+        "base": "https://www.anec.com.br",
+        "search": "https://www.anec.com.br/search",
+        "article": "https://www.anec.com.br/article",
     },
     Fonte.ANP_DIESEL: {
         "base": "https://www.gov.br/anp/pt-br",
@@ -347,6 +353,7 @@ class HTTPSettings(BaseSettings):
     rate_limit_acervo_fundiario: float = 3.0
     rate_limit_ana: float = 2.0
     rate_limit_anda: float = 3.0
+    rate_limit_anec: float = 3.0
     rate_limit_anp_diesel: float = 2.0
     rate_limit_antaq: float = 1.0
     rate_limit_antt_pedagio: float = 2.0
@@ -429,4 +436,5 @@ MIN_CSV_SIZE: int = 100
 MIN_HTML_SIZE: int = 500
 MIN_ZIP_SIZE: int = 500
 MIN_XLSX_SIZE: int = 1_000
+MIN_PDF_SIZE: int = 10_000
 MIN_HTML_PAGE_SIZE: int = 5_000

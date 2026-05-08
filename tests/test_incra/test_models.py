@@ -3,6 +3,7 @@ from __future__ import annotations
 from agrobr.incra.models import (
     COLUNAS_SAIDA,
     COLUNAS_SAIDA_GEO,
+    FASES_VALIDAS,
     GEOM_COLUMN,
     LAYER,
     MAX_FEATURES_GEO,
@@ -32,11 +33,11 @@ class TestConstants:
     def test_wfs_base_url(self):
         assert "cmr.funai.gov.br" in WFS_BASE
 
-    def test_max_features_geo_gte_426(self):
-        assert MAX_FEATURES_GEO >= 426
+    def test_max_features_geo_has_headroom(self):
+        assert MAX_FEATURES_GEO >= 1000
 
-    def test_max_features_tabular(self):
-        assert MAX_FEATURES_TABULAR >= 1
+    def test_max_features_tabular_has_headroom(self):
+        assert MAX_FEATURES_TABULAR >= 1000
 
     def test_property_names_has_required(self):
         assert "cd_quilomb" in PROPERTY_NAMES
@@ -80,3 +81,19 @@ class TestConstants:
     def test_colunas_saida_geo_contains_all_tabular(self):
         for col in COLUNAS_SAIDA:
             assert col in COLUNAS_SAIDA_GEO
+
+    def test_fases_validas_real(self):
+        assert (
+            frozenset(
+                {
+                    "CCDRU",
+                    "DECRETO",
+                    "PORTARIA",
+                    "RTID",
+                    "TITULADO",
+                    "TITULO ANULADO",
+                    "TITULO PARCIAL",
+                }
+            )
+            == FASES_VALIDAS
+        )

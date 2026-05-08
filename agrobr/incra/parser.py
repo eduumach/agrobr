@@ -13,6 +13,7 @@ from .models import (
     COLUNAS_SAIDA,
     COLUNAS_SAIDA_GEO,
     MAX_FEATURES_GEO,
+    MAX_FEATURES_TABULAR,
     RENAME_MAP,
 )
 
@@ -35,6 +36,13 @@ def parse_quilombolas_csv(data: bytes) -> pd.DataFrame:
             source="incra",
             parser_version=PARSER_VERSION,
             reason=f"Colunas obrigatorias ausentes: {missing}",
+        )
+
+    if len(df) >= MAX_FEATURES_TABULAR:
+        logger.warning(
+            "incra_quilombolas_truncated",
+            max_features=MAX_FEATURES_TABULAR,
+            records=len(df),
         )
 
     df = df.rename(columns=RENAME_MAP)
@@ -71,6 +79,18 @@ def parse_quilombolas_geojson(data: bytes) -> Any:
     gdf["familias"] = pd.to_numeric(gdf["familias"], errors="coerce").astype("Int64")
     gdf["data_publicacao"] = pd.to_datetime(gdf["data_publicacao"], errors="coerce")
     gdf["data_titulo"] = pd.to_datetime(gdf["data_titulo"], errors="coerce")
+
+    invalid_mask = ~gdf.geometry.is_valid
+    n_invalid = int(invalid_mask.sum())
+    if n_invalid > 0:
+        from shapely.validation import make_valid
+
+        gdf.loc[invalid_mask, "geometry"] = gdf.loc[invalid_mask, "geometry"].apply(make_valid)
+        logger.warning(
+            "incra_quilombolas_geo_repaired",
+            invalid=n_invalid,
+            total=len(gdf),
+        )
 
     output_cols = [c for c in COLUNAS_SAIDA_GEO if c in gdf.columns]
     return gdf[output_cols].reset_index(drop=True)

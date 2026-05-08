@@ -1,11 +1,11 @@
 cd_quilomb,no_comunidade,no_municipio,sg_uf,nu_area_ha,nu_familia,ds_fase,st_titulad,dt_publica,dt_titulo
-Q001,Kalunga,Monte Alegre de Goias,GO,262000.0,600,Titulada,T,2009-04-15,2009-04-15
-Q002,Frechal,Mirinzal,MA,9542.0,92,Titulada,T,1992-11-20,1996-03-21
-Q003,Ivaporunduva,Eldorado,SP,2754.0,80,Titulada,T,2010-05-18,2010-06-20
-Q004,Rio dos Macacos,Simoes Filho,BA,301.0,56,Em Titulacao,F,2014-12-10,
-Q005,Sacopa,Rio de Janeiro,RJ,0.6,3,Decreto Publicado,F,2018-08-01,
-Q006,Preto Forro,Cabo Frio,RJ,80.0,45,RTID em Elaboracao,F,,
-Q007,Furnas do Dionisio,Jaragua,GO,998.0,150,Em Titulacao,F,2019-07-22,
-Q008,Alpes,Caxias do Sul,RS,62.0,28,Titulada,T,2011-09-30,2012-01-15
-Q009,Sao Sebastiao,Viamao,RS,4329.0,160,RTID Publicado,F,2007-10-05,
-Q010,Cacandoca,Ubatuba,SP,890.0,50,Titulada,T,2005-12-09,2005-12-09
+Q001,Kalunga,Monte Alegre de Goias,GO,262000.0,600,TITULADO,T,2009-04-15,2009-04-15
+Q002,Frechal,Mirinzal,MA,9542.0,92,TITULADO,T,1992-11-20,1996-03-21
+Q003,Ivaporunduva,Eldorado,SP,2754.0,80,TITULADO,T,2010-05-18,2010-06-20
+Q004,Rio dos Macacos,Simoes Filho,BA,301.0,56,PORTARIA,F,2014-12-10,
+Q005,Sacopa,Rio de Janeiro,RJ,0.6,3,DECRETO,F,2018-08-01,
+Q006,Preto Forro,Cabo Frio,RJ,80.0,45,RTID,F,,
+Q007,Furnas do Dionisio,Jaragua,GO,998.0,150,PORTARIA,F,2019-07-22,
+Q008,Alpes,Caxias do Sul,RS,62.0,28,TITULADO,T,2011-09-30,2012-01-15
+Q009,Sao Sebastiao,Viamao,RS,4329.0,160,TITULO PARCIAL,F,2007-10-05,
+Q010,Cacandoca,Ubatuba,SP,890.0,50,TITULADO,T,2005-12-09,2005-12-09

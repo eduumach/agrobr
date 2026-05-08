@@ -14,7 +14,7 @@
         "sg_uf": "GO",
         "nu_area_ha": 262000.0,
         "nu_familia": "600",
-        "ds_fase": "Titulada",
+        "ds_fase": "TITULADO",
         "st_titulad": "T",
         "dt_publica": "2009-04-15",
         "dt_titulo": "2009-04-15"
@@ -33,7 +33,7 @@
         "sg_uf": "MA",
         "nu_area_ha": 9542.0,
         "nu_familia": "92",
-        "ds_fase": "Titulada",
+        "ds_fase": "TITULADO",
         "st_titulad": "T",
         "dt_publica": "1992-11-20",
         "dt_titulo": "1996-03-21"
@@ -52,7 +52,7 @@
         "sg_uf": "SP",
         "nu_area_ha": 2754.0,
         "nu_familia": "80",
-        "ds_fase": "Titulada",
+        "ds_fase": "TITULADO",
         "st_titulad": "T",
         "dt_publica": "2010-05-18",
         "dt_titulo": "2010-06-20"
@@ -71,7 +71,7 @@
         "sg_uf": "BA",
         "nu_area_ha": 301.0,
         "nu_familia": "56",
-        "ds_fase": "Em Titulacao",
+        "ds_fase": "PORTARIA",
         "st_titulad": "F",
         "dt_publica": "2014-12-10",
         "dt_titulo": null
@@ -90,7 +90,7 @@
         "sg_uf": "RJ",
         "nu_area_ha": 0.6,
         "nu_familia": "3",
-        "ds_fase": "Decreto Publicado",
+        "ds_fase": "DECRETO",
         "st_titulad": "F",
         "dt_publica": "2018-08-01",
         "dt_titulo": null
@@ -109,7 +109,7 @@
         "sg_uf": "RJ",
         "nu_area_ha": 80.0,
         "nu_familia": "45",
-        "ds_fase": "RTID em Elaboracao",
+        "ds_fase": "RTID",
         "st_titulad": "F",
         "dt_publica": null,
         "dt_titulo": null
@@ -128,7 +128,7 @@
         "sg_uf": "GO",
         "nu_area_ha": 998.0,
         "nu_familia": "150",
-        "ds_fase": "Em Titulacao",
+        "ds_fase": "PORTARIA",
         "st_titulad": "F",
         "dt_publica": "2019-07-22",
         "dt_titulo": null
@@ -147,7 +147,7 @@
         "sg_uf": "RS",
         "nu_area_ha": 62.0,
         "nu_familia": "28",
-        "ds_fase": "Titulada",
+        "ds_fase": "TITULADO",
         "st_titulad": "T",
         "dt_publica": "2011-09-30",
         "dt_titulo": "2012-01-15"
@@ -166,7 +166,7 @@
         "sg_uf": "RS",
         "nu_area_ha": 4329.0,
         "nu_familia": "160",
-        "ds_fase": "RTID Publicado",
+        "ds_fase": "TITULO PARCIAL",
         "st_titulad": "F",
         "dt_publica": "2007-10-05",
         "dt_titulo": null
@@ -185,7 +185,7 @@
         "sg_uf": "SP",
         "nu_area_ha": 890.0,
         "nu_familia": "50",
-        "ds_fase": "Titulada",
+        "ds_fase": "TITULADO",
         "st_titulad": "T",
         "dt_publica": "2005-12-09",
         "dt_titulo": "2005-12-09"

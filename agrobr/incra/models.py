@@ -7,8 +7,8 @@ WFS_VERSION = "1.0.0"
 LAYER = "lim_quilombolas_a"
 NAMESPACE = "CMR-PUBLICO"
 GEOM_COLUMN = "geom"
-MAX_FEATURES_GEO = 500
-MAX_FEATURES_TABULAR = 500
+MAX_FEATURES_GEO = 1500
+MAX_FEATURES_TABULAR = 1500
 
 PROPERTY_NAMES = [
     "cd_quilomb",
@@ -55,10 +55,12 @@ COLUNAS_SAIDA_GEO = COLUNAS_SAIDA + ["geometry"]
 
 FASES_VALIDAS = frozenset(
     {
-        "Titulada",
-        "Em Titulacao",
-        "Decreto Publicado",
-        "RTID em Elaboracao",
-        "RTID Publicado",
+        "CCDRU",
+        "DECRETO",
+        "PORTARIA",
+        "RTID",
+        "TITULADO",
+        "TITULO ANULADO",
+        "TITULO PARCIAL",
     }
 )

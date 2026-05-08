@@ -80,7 +80,7 @@ class TestQuilombolas:
             await api.quilombolas(bbox=(10.0, 5.0, 5.0, 10.0))
 
     @pytest.mark.asyncio
-    async def test_passes_uf_to_client(self):
+    async def test_client_receives_only_bbox(self):
         csv_bytes = _csv_bytes()
         with patch.object(
             api.client,
@@ -88,9 +88,68 @@ class TestQuilombolas:
             new_callable=AsyncMock,
             return_value=(csv_bytes, "https://cmr.funai.gov.br/geoserver/ows"),
         ) as mock_fetch:
-            await api.quilombolas(uf="GO")
+            await api.quilombolas(uf="GO", fase="TITULADO", bbox=(-60.0, -15.0, -50.0, -10.0))
 
-        assert mock_fetch.call_args.kwargs["uf"] == "GO"
+        call_kwargs = mock_fetch.call_args.kwargs
+        assert "uf" not in call_kwargs
+        assert "fase" not in call_kwargs
+        assert call_kwargs["bbox"] == (-60.0, -15.0, -50.0, -10.0)
+
+    @pytest.mark.asyncio
+    async def test_post_filter_by_uf(self):
+        csv_bytes = _csv_bytes()
+        with patch.object(
+            api.client,
+            "fetch_quilombolas",
+            new_callable=AsyncMock,
+            return_value=(csv_bytes, "https://cmr.funai.gov.br/geoserver/ows"),
+        ):
+            df = await api.quilombolas(uf="GO")
+
+        assert len(df) == 2
+        assert (df["uf"] == "GO").all()
+
+    @pytest.mark.asyncio
+    async def test_post_filter_by_fase(self):
+        csv_bytes = _csv_bytes()
+        with patch.object(
+            api.client,
+            "fetch_quilombolas",
+            new_callable=AsyncMock,
+            return_value=(csv_bytes, "https://cmr.funai.gov.br/geoserver/ows"),
+        ):
+            df = await api.quilombolas(fase="TITULADO")
+
+        assert len(df) == 5
+        assert (df["fase"] == "TITULADO").all()
+
+    @pytest.mark.asyncio
+    async def test_post_filter_combined_uf_fase(self):
+        csv_bytes = _csv_bytes()
+        with patch.object(
+            api.client,
+            "fetch_quilombolas",
+            new_callable=AsyncMock,
+            return_value=(csv_bytes, "https://cmr.funai.gov.br/geoserver/ows"),
+        ):
+            df = await api.quilombolas(uf="GO", fase="TITULADO")
+
+        assert len(df) == 1
+        assert (df["uf"] == "GO").all()
+        assert (df["fase"] == "TITULADO").all()
+
+    @pytest.mark.asyncio
+    async def test_post_filter_no_match_returns_empty(self):
+        csv_bytes = _csv_bytes()
+        with patch.object(
+            api.client,
+            "fetch_quilombolas",
+            new_callable=AsyncMock,
+            return_value=(csv_bytes, "https://cmr.funai.gov.br/geoserver/ows"),
+        ):
+            df = await api.quilombolas(uf="AC")
+
+        assert len(df) == 0
 
     @pytest.mark.asyncio
     async def test_uf_case_insensitive(self):
@@ -100,10 +159,16 @@ class TestQuilombolas:
             "fetch_quilombolas",
             new_callable=AsyncMock,
             return_value=(csv_bytes, "https://cmr.funai.gov.br/geoserver/ows"),
-        ) as mock_fetch:
-            await api.quilombolas(uf="go")
+        ):
+            df = await api.quilombolas(uf="go")
 
-        assert mock_fetch.call_args.kwargs["uf"] == "GO"
+        assert len(df) == 2
+        assert (df["uf"] == "GO").all()
+
+    @pytest.mark.asyncio
+    async def test_invalid_fase_raises(self):
+        with pytest.raises(ValueError, match="Fase invalida"):
+            await api.quilombolas(fase="Titulada")
 
 
 gpd = pytest.importorskip("geopandas")
@@ -175,7 +240,7 @@ class TestQuilombolasGeo:
             new_callable=AsyncMock,
             return_value=(geojson_bytes, "https://cmr.funai.gov.br/geoserver/ows"),
         ) as mock_fetch:
-            await api.quilombolas_geo(uf="GO", fase="Titulada", bbox=(-60.0, -15.0, -50.0, -10.0))
+            await api.quilombolas_geo(uf="GO", fase="TITULADO", bbox=(-60.0, -15.0, -50.0, -10.0))
 
         call_kwargs = mock_fetch.call_args.kwargs
         assert "uf" not in call_kwargs
@@ -205,10 +270,10 @@ class TestQuilombolasGeo:
             new_callable=AsyncMock,
             return_value=(geojson_bytes, "https://cmr.funai.gov.br/geoserver/ows"),
         ):
-            gdf = await api.quilombolas_geo(fase="Titulada")
+            gdf = await api.quilombolas_geo(fase="TITULADO")
 
         assert len(gdf) == 5
-        assert (gdf["fase"] == "Titulada").all()
+        assert (gdf["fase"] == "TITULADO").all()
 
     @pytest.mark.asyncio
     async def test_post_filter_combined_uf_fase(self):
@@ -219,11 +284,11 @@ class TestQuilombolasGeo:
             new_callable=AsyncMock,
             return_value=(geojson_bytes, "https://cmr.funai.gov.br/geoserver/ows"),
         ):
-            gdf = await api.quilombolas_geo(uf="GO", fase="Titulada")
+            gdf = await api.quilombolas_geo(uf="GO", fase="TITULADO")
 
         assert len(gdf) == 1
         assert (gdf["uf"] == "GO").all()
-        assert (gdf["fase"] == "Titulada").all()
+        assert (gdf["fase"] == "TITULADO").all()
 
     @pytest.mark.asyncio
     async def test_post_filter_no_match_returns_empty(self):
