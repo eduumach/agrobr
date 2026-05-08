@@ -16,6 +16,7 @@ from agrobr.datasets.desmatamento import desmatamento
 from agrobr.datasets.deterministic import deterministic, get_snapshot, is_deterministic
 from agrobr.datasets.estimativa_safra import estimativa_safra
 from agrobr.datasets.exportacao import exportacao
+from agrobr.datasets.exportacao_anec import embarques_anec
 from agrobr.datasets.extrativismo_vegetal import extrativismo_vegetal
 from agrobr.datasets.fertilizante import fertilizante
 from agrobr.datasets.futuros_agricolas import futuros_agricolas
@@ -61,6 +62,7 @@ __all__ = [
     "describe",
     "describe_all",
     "deterministic",
+    "embarques_anec",
     "estimativa_safra",
     "exportacao",
     "extrativismo_vegetal",

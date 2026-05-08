@@ -24,6 +24,7 @@ def build_source_meta(
     schema_version: str = "1.0",
     attempted_sources: list[str] | None = None,
     selected_source: str | None = None,
+    raw_content_hash: str | None = None,
 ) -> MetaInfo:
     from agrobr.models import MetaInfo
     from agrobr.utils.time import utcnow
@@ -43,6 +44,7 @@ def build_source_meta(
         attempted_sources=attempted_sources if attempted_sources is not None else [source],
         selected_source=selected_source if selected_source is not None else source,
         fetch_timestamp=now,
+        raw_content_hash=raw_content_hash,
     )
 
 

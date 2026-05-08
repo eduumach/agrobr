@@ -1,0 +1,10 @@
+{
+  "props": {
+    "pageProps": {
+      "paginatedArticles": {
+        "total": 0,
+        "articles": []
+      }
+    }
+  }
+}
