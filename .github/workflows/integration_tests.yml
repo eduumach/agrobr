@@ -28,7 +28,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -e ".[dev,pdf,bigquery]"
+          pip install -e ".[dev,pdf,bigquery,geo]"
 
       - name: Run integration tests
         id: integration

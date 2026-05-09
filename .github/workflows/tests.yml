@@ -24,7 +24,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -e ".[dev,pdf]"
+          pip install -e ".[dev,pdf,geo]"
 
       - name: Run linting
         run: |
@@ -44,3 +44,9 @@ jobs:
         with:
           files: ./coverage.xml
           fail_ci_if_error: false
+
+      - name: Security audit (pip-audit)
+        if: matrix.python-version == '3.12'
+        run: |
+          pip install pip-audit
+          pip-audit --skip-editable
