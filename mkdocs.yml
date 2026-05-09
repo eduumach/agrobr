@@ -131,6 +131,9 @@ nav:
     - SICAR: api/sicar.md
     - ZARC: api/zarc.md
     - Defensivos: api/defensivos.md
+    - RNC/CultivarWeb: api/rnc.md
+    - EMBRAPA Solos: api/embrapa_solos.md
+    - Fundação Rio Verde: api/rio_verde.md
   - Fontes:
     - Visão Geral: sources/index.md
     - CEPEA: sources/cepea.md
@@ -160,7 +163,19 @@ nav:
     - SICAR: sources/sicar.md
     - ZARC: sources/zarc.md
     - Defensivos: sources/defensivos.md
+    - FUNAI Terras Indígenas: sources/funai.md
+    - ICMBio UCs Federais: sources/icmbio.md
+    - INCRA Quilombolas: sources/incra.md
     - Acervo Fundiário/INCRA: sources/acervo_fundiario.md
+    - IBAMA Embargos: sources/ibama.md
+    - MapBiomas Alerta: sources/mapbiomas_alerta.md
+    - Lista Suja: sources/lista_suja.md
+    - ANA/SNIRH: sources/ana.md
+    - SFB: sources/sfb.md
+    - RNC/CultivarWeb: sources/rnc.md
+    - EMBRAPA Solos: sources/embrapa_solos.md
+    - Fundação Rio Verde: sources/rio_verde.md
+    - ANEC: sources/anec.md
   - Licenças dos Dados: licenses.md
   - Portabilidade:
     - Visão Geral: porting/index.md
