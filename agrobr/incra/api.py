@@ -59,6 +59,15 @@ async def quilombolas(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
+    """Territorios quilombolas via WFS do servidor CMR/FUNAI.
+
+    Note:
+        Campo `codigo` (cd_quilomb) e nullable em ~63% dos registros — sao
+        territorios em pre-cadastro identificados pelo CMR/FUNAI que ainda
+        nao receberam codigo INCRA oficial. Use `df["codigo"].notna()` para
+        filtrar apenas cadastrados. Filtros `uf` e `fase` sao aplicados
+        client-side (servidor ignora `CQL_FILTER`).
+    """
     uf = validate_uf(uf)
     fase = _validate_fase(fase)
     bbox = validate_bbox(bbox)
@@ -119,6 +128,14 @@ async def quilombolas_geo(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> Any:
+    """Territorios quilombolas como GeoDataFrame via WFS do CMR/FUNAI.
+
+    Note:
+        Campo `codigo` (cd_quilomb) e nullable em ~63% dos registros (pre-cadastro
+        sem codigo INCRA oficial). Geometrias invalidas sao reparadas via
+        `make_valid` (log `incra_quilombolas_geo_repaired`). Filtros `uf` e `fase`
+        sao client-side.
+    """
     uf = validate_uf(uf)
     fase = _validate_fase(fase)
     bbox = validate_bbox(bbox)

@@ -1,5 +1,27 @@
 # INCRA — Territorios Quilombolas
 
+!!! warning "Mudanca breaking — codigo legado"
+    Versoes anteriores aceitavam fases em formato humanizado (`"Titulada"`,
+    `"Em Titulacao"`, `"Decreto Publicado"`, `"RTID em Elaboracao"`,
+    `"RTID Publicado"`). Esses valores **nunca casaram** com os dados reais do
+    servidor CMR/FUNAI (que retorna em CAIXA ALTA), mas o filtro CQL era
+    silenciosamente aplicado pelo servidor e retornava resultado vazio sem
+    erro — bug funcional silencioso.
+
+    **A partir desta versao, esses valores levantam `ValueError`.** Migracao:
+
+    | Antes | Depois |
+    |-------|--------|
+    | `fase="Titulada"` | `fase="TITULADO"` |
+    | `fase="Em Titulacao"` | `fase="PORTARIA"` |
+    | `fase="Decreto Publicado"` | `fase="DECRETO"` |
+    | `fase="RTID em Elaboracao"` | `fase="RTID"` |
+    | `fase="RTID Publicado"` | `fase="TITULO PARCIAL"` |
+
+    Quem usava fase no formato antigo recebia DataFrame vazio silenciosamente
+    — comportamento incorreto. O novo erro torna a inconsistencia explicita.
+    Veja [Filtros](#filtros) abaixo para a lista canonica.
+
 ## Visao Geral
 
 | Item | Detalhe |

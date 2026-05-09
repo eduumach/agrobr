@@ -13,10 +13,23 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ### Improved
 - **incra** — `MAX_FEATURES_TABULAR` e `MAX_FEATURES_GEO` aumentados de 500 para 1500 (~250% margem em cima dos 431 territorios atuais). Geometrias invalidas no GeoJSON sao reparadas automaticamente via `shapely.validation.make_valid()` no parser, com log `incra_quilombolas_geo_repaired` indicando quantas foram reparadas (atualmente 1/431, polygon degenerado, area preservada)
-- **utils/result** — `build_source_meta()` aceita `raw_content_hash` como kwarg, eliminando o anti-pattern de mutacao pos-construcao (`meta.raw_content_hash = ...`) usado em `cepea/api.py` e `anec/api.py`
+- **utils/result** — `build_source_meta()` aceita `raw_content_hash` como kwarg, eliminando o anti-pattern de mutacao pos-construcao (`meta.raw_content_hash = ...`) em `anec/api.py`. `cepea/api.py` mantem build incremental por design (cache + fetch + fallback exigem mutacao progressiva)
 
 ### Fixed
-- **incra (breaking)** — Filtros `uf`/`fase` em `quilombolas()`/`quilombolas_geo()` migrados para client-side: o servidor CMR/FUNAI nao respeita `CQL_FILTER` nesses campos e retornava o dataset completo silenciosamente, mascarando os filtros. `FASES_VALIDAS` realinhado com os valores reais do servidor: `CCDRU`, `DECRETO`, `PORTARIA`, `RTID`, `TITULADO`, `TITULO ANULADO`, `TITULO PARCIAL`. Chamadas com fases antigas (`"Titulada"`, `"Em Titulacao"`, `"Decreto Publicado"`, `"RTID em Elaboracao"`, `"RTID Publicado"`) agora levantam `ValueError` — migrar para os novos valores. Adicionado log `incra_quilombolas_truncated` quando o resultado tabular atinge `MAX_FEATURES_TABULAR` (espelhando o ja existente para o GeoJSON)
+- **incra (breaking)** — Filtros `uf`/`fase` em `quilombolas()`/`quilombolas_geo()` migrados para client-side: o servidor CMR/FUNAI nao respeita `CQL_FILTER` nesses campos e retornava o dataset completo silenciosamente, mascarando os filtros. `FASES_VALIDAS` realinhado com os valores reais do servidor: `CCDRU`, `DECRETO`, `PORTARIA`, `RTID`, `TITULADO`, `TITULO ANULADO`, `TITULO PARCIAL`. Adicionado log `incra_quilombolas_truncated` quando o resultado tabular atinge `MAX_FEATURES_TABULAR` (espelhando o ja existente para o GeoJSON).
+
+  **Migracao obrigatoria** — chamadas com fases antigas agora levantam `ValueError` (antes retornavam DataFrame vazio silenciosamente):
+
+  | Antes | Depois |
+  |-------|--------|
+  | `quilombolas(fase="Titulada")` | `quilombolas(fase="TITULADO")` |
+  | `quilombolas(fase="Em Titulacao")` | `quilombolas(fase="PORTARIA")` |
+  | `quilombolas(fase="Decreto Publicado")` | `quilombolas(fase="DECRETO")` |
+  | `quilombolas(fase="RTID em Elaboracao")` | `quilombolas(fase="RTID")` |
+  | `quilombolas(fase="RTID Publicado")` | `quilombolas(fase="TITULO PARCIAL")` |
+
+  Veja `docs/sources/incra.md` para a lista canonica e seus significados.
+- **sicar (alt)** — `resumo(uf)` (sem filtro de municipio) falhava com `SSLV3_ALERT_HANDSHAKE_FAILURE` porque criava 5 clientes HTTP padrao em vez de reusar o `_ssl_ctx` (com `SECLEVEL=1`) necessario para o servidor `geoserver.car.gov.br`. Agora usa `httpx.AsyncClient` customizado e propaga via `client=http` em todas as chamadas `fetch_hits`
 
 ## [1.0.5] - 2026-03-29
 

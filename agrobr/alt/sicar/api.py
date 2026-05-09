@@ -338,11 +338,12 @@ async def resumo(
     t0 = time.monotonic()
 
     if municipio is None and cod_municipio is None:
-        total = await client.fetch_hits(uf_upper)
-        ativos = await client.fetch_hits(uf_upper, "status_imovel='AT'")
-        pendentes = await client.fetch_hits(uf_upper, "status_imovel='PE'")
-        suspensos = await client.fetch_hits(uf_upper, "status_imovel='SU'")
-        cancelados = await client.fetch_hits(uf_upper, "status_imovel='CA'")
+        async with client.make_session() as http:
+            total = await client.fetch_hits(uf_upper, client=http)
+            ativos = await client.fetch_hits(uf_upper, "status_imovel='AT'", client=http)
+            pendentes = await client.fetch_hits(uf_upper, "status_imovel='PE'", client=http)
+            suspensos = await client.fetch_hits(uf_upper, "status_imovel='SU'", client=http)
+            cancelados = await client.fetch_hits(uf_upper, "status_imovel='CA'", client=http)
 
         fetch_ms = int((time.monotonic() - t0) * 1000)
 

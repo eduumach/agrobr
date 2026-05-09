@@ -29,6 +29,16 @@ _ssl_ctx = ssl.create_default_context()
 _ssl_ctx.set_ciphers("DEFAULT:@SECLEVEL=1")
 
 
+def make_session() -> httpx.AsyncClient:
+    """Cria `AsyncClient` com config padrao SICAR (TLS legacy + UA + redirects)."""
+    return httpx.AsyncClient(
+        timeout=TIMEOUT,
+        headers=UserAgentRotator.get_bot_headers(),
+        follow_redirects=True,
+        verify=_ssl_ctx,
+    )
+
+
 def _build_wfs_url(
     uf: str,
     *,
@@ -70,12 +80,7 @@ async def fetch_hits(
 
 
 async def fetch_imoveis(uf: str, cql_filter: str | None = None) -> tuple[list[bytes], str]:
-    async with httpx.AsyncClient(
-        timeout=TIMEOUT,
-        headers=UserAgentRotator.get_bot_headers(),
-        follow_redirects=True,
-        verify=_ssl_ctx,
-    ) as http:
+    async with make_session() as http:
         total = await fetch_hits(uf, cql_filter, client=http)
         logger.info("sicar_hits", uf=uf, total=total, cql_filter=cql_filter)
 
@@ -126,12 +131,7 @@ async def fetch_imoveis_geo(
         output_format="application/json",
         property_names=PROPERTY_NAMES_GEO,
     )
-    async with httpx.AsyncClient(
-        timeout=TIMEOUT,
-        headers=UserAgentRotator.get_bot_headers(),
-        follow_redirects=True,
-        verify=_ssl_ctx,
-    ) as http:
+    async with make_session() as http:
         content = await fetch_wfs(url, source="sicar", timeout=TIMEOUT, client=http)
     logger.info("sicar_imoveis_geojson", source="sicar", size=len(content), uf=uf)
     return content, url
