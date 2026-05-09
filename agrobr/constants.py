@@ -65,8 +65,8 @@ URLS = {
         "exportacao": "https://abiove.org.br/abiove_content/Abiove",
     },
     Fonte.ACERVO_FUNDIARIO: {
-        "base": "https://acervofundiario.incra.gov.br",
-        "wfs": "https://acervofundiario.incra.gov.br/i3geo/ogc.php",
+        "base": "https://certificacao.incra.gov.br",
+        "download": "https://certificacao.incra.gov.br/csv_shp/zip/",
     },
     Fonte.ANA: {
         "base": "https://portal1.snirh.gov.br",

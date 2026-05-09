@@ -160,6 +160,7 @@ nav:
     - SICAR: sources/sicar.md
     - ZARC: sources/zarc.md
     - Defensivos: sources/defensivos.md
+    - Acervo Fundiário/INCRA: sources/acervo_fundiario.md
   - Licenças dos Dados: licenses.md
   - Portabilidade:
     - Visão Geral: porting/index.md

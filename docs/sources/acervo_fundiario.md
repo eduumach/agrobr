@@ -1,120 +1,158 @@
-# Acervo Fundiario — SIGEF, SNCI e Assentamentos
+# Acervo Fundiário — SIGEF, SNCI e Assentamentos (INCRA)
 
-## Visao Geral
+!!! warning "Licença `nc` — vedado uso comercial"
+    Os dados do Acervo Fundiário do INCRA são de uso público com restrição de uso comercial.
+    A primeira chamada emite `UserWarning` lembrando dessa restrição.
+
+## Visão Geral
 
 | Item | Detalhe |
 |------|---------|
-| Provedor | INCRA (Instituto Nacional de Colonizacao e Reforma Agraria) |
+| Provedor | INCRA (Instituto Nacional de Colonização e Reforma Agrária) |
 | Dados | Parcelas certificadas (SIGEF/SNCI) + assentamentos |
-| Acesso | WFS OGC (MapServer i3geo) |
-| Formato | GML2 (tabular e geo) |
-| Autenticacao | Nenhuma |
-| Licenca | Vedado uso comercial — `nc` |
-| Cobertura | 27 UFs (layer por UF) |
+| Acesso | Download de shapefile ZIP estático |
+| Endpoint | `https://certificacao.incra.gov.br/csv_shp/zip/` |
+| CRS | EPSG:4674 (SIRGAS 2000) |
+| Encoding | DBF latin1 (cp1252) |
+| Atualização | Contínua (varia por UF, exposta via `Last-Modified`) |
+| Autenticação | Nenhuma |
+| Licença | Vedado uso comercial — `nc` |
 
-## Acesso via WFS
+## Cobertura por dataset
 
-| Parametro | Valor |
-|-----------|-------|
-| Endpoint | `acervofundiario.incra.gov.br/i3geo/ogc.php` |
-| WFS Version | 1.0.0 |
-| CRS | EPSG:4326 |
+| Dataset | UFs disponíveis | Tamanho típico | Granularidade |
+|---|---|---|---|
+| **SIGEF** | 15/27 (AC, AL, AM, BA, ES, GO, MA, MG, MS, MT, PA, PR, SC, SP, TO) | 8-687 MB por UF | Por UF |
+| **SNCI** | 10/27 (BA, GO, MG, MS, MT, PA, PI, SC, SP, TO) | 0.6-22 MB por UF | Por UF |
+| **Assentamentos** | Brasil único | 48 MB | Brasil completo, filtro UF client-side |
 
-Cada UF e uma layer separada no servidor. O parametro `uf` e obrigatorio.
+UFs não listadas levantam `SourceUnavailableError` com a lista de disponíveis. Ausência reflete dados upstream do INCRA, não bug do agrobr.
 
-### Layers
-
-| Tipo | Layer Pattern | Endpoint |
-|------|--------------|----------|
-| SIGEF particular | `certificada_sigef_particular_{uf}` | `sigef(uf, tipo="particular")` |
-| SIGEF publico | `certificada_sigef_publico_{uf}` | `sigef(uf, tipo="publico")` |
-| SNCI privado | `imoveiscertificados_privado_{uf}` | `snci(uf, tipo="privado")` |
-| SNCI publico | `imoveiscertificados_publico_{uf}` | `snci(uf, tipo="publico")` |
-| Assentamentos | `assentamentos_{uf}` | `assentamentos(uf)` |
-
-## Exemplo de Uso
+## Funções públicas
 
 ```python
 import asyncio
 from agrobr import acervo_fundiario
 
 async def main():
-    # Parcelas SIGEF particulares em Goias
+    # SIGEF — parcelas certificadas pós-2013
     df = await acervo_fundiario.sigef("GO")
+    df, meta = await acervo_fundiario.sigef("MG", return_meta=True)
+    df_pl = await acervo_fundiario.sigef("SP", as_polars=True)
+    gdf = await acervo_fundiario.sigef_geo("GO", bbox=(-50, -16, -49, -15))
 
-    # Parcelas SIGEF publicas com metadados
-    df, meta = await acervo_fundiario.sigef("SP", tipo="publico", return_meta=True)
+    # SNCI — parcelas certificadas pré-2013
+    df = await acervo_fundiario.snci("GO")
+    gdf = await acervo_fundiario.snci_geo("MT")
 
-    # Certificados SNCI (pre-2013)
-    df = await acervo_fundiario.snci("MT", tipo="privado")
-
-    # Assentamentos com bbox
-    df = await acervo_fundiario.assentamentos("GO", bbox=(-50, -16, -49, -15))
-
-    # Retorno em Polars
-    df_pl = await acervo_fundiario.sigef("GO", as_polars=True)
-
-    # Com geometria (requer geopandas)
-    gdf = await acervo_fundiario.sigef_geo("GO")
-    gdf = await acervo_fundiario.assentamentos_geo("BA")
+    # Assentamentos — Brasil único, uf opcional
+    df = await acervo_fundiario.assentamentos()             # todas as UFs
+    df = await acervo_fundiario.assentamentos(uf="GO")      # filtro client-side
+    gdf = await acervo_fundiario.assentamentos_geo(uf="MG")
 
 asyncio.run(main())
 ```
 
-## Colunas — SIGEF
+## Cache filesystem
 
-| Coluna | Tipo | Descricao |
-|--------|------|-----------|
-| codigo_parcela | str | Codigo UUID da parcela |
-| rt | str | Responsavel tecnico |
-| art | str | Anotacao de responsabilidade tecnica |
-| situacao | str | Situacao informada (REGISTRADA, etc) |
-| codigo_imovel | str | Codigo do imovel rural |
-| data_submissao | datetime | Data de submissao |
-| data_aprovacao | datetime | Data de aprovacao |
-| status | str | Status da certificacao (CERTIFICADA, etc) |
-| nome_area | str | Nome da area/fazenda |
-| registro_matricula | str | Matricula do registro |
-| registro_data | str | Data do registro (nullable) |
-| cod_municipio | str | Codigo IBGE do municipio |
+Arquivos baixados ficam em `~/.agrobr/cache/acervo_fundiario/{tema}/{UF}.zip` com `meta.json` ao lado contendo `last_modified`, `etag`, `sha256`, `size_bytes`, `fetched_at`, `source_url`.
 
-## Colunas — SNCI
+A revalidação usa o header `Last-Modified` do servidor: a 2ª chamada faz HEAD (~50ms) e reusa cache se o arquivo não mudou.
 
-| Coluna | Tipo | Descricao |
-|--------|------|-----------|
-| id | str | ID interno |
-| num_processo | str | Numero do processo |
-| sr | str | Superintendencia Regional |
-| num_certificacao | str | Numero da certificacao |
-| data_certificacao | datetime | Data da certificacao |
-| area_peca_tecnica | float | Area em hectares (peca tecnica) |
-| cod_profissional | str | Codigo do profissional credenciado |
-| cod_imovel_rural | str | Codigo do imovel rural |
-| nome_imovel | str | Nome do imovel |
+**Tamanho potencial do cache:**
 
-## Colunas — Assentamentos
+- SIGEF Brasil completo (15 UFs) ≈ 2.4 GB (maior: MG=687 MB, SP=322 MB, PR=287 MB)
+- SNCI Brasil completo (10 UFs) ≈ 84 MB
+- Assentamentos Brasil = 48 MB
 
-| Coluna | Tipo | Descricao |
-|--------|------|-----------|
-| gid | str | ID interno |
-| codigo_sipra | str | Codigo SIPRA do projeto |
-| nome_projeto | str | Nome do projeto de assentamento |
-| municipio | str | Municipio |
-| area_ha | float | Area declarada em hectares |
-| capacidade | float | Capacidade de familias |
-| num_familias | float | Numero de familias assentadas |
-| fase | str | Fase do projeto |
-| data_criacao | datetime | Data de criacao (DD/MM/YYYY) |
-| forma_obtencao | str | Forma de obtencao (Desapropriacao, etc) |
-| data_obtencao | datetime | Data de obtencao |
-| area_calc_ha | float | Area calculada em hectares |
-| sr | str | Superintendencia Regional (nullable) |
-| descricao_fase | str | Descricao da fase (nullable) |
+Por demanda. Caso casual de 1-3 UFs costuma ficar abaixo de 1 GB.
 
-## Limitacoes
+**Opt-out:**
 
-- Cada UF e uma layer separada — `uf` e obrigatorio
-- Servidor so suporta GML2 (sem CSV, sem GeoJSON)
-- Sem paginacao (WFS 1.0.0 MapServer) — UFs grandes podem ser lentas
-- Algumas UFs podem ter layers com SRS bugado (ex: DF particular)
-- Licenca `nc` — vedado uso comercial
+```python
+df = await acervo_fundiario.sigef("GO", use_cache=False)
+```
+
+```bash
+export AGROBR_ACERVO_FUNDIARIO_CACHE_DISABLED=1
+```
+
+## Schemas
+
+### SIGEF
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| codigo_parcela | str | UUID da parcela |
+| rt | str | Responsável técnico |
+| art | str | Anotação de responsabilidade técnica |
+| situacao | str | Situação informada |
+| codigo_imovel | str | Código do imóvel rural |
+| data_submissao | datetime | Data de submissão |
+| data_aprovacao | datetime | Data de aprovação |
+| status | str | Status da certificação |
+| nome_area | str | Nome da área/fazenda |
+| registro_matricula | str | Matrícula do registro |
+| registro_data | datetime | Data do registro (nullable) |
+| cod_municipio | int | Código IBGE do município |
+| uf | str | Sigla UF (mapeada de `uf_id` IBGE) |
+| geometry | Polygon | Geometria (apenas em `_geo`) |
+
+### SNCI
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| num_processo | str | Número do processo |
+| sr | str | Superintendência regional |
+| num_certificacao | str | Número da certificação |
+| data_certificacao | datetime | Data da certificação |
+| area_peca_tecnica | float | Área em hectares (peça técnica) |
+| cod_profissional | str | Código do profissional credenciado |
+| cod_imovel_rural | str | Código do imóvel rural |
+| nome_imovel | str | Nome do imóvel |
+| uf | str | Sigla UF (de `uf_municip`) |
+| geometry | Polygon | Apenas em `_geo` |
+
+### Assentamentos
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| codigo_sipra | str | Código SIPRA do projeto |
+| nome_projeto | str | Nome do projeto |
+| municipio | str | Município |
+| uf | str | Sigla UF |
+| area_ha | str | Área declarada (vem como string do DBF) |
+| capacidade | int | Capacidade de famílias |
+| num_familias | int | Número de famílias assentadas |
+| fase | int | Fase do projeto |
+| data_criacao | datetime | Data de criação |
+| forma_obtencao | str | Forma de obtenção |
+| data_obtencao | datetime | Data de obtenção |
+| area_calc_ha | float | Área calculada em hectares |
+| sr | str | Superintendência regional (nullable) |
+| descricao_fase | str | Descrição da fase (nullable) |
+| geometry | Polygon | Apenas em `_geo` |
+
+## Filtros
+
+### `bbox`
+
+Aplicado pelo `pyogrio` durante a leitura do shapefile (filtro espacial pré-leitura, 4-9x menos RAM/tempo que filtrar `gdf.cx[]` após carregar tudo).
+
+```python
+gdf = await acervo_fundiario.sigef_geo("MG", bbox=(-44, -18, -43, -17))
+```
+
+### `uf` em assentamentos
+
+O dataset de assentamentos é Brasil único — o filtro `uf` é client-side, normalizando a coluna `uf` (`.str.upper().str.strip()`) e comparando.
+
+Dados upstream do INCRA têm UFs inválidas conhecidas (`MB`=501 rows, `SM`=200 rows, `12`, `'ma'`). O parser não filtra essas rows silenciosamente — um log warning `acervo_fundiario_dirty_uf_data` reporta os counts. Filtro `uf="MG"` retorna apenas rows com `MG` válido; as inválidas continuam no DataFrame quando `uf=None`.
+
+## Limitações
+
+- **12 UFs faltam SIGEF** (AP, CE, DF, PB, PE, PI, RJ, RN, RO, RR, RS, SE) — não há registro upstream
+- **17 UFs faltam SNCI** — só Centro-Oeste/Sudeste/Sul/parte do Norte cobertos
+- **Cert SSL inválido** no servidor — agrobr usa TLS relaxado (`check_hostname=False`, `verify_mode=CERT_NONE`). Servidor é gov.br público.
+- **Sem distinção particular/público** — o shapefile não tem campo de tipo (era distinção do WFS legacy)
+- **Tamanho de cache pode acumular GB** — ver seção "Cache filesystem"

@@ -7,185 +7,141 @@ import pandas as pd
 import pytest
 
 from agrobr.acervo_fundiario import api
-
-GOLDEN = Path(__file__).resolve().parent.parent / "golden_data" / "acervo_fundiario"
-
-
-def _sigef_bytes() -> bytes:
-    return (GOLDEN / "sigef_sample" / "response.gml").read_bytes()
-
-
-def _snci_bytes() -> bytes:
-    return (GOLDEN / "snci_sample" / "response.gml").read_bytes()
-
-
-def _assentamentos_bytes() -> bytes:
-    return (GOLDEN / "assentamentos_sample" / "response.gml").read_bytes()
-
-
-# ---------------------------------------------------------------------------
-# SIGEF
-# ---------------------------------------------------------------------------
+from agrobr.exceptions import SourceUnavailableError
 
 
 @pytest.mark.asyncio
 class TestSigef:
-    @patch.object(api.client, "fetch_sigef", new_callable=AsyncMock)
-    async def test_returns_dataframe(self, mock_fetch):
-        mock_fetch.return_value = (_sigef_bytes(), "https://test")
-        df = await api.sigef("GO")
+    @patch.object(api.client, "download_and_cache", new_callable=AsyncMock)
+    async def test_returns_dataframe(self, mock_dl, synthetic_sigef_zip: Path):
+        mock_dl.return_value = synthetic_sigef_zip
+        df = await api.sigef("ES")
         assert isinstance(df, pd.DataFrame)
         assert len(df) == 5
+        assert "uf" in df.columns
 
-    @patch.object(api.client, "fetch_sigef", new_callable=AsyncMock)
-    async def test_return_meta(self, mock_fetch):
-        mock_fetch.return_value = (_sigef_bytes(), "https://test")
-        df, meta = await api.sigef("GO", return_meta=True)
-        assert isinstance(df, pd.DataFrame)
+    @patch.object(api.client, "download_and_cache", new_callable=AsyncMock)
+    async def test_return_meta(self, mock_dl, synthetic_sigef_zip: Path):
+        mock_dl.return_value = synthetic_sigef_zip
+        df, meta = await api.sigef("ES", return_meta=True)
         assert meta.source == "acervo_fundiario"
-        assert meta.source_method == "httpx+wfs+gml2"
+        assert meta.source_method == "httpx+pyogrio+shapefile_zip"
         assert meta.records_count == 5
+        assert "Sigef Brasil_ES.zip" in meta.source_url
 
-    @patch.object(api.client, "fetch_sigef", new_callable=AsyncMock)
-    async def test_as_polars(self, mock_fetch):
+    @patch.object(api.client, "download_and_cache", new_callable=AsyncMock)
+    async def test_as_polars(self, mock_dl, synthetic_sigef_zip: Path):
         pl = pytest.importorskip("polars")
-        mock_fetch.return_value = (_sigef_bytes(), "https://test")
-        result = await api.sigef("GO", as_polars=True)
+        mock_dl.return_value = synthetic_sigef_zip
+        result = await api.sigef("ES", as_polars=True)
         assert isinstance(result, pl.DataFrame)
 
-    @patch.object(api.client, "fetch_sigef", new_callable=AsyncMock)
-    async def test_tipo_publico(self, mock_fetch):
-        mock_fetch.return_value = (_sigef_bytes(), "https://test")
-        await api.sigef("GO", tipo="publico")
-        mock_fetch.assert_called_once_with("GO", "publico", bbox=None)
-
     async def test_invalid_uf(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="UF invalida"):
             await api.sigef("XX")
 
-    async def test_invalid_tipo(self):
-        with pytest.raises(ValueError):
-            await api.sigef("GO", tipo="invalido")
+    async def test_uf_not_in_sigef(self):
+        with pytest.raises(SourceUnavailableError, match="nao disponivel em SIGEF"):
+            await api.sigef("AP")
+
+    @patch.object(api.client, "download_and_cache", new_callable=AsyncMock)
+    async def test_kwargs_legacy_tipo_ignored(self, mock_dl, synthetic_sigef_zip: Path):
+        mock_dl.return_value = synthetic_sigef_zip
+        df = await api.sigef("ES", tipo="particular")
+        assert isinstance(df, pd.DataFrame)
 
 
 @pytest.mark.asyncio
 class TestSigefGeo:
-    @patch.object(api.client, "fetch_sigef", new_callable=AsyncMock)
-    async def test_returns_geodataframe(self, mock_fetch):
+    @patch.object(api.client, "download_and_cache", new_callable=AsyncMock)
+    async def test_returns_geodataframe(self, mock_dl, synthetic_sigef_zip: Path):
         gpd = pytest.importorskip("geopandas")
-        mock_fetch.return_value = (
-            (GOLDEN / "sigef_geo_sample" / "response.gml").read_bytes(),
-            "https://test",
-        )
-        gdf = await api.sigef_geo("GO")
+        mock_dl.return_value = synthetic_sigef_zip
+        gdf = await api.sigef_geo("ES")
         assert isinstance(gdf, gpd.GeoDataFrame)
-        assert len(gdf) == 3
 
-    @patch.object(api.client, "fetch_sigef", new_callable=AsyncMock)
-    async def test_geo_calls_with_geo_flag(self, mock_fetch):
+    @patch.object(api.client, "download_and_cache", new_callable=AsyncMock)
+    async def test_return_meta_with_geo(self, mock_dl, synthetic_sigef_zip: Path):
         pytest.importorskip("geopandas")
-        mock_fetch.return_value = (
-            (GOLDEN / "sigef_geo_sample" / "response.gml").read_bytes(),
-            "https://test",
-        )
-        await api.sigef_geo("GO")
-        mock_fetch.assert_called_once_with("GO", "particular", bbox=None, geo=True)
+        mock_dl.return_value = synthetic_sigef_zip
+        gdf, meta = await api.sigef_geo("ES", return_meta=True)
+        assert meta.source == "acervo_fundiario"
+        assert meta.records_count == 5
 
-
-# ---------------------------------------------------------------------------
-# SNCI
-# ---------------------------------------------------------------------------
+    async def test_uf_not_in_sigef(self):
+        with pytest.raises(SourceUnavailableError):
+            await api.sigef_geo("AP")
 
 
 @pytest.mark.asyncio
 class TestSnci:
-    @patch.object(api.client, "fetch_snci", new_callable=AsyncMock)
-    async def test_returns_dataframe(self, mock_fetch):
-        mock_fetch.return_value = (_snci_bytes(), "https://test")
+    @patch.object(api.client, "download_and_cache", new_callable=AsyncMock)
+    async def test_returns_dataframe(self, mock_dl, synthetic_snci_zip: Path):
+        mock_dl.return_value = synthetic_snci_zip
         df = await api.snci("GO")
         assert isinstance(df, pd.DataFrame)
-        assert len(df) == 5
+        assert len(df) == 4
 
-    @patch.object(api.client, "fetch_snci", new_callable=AsyncMock)
-    async def test_return_meta(self, mock_fetch):
-        mock_fetch.return_value = (_snci_bytes(), "https://test")
-        df, meta = await api.snci("GO", return_meta=True)
-        assert meta.source == "acervo_fundiario"
-        assert meta.records_count == 5
+    async def test_uf_not_in_snci(self):
+        with pytest.raises(SourceUnavailableError, match="nao disponivel em SNCI"):
+            await api.snci("ES")
 
-    @patch.object(api.client, "fetch_snci", new_callable=AsyncMock)
-    async def test_tipo_publico(self, mock_fetch):
-        mock_fetch.return_value = (_snci_bytes(), "https://test")
-        await api.snci("GO", tipo="publico")
-        mock_fetch.assert_called_once_with("GO", "publico", bbox=None)
-
-    async def test_invalid_tipo(self):
+    async def test_invalid_uf(self):
         with pytest.raises(ValueError):
-            await api.snci("GO", tipo="invalido")
+            await api.snci("XX")
 
 
 @pytest.mark.asyncio
 class TestSnciGeo:
-    @patch.object(api.client, "fetch_snci", new_callable=AsyncMock)
-    async def test_returns_geodataframe(self, mock_fetch):
+    @patch.object(api.client, "download_and_cache", new_callable=AsyncMock)
+    async def test_returns_geodataframe(self, mock_dl, synthetic_snci_zip: Path):
         gpd = pytest.importorskip("geopandas")
-        mock_fetch.return_value = (
-            (GOLDEN / "snci_geo_sample" / "response.gml").read_bytes(),
-            "https://test",
-        )
+        mock_dl.return_value = synthetic_snci_zip
         gdf = await api.snci_geo("GO")
         assert isinstance(gdf, gpd.GeoDataFrame)
-        assert len(gdf) == 3
-
-
-# ---------------------------------------------------------------------------
-# Assentamentos
-# ---------------------------------------------------------------------------
 
 
 @pytest.mark.asyncio
 class TestAssentamentos:
-    @patch.object(api.client, "fetch_assentamentos", new_callable=AsyncMock)
-    async def test_returns_dataframe(self, mock_fetch):
-        mock_fetch.return_value = (_assentamentos_bytes(), "https://test")
-        df = await api.assentamentos("GO")
-        assert isinstance(df, pd.DataFrame)
-        assert len(df) == 5
+    @patch.object(api.client, "download_and_cache", new_callable=AsyncMock)
+    async def test_no_uf_returns_all(self, mock_dl, synthetic_assentamentos_zip: Path):
+        mock_dl.return_value = synthetic_assentamentos_zip
+        df = await api.assentamentos()
+        assert len(df) == 4
 
-    @patch.object(api.client, "fetch_assentamentos", new_callable=AsyncMock)
-    async def test_return_meta(self, mock_fetch):
-        mock_fetch.return_value = (_assentamentos_bytes(), "https://test")
-        df, meta = await api.assentamentos("GO", return_meta=True)
+    @patch.object(api.client, "download_and_cache", new_callable=AsyncMock)
+    async def test_uf_filter(self, mock_dl, synthetic_assentamentos_zip: Path):
+        mock_dl.return_value = synthetic_assentamentos_zip
+        df = await api.assentamentos(uf="MG")
+        assert len(df) == 2
+        assert df["uf"].unique().tolist() == ["MG"]
+
+    async def test_invalid_uf_raises(self):
+        with pytest.raises(ValueError):
+            await api.assentamentos(uf="XX")
+
+    @patch.object(api.client, "download_and_cache", new_callable=AsyncMock)
+    async def test_return_meta(self, mock_dl, synthetic_assentamentos_zip: Path):
+        mock_dl.return_value = synthetic_assentamentos_zip
+        df, meta = await api.assentamentos(return_meta=True)
         assert meta.source == "acervo_fundiario"
-        assert meta.records_count == 5
-
-    @patch.object(api.client, "fetch_assentamentos", new_callable=AsyncMock)
-    async def test_with_bbox(self, mock_fetch):
-        mock_fetch.return_value = (_assentamentos_bytes(), "https://test")
-        await api.assentamentos("GO", bbox=(-50, -16, -49, -15))
-        mock_fetch.assert_called_once_with("GO", bbox=(-50.0, -16.0, -49.0, -15.0))
+        assert "Assentamento Brasil.zip" in meta.source_url
 
 
 @pytest.mark.asyncio
 class TestAssentamentosGeo:
-    @patch.object(api.client, "fetch_assentamentos", new_callable=AsyncMock)
-    async def test_returns_geodataframe(self, mock_fetch):
+    @patch.object(api.client, "download_and_cache", new_callable=AsyncMock)
+    async def test_returns_geodataframe(self, mock_dl, synthetic_assentamentos_zip: Path):
         gpd = pytest.importorskip("geopandas")
-        mock_fetch.return_value = (
-            (GOLDEN / "assentamentos_geo_sample" / "response.gml").read_bytes(),
-            "https://test",
-        )
-        gdf = await api.assentamentos_geo("GO")
+        mock_dl.return_value = synthetic_assentamentos_zip
+        gdf = await api.assentamentos_geo()
         assert isinstance(gdf, gpd.GeoDataFrame)
-        assert len(gdf) == 3
 
-    @patch.object(api.client, "fetch_assentamentos", new_callable=AsyncMock)
-    async def test_return_meta(self, mock_fetch):
-        gpd = pytest.importorskip("geopandas")
-        mock_fetch.return_value = (
-            (GOLDEN / "assentamentos_geo_sample" / "response.gml").read_bytes(),
-            "https://test",
-        )
-        gdf, meta = await api.assentamentos_geo("GO", return_meta=True)
-        assert isinstance(gdf, gpd.GeoDataFrame)
-        assert meta.source == "acervo_fundiario"
+
+@pytest.mark.asyncio
+class TestLicenseWarning:
+    @patch.object(api.client, "download_and_cache", new_callable=AsyncMock)
+    async def test_first_call_warns(self, mock_dl, synthetic_sigef_zip: Path):
+        mock_dl.return_value = synthetic_sigef_zip
+        with pytest.warns(UserWarning, match="vedado o uso comercial"):
+            await api.sigef("ES")

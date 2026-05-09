@@ -1,6 +1,6 @@
 """Acervo Fundiario — Certificacao fundiaria e assentamentos (INCRA).
 
-Fonte: acervofundiario.incra.gov.br (WFS OGC, sem auth).
+Fonte: certificacao.incra.gov.br/csv_shp/zip/ (download de shapefile estatico).
 Licenca: Vedado uso comercial — classificacao nc.
 """
 

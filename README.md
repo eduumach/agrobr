@@ -655,7 +655,7 @@ Use `agrobr health --all` para verificar localmente.
 | IBAMA | Embargos ambientais (WFS siscom.ibama.gov.br) — ~89K features, filtro uf/bbox | ✅ | Funcional |
 | ICMBio | Unidades de conservacao federais (WFS geoservicos.inde.gov.br) — 344 UCs | ✅ | Funcional |
 | INCRA | Territorios quilombolas (WFS cmr.funai.gov.br) — ~426 territorios | ✅ | Funcional |
-| Acervo Fundiario/INCRA | Parcelas certificadas SIGEF/SNCI + assentamentos (WFS geo) — filtro uf/tipo/bbox | ✅ | Funcional |
+| Acervo Fundiario/INCRA | Parcelas certificadas SIGEF (15 UFs) + SNCI (10 UFs) + assentamentos Brasil — shapefile ZIP, filtro uf/bbox | ✅ | Funcional |
 | RNC/CultivarWeb | Cultivares registradas (~37K) e protegidas (~5K) — MAPA/SNPC | ✅ | Funcional |
 | EMBRAPA Solos | Perfis de solo PronaSolos (34K+) + mapa pedologico SiBCS (2.8K poligonos) | ✅ | Funcional |
 | Fundacao Rio Verde | Ensaios cultivares soja MT — ~97 cultivares x 4 epocas (PDF) | ✅ | Funcional |

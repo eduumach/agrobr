@@ -51,7 +51,7 @@
 | **SFB** | Dados publicos | Sim | `livre` | [SFB](https://mapas.florestal.gov.br) |
 | **RNC/CultivarWeb** | Dados publicos governo federal | Sim (dados publicos) | `livre` | [CultivarWeb](https://sistemas.agricultura.gov.br/snpc/cultivarweb) |
 | **EMBRAPA Solos** | CC BY-NC 3.0 BR | Requer autorizacao da EMBRAPA | `nc` | [GeoInfo](https://geoinfo.dados.embrapa.br) |
-| **Acervo Fundiario/INCRA** | Vedado uso comercial (portal) | Nao | `nc` | [Acervo Fundiario](https://acervofundiario.incra.gov.br) |
+| **Acervo Fundiario/INCRA** | Vedado uso comercial (portal) | Nao | `nc` | [INCRA Certificacao](https://certificacao.incra.gov.br) |
 | **Fundacao Rio Verde** | Sem termos publicos | Verificar com a fundacao | `zona_cinza` | [fundacaorioverde.com.br](https://fundacaorioverde.com.br) |
 
 ### Legenda de Classificação

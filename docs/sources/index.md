@@ -37,7 +37,7 @@ Todas as fontes suportam `return_meta=True` para rastreabilidade completa.
 | [FUNAI Terras Indigenas](funai.md) | Terras indigenas (WFS geo) | Continua | ~740 TIs, todas UFs |
 | [ICMBio UCs Federais](icmbio.md) | Unidades de conservacao federais (WFS geo) | Continua | 344 UCs federais |
 | [INCRA Quilombolas](incra.md) | Territorios quilombolas (WFS geo) | Continua | ~426 territorios |
-| [Acervo Fundiario/INCRA](acervo_fundiario.md) | Parcelas certificadas + assentamentos (WFS geo) | Continua | SIGEF/SNCI + assentamentos |
+| [Acervo Fundiario/INCRA](acervo_fundiario.md) | Parcelas certificadas + assentamentos (shapefile ZIP) | Continua | SIGEF (15 UFs) + SNCI (10 UFs) + assentamentos Brasil |
 | [IBAMA Embargos](ibama.md) | Embargos ambientais (WFS geo) | Continua | ~89K embargos, paginado |
 | [MapBiomas Alerta](mapbiomas_alerta.md) | Alertas de desmatamento (GraphQL) | Semanal | Nacional |
 | [Lista Suja](lista_suja.md) | Cadastro de trabalho escravo (XLSX) | Semestral | Nacional |
