@@ -5,7 +5,6 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-from shapely.geometry import Polygon
 
 from agrobr.acervo_fundiario import parser
 from agrobr.acervo_fundiario.models import (
@@ -113,8 +112,10 @@ class TestParseAssentamentos:
 
 class TestSchemaDriftDetection:
     def test_missing_required_raises(self, tmp_path: Path):
+        pytest.importorskip("geopandas")
         import geopandas as gpd
         import pyogrio
+        from shapely.geometry import Polygon
 
         df = pd.DataFrame({"some_col": ["x"]})
         gdf = gpd.GeoDataFrame(df, geometry=[Polygon([(0, 0), (1, 0), (1, 1)])], crs="EPSG:4674")

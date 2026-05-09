@@ -7,10 +7,11 @@ from typing import Any
 
 import pandas as pd
 import pytest
-from shapely.geometry import Polygon
 
 
-def _make_polygons(n: int, *, base_lon: float = -40.0, base_lat: float = -20.0) -> list[Polygon]:
+def _make_polygons(n: int, *, base_lon: float = -40.0, base_lat: float = -20.0) -> list[Any]:
+    from shapely.geometry import Polygon
+
     return [
         Polygon(
             [
@@ -29,7 +30,7 @@ def _write_synthetic_zip(
     *,
     name: str,
     rows: list[dict[str, Any]],
-    polygons: list[Polygon],
+    polygons: list[Any],
 ) -> Path:
     import geopandas as gpd
     import pyogrio
@@ -50,6 +51,7 @@ def _write_synthetic_zip(
 
 @pytest.fixture
 def synthetic_sigef_zip(tmp_path: Path) -> Path:
+    pytest.importorskip("geopandas")
     rows = [
         {
             "parcela_co": f"abc-{i}",
@@ -75,6 +77,7 @@ def synthetic_sigef_zip(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def synthetic_snci_zip(tmp_path: Path) -> Path:
+    pytest.importorskip("geopandas")
     rows = [
         {
             "num_proces": f"P-{i:04d}",
@@ -99,6 +102,7 @@ def synthetic_snci_zip(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def synthetic_assentamentos_zip(tmp_path: Path) -> Path:
+    pytest.importorskip("geopandas")
     rows = [
         {
             "cd_sipra": "MG0001000",
