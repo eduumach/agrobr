@@ -251,6 +251,55 @@ class TestFetchWfsHtmlGuard:
             )
             assert content == wfs_body
 
+    @pytest.mark.asyncio
+    async def test_service_exception_raises_with_message(self):
+        import httpx
+
+        from agrobr.exceptions import SourceUnavailableError
+        from agrobr.utils.geo import fetch_wfs
+
+        body = (
+            b'<?xml version="1.0" ?>\n<ServiceExceptionReport>\n'
+            b"   <ServiceException>\n      bbox and cql_filter both specified"
+            b" but are mutually exclusive\n   </ServiceException>\n"
+            b"</ServiceExceptionReport>"
+        )
+        resp = self._mock_resp(200, body)
+
+        with patch.object(httpx.AsyncClient, "get", return_value=resp):
+            client = httpx.AsyncClient(timeout=httpx.Timeout(10))
+            with pytest.raises(SourceUnavailableError, match="bbox and cql_filter"):
+                await fetch_wfs(
+                    "http://example.com/wfs?service=WFS",
+                    source="test",
+                    timeout=httpx.Timeout(10),
+                    client=client,
+                )
+
+    @pytest.mark.asyncio
+    async def test_ows_exception_raises_with_message(self):
+        import httpx
+
+        from agrobr.exceptions import SourceUnavailableError
+        from agrobr.utils.geo import fetch_wfs
+
+        body = (
+            b'<?xml version="1.0"?><ows:ExceptionReport xmlns:ows="http://www.opengis.net/ows">'
+            b"<ows:Exception><ows:ExceptionText>Layer not found</ows:ExceptionText>"
+            b"</ows:Exception></ows:ExceptionReport>"
+        )
+        resp = self._mock_resp(200, body)
+
+        with patch.object(httpx.AsyncClient, "get", return_value=resp):
+            client = httpx.AsyncClient(timeout=httpx.Timeout(10))
+            with pytest.raises(SourceUnavailableError, match="Layer not found"):
+                await fetch_wfs(
+                    "http://example.com/wfs?service=WFS",
+                    source="test",
+                    timeout=httpx.Timeout(10),
+                    client=client,
+                )
+
 
 class TestCheckGeopandas:
     def test_returns_module(self):

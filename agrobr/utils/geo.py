@@ -123,6 +123,18 @@ async def fetch_wfs(
                 url=url,
                 last_error="WFS returned HTML instead of feature data (possible maintenance or URL redirect)",
             )
+        head = content[:500]
+        if b"<ServiceException" in head or b"<ows:Exception" in head:
+            text = content.decode("utf-8", errors="replace")
+            m = re.search(
+                r"<(?:ows:)?(?:ServiceException|ExceptionText)[^>]*>(.*?)</", text, re.DOTALL
+            )
+            msg = m.group(1).strip() if m else text[:300].strip()
+            raise SourceUnavailableError(
+                source=source,
+                url=url,
+                last_error=f"WFS server exception: {msg}",
+            )
         if len(content) < MIN_WFS_SIZE:
             raise SourceUnavailableError(
                 source=source,
