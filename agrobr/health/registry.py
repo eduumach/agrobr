@@ -35,6 +35,9 @@ def _build_registry() -> dict[Fonte, SourceHealthConfig]:
             "has_deep_check": True,
             "tier": "critical",
         },
+        Fonte.IMEA: {
+            "url": URLS[Fonte.IMEA]["cotacoes"],
+        },
         Fonte.USDA: {
             "requires_api_key": True,
             "api_key_env_var": "AGROBR_USDA_API_KEY",
