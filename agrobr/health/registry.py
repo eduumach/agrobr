@@ -101,6 +101,7 @@ SOURCE_DATASET_MAP: dict[str, list[str]] = {
         "silvicultura",
     ],
     "inmet": ["clima"],
+    "mapa_psr": ["seguro_rural"],
     "mapbiomas": ["uso_do_solo"],
     "nasa_power": ["clima"],
     "queimadas": ["queimadas"],
