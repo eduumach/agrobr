@@ -38,6 +38,16 @@ class CheckResult:
     category: str | None = None
 
 
+def _exception_message(error: Exception) -> str:
+    return str(error) or type(error).__name__
+
+
+def _source_down_status(config: SourceHealthConfig) -> CheckStatus:
+    if config.tier == "best_effort":
+        return CheckStatus.WARNING
+    return CheckStatus.FAILED
+
+
 # ---------------------------------------------------------------------------
 # Generic HTTP probe
 # ---------------------------------------------------------------------------
@@ -71,6 +81,7 @@ async def _check_http(config: SourceHealthConfig) -> CheckResult:
         async with httpx.AsyncClient(
             timeout=config.timeout,
             headers=headers,
+            verify=config.verify,
         ) as client:
             if config.method == "HEAD":
                 response = await client.head(
@@ -87,10 +98,21 @@ async def _check_http(config: SourceHealthConfig) -> CheckResult:
         details["status_code"] = response.status_code
         details["latency_ms"] = latency
 
+        if response.status_code in config.soft_block_codes:
+            return CheckResult(
+                source=config.source,
+                status=CheckStatus.WARNING,
+                latency_ms=latency,
+                message=f"HTTP {response.status_code}",
+                details=details,
+                timestamp=utcnow(),
+                category="soft_block",
+            )
+
         if response.status_code >= 400:
             return CheckResult(
                 source=config.source,
-                status=CheckStatus.FAILED,
+                status=_source_down_status(config),
                 latency_ms=latency,
                 message=f"HTTP {response.status_code}",
                 details=details,
@@ -120,12 +142,13 @@ async def _check_http(config: SourceHealthConfig) -> CheckResult:
 
     except Exception as e:
         latency = (time.monotonic() - start) * 1000
-        logger.error("health_check_failed", source=config.source.value, error=str(e))
+        message = _exception_message(e)
+        logger.error("health_check_failed", source=config.source.value, error=message)
         return CheckResult(
             source=config.source,
-            status=CheckStatus.FAILED,
+            status=_source_down_status(config),
             latency_ms=latency,
-            message=str(e),
+            message=message,
             details=details,
             timestamp=utcnow(),
             category="source_down",
@@ -213,14 +236,15 @@ async def check_cepea_deep() -> CheckResult:
 
     except Exception as e:
         latency = (time.monotonic() - start) * 1000
-        is_soft_block = "soft block" in str(e).lower()
+        message = _exception_message(e)
+        is_soft_block = "soft block" in message.lower()
         category = "soft_block" if is_soft_block else "parse_error"
-        logger.error("health_check_failed", source="cepea", error=str(e), category=category)
+        logger.error("health_check_failed", source="cepea", error=message, category=category)
         return CheckResult(
             source=Fonte.CEPEA,
             status=CheckStatus.FAILED,
             latency_ms=latency,
-            message=str(e),
+            message=message,
             details=details,
             timestamp=utcnow(),
             category=category,
@@ -255,10 +279,17 @@ async def run_all_checks(
     sources: list[Fonte] | None = None,
     *,
     deep: bool = False,
+    concurrency: int = 8,
 ) -> list[CheckResult]:
     """Run health checks for *sources* (default: all registered)."""
     targets = sources or list(HEALTH_REGISTRY.keys())
-    results = await asyncio.gather(*[check_source(s, deep=deep) for s in targets])
+    semaphore = asyncio.Semaphore(concurrency)
+
+    async def run_one(source: Fonte) -> CheckResult:
+        async with semaphore:
+            return await check_source(source, deep=deep)
+
+    results = await asyncio.gather(*[run_one(s) for s in targets])
     return list(results)
 
 
@@ -266,6 +297,7 @@ async def run_checks_with_state(
     sources: list[Fonte] | None = None,
     *,
     deep: bool = False,
+    concurrency: int = 8,
     settings: AlertSettings | None = None,
 ) -> list[tuple[CheckResult, bool, AlertLevel | None]]:
     """Run checks, persist to health_checks table, compute alert decisions.
@@ -275,7 +307,7 @@ async def run_checks_with_state(
     from agrobr.health.state import record_check, should_send_alert
 
     settings = settings or AlertSettings()
-    results = await run_all_checks(sources, deep=deep)
+    results = await run_all_checks(sources, deep=deep, concurrency=concurrency)
     out: list[tuple[CheckResult, bool, AlertLevel | None]] = []
 
     for result in results:

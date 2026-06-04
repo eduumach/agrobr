@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from agrobr.constants import Fonte
+import ssl
+
+from agrobr.constants import URLS, Fonte
 from agrobr.health.registry import (
     HEALTH_REGISTRY,
     SOURCE_DATASET_MAP,
@@ -51,6 +53,51 @@ class TestHealthRegistry:
     def test_ibge_uses_api_url(self):
         config = HEALTH_REGISTRY[Fonte.IBGE]
         assert "apisidra" in config.url
+        assert "/values/t/5457/" in config.url
+
+    def test_gov_sources_use_dataset_endpoints(self):
+        expected = {
+            Fonte.ANA: URLS[Fonte.ANA]["arcgis"],
+            Fonte.ANP_DIESEL: URLS[Fonte.ANP_DIESEL]["vendas_diesel_csv"],
+            Fonte.ANTAQ: URLS[Fonte.ANTAQ]["bulk_txt"],
+            Fonte.ANTT_PEDAGIO: "package_show?id=volume-trafego-praca-pedagio",
+            Fonte.CONAB: URLS[Fonte.CONAB]["boletim_graos"],
+            Fonte.DEFENSIVOS: URLS[Fonte.DEFENSIVOS]["formulados"],
+            Fonte.FUNAI: URLS[Fonte.FUNAI]["geoserver"],
+            Fonte.ICMBIO: URLS[Fonte.ICMBIO]["geoserver"],
+            Fonte.INCRA: URLS[Fonte.INCRA]["geoserver"],
+            Fonte.LISTA_SUJA: URLS[Fonte.LISTA_SUJA]["download"],
+            Fonte.MAPA_PSR: URLS[Fonte.MAPA_PSR]["dataset"],
+            Fonte.SFB: URLS[Fonte.SFB]["arcgis"],
+            Fonte.SICAR: URLS[Fonte.SICAR]["geoserver"],
+            Fonte.RNC: URLS[Fonte.RNC]["cultivarweb"],
+            Fonte.ZARC: "package_show?id=tabua-de-risco-zoneamento-agricola-de-risco-climatico",
+        }
+
+        for fonte, url_part in expected.items():
+            assert url_part in HEALTH_REGISTRY[fonte].url
+
+    def test_file_download_sources_use_head(self):
+        sources = [
+            Fonte.ANTAQ,
+            Fonte.COMEXSTAT,
+            Fonte.DEFENSIVOS,
+        ]
+
+        for fonte in sources:
+            assert HEALTH_REGISTRY[fonte].method == "HEAD"
+
+    def test_comexstat_disables_tls_verification(self):
+        assert HEALTH_REGISTRY[Fonte.COMEXSTAT].verify is False
+
+    def test_antaq_is_best_effort(self):
+        assert HEALTH_REGISTRY[Fonte.ANTAQ].tier == "best_effort"
+
+    def test_sicar_uses_legacy_tls_context(self):
+        assert isinstance(HEALTH_REGISTRY[Fonte.SICAR].verify, ssl.SSLContext)
+
+    def test_cepea_marks_403_as_soft_block(self):
+        assert HEALTH_REGISTRY[Fonte.CEPEA].soft_block_codes == (403,)
 
     def test_default_method_is_get(self):
         for config in HEALTH_REGISTRY.values():

@@ -96,6 +96,51 @@ class TestCheckHttp:
         assert "503" in result.message
 
     @pytest.mark.asyncio
+    async def test_best_effort_http_error_returns_warning(self):
+        config = SourceHealthConfig(
+            source=Fonte.ANTAQ,
+            url="https://example.com",
+            tier="best_effort",
+        )
+        mock_response = MagicMock()
+        mock_response.status_code = 503
+
+        mock_client = AsyncMock()
+        mock_client.get.return_value = mock_response
+
+        with patch("httpx.AsyncClient") as mock_cls:
+            mock_cls.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+            mock_cls.return_value.__aexit__ = AsyncMock(return_value=None)
+
+            result = await _check_http(config)
+
+        assert result.status == CheckStatus.WARNING
+        assert result.category == "source_down"
+
+    @pytest.mark.asyncio
+    async def test_soft_block_code_returns_warning(self):
+        config = SourceHealthConfig(
+            source=Fonte.CEPEA,
+            url="https://example.com",
+            soft_block_codes=(403,),
+        )
+        mock_response = MagicMock()
+        mock_response.status_code = 403
+
+        mock_client = AsyncMock()
+        mock_client.get.return_value = mock_response
+
+        with patch("httpx.AsyncClient") as mock_cls:
+            mock_cls.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+            mock_cls.return_value.__aexit__ = AsyncMock(return_value=None)
+
+            result = await _check_http(config)
+
+        assert result.status == CheckStatus.WARNING
+        assert result.category == "soft_block"
+        assert result.message == "HTTP 403"
+
+    @pytest.mark.asyncio
     async def test_http_exception(self):
         import httpx as httpx_mod
 
@@ -111,6 +156,45 @@ class TestCheckHttp:
 
         assert result.status == CheckStatus.FAILED
         assert result.category == "source_down"
+
+    @pytest.mark.asyncio
+    async def test_best_effort_exception_returns_warning(self):
+        import httpx as httpx_mod
+
+        config = SourceHealthConfig(
+            source=Fonte.ANTAQ,
+            url="https://example.com",
+            tier="best_effort",
+        )
+        mock_client = AsyncMock()
+        mock_client.get.side_effect = httpx_mod.ConnectError("connection refused")
+
+        with patch("httpx.AsyncClient") as mock_cls:
+            mock_cls.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+            mock_cls.return_value.__aexit__ = AsyncMock(return_value=None)
+
+            result = await _check_http(config)
+
+        assert result.status == CheckStatus.WARNING
+        assert result.category == "source_down"
+
+    @pytest.mark.asyncio
+    async def test_http_exception_without_message_uses_type_name(self):
+        import httpx as httpx_mod
+
+        config = SourceHealthConfig(source=Fonte.CONAB, url="https://example.com")
+        mock_client = AsyncMock()
+        mock_client.get.side_effect = httpx_mod.ReadTimeout("")
+
+        with patch("httpx.AsyncClient") as mock_cls:
+            mock_cls.return_value.__aenter__ = AsyncMock(return_value=mock_client)
+            mock_cls.return_value.__aexit__ = AsyncMock(return_value=None)
+
+            result = await _check_http(config)
+
+        assert result.status == CheckStatus.FAILED
+        assert result.category == "source_down"
+        assert result.message == "ReadTimeout"
 
     @pytest.mark.asyncio
     async def test_api_key_missing(self):
