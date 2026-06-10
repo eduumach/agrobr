@@ -102,8 +102,15 @@ def read_csv_safe(
         df: pd.DataFrame = pd.read_csv(io.BytesIO(data), encoding="utf-8", **kwargs)
         return df
     except UnicodeDecodeError:
-        df = pd.read_csv(io.BytesIO(data), encoding="latin-1", **kwargs)
-        return df
+        try:
+            df = pd.read_csv(io.BytesIO(data), encoding="latin-1", **kwargs)
+            return df
+        except Exception as e:
+            raise ParseError(
+                source=source,
+                parser_version=parser_version,
+                reason=f"Erro ao ler {label} (latin-1): {e}",
+            ) from e
     except Exception as e:
         raise ParseError(
             source=source,

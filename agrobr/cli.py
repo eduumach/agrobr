@@ -33,6 +33,19 @@ def version_callback(value: bool) -> None:
         raise typer.Exit()
 
 
+def _configure_cli_logging(verbose: bool) -> None:
+    import logging
+    import sys
+
+    import structlog
+
+    level = logging.INFO if verbose else logging.WARNING
+    structlog.configure(
+        wrapper_class=structlog.make_filtering_bound_logger(level),
+        logger_factory=structlog.PrintLoggerFactory(file=sys.stderr),
+    )
+
+
 @app.callback()  # type: ignore[misc, untyped-decorator]
 def main(
     _version: bool = typer.Option(
@@ -43,8 +56,13 @@ def main(
         callback=version_callback,
         is_eager=True,
     ),
+    verbose: bool = typer.Option(
+        False,
+        "--verbose",
+        help="Mostra logs INFO no stderr",
+    ),
 ) -> None:
-    pass
+    _configure_cli_logging(verbose)
 
 
 cepea_app = typer.Typer(help="Indicadores CEPEA")
@@ -521,9 +539,8 @@ def snapshot_delete(
 
 @snapshot_app.command("use")  # type: ignore[misc, untyped-decorator]
 def snapshot_use(
-    name: str = typer.Argument(..., help="Nome do snapshot a usar"),
+    name: str = typer.Argument(..., help="Nome do snapshot a validar"),
 ) -> None:
-    from agrobr.config import set_mode
     from agrobr.snapshots import get_snapshot
 
     snapshot = get_snapshot(name)
@@ -532,10 +549,11 @@ def snapshot_use(
         typer.echo("Use 'agrobr snapshot list' para ver snapshots disponiveis.")
         raise typer.Exit(1)
 
-    set_mode("deterministic", snapshot=name)
-    typer.echo(f"Modo deterministico ativado com snapshot '{name}'.")
-    typer.echo("Todas as chamadas usarao dados do snapshot.")
-    typer.echo("Use 'agrobr config mode normal' para voltar ao modo normal.")
+    typer.echo(f"Snapshot '{name}' valido.")
+    typer.echo("O modo deterministico vale por processo Python — ative no seu codigo:")
+    typer.echo('  async with datasets.deterministic("YYYY-MM-DD"):')
+    typer.echo("      df = await datasets.preco_diario('soja')")
+    typer.echo(f'  ou: snapshots.load_from_snapshot(source, dataset, snapshot_name="{name}")')
 
 
 if __name__ == "__main__":

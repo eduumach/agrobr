@@ -185,7 +185,22 @@ class TestConabParserEdgeCases:
         assert parser._parse_decimal(float("nan")) is None
 
     def test_parse_decimal_zero_string(self, parser):
-        assert parser._parse_decimal("0") is None
+        assert parser._parse_decimal("0") == Decimal("0.0")
+
+    def test_parse_decimal_milhar_br(self, parser):
+        assert parser._parse_decimal("1.234,5") == Decimal("1234.5")
+
+    def test_parse_decimal_traco(self, parser):
+        assert parser._parse_decimal("-") is None
+
+    def test_parse_decimal_nan_textual(self, parser):
+        assert parser._parse_decimal("NaN") is None
+        assert parser._parse_decimal("nan") is None
+        assert parser._parse_decimal("inf") is None
+
+    def test_parse_decimal_float_nao_finito(self, parser):
+        assert parser._parse_decimal(float("inf")) is None
+        assert parser._parse_decimal(float("-inf")) is None
 
     def test_parse_decimal_integer(self, parser):
         assert parser._parse_decimal(42) == Decimal("42")

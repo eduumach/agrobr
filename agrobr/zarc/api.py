@@ -7,6 +7,7 @@ import pandas as pd
 import structlog
 
 from agrobr.models import MetaInfo
+from agrobr.normalize.crops import _remover_acentos
 from agrobr.normalize.regions import UFS_VALIDAS
 from agrobr.utils.result import build_source_meta, finalize_result
 
@@ -102,8 +103,15 @@ async def zoneamento(
     t1 = time.monotonic()
 
     if cultura is not None:
-        cultura_lower = cultura.lower().replace(" ", "_")
-        df = df[df["cultura"] == cultura_lower]
+        cultura_key = _remover_acentos(cultura.lower().replace(" ", "_"))
+        culturas_tabua = df["cultura"].dropna().unique().tolist()
+        matches = [c for c in culturas_tabua if _remover_acentos(str(c)) == cultura_key]
+        if not matches:
+            raise ValueError(
+                f"Cultura '{cultura}' nao encontrada na tabua {safra}. "
+                f"Disponiveis: {sorted(culturas_tabua)}"
+            )
+        df = df[df["cultura"].isin(matches)]
     if uf_upper is not None:
         df = df[df["uf"] == uf_upper]
     if municipio is not None:

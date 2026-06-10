@@ -62,6 +62,14 @@ async def _get_browser() -> Browser:
 
     async with _lock:
         if _browser is None or not _browser.is_connected():
+            if _playwright_instance is not None:
+                try:
+                    await _playwright_instance.stop()
+                except Exception:
+                    logger.debug("browser_stale_instance_stop_failed", exc_info=True)
+                _playwright_instance = None
+                _browser = None
+
             logger.info("browser_starting", browser="chromium")
 
             _playwright_instance = await async_playwright().start()

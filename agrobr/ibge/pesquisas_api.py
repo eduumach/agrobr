@@ -63,6 +63,8 @@ async def silvicultura(
         source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
+        attempted_sources=["ibge_silvicultura"],
+        selected_source="ibge_silvicultura",
     )
     logger.info(
         "ibge_silvicultura_request",
@@ -221,6 +223,8 @@ async def extracao_vegetal(
         source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
+        attempted_sources=["ibge_extracao_vegetal"],
+        selected_source="ibge_extracao_vegetal",
     )
     logger.info(
         "ibge_extracao_vegetal_request",
@@ -353,6 +357,8 @@ async def leite_trimestral(
         source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
+        attempted_sources=["ibge_leite_trimestral"],
+        selected_source="ibge_leite_trimestral",
     )
     logger.info(
         "ibge_leite_trimestral_request",
@@ -496,6 +502,8 @@ async def pib_agro(
         source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
+        attempted_sources=["ibge_pib"],
+        selected_source="ibge_pib",
     )
     logger.info(
         "ibge_pib_agro_request",

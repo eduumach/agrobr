@@ -78,6 +78,20 @@ def configure(
     alternative_source: bool | None = None,
     log_level: str | None = None,
 ) -> None:
+    """Deprecated: nunca teve efeito sobre fetch/cache/fallback.
+
+    Use variáveis de ambiente AGROBR_* para cache/HTTP e
+    datasets.deterministic() para o modo determinístico.
+    """
+    import warnings
+
+    warnings.warn(
+        "agrobr.configure() esta deprecated e NAO tem efeito sobre fetch, cache ou "
+        "fallback de fontes. Use variaveis de ambiente AGROBR_* e "
+        "datasets.deterministic(). Sera removida na versao 2.0.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     config = get_config()
 
     if cache_enabled is not None:

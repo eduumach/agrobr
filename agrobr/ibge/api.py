@@ -77,6 +77,8 @@ async def pam(
         source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
+        attempted_sources=["ibge_pam"],
+        selected_source="ibge_pam",
     )
     logger.info(
         "ibge_pam_request",
@@ -214,6 +216,8 @@ async def lspa(
         source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
+        attempted_sources=["ibge_lspa"],
+        selected_source="ibge_lspa",
     )
     logger.info(
         "ibge_lspa_request",
@@ -322,6 +326,8 @@ async def ppm(
         source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
+        attempted_sources=["ibge_ppm"],
+        selected_source="ibge_ppm",
     )
     logger.info(
         "ibge_ppm_request",
@@ -536,6 +542,8 @@ async def abate(
         source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
+        attempted_sources=["ibge_abate"],
+        selected_source="ibge_abate",
     )
     logger.info(
         "ibge_abate_request",

@@ -332,6 +332,8 @@ async def censo_agro(
         source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
+        attempted_sources=["ibge_censo_agro"],
+        selected_source="ibge_censo_agro",
     )
     logger.info(
         "ibge_censo_agro_request",
@@ -511,6 +513,8 @@ async def censo_agro_historico(
         source_url=SIDRA_BASE,
         source_method="httpx",
         fetched_at=utcnow(),
+        attempted_sources=["ibge_censo_agro_historico"],
+        selected_source="ibge_censo_agro_historico",
     )
     logger.info(
         "ibge_censo_agro_historico_request",

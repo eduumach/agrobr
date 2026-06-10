@@ -128,7 +128,7 @@ CREDITO_RURAL_V1_1 = Contract(
     ],
     guarantees=[
         "Column names never change (additions only)",
-        "'safra' always matches pattern YYYY/YY",
+        "'safra' always matches pattern YYYY/YYYY",
         "'uf' is always a valid Brazilian state code when present",
         "Numeric values are always >= 0",
     ],
@@ -2319,6 +2319,50 @@ CONDICAO_LAVOURAS_V1 = Contract(
 )
 
 register_contract("condicao_lavouras", CONDICAO_LAVOURAS_V1)
+
+EMBARQUES_ANEC_V1 = Contract(
+    name="anec.embarques",
+    version="1.0",
+    effective_from="1.0.6",
+    primary_key=["porto", "produto", "periodo"],
+    columns=[
+        Column(
+            name="porto",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="produto",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+        ),
+        Column(
+            name="periodo",
+            type=ColumnType.STRING,
+            nullable=False,
+            stable=True,
+            description="last_week|current_week",
+        ),
+        Column(
+            name="valor_ton",
+            type=ColumnType.FLOAT,
+            nullable=True,
+            stable=True,
+            unit="ton",
+            min_value=0,
+        ),
+    ],
+    guarantees=[
+        "Column names never change (additions only)",
+        "'valor_ton' is always >= 0 when present",
+        "One row per porto x produto x periodo",
+    ],
+    breaking_policy=BreakingChangePolicy.MAJOR_VERSION,
+)
+
+register_contract("embarques_anec", EMBARQUES_ANEC_V1)
 
 __all__ = [
     "AJUSTE_DIARIO_V1",

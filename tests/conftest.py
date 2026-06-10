@@ -29,6 +29,8 @@ def _fast_retry(monkeypatch):
 @pytest.fixture(autouse=True)
 def _reset_global_state():
     yield
+    import structlog
+
     from agrobr.config import reset_config
     from agrobr.http.rate_limiter import RateLimiter
 
@@ -38,6 +40,7 @@ def _reset_global_state():
     from agrobr.utils.warnings import warn_once_reset
 
     warn_once_reset()
+    structlog.reset_defaults()
 
 
 @pytest.fixture

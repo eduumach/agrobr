@@ -7,6 +7,7 @@ from datetime import date, datetime, timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple, overload
 
+import duckdb
 import httpx
 import pandas as pd
 import structlog
@@ -194,12 +195,16 @@ async def indicador(
     indicadores: list[Indicador] = []
 
     if not force_refresh:
-        cached_data = store.indicadores_query(
-            produto=produto,
-            inicio=datetime.combine(inicio, datetime.min.time()),
-            fim=datetime.combine(fim, datetime.max.time()),
-            praca=praca,
-        )
+        try:
+            cached_data = store.indicadores_query(
+                produto=produto,
+                inicio=datetime.combine(inicio, datetime.min.time()),
+                fim=datetime.combine(fim, datetime.max.time()),
+                praca=praca,
+            )
+        except duckdb.Error as e:
+            logger.warning("cache_query_failed", produto=produto, error=str(e))
+            cached_data = []
 
         indicadores = _dicts_to_indicadores(cached_data)
 
@@ -207,6 +212,8 @@ async def indicador(
             meta.from_cache = True
             meta.source = "cache"
             meta.source_method = "duckdb"
+            meta.attempted_sources = ["cache"]
+            meta.selected_source = "cache"
 
         logger.info(
             "history_query",
@@ -225,6 +232,12 @@ async def indicador(
             meta.source = (
                 "noticias_agricolas" if result.source_name == "noticias_agricolas" else "cepea"
             )
+            meta.attempted_sources = (
+                ["cepea", "noticias_agricolas"]
+                if result.source_name == "noticias_agricolas"
+                else ["cepea"]
+            )
+            meta.selected_source = meta.source
             meta.source_method = "httpx"
             meta.parse_duration_ms = result.parse_ms
             meta.source_url = result.source_url
@@ -235,7 +248,11 @@ async def indicador(
 
             if result.indicadores:
                 new_dicts = _indicadores_to_dicts(result.indicadores)
-                saved_count = store.indicadores_upsert(new_dicts)
+                try:
+                    saved_count = store.indicadores_upsert(new_dicts)
+                except duckdb.Error as e:
+                    logger.warning("cache_upsert_failed", produto=produto, error=str(e))
+                    saved_count = 0
 
                 logger.info(
                     "new_data_saved",

@@ -75,14 +75,13 @@ async def meu_pipeline():
 
 !!! note "Context manager vs CLI"
     O context manager `deterministic()` e o decorator recebem uma **data ISO** (ex: `"2025-12-31"`) e filtram consultas por data.
-    O CLI `snapshot use` recebe o **nome do snapshot** e ativa o modo determinístico via configuração global.
+    O CLI `snapshot use` recebe o **nome do snapshot**, valida que ele existe e mostra como ativar o modo determinístico no código — o modo vale por processo Python, então um comando de CLI não consegue ativá-lo para execuções futuras.
 
 ### CLI
 
 ```bash
-agrobr snapshot use 2025-12-31
-# Ativa modo determinístico para a sessão
-# Voltar ao normal: agrobr config mode normal
+agrobr snapshot use 2025-Q4
+# Valida o snapshot e mostra como ativa-lo no codigo
 ```
 
 ### Configuração global

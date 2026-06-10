@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import math
 import re
 from datetime import date
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from io import BytesIO
 from typing import Any, cast
 
@@ -12,9 +13,21 @@ import structlog
 from agrobr import constants
 from agrobr.exceptions import ParseError
 from agrobr.models import Safra
+from agrobr.normalize.numeric import safe_float
 from agrobr.utils.io import read_excel_safe
 
 logger = structlog.get_logger()
+
+_SUPRIMENTO_HEADER_KEYWORDS: dict[int, str] = {
+    3: "ESTOQUE",
+    4: "PRODU",
+    5: "IMPORTA",
+    6: "SUPRIMENTO",
+    7: "CONSUMO",
+    8: "EXPORTA",
+    9: "DEMANDA",
+    10: "ESTOQUE",
+}
 
 
 class ConabParserV1:
@@ -184,6 +197,8 @@ class ConabParserV1:
                 parser_version=self.version,
                 reason="Não encontrou header na aba Suprimento",
             )
+
+        self._validate_suprimento_header(df.iloc[cast(int, header_row)])
 
         suprimentos = []
         current_produto = None
@@ -497,20 +512,27 @@ class ConabParserV1:
 
         return cols
 
+    def _validate_suprimento_header(self, header: pd.Series) -> None:
+        for col_idx, keyword in _SUPRIMENTO_HEADER_KEYWORDS.items():
+            cell = str(header.iloc[col_idx]).upper() if pd.notna(header.iloc[col_idx]) else ""
+            if keyword not in cell:
+                raise ParseError(
+                    source="conab",
+                    parser_version=self.version,
+                    reason=(
+                        f"Layout da aba Suprimento mudou: coluna {col_idx} "
+                        f"esperava '{keyword}', encontrou '{cell[:30]}'"
+                    ),
+                )
+
     def _parse_decimal(self, value: Any) -> Decimal | None:
         if pd.isna(value):
             return None
 
-        try:
-            if isinstance(value, int | float):
-                return Decimal(str(value))
+        if isinstance(value, int | float):
+            return Decimal(str(value)) if math.isfinite(value) else None
 
-            value_str = str(value).strip().replace(",", ".")
-            value_str = value_str.replace(" ", "")
-
-            if not value_str or value_str in ["0", "-", "NaN", "nan"]:
-                return None
-
-            return Decimal(value_str)
-        except (InvalidOperation, ValueError):
+        parsed = safe_float(str(value))
+        if parsed is None or not math.isfinite(parsed):
             return None
+        return Decimal(str(parsed))
