@@ -10,7 +10,13 @@ from unittest.mock import AsyncMock, patch
 import pytest
 
 from agrobr.alt.sicar import client
-from agrobr.alt.sicar.client import _build_wfs_url, fetch_hits, fetch_imoveis, fetch_imoveis_geo
+from agrobr.alt.sicar.client import (
+    _build_wfs_url,
+    fetch_hits,
+    fetch_imoveis,
+    fetch_imoveis_geo,
+    stream_imoveis_geo,
+)
 from agrobr.alt.sicar.models import MAX_FEATURES_GEO, PAGE_SIZE, WFS_BASE, WFS_VERSION
 from agrobr.exceptions import ParseError
 from agrobr.utils.warnings import warn_once_reset
@@ -320,6 +326,89 @@ class TestFetchImoveisGeoPaginated:
 
         assert len(pages) == 2
         assert counts == [PAGE_SIZE, 500]
+
+
+class TestStreamImoveisGeo:
+    GEOJSON = b'{"type":"FeatureCollection","features":[]}'
+
+    @pytest.mark.asyncio
+    async def test_single_page_yields_once_and_stops(self):
+        mock_fetch = AsyncMock(return_value=self.GEOJSON)
+        with patch.object(client, "fetch_wfs", mock_fetch):
+            batches = [b async for b in stream_imoveis_geo("MT", max_features=PAGE_SIZE)]
+
+        assert len(batches) == 1
+        pages, url = batches[0]
+        assert pages == [self.GEOJSON]
+        assert "sicar" in url
+        mock_fetch.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_total_zero_yields_single_empty_batch(self):
+        xml_hits = b'<wfs:FeatureCollection numberMatched="0"/>'
+        with patch.object(client, "fetch_wfs", new_callable=AsyncMock, return_value=xml_hits):
+            batches = [b async for b in stream_imoveis_geo("DF", max_features=None)]
+
+        assert len(batches) == 1
+        pages, url = batches[0]
+        assert pages == []
+        assert "sicar" in url
+
+    @pytest.mark.asyncio
+    async def test_bounded_max_features_yields_single_batch(self):
+        mock_fetch, counts = _geo_paginated_mock(50_000, self.GEOJSON)
+        with patch.object(client, "fetch_wfs", side_effect=mock_fetch):
+            batches = [b async for b in stream_imoveis_geo("MT", max_features=15_000)]
+
+        assert len(batches) == 1
+        pages, _url = batches[0]
+        assert len(pages) == 2
+        assert sum(counts) == 15_000
+
+    @pytest.mark.asyncio
+    async def test_unbounded_yields_batches_of_geo_batch_size(self):
+        n_pages = client.GEO_BATCH_SIZE * 2 + 2
+        mock_fetch, _counts = _geo_paginated_mock(n_pages * PAGE_SIZE, self.GEOJSON)
+        with (
+            patch.object(client, "fetch_wfs", side_effect=mock_fetch),
+            patch.object(client.asyncio, "sleep", new_callable=AsyncMock),
+        ):
+            batches = [b async for b in stream_imoveis_geo("MT", max_features=None)]
+
+        sizes = [len(pages) for pages, _url in batches]
+        assert sizes == [client.GEO_BATCH_SIZE, client.GEO_BATCH_SIZE, 2]
+        assert sum(sizes) == n_pages
+
+    @pytest.mark.asyncio
+    async def test_throttle_sleep_within_batch(self):
+        n_pages = client.GEO_BATCH_SIZE + 1
+        mock_fetch, _counts = _geo_paginated_mock(n_pages * PAGE_SIZE, self.GEOJSON)
+        sleeps: list[float] = []
+
+        async def mock_sleep(delay):
+            sleeps.append(delay)
+
+        with (
+            patch.object(client, "fetch_wfs", side_effect=mock_fetch),
+            patch.object(client.asyncio, "sleep", side_effect=mock_sleep),
+        ):
+            async for _ in stream_imoveis_geo("MT", max_features=None):
+                pass
+
+        assert sleeps == [client.THROTTLE_DELAY]
+
+    @pytest.mark.asyncio
+    async def test_fetch_imoveis_geo_aggregates_multiple_batches(self):
+        n_pages = client.GEO_BATCH_SIZE * 2 + 2
+        mock_fetch, _counts = _geo_paginated_mock(n_pages * PAGE_SIZE, self.GEOJSON)
+        with (
+            patch.object(client, "fetch_wfs", side_effect=mock_fetch),
+            patch.object(client.asyncio, "sleep", new_callable=AsyncMock),
+        ):
+            pages, url = await fetch_imoveis_geo("MT", max_features=None)
+
+        assert len(pages) == n_pages
+        assert "sicar" in url
 
 
 class TestTimeout:
