@@ -48,17 +48,31 @@ class TestAlertCategory:
 class TestSendAlert:
     @pytest.mark.asyncio
     async def test_disabled_alerts_do_nothing(self):
-        mock_settings = make_alert_settings(enabled=False)
+        mock_settings = make_alert_settings(
+            enabled=False, slack_webhook="https://hooks.slack.com/test"
+        )
 
-        with patch("agrobr.alerts.notifier.constants.AlertSettings", return_value=mock_settings):
+        with (
+            patch("agrobr.alerts.notifier.constants.AlertSettings", return_value=mock_settings),
+            patch("agrobr.alerts.notifier._send_slack", new_callable=AsyncMock) as mock_slack,
+        ):
             await send_alert(AlertLevel.CRITICAL, "test", {"key": "val"})
+
+        mock_slack.assert_not_called()
 
     @pytest.mark.asyncio
     async def test_no_channels_configured(self):
         mock_settings = make_alert_settings()
 
-        with patch("agrobr.alerts.notifier.constants.AlertSettings", return_value=mock_settings):
+        with (
+            patch("agrobr.alerts.notifier.constants.AlertSettings", return_value=mock_settings),
+            patch("agrobr.alerts.notifier._send_slack", new_callable=AsyncMock) as mock_slack,
+            patch("agrobr.alerts.notifier._send_discord", new_callable=AsyncMock) as mock_discord,
+        ):
             await send_alert(AlertLevel.INFO, "test", {})
+
+        mock_slack.assert_not_called()
+        mock_discord.assert_not_called()
 
     @pytest.mark.asyncio
     async def test_slack_channel_dispatched(self):

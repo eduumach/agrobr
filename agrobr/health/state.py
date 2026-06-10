@@ -12,13 +12,9 @@ from agrobr.cache.duckdb_store import get_store
 from agrobr.constants import AlertSettings, Fonte
 
 if TYPE_CHECKING:
-    import duckdb
+    pass
 
 logger = structlog.get_logger()
-
-
-def _get_conn() -> duckdb.DuckDBPyConnection:
-    return get_store()._get_conn()
 
 
 def record_check(
@@ -29,40 +25,51 @@ def record_check(
     message: str | None = None,
 ) -> None:
     """INSERT a health-check row (pure log, no mutable state)."""
-    conn = _get_conn()
-    conn.execute(
-        "INSERT INTO health_checks (source, status, category, latency_ms, message, checked_at) "
-        "VALUES (?, ?, ?, ?, ?, current_timestamp)",
-        [source.value, status, category, latency_ms, message],
-    )
+    store = get_store()
+    with store._lock:
+        store._get_conn().execute(
+            "INSERT INTO health_checks (source, status, category, latency_ms, message, checked_at) "
+            "VALUES (?, ?, ?, ?, ?, current_timestamp)",
+            [source.value, status, category, latency_ms, message],
+        )
 
 
 def get_consecutive_failures(source: Fonte) -> int:
     """Count failures since the last OK for *source* (via query, not mutable state)."""
-    conn = _get_conn()
-    result = conn.execute(
-        """
-        SELECT COUNT(*) FROM health_checks
-        WHERE source = ?
-          AND checked_at > COALESCE(
-              (SELECT MAX(checked_at) FROM health_checks
-               WHERE source = ? AND status = 'ok'),
-              '1970-01-01'
-          )
-          AND status != 'ok'
-        """,
-        [source.value, source.value],
-    ).fetchone()
+    store = get_store()
+    with store._lock:
+        result = (
+            store._get_conn()
+            .execute(
+                """
+                SELECT COUNT(*) FROM health_checks
+                WHERE source = ?
+                  AND checked_at > COALESCE(
+                      (SELECT MAX(checked_at) FROM health_checks
+                       WHERE source = ? AND status = 'ok'),
+                      '1970-01-01'
+                  )
+                  AND status != 'ok'
+                """,
+                [source.value, source.value],
+            )
+            .fetchone()
+        )
     return int(result[0]) if result and result[0] else 0
 
 
 def get_last_success(source: Fonte) -> datetime | None:
     """Return the timestamp of the most recent OK check for *source*."""
-    conn = _get_conn()
-    result = conn.execute(
-        "SELECT MAX(checked_at) FROM health_checks WHERE source = ? AND status = 'ok'",
-        [source.value],
-    ).fetchone()
+    store = get_store()
+    with store._lock:
+        result = (
+            store._get_conn()
+            .execute(
+                "SELECT MAX(checked_at) FROM health_checks WHERE source = ? AND status = 'ok'",
+                [source.value],
+            )
+            .fetchone()
+        )
     return result[0] if result and result[0] else None
 
 

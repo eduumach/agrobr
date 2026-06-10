@@ -118,7 +118,10 @@ async def send_alert(
         results = await asyncio.gather(*tasks, return_exceptions=True)
         for i, result in enumerate(results):
             if isinstance(result, Exception):
-                logger.error("alert_send_failed", channel=i, error=str(result))
+                detail = type(result).__name__
+                if isinstance(result, httpx.HTTPStatusError):
+                    detail = f"{detail}: HTTP {result.response.status_code}"
+                logger.error("alert_send_failed", channel=i, error=detail)
     else:
         logger.warning("no_alert_channels_configured", title=title)
 
