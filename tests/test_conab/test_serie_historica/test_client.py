@@ -49,7 +49,8 @@ class TestConabSerieTimeout:
             patch(
                 "agrobr.conab.serie_historica.client.httpx.AsyncClient", return_value=mock_client
             ),
-            pytest.raises(SourceUnavailableError, match="conab_serie_historica"),
+            patch(RETRY_SLEEP, new_callable=AsyncMock),
+            pytest.raises(SourceUnavailableError, match="conab_serie"),
         ):
             await client.fetch_series_page("graos")
 

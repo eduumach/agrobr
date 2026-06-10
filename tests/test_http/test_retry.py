@@ -11,12 +11,46 @@ import pytest
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.retry import (
     RETRIABLE_EXCEPTIONS,
+    RetriableStatusError,
     retry_async,
     retry_on_status,
     should_retry_status,
     with_retry,
 )
 from tests.helpers import RETRY_SLEEP, make_mock_response
+
+
+def _status_error(cls, status: int, headers: dict[str, str] | None = None):
+    request = httpx.Request("GET", "https://test.local")
+    response = httpx.Response(status, request=request, headers=headers)
+    return cls(f"status {status}", request=request, response=response)
+
+
+class TestRetriableStatusError:
+    def test_na_tupla_global(self):
+        assert RetriableStatusError in RETRIABLE_EXCEPTIONS
+
+    @pytest.mark.asyncio
+    async def test_retriable_status_error_is_retried(self):
+        func = AsyncMock(side_effect=[_status_error(RetriableStatusError, 500), "ok"])
+        result = await retry_async(func, max_attempts=3, base_delay=0.01, max_delay=0.02)
+        assert result == "ok"
+        assert func.call_count == 2
+
+    @pytest.mark.asyncio
+    async def test_generic_http_status_error_not_retried(self):
+        func = AsyncMock(side_effect=_status_error(httpx.HTTPStatusError, 404))
+        with pytest.raises(httpx.HTTPStatusError):
+            await retry_async(func, max_attempts=3, base_delay=0.01, max_delay=0.02)
+        assert func.call_count == 1
+
+    @pytest.mark.asyncio
+    async def test_retry_after_header_respected(self):
+        err = _status_error(RetriableStatusError, 429, headers={"Retry-After": "0.01"})
+        func = AsyncMock(side_effect=[err, "ok"])
+        result = await retry_async(func, max_attempts=3, base_delay=5.0, max_delay=10.0)
+        assert result == "ok"
+        assert func.call_count == 2
 
 
 class TestRetryAsync:

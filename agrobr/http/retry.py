@@ -13,10 +13,17 @@ from agrobr import constants
 logger = structlog.get_logger()
 T = TypeVar("T")
 
+
+class RetriableStatusError(httpx.HTTPStatusError):
+    """Status retriable detectado pelo client; entra no retry sem capturar
+    HTTPStatusError genérico (404/403 de raise_for_status propagam imediato)."""
+
+
 RETRIABLE_EXCEPTIONS: tuple[type[Exception], ...] = (
     httpx.TimeoutException,
     httpx.NetworkError,
     httpx.RemoteProtocolError,
+    RetriableStatusError,
 )
 
 

@@ -10,7 +10,7 @@ from agrobr import constants
 from agrobr.constants import _CEPEA_ENDPOINTS, MIN_HTML_PAGE_SIZE
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.rate_limiter import RateLimiter
-from agrobr.http.retry import retry_async, should_retry_status
+from agrobr.http.retry import RetriableStatusError, retry_async, should_retry_status
 from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
 from agrobr.normalize.encoding import decode_content
@@ -95,7 +95,7 @@ async def _fetch_with_httpx(url: str, headers: dict[str, str]) -> FetchResult:
             response = await client.get(url, headers=headers)
 
             if should_retry_status(response.status_code):
-                raise httpx.HTTPStatusError(
+                raise RetriableStatusError(
                     f"Retriable status: {response.status_code}",
                     request=response.request,
                     response=response,

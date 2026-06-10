@@ -6,7 +6,7 @@ import structlog
 from agrobr import constants
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.rate_limiter import RateLimiter
-from agrobr.http.retry import retry_async, should_retry_status
+from agrobr.http.retry import RetriableStatusError, retry_async, should_retry_status
 from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
 from agrobr.normalize.encoding import decode_content
@@ -68,7 +68,7 @@ async def fetch_indicador_page(produto: str) -> str:
             response = await client.get(url, headers=headers)
 
             if should_retry_status(response.status_code):
-                raise httpx.HTTPStatusError(
+                raise RetriableStatusError(
                     f"Retriable status: {response.status_code}",
                     request=response.request,
                     response=response,

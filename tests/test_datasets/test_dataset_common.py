@@ -87,6 +87,18 @@ class TestDatasetValidation:
 
 @pytest.mark.parametrize("dataset_name", ALL_DATASETS)
 class TestDatasetRegistry:
+    def test_fetch_aceita_primeiro_argumento_posicional(self, dataset_name):
+        import inspect
+
+        from agrobr.datasets.registry import get_dataset
+
+        params = list(inspect.signature(get_dataset(dataset_name).fetch).parameters.values())
+        assert params, f"{dataset_name}.fetch() sem parametros"
+        assert params[0].kind in (
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            inspect.Parameter.POSITIONAL_ONLY,
+        ), f"{dataset_name}.fetch() nao aceita o primeiro argumento posicional"
+
     def test_registered_in_registry(self, dataset_name):
         assert dataset_name in registry.list_datasets()
 
@@ -142,6 +154,24 @@ class TestTrySourcesErrorPaths:
         df, meta = await dataset.fetch("soja", return_meta=True)
         assert meta.attempted_sources == ["cepea", "cache"]
         assert meta.selected_source == "cache"
+
+    @pytest.mark.asyncio
+    async def test_source_unavailable_classified_and_falls_back(self):
+        from agrobr.datasets.preco_diario import PrecoDiarioDataset
+
+        dataset = PrecoDiarioDataset()
+        dataset.info.sources[0].fetch_fn = make_source(
+            _DUMMY_DF,
+            raises=SourceUnavailableError(source="cepea", last_error="HTTP 500 after 3 retries"),
+        )
+        dataset.info.sources[1].fetch_fn = AsyncMock(side_effect=RuntimeError("boom"))
+
+        with pytest.raises(SourceUnavailableError) as exc_info:
+            await dataset.fetch("soja")
+
+        errors = exc_info.value.errors
+        assert errors[0][1] == "unavailable"
+        assert errors[1][1] == "unexpected"
 
     @pytest.mark.asyncio
     async def test_all_fail_mixed_errors(self):

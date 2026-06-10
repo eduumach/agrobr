@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import date
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import httpx
 import pytest
@@ -128,8 +128,9 @@ class TestNasaPowerChunking:
 
     @pytest.mark.asyncio
     async def test_retriable_chunk_skipped(self):
+        from agrobr.exceptions import SourceUnavailableError
+
         chunk_ok = {"properties": {"parameter": {"T2M": {"20240101": 25.0}}}}
-        resp_502 = make_mock_response(502, json_data={})
 
         call_count = 0
 
@@ -137,7 +138,9 @@ class TestNasaPowerChunking:
             nonlocal call_count
             call_count += 1
             if call_count == 1:
-                raise httpx.HTTPStatusError("502", request=MagicMock(), response=resp_502)
+                raise SourceUnavailableError(
+                    source="nasa_power", last_error="HTTP 502 after 3 retries"
+                )
             return chunk_ok
 
         with patch("agrobr.nasa_power.client._get_json", new_callable=AsyncMock) as mock_get:

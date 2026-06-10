@@ -144,13 +144,18 @@ async def fetch_series_page(categoria: str = "graos") -> str:
     headers = UserAgentRotator.get_headers(source="conab_serie")
     headers["Accept"] = "text/html,*/*;q=0.8"
 
+    from agrobr.http.retry import retry_on_status
+
     async with httpx.AsyncClient(
         timeout=TIMEOUT,
         headers=headers,
         follow_redirects=True,
     ) as client:
         try:
-            response = await client.get(url)
+            response = await retry_on_status(
+                lambda: client.get(url),
+                source="conab_serie",
+            )
             response.raise_for_status()
             logger.info(
                 "conab_serie_historica_page_ok",

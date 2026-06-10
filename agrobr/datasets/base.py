@@ -130,6 +130,8 @@ class BaseDataset(ABC):
 
         if has_contract(self.info.name):
             validate_dataset(df, self.info.name)
+        else:
+            logger.debug("contract_missing", dataset=self.info.name)
 
     async def _try_sources(
         self,
@@ -155,7 +157,17 @@ class BaseDataset(ABC):
                     rows=len(df),
                     attempted_sources=attempted,
                 )
+                if len(df) == 0:
+                    logger.warning(
+                        "source_empty_result",
+                        dataset=self.info.name,
+                        source=source.name,
+                        hint="Filtros podem nao casar com os dados atuais da fonte",
+                    )
                 return df, source.name, meta, attempted
+
+            except TypeError:
+                raise
 
             except (httpx.HTTPError, httpx.TimeoutException, OSError) as e:
                 logger.warning(
@@ -186,6 +198,16 @@ class BaseDataset(ABC):
                     error=str(e),
                 )
                 errors.append((source.name, "contract", str(e)))
+
+            except SourceUnavailableError as e:
+                logger.warning(
+                    "source_unavailable",
+                    dataset=self.info.name,
+                    source=source.name,
+                    error_type="unavailable",
+                    error=str(e),
+                )
+                errors.append((source.name, "unavailable", str(e)))
 
             except Exception as e:
                 logger.warning(

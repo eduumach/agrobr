@@ -6,7 +6,8 @@ from typing import Any
 import httpx
 import structlog
 
-from agrobr.constants import RETRIABLE_STATUS_CODES, URLS, Fonte
+from agrobr.constants import URLS, Fonte
+from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.retry import retry_on_status
 from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
@@ -121,15 +122,12 @@ async def fetch_daily(
                     chunk_end=str(chunk_end),
                 )
 
-            except httpx.HTTPStatusError as e:
-                if e.response.status_code in RETRIABLE_STATUS_CODES:
-                    logger.warning(
-                        "nasa_power_chunk_retriable",
-                        status=e.response.status_code,
-                        chunk_start=str(chunk_start),
-                    )
-                else:
-                    raise
+            except SourceUnavailableError as e:
+                logger.warning(
+                    "nasa_power_chunk_unavailable",
+                    error=str(e),
+                    chunk_start=str(chunk_start),
+                )
 
             chunk_start = chunk_end + timedelta(days=1)
 

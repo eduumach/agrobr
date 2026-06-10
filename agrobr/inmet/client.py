@@ -7,7 +7,7 @@ from typing import Any
 import httpx
 import structlog
 
-from agrobr.constants import RETRIABLE_STATUS_CODES, URLS, Fonte
+from agrobr.constants import URLS, Fonte
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.retry import retry_on_status
 from agrobr.http.settings import get_timeout
@@ -126,16 +126,13 @@ async def fetch_dados_estacao(
                     chunk_end=str(chunk_end),
                     records=len(chunk_data),
                 )
-            except httpx.HTTPStatusError as e:
-                if e.response.status_code in RETRIABLE_STATUS_CODES:
-                    logger.warning(
-                        "inmet_chunk_retriable_error",
-                        estacao=codigo,
-                        status=e.response.status_code,
-                        chunk_start=str(chunk_start),
-                    )
-                else:
-                    raise
+            except SourceUnavailableError as e:
+                logger.warning(
+                    "inmet_chunk_unavailable",
+                    estacao=codigo,
+                    error=str(e),
+                    chunk_start=str(chunk_start),
+                )
 
             chunk_start = chunk_end + timedelta(days=1)
 

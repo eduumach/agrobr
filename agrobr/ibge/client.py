@@ -13,6 +13,8 @@ from agrobr.http.rate_limiter import RateLimiter
 
 logger = structlog.get_logger()
 
+SIDRA_FETCH_TIMEOUT = 120.0
+
 TABELAS = {
     "pam_temporarias": "1612",
     "pam_permanentes": "1613",
@@ -652,10 +654,15 @@ async def fetch_sidra(
         if classifications:
             kwargs["classifications"] = classifications
 
+        import requests
+
         from agrobr.http.retry import retry_async
 
         async def _do_fetch() -> pd.DataFrame:
-            df = await asyncio.to_thread(sidrapy.get_table, **kwargs)
+            df = await asyncio.wait_for(
+                asyncio.to_thread(sidrapy.get_table, **kwargs),
+                timeout=SIDRA_FETCH_TIMEOUT,
+            )
             return pd.DataFrame(df)
 
         df = await retry_async(
@@ -664,7 +671,8 @@ async def fetch_sidra(
                 httpx.TimeoutException,
                 httpx.NetworkError,
                 httpx.RemoteProtocolError,
-                ConnectionError,
+                requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout,
                 TimeoutError,
             ),
         )

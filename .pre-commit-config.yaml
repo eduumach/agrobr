@@ -27,4 +27,5 @@ repos:
           - httpx>=0.25.0
           - pandas-stubs>=2.0.0
           - types-beautifulsoup4>=4.12.0
+          - types-requests>=2.32.0
         args: [--ignore-missing-imports]
