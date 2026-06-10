@@ -74,7 +74,7 @@ df = antaq.movimentacao(2024)
 
 ## Notas
 
-- Fonte: [ANTAQ Estatistico Aquaviario](https://web3.antaq.gov.br/ea/sense/download.html) — licenca `livre`
+- Fonte: [ANTAQ Estatistico Aquaviario](https://estatistica.antaq.gov.br/ea/sense/download.html) — licenca `livre`
 - Dados: ZIP bulk (TXT com `;`, encoding UTF-8-sig)
 - Historico: 2010+
 - ZIPs anuais (~80MB) — download pode levar alguns segundos

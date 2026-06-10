@@ -46,7 +46,7 @@ MOVIMENTACAO_PORTUARIA_INFO = DatasetInfo(
     contract_version="1.0",
     update_frequency="yearly",
     typical_latency="ano+6 meses",
-    source_url="https://web3.antaq.gov.br/ea/sense/",
+    source_url="https://estatistica.antaq.gov.br/ea/sense/",
     source_institution="ANTAQ",
     unit="ton",
     license="livre",
@@ -61,9 +61,9 @@ class MovimentacaoPortuariaDataset(BaseDataset):
 
     async def fetch(  # type: ignore[override]
         self,
+        mercadoria: str | None = None,
         *,
         ano: int,
-        mercadoria: str | None = None,
         porto: str | None = None,
         uf: str | None = None,
         sentido: str | None = None,
@@ -100,7 +100,41 @@ class MovimentacaoPortuariaDataset(BaseDataset):
         return df
 
     def _normalize(self, df: pd.DataFrame) -> pd.DataFrame:
-        return df
+        if df.empty:
+            return df
+
+        pk = ["ano", "mes", "porto", "cd_mercadoria", "sentido", "tipo_navegacao"]
+        df = df.dropna(subset=["ano", "mes"])
+
+        def _single_or_none(s: pd.Series) -> Any:
+            return s.iloc[0] if s.nunique(dropna=False) == 1 else None
+
+        agg: dict[str, Any] = {}
+        for col in ("peso_bruto_ton", "qt_carga", "teu"):
+            if col in df.columns:
+                agg[col] = "sum"
+        for col in (
+            "complexo_portuario",
+            "municipio",
+            "uf",
+            "regiao",
+            "mercadoria",
+            "grupo_mercadoria",
+        ):
+            if col in df.columns:
+                agg[col] = "first"
+        for col in (
+            "data_atracacao",
+            "tipo_operacao",
+            "natureza_carga",
+            "terminal",
+            "origem",
+            "destino",
+        ):
+            if col in df.columns:
+                agg[col] = _single_or_none
+
+        return df.groupby(pk, dropna=False, as_index=False).agg(agg).reset_index(drop=True)
 
 
 _movimentacao_portuaria = MovimentacaoPortuariaDataset()

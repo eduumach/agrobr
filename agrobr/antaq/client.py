@@ -1,53 +1,77 @@
 from __future__ import annotations
 
+import asyncio
 import io
 import zipfile
 
-import httpx
+import requests
 import structlog
 
 from agrobr.constants import MIN_ZIP_SIZE, URLS, Fonte
-from agrobr.http.retry import retry_on_status
-from agrobr.http.settings import get_timeout
+from agrobr.exceptions import SourceUnavailableError
+from agrobr.http.retry import retry_async, should_retry_status
 from agrobr.http.user_agents import UserAgentRotator
 
 logger = structlog.get_logger()
 
 BULK_TXT_BASE = URLS[Fonte.ANTAQ]["bulk_txt"]
 
-TIMEOUT = get_timeout(read=180.0)
+ANTAQ_TIMEOUT = 180.0
+
+
+class _RetriableHTTPError(requests.exceptions.HTTPError):
+    pass
+
+
+def _get_sync(url: str) -> bytes:
+    """Baixa via requests: o WAF da ANTAQ rejeita o fingerprint do httpx (HTTP 403)."""
+    response = requests.get(
+        url,
+        timeout=ANTAQ_TIMEOUT,
+        headers=UserAgentRotator.get_headers(source="antaq"),
+        allow_redirects=True,
+    )
+    if should_retry_status(response.status_code):
+        raise _RetriableHTTPError(f"Retriable status: {response.status_code}")
+    response.raise_for_status()
+    return response.content
 
 
 async def _download_zip(url: str) -> bytes:
     logger.debug("antaq_download_zip", url=url)
 
-    async with httpx.AsyncClient(
-        timeout=TIMEOUT, headers=UserAgentRotator.get_headers(source="antaq"), follow_redirects=True
-    ) as client:
-        response = await retry_on_status(
-            lambda: client.get(url),
-            source="antaq",
+    try:
+        content = await retry_async(
+            lambda: asyncio.to_thread(_get_sync, url),
+            retriable_exceptions=(
+                requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout,
+                _RetriableHTTPError,
+                TimeoutError,
+            ),
         )
-        response.raise_for_status()
-
-        content = response.content
-        if len(content) < MIN_ZIP_SIZE:
-            from agrobr.exceptions import SourceUnavailableError
-
-            raise SourceUnavailableError(
-                source="antaq",
-                url=url,
-                last_error=(
-                    f"Downloaded ZIP too small ({len(content)} bytes), expected a valid ZIP archive"
-                ),
-            )
-
-        logger.info(
-            "antaq_download_ok",
+    except requests.exceptions.RequestException as e:
+        raise SourceUnavailableError(
             source="antaq",
-            size_bytes=len(content),
+            url=url,
+            last_error=f"{type(e).__name__}: {e}",
+        ) from e
+
+    if len(content) < MIN_ZIP_SIZE:
+        raise SourceUnavailableError(
+            source="antaq",
+            url=url,
+            last_error=(
+                f"Downloaded ZIP too small ({len(content)} bytes), expected a valid ZIP archive"
+            ),
         )
-        return content
+
+    logger.info(
+        "antaq_download_ok",
+        source="antaq",
+        size_bytes=len(content),
+    )
+    return content
 
 
 def _extract_txt_from_zip(zip_bytes: bytes, filename: str) -> str:

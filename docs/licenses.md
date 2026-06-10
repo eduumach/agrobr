@@ -15,7 +15,7 @@
 | **BCB/SICOR** | Dados públicos governo federal | Sim (dados públicos) | `livre` | [BCB OData](https://olinda.bcb.gov.br) |
 | **ComexStat** | Dados públicos governo federal | Sim (dados públicos) | `livre` | [MDIC](https://comexstat.mdic.gov.br) |
 | **ANDA** | Sem termos públicos; autorização solicitada (fev/2026) | Aguardando resposta | `zona_cinza` | [anda.org.br](https://anda.org.br) |
-| **ANTAQ** | Dados públicos governo federal | Sim (dados públicos) | `livre` | [Estatístico Aquaviário](https://web3.antaq.gov.br/ea/sense/download.html) |
+| **ANTAQ** | Dados públicos governo federal | Sim (dados públicos) | `livre` | [Estatístico Aquaviário](https://estatistica.antaq.gov.br/ea/sense/download.html) |
 | **ANP Diesel** | Dados públicos governo federal | Sim (dados públicos) | `livre` | [ANP](https://www.gov.br/anp/) |
 | **ANTT Pedagio** | CC-BY (Creative Commons Attribution) | Sim (dados públicos) | `livre` | [ANTT Dados Abertos](https://dados.antt.gov.br) |
 | **MAPA PSR** | Dados públicos governo federal (CC-BY) | Sim (dados públicos) | `livre` | [SISSER/MAPA](https://dados.agricultura.gov.br/dataset/sisser3) |

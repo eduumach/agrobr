@@ -60,12 +60,12 @@ class QueimadasDataset(BaseDataset):
 
     async def fetch(  # type: ignore[override]
         self,
+        bioma: str | None = None,
         *,
         ano: int,
         mes: int,
         dia: int | None = None,
         uf: str | None = None,
-        bioma: str | None = None,
         satelite: str | None = None,
         return_meta: bool = False,
         **kwargs: Any,

@@ -8,7 +8,7 @@ portuaria de carga (granel solido, liquido, geral, conteiner) desde 2010.
 
 ## Instalacao
 
-Nao requer dependencias opcionais. Usa apenas httpx + pandas (core).
+Nao requer dependencias opcionais. Usa requests + pandas (core) — o WAF da ANTAQ rejeita clients httpx.
 
 ## API
 
@@ -105,7 +105,7 @@ Join via `IDAtracacao` (FK Carga → Atracacao), lookup via `CDMercadoria`.
 ```python
 df, meta = await antaq.movimentacao(2024, return_meta=True)
 print(meta.source)           # "antaq"
-print(meta.source_method)    # "httpx"
+print(meta.source_method)    # "requests+zip"
 print(meta.parser_version)   # 1
 print(meta.records_count)    # ~2.4M para ano completo
 ```
@@ -118,8 +118,8 @@ para Carga.txt). O download pode levar alguns segundos. O parser usa
 
 ## Fonte
 
-- URL: `https://web3.antaq.gov.br/ea/sense/download.html`
-- Download: `https://web3.antaq.gov.br/ea/txt/{ANO}.zip`
+- URL: `https://estatistica.antaq.gov.br/ea/sense/download.html`
+- Download: `https://estatistica.antaq.gov.br/ea/txt/{ANO}.zip`
 - Formato: TXT (CSV com separador `;`, encoding UTF-8-sig, decimal `,`)
 - Atualizacao: anual (dados consolidados)
 - Historico: 2010+

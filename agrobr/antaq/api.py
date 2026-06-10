@@ -78,7 +78,7 @@ async def movimentacao(
         uf=uf,
     )
 
-    source_url = f"https://web3.antaq.gov.br/ea/txt/{ano}.zip"
+    source_url = f"https://estatistica.antaq.gov.br/ea/txt/{ano}.zip"
 
     t0 = time.monotonic()
     ano_zip = await client.fetch_ano_zip(ano)
@@ -133,7 +133,7 @@ async def movimentacao(
     meta = build_source_meta(
         "antaq",
         source_url,
-        "httpx",
+        "requests+zip",
         fetch_ms,
         parse_ms,
         df,

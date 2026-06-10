@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Pipeline v0.7.0 — Dados Agrícolas Completos
+Pipeline agrobr — Dados Agrícolas Completos
 ============================================
 
-Pipeline demonstrando todas as fontes do agrobr v0.7.0:
+Pipeline demonstrando todas as fontes do agrobr agrobr:
 - CEPEA: indicadores de preço
 - CONAB: safras + custos de produção
 - IBGE: PAM
@@ -19,8 +19,8 @@ Demonstra:
 - Exportação em Parquet
 
 Uso:
-    python pipeline_v07.py
-    python pipeline_v07.py  # segunda execução → cache hit
+    python pipeline_cache.py
+    python pipeline_cache.py  # segunda execução → cache hit
 """
 
 from __future__ import annotations
@@ -174,7 +174,7 @@ def salvar_parquet(dados: dict[str, pd.DataFrame], output_dir: Path) -> list[str
 async def main() -> None:
     """Pipeline principal."""
     print("=" * 70)
-    print("agrobr v0.7.0 — Pipeline de Dados Agrícolas Completo")
+    print("agrobr agrobr — Pipeline de Dados Agrícolas Completo")
     print("=" * 70)
 
     t0 = time.monotonic()
@@ -233,7 +233,7 @@ async def main() -> None:
     print("\n4. EXPORTAÇÃO (Parquet)")
     print("-" * 70)
 
-    output_dir = Path("./output/v07_pipeline")
+    output_dir = Path("./output/pipeline_cache")
     all_data = {**{f"precos_{k}": v for k, v in precos_views.items()}, **datasets}
     salvos = salvar_parquet(all_data, output_dir)
 

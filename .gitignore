@@ -32,8 +32,25 @@ CLAUDE.md
 
 # Temporary / exploration
 tmp_*/
+tmp_*.*
 /data/
 nul
+*.duckdb
+
+# Local-only (nao publicar)
+AGENTS.md
+site/
+.streamlit/
+streamlit_app.py
+aulas/
+todo.txt
+pr68_sicar_pagina_geo.md
+greengate_geo_contexto.md
+test_greengate_sources.py
+mapa_quilombolas.html
+agrobr-cheat-sheet.html
+linkedin-banner.html
+qgis.jpg
 
 # External / unrelated
 AgronomiaBR-Reddit/

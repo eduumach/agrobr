@@ -60,8 +60,8 @@ class ZoneamentoAgricolaDataset(BaseDataset):
 
     async def fetch(  # type: ignore[override]
         self,
-        *,
         cultura: str | None = None,
+        *,
         uf: str | None = None,
         municipio: int | str | None = None,
         safra: str | None = None,

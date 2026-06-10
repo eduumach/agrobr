@@ -1,2 +1,0 @@
-agrobr>=1.0.0
-streamlit>=1.30

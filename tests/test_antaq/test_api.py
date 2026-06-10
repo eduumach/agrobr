@@ -168,8 +168,8 @@ class TestMovimentacao:
             df, meta = await api.movimentacao(2024, return_meta=True)
 
         assert meta.source == "antaq"
-        assert meta.source_url == "https://web3.antaq.gov.br/ea/txt/2024.zip"
-        assert meta.source_method == "httpx"
+        assert meta.source_url == "https://estatistica.antaq.gov.br/ea/txt/2024.zip"
+        assert meta.source_method == "requests+zip"
         assert meta.attempted_sources == ["antaq_ea"]
         assert meta.selected_source == "antaq_ea"
         assert meta.records_count == len(df)

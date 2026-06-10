@@ -61,11 +61,11 @@ class EmbarquesANECDataset(BaseDataset):
 
     async def fetch(  # type: ignore[override]
         self,
+        produto: str | None = None,
         *,
         ano: int,
         semana: int | None = None,
         porto: str | None = None,
-        produto: str | None = None,
         tipo: str | None = None,
         use_cache: bool = True,
         return_meta: bool = False,

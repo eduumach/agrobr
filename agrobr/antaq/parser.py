@@ -12,6 +12,7 @@ from agrobr.antaq.models import (
     PARSER_VERSION,
     RENAME_FINAL,
 )
+from agrobr.normalize.dates import month_to_number
 
 logger = structlog.get_logger()
 
@@ -125,7 +126,9 @@ def join_movimentacao(
     if "ano" in df.columns:
         df["ano"] = pd.to_numeric(df["ano"], errors="coerce").astype("Int64")
     if "mes" in df.columns:
-        df["mes"] = pd.to_numeric(df["mes"], errors="coerce").astype("Int64")
+        mes_numerico = pd.to_numeric(df["mes"], errors="coerce")
+        mes_por_nome = df["mes"].astype(str).map(month_to_number)
+        df["mes"] = mes_numerico.fillna(mes_por_nome).astype("Int64")
 
     final_cols = [
         c

@@ -6,14 +6,13 @@ import io
 import zipfile
 from unittest.mock import AsyncMock, patch
 
-import httpx
 import pytest
 
 from agrobr.antaq import client
 from agrobr.exceptions import SourceUnavailableError
-from tests.helpers import RETRY_SLEEP, make_mock_async_client, make_mock_response
+from tests.helpers import RETRY_SLEEP
 
-_ANTAQ_URL = "https://web3.antaq.gov.br/ea/txt/2024.zip"
+_ANTAQ_URL = "https://estatistica.antaq.gov.br/ea/txt/2024.zip"
 
 
 def _make_zip(files: dict[str, str], *, min_size: int = 0) -> bytes:
@@ -37,63 +36,81 @@ def _make_zip(files: dict[str, str], *, min_size: int = 0) -> bytes:
     return data
 
 
+def _make_requests_response(status: int, content: bytes = b""):
+    import requests
+
+    response = requests.Response()
+    response.status_code = status
+    response._content = content
+    response.url = _ANTAQ_URL
+    return response
+
+
 class TestDownloadZip:
     @pytest.mark.asyncio
     async def test_success(self):
         zip_bytes = _make_zip({"test.txt": "hello"}, min_size=500)
-        resp = make_mock_response(200, content=zip_bytes, url=_ANTAQ_URL)
-        mock_client = make_mock_async_client()
-        mock_client.get = AsyncMock(return_value=resp)
+        resp = _make_requests_response(200, zip_bytes)
 
-        with patch("agrobr.antaq.client.httpx.AsyncClient", return_value=mock_client):
+        with patch("agrobr.antaq.client.requests.get", return_value=resp):
             result = await client._download_zip(_ANTAQ_URL)
 
         assert result == zip_bytes
 
     @pytest.mark.asyncio
     async def test_timeout_retried_raises_source_unavailable(self):
-        mock_client = make_mock_async_client()
-        mock_client.get = AsyncMock(side_effect=httpx.TimeoutException("timeout"))
+        import requests
 
         with (
-            patch("agrobr.antaq.client.httpx.AsyncClient", return_value=mock_client),
+            patch(
+                "agrobr.antaq.client.requests.get",
+                side_effect=requests.exceptions.Timeout("timeout"),
+            ) as mock_get,
             patch(RETRY_SLEEP, new_callable=AsyncMock),
             pytest.raises(SourceUnavailableError),
         ):
             await client._download_zip(_ANTAQ_URL)
 
-        assert mock_client.get.call_count == 3
+        assert mock_get.call_count == 3
 
     @pytest.mark.asyncio
     async def test_500_retries_then_raises(self):
-        resp_500 = make_mock_response(500, content=b"", url=_ANTAQ_URL)
-        mock_client = make_mock_async_client()
-        mock_client.get = AsyncMock(return_value=resp_500)
+        resp_500 = _make_requests_response(500)
 
         with (
-            patch("agrobr.antaq.client.httpx.AsyncClient", return_value=mock_client),
+            patch("agrobr.antaq.client.requests.get", return_value=resp_500) as mock_get,
             patch(RETRY_SLEEP, new_callable=AsyncMock),
             pytest.raises(SourceUnavailableError),
         ):
             await client._download_zip(_ANTAQ_URL)
 
-        assert mock_client.get.call_count > 1
+        assert mock_get.call_count > 1
 
     @pytest.mark.asyncio
     async def test_429_retries_then_succeeds(self):
         zip_bytes = _make_zip({"test.txt": "ok"}, min_size=500)
-        resp_429 = make_mock_response(429, content=b"", url=_ANTAQ_URL)
-        resp_ok = make_mock_response(200, content=zip_bytes, url=_ANTAQ_URL)
-        mock_client = make_mock_async_client()
-        mock_client.get = AsyncMock(side_effect=[resp_429, resp_ok])
+        resp_429 = _make_requests_response(429)
+        resp_ok = _make_requests_response(200, zip_bytes)
 
         with (
-            patch("agrobr.antaq.client.httpx.AsyncClient", return_value=mock_client),
+            patch("agrobr.antaq.client.requests.get", side_effect=[resp_429, resp_ok]),
             patch(RETRY_SLEEP, new_callable=AsyncMock),
         ):
             result = await client._download_zip(_ANTAQ_URL)
 
         assert result == zip_bytes
+
+    @pytest.mark.asyncio
+    async def test_403_nao_retried(self):
+        resp_403 = _make_requests_response(403)
+
+        with (
+            patch("agrobr.antaq.client.requests.get", return_value=resp_403) as mock_get,
+            pytest.raises(SourceUnavailableError, match="HTTPError"),
+        ):
+            await client._download_zip(_ANTAQ_URL)
+
+        assert mock_get.call_count == 1
 
 
 class TestExtractTxtFromZip:
@@ -148,7 +165,7 @@ class TestFetchAnoZip:
         ) as mock:
             result = await client.fetch_ano_zip(2024)
 
-        mock.assert_called_once_with("https://web3.antaq.gov.br/ea/txt/2024.zip")
+        mock.assert_called_once_with("https://estatistica.antaq.gov.br/ea/txt/2024.zip")
         assert result == zip_bytes
 
 
@@ -162,7 +179,7 @@ class TestFetchMercadoriaZip:
         ) as mock:
             result = await client.fetch_mercadoria_zip()
 
-        mock.assert_called_once_with("https://web3.antaq.gov.br/ea/txt/Mercadoria.zip")
+        mock.assert_called_once_with("https://estatistica.antaq.gov.br/ea/txt/Mercadoria.zip")
         assert result == zip_bytes
 
 

@@ -39,6 +39,47 @@ def _make_df(**overrides):
     return pd.DataFrame([row])
 
 
+class TestMovimentacaoPortuariaAgregacao:
+    @pytest.mark.asyncio
+    async def test_agrega_por_pk_do_contrato(self):
+        df_detalhe = pd.concat(
+            [
+                _make_df(peso_bruto_ton=60000.0, qt_carga=59000.0, teu=2),
+                _make_df(peso_bruto_ton=5000.0, qt_carga=5500.0, teu=1, terminal="Outro Terminal"),
+            ],
+            ignore_index=True,
+        )
+        dataset = MovimentacaoPortuariaDataset()
+        dataset.info.sources[0].fetch_fn = make_source(df_detalhe)
+
+        df = await dataset.fetch(ano=2024)
+
+        assert len(df) == 1
+        assert df["peso_bruto_ton"].iloc[0] == 65000.0
+        assert df["qt_carga"].iloc[0] == 64500.0
+        assert df["teu"].iloc[0] == 3
+
+    @pytest.mark.asyncio
+    async def test_detalhe_unico_preservado_misto_vira_none(self):
+        df_detalhe = pd.concat(
+            [
+                _make_df(terminal="Terminal A", origem="Brasil"),
+                _make_df(terminal="Terminal B", origem="Brasil"),
+            ],
+            ignore_index=True,
+        )
+        dataset = MovimentacaoPortuariaDataset()
+        dataset.info.sources[0].fetch_fn = make_source(df_detalhe)
+
+        df = await dataset.fetch(ano=2024)
+
+        assert len(df) == 1
+        assert df["origem"].iloc[0] == "Brasil"
+        assert df["terminal"].iloc[0] is None
+        assert "data_atracacao" in df.columns
+        assert "natureza_carga" in df.columns
+
+
 class TestMovimentacaoPortuariaFetch:
     @pytest.mark.asyncio
     async def test_fetch_returns_df(self):

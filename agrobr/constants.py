@@ -88,8 +88,8 @@ URLS = {
         "vendas_diesel_csv": "https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/arquivos/vdpb/vct/vendas-oleo-diesel-tipo-m3-2013-2025.csv",
     },
     Fonte.ANTAQ: {
-        "base": "https://web3.antaq.gov.br/ea/sense/download.html",
-        "bulk_txt": "https://web3.antaq.gov.br/ea/txt",
+        "base": "https://estatistica.antaq.gov.br/ea/sense/download.html",
+        "bulk_txt": "https://estatistica.antaq.gov.br/ea/txt",
     },
     Fonte.ANTT_PEDAGIO: {
         "base": "https://dados.antt.gov.br",

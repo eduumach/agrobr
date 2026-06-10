@@ -123,8 +123,9 @@ gdf = await agrobr.desmatamento.deter_geo(
 ## Limitacoes
 
 - DETER so disponivel para Amazonia e Cerrado
-- WFS limita 50.000 features por requisicao — filtrar por estado e/ou ano
-- Dados PRODES sao poligonos individuais (granularidade fina) — usar agregacao se necessario
+- WFS limita 50.000 features por requisicao — filtrar por estado e/ou ano (warning `desmatamento_*_truncated` quando o teto e atingido)
+- Source API (`agrobr.desmatamento.*`) retorna poligonos individuais (granularidade fina); o dataset `datasets.desmatamento` entrega o agregado anual por uf/classe/bioma conforme o contrato
+- Pos-migracao BiomasBR (03/2026), os layers PRODES de Amazonia, Pantanal, Caatinga e Mata Atlantica estao temporariamente quebrados no GeoServer do INPE (ServiceException para qualquer cliente); Cerrado e Pampa operacionais
 - DETER e sistema de alerta, nao de consolidacao — pode haver sobreposicao
 - `prodes_geo()` e `deter_geo()` retornam geometria (~10x mais volume que tabular) — usar filtros para reduzir dados
 

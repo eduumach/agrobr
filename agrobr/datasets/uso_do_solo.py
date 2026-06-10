@@ -74,8 +74,8 @@ class UsodoSoloDataset(BaseDataset):
 
     async def fetch(  # type: ignore[override]
         self,
-        *,
         tipo: Literal["cobertura", "transicao"] = "cobertura",
+        *,
         bioma: str | None = None,
         estado: str | None = None,
         ano: int | None = None,

@@ -358,7 +358,7 @@ decodificar_response <- function(raw_bytes) {
     return(stri_encode(raw_bytes, from = encoding, to = "UTF-8"))
   }
 
-  for (enc in c("UTF-8", "ISO-8859-1", "Windows-1252")) {
+  for (enc in c("UTF-8", "Windows-1252", "ISO-8859-1")) {
     tryCatch(
       return(stri_encode(raw_bytes, from = enc, to = "UTF-8")),
       error = function(e) NULL
