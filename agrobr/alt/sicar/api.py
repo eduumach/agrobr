@@ -8,6 +8,7 @@ import httpx
 import pandas as pd
 import structlog
 
+from agrobr.exceptions import SourceUnavailableError
 from agrobr.models import MetaInfo
 from agrobr.utils.result import build_source_meta, finalize_result
 from agrobr.utils.validation import validate_year_uf
@@ -156,7 +157,7 @@ async def imoveis(
                     threshold=MAX_FEATURES_WARNING,
                     hint="Considere filtrar por municipio para reduzir volume",
                 )
-        except httpx.HTTPError:
+        except (httpx.HTTPError, SourceUnavailableError):
             logger.warning("sicar_hit_count_check_failed", uf=uf_upper, exc_info=True)
 
     t0 = time.monotonic()
@@ -199,6 +200,7 @@ async def imoveis_geo(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    max_features: int | None = 5000,
     return_meta: Literal[False] = False,
 ) -> gpd.GeoDataFrame: ...
 
@@ -214,6 +216,7 @@ async def imoveis_geo(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    max_features: int | None = 5000,
     return_meta: Literal[True],
 ) -> tuple[gpd.GeoDataFrame, MetaInfo]: ...
 
@@ -228,6 +231,7 @@ async def imoveis_geo(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    max_features: int | None = 5000,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> Any:
@@ -264,12 +268,29 @@ async def imoveis_geo(
         criado_apos=criado_apos,
     )
 
+    if municipio is None and cod_municipio is None:
+        try:
+            async with client.make_session() as http:
+                total = await client.fetch_hits(uf_upper, cql, client=http)
+            effective = total if max_features is None else min(total, max_features)
+            if effective > MAX_FEATURES_WARNING:
+                logger.warning(
+                    "sicar_geo_large_query",
+                    uf=uf_upper,
+                    total=total,
+                    max_features=max_features,
+                    threshold=MAX_FEATURES_WARNING,
+                    hint="Considere definir max_features ou filtrar por municipio para reduzir volume",
+                )
+        except (httpx.HTTPError, SourceUnavailableError):
+            logger.warning("sicar_geo_hit_count_check_failed", uf=uf_upper, exc_info=True)
+
     t0 = time.monotonic()
-    content, source_url = await client.fetch_imoveis_geo(uf_upper, cql)
+    pages, source_url = await client.fetch_imoveis_geo(uf_upper, cql, max_features=max_features)
     fetch_ms = int((time.monotonic() - t0) * 1000)
 
     t1 = time.monotonic()
-    gdf = parser.parse_imoveis_geojson(content)
+    gdf = parser.parse_imoveis_geojson(pages, max_features=max_features)
     parse_ms = int((time.monotonic() - t1) * 1000)
 
     if not gdf.empty and "cod_imovel" in gdf.columns:
