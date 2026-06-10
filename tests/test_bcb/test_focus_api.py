@@ -75,7 +75,7 @@ class TestFocusColumnRenaming:
             df = await focus_api.focus()
 
         row = df.iloc[0]
-        assert row["indicador"] == "PIB Agropecuário"
+        assert row["indicador"] == "PIB Agropecuária"
         assert row["media"] == pytest.approx(3.5)
         assert row["mediana"] == pytest.approx(3.48)
         assert row["numero_respondentes"] == 85

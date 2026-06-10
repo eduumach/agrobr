@@ -183,12 +183,12 @@ Expectativas de mercado coletadas pelo BCB (relatorio Focus).
 ```python
 from agrobr import bcb
 
-df = await bcb.focus("PIB Agropecuário")
+df = await bcb.focus("PIB Agropecuária")
 ```
 
 ### Indicadores
 
-- PIB Agropecuario
+- PIB Agropecuária
 - IPCA
 - IGP-DI
 - IGP-M

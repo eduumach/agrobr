@@ -176,7 +176,7 @@ df = await bcb.sgs('pib_agropecuaria')                    # também: ipca, igpm,
 df = await bcb.ptax(data_inicial='2024-01-01', data_final='2024-12-31')
 
 # BCB Focus — expectativas de mercado
-df = await bcb.focus('PIB Agropecuário')
+df = await bcb.focus('PIB Agropecuária')
 
 # MAPA PSR — apólices e sinistros do seguro rural
 df = await alt.mapa_psr.apolices(cultura='soja', ano=2023)
@@ -357,7 +357,7 @@ Via CLI:
 ```bash
 agrobr snapshot create 2025-Q4 --sources cepea,conab,ibge
 agrobr snapshot list
-agrobr snapshot use 2025-Q4
+agrobr snapshot use 2025-Q4   # valida o snapshot e mostra como ativa-lo no codigo
 agrobr snapshot delete 2025-Q4
 ```
 
@@ -406,7 +406,7 @@ agrobr config show
 # Snapshots
 agrobr snapshot create 2025-Q4 --sources cepea,conab,ibge
 agrobr snapshot list
-agrobr snapshot use 2025-Q4
+agrobr snapshot use 2025-Q4   # valida o snapshot e mostra como ativa-lo no codigo
 ```
 
 ## Datasets disponíveis
@@ -437,7 +437,7 @@ agrobr snapshot use 2025-Q4
 | `movimentacao_portuaria` | Movimentação portuária de carga (granel, geral, contêiner) | ANTAQ |
 | `oferta_demanda_global` | Oferta/demanda global de commodities | USDA PSD |
 | `pecuaria_municipal` | Pecuária municipal (rebanhos e produção animal) | IBGE PPM |
-| `pib_agro` | PIB agropecuário por setor e trimestre | IBGE SIDRA |
+| `pib_agro` | PIB Agropecuária por setor e trimestre | IBGE SIDRA |
 | `preco_atacado` | Preços de atacado hortifrúti em CEASAs | CONAB CEASA/PROHORT |
 | `preco_diario` | Preços diários spot | CEPEA → cache |
 | `producao_anual` | Produção anual consolidada | IBGE PAM → CONAB |

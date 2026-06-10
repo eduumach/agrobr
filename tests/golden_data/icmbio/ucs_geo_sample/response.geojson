@@ -14,7 +14,7 @@
         "grupouc": "PI",
         "areahaalb": 32630.0,
         "ufabrang": "MT",
-        "biomaibge": "Cerrado",
+        "biomas": "Cerrado",
         "criacaoano": "1989",
         "criacaoato": "Decreto 97656"
       }
@@ -32,7 +32,7 @@
         "grupouc": "PI",
         "areahaalb": 28700.0,
         "ufabrang": "MT",
-        "biomaibge": "Cerrado",
+        "biomas": "Cerrado",
         "criacaoano": "1982",
         "criacaoato": "Decreto 87222"
       }
@@ -50,7 +50,7 @@
         "grupouc": "PI",
         "areahaalb": 342000.0,
         "ufabrang": "MT;PA",
-        "biomaibge": "Amazonia",
+        "biomas": "Amazonia",
         "criacaoano": "2005",
         "criacaoato": "Decreto s/n"
       }
@@ -68,7 +68,7 @@
         "grupouc": "US",
         "areahaalb": 395827.0,
         "ufabrang": "PA",
-        "biomaibge": "Amazonia",
+        "biomas": "Amazonia",
         "criacaoano": "1998",
         "criacaoato": "Decreto 2486"
       }
@@ -86,7 +86,7 @@
         "grupouc": "US",
         "areahaalb": 25100.0,
         "ufabrang": "MT",
-        "biomaibge": "Cerrado",
+        "biomas": "Cerrado",
         "criacaoano": "1992",
         "criacaoato": "Decreto 537"
       }
@@ -104,7 +104,7 @@
         "grupouc": "PI",
         "areahaalb": 135000.0,
         "ufabrang": "MT",
-        "biomaibge": "Pantanal",
+        "biomas": "Pantanal",
         "criacaoano": "1981",
         "criacaoato": "Decreto 86392"
       }
@@ -122,7 +122,7 @@
         "grupouc": "US",
         "areahaalb": 138000.0,
         "ufabrang": "MT",
-        "biomaibge": "Amazonia",
+        "biomas": "Amazonia",
         "criacaoano": "1996",
         "criacaoato": "Decreto 1845"
       }
@@ -140,7 +140,7 @@
         "grupouc": "PI",
         "areahaalb": 200000.0,
         "ufabrang": "MT",
-        "biomaibge": "Cerrado",
+        "biomas": "Cerrado",
         "criacaoano": "1981",
         "criacaoato": "Decreto 86061"
       }
@@ -158,7 +158,7 @@
         "grupouc": "PI",
         "areahaalb": 42389.0,
         "ufabrang": "DF",
-        "biomaibge": "Cerrado",
+        "biomas": "Cerrado",
         "criacaoano": "1961",
         "criacaoato": "Decreto 241"
       }
@@ -176,7 +176,7 @@
         "grupouc": "US",
         "areahaalb": 1050.0,
         "ufabrang": "DF",
-        "biomaibge": "Cerrado",
+        "biomas": "Cerrado",
         "criacaoano": "1986",
         "criacaoato": "Decreto 91303"
       }

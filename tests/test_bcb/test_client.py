@@ -17,6 +17,24 @@ from tests.helpers import (
 )
 
 
+class TestPertenceASafra:
+    def test_jul_a_dez_do_ano_inicio(self):
+        assert client._pertence_a_safra({"AnoEmissao": "2023", "MesEmissao": "07"}, 2023)
+        assert client._pertence_a_safra({"AnoEmissao": "2023", "MesEmissao": "12"}, 2023)
+
+    def test_jan_a_jun_do_ano_fim(self):
+        assert client._pertence_a_safra({"AnoEmissao": "2024", "MesEmissao": "01"}, 2023)
+        assert client._pertence_a_safra({"AnoEmissao": "2024", "MesEmissao": "06"}, 2023)
+
+    def test_fora_da_safra(self):
+        assert not client._pertence_a_safra({"AnoEmissao": "2023", "MesEmissao": "06"}, 2023)
+        assert not client._pertence_a_safra({"AnoEmissao": "2024", "MesEmissao": "07"}, 2023)
+
+    def test_record_sem_ano_descartado(self):
+        assert not client._pertence_a_safra({"MesEmissao": "07"}, 2023)
+        assert not client._pertence_a_safra({"AnoEmissao": "x", "MesEmissao": "07"}, 2023)
+
+
 class TestBcbTimeout:
     @pytest.mark.asyncio
     async def test_timeout_retried_raises_source_unavailable(self):
@@ -131,8 +149,10 @@ class TestBcbFetchCreditoRural:
     @pytest.mark.asyncio
     async def test_client_side_filtering_safra(self):
         records = [
-            {"AnoEmissao": "2023", "nomeProduto": "SOJA", "cdEstado": "51"},
-            {"AnoEmissao": "2024", "nomeProduto": "SOJA", "cdEstado": "51"},
+            {"AnoEmissao": "2023", "MesEmissao": "09", "nomeProduto": "SOJA", "cdEstado": "51"},
+            {"AnoEmissao": "2024", "MesEmissao": "02", "nomeProduto": "SOJA", "cdEstado": "51"},
+            {"AnoEmissao": "2023", "MesEmissao": "03", "nomeProduto": "SOJA", "cdEstado": "51"},
+            {"AnoEmissao": "2024", "MesEmissao": "08", "nomeProduto": "SOJA", "cdEstado": "51"},
         ]
         resp = make_mock_response(200, json_data={"value": records})
         mock_client = make_mock_async_client()
@@ -141,7 +161,11 @@ class TestBcbFetchCreditoRural:
         with patch("agrobr.bcb.client.httpx.AsyncClient", return_value=mock_client):
             result = await client.fetch_credito_rural(finalidade="custeio", safra_sicor="2023/2024")
 
-        assert all(r["AnoEmissao"] == "2023" for r in result)
+        assert len(result) == 2
+        assert {(r["AnoEmissao"], r["MesEmissao"]) for r in result} == {
+            ("2023", "09"),
+            ("2024", "02"),
+        }
 
 
 class TestBcbFallback:

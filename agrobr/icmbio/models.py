@@ -17,7 +17,7 @@ PROPERTY_NAMES = [
     "grupouc",
     "areahaalb",
     "ufabrang",
-    "biomaibge",
+    "biomas",
     "criacaoano",
     "criacaoato",
 ]
@@ -31,7 +31,7 @@ RENAME_MAP: dict[str, str] = {
     "grupouc": "grupo",
     "areahaalb": "area_ha",
     "ufabrang": "uf",
-    "biomaibge": "bioma",
+    "biomas": "bioma",
     "criacaoano": "ano_criacao",
     "criacaoato": "ato_criacao",
 }

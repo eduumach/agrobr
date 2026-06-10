@@ -109,7 +109,7 @@ class DesmatamentoDataset(BaseDataset):
             **kwargs,
         )
 
-        df = self._normalize(df)
+        df = self._normalize(df, tipo)
 
         from agrobr.contracts import has_contract, validate_dataset
 
@@ -121,8 +121,31 @@ class DesmatamentoDataset(BaseDataset):
             return df, self._build_meta(df, source_name, source_meta, attempted, snapshot)
         return df
 
-    def _normalize(self, df: pd.DataFrame) -> pd.DataFrame:
-        return df
+    def _normalize(self, df: pd.DataFrame, tipo: str) -> pd.DataFrame:
+        if df.empty:
+            return df
+
+        if tipo == "prodes":
+            pk = ["ano", "uf", "classe", "bioma"]
+            df = df.dropna(subset=["ano"])
+        else:
+            pk = ["data", "classe", "uf", "municipio", "bioma"]
+            df = df.dropna(subset=["data"])
+
+        output_order = list(df.columns)
+
+        def _single_or_none(s: pd.Series) -> str | None:
+            return s.iloc[0] if s.nunique(dropna=False) == 1 else None
+
+        agg: dict[str, Any] = {"area_km2": "sum"}
+        if "municipio_id" in df.columns:
+            agg["municipio_id"] = "first"
+        for col in ("satelite", "sensor"):
+            if col in df.columns:
+                agg[col] = _single_or_none
+
+        out = df.groupby(pk, dropna=False, as_index=False).agg(agg)
+        return out[[c for c in output_order if c in out.columns]].reset_index(drop=True)
 
 
 _desmatamento = DesmatamentoDataset()

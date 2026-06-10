@@ -34,7 +34,7 @@ def _build_cql_filters(
         grupo_upper = grupo.strip().upper()
         filters.append(f"grupouc='{grupo_upper}'")
     if bioma is not None:
-        filters.append(f"biomaibge='{bioma}'")
+        filters.append(f"biomas ILIKE '%{bioma}%'")
     return " AND ".join(filters) if filters else None
 
 

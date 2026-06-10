@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+from urllib.parse import quote
 
 import httpx
 import structlog
@@ -18,12 +19,33 @@ BASE_URL = URLS[Fonte.BCB]["base"]
 TIMEOUT = get_timeout(read=120.0)
 
 PAGE_SIZE = 10000
+FALLBACK_PAGE_SIZES = (2000, 500)
 BCB_MAX_RETRIES = 6
 
 ENDPOINT_MAP: dict[str, str] = {
     "custeio": "CusteioRegiaoUFProduto",
     "investimento": "InvestRegiaoUFProduto",
     "comercializacao": "ComercRegiaoUFProduto",
+}
+
+_SELECT_COMUM = [
+    "nomeProduto",
+    "nomeRegiao",
+    "nomeUF",
+    "MesEmissao",
+    "AnoEmissao",
+    "cdPrograma",
+    "cdSubPrograma",
+    "cdFonteRecurso",
+    "cdTipoSeguro",
+    "Atividade",
+    "cdModalidade",
+]
+
+SELECT_MAP: dict[str, list[str]] = {
+    "custeio": [*_SELECT_COMUM, "QtdCusteio", "VlCusteio", "AreaCusteio"],
+    "investimento": [*_SELECT_COMUM, "QtdInvest", "VlInvest"],
+    "comercializacao": [*_SELECT_COMUM, "QtdComerc", "VlComerc"],
 }
 
 
@@ -34,19 +56,15 @@ async def _fetch_odata(
     top: int = PAGE_SIZE,
     skip: int = 0,
 ) -> dict[str, Any]:
-    url = f"{BASE_URL}/{endpoint}"
-
-    params: dict[str, str] = {
-        "$format": "json",
-        "$top": str(top),
-        "$skip": str(skip),
-    }
+    parts = [f"$format=json&$top={top}&$skip={skip}"]
 
     if filters:
-        params["$filter"] = " and ".join(filters)
+        parts.append("$filter=" + quote(" and ".join(filters), safe="(),'"))
 
     if select:
-        params["$select"] = ",".join(select)
+        parts.append("$select=" + ",".join(select))
+
+    url = f"{BASE_URL}/{endpoint}?" + "&".join(parts)
 
     async with httpx.AsyncClient(
         timeout=TIMEOUT, headers=UserAgentRotator.get_bot_headers(), follow_redirects=True
@@ -59,13 +77,26 @@ async def _fetch_odata(
         )
 
         response = await retry_on_status(
-            lambda: client.get(url, params=params),
+            lambda: client.get(url),
             source="bcb",
             max_attempts=BCB_MAX_RETRIES,
         )
 
         response.raise_for_status()
         return response.json()  # type: ignore[no-any-return]
+
+
+def _pertence_a_safra(record: dict[str, Any], ano_inicio: int) -> bool:
+    from agrobr.normalize.dates import INICIO_SAFRA_MES
+
+    try:
+        ano = int(record.get("AnoEmissao") or 0)
+        mes = int(record.get("MesEmissao") or 0)
+    except (TypeError, ValueError):
+        return False
+    if mes >= INICIO_SAFRA_MES:
+        return ano == ano_inicio
+    return ano == ano_inicio + 1
 
 
 async def fetch_credito_rural(
@@ -97,13 +128,30 @@ async def fetch_credito_rural(
     all_records: list[dict[str, Any]] = []
     skip = 0
 
+    select = SELECT_MAP.get(finalidade.lower())
+    page_size = PAGE_SIZE
+
     while True:
-        data = await _fetch_odata(
-            endpoint=endpoint,
-            filters=server_filter,
-            top=PAGE_SIZE,
-            skip=skip,
-        )
+        try:
+            data = await _fetch_odata(
+                endpoint=endpoint,
+                filters=server_filter,
+                select=select,
+                top=page_size,
+                skip=skip,
+            )
+        except SourceUnavailableError:
+            menores = [p for p in FALLBACK_PAGE_SIZES if p < page_size]
+            if not menores:
+                raise
+            page_size = menores[0]
+            logger.warning(
+                "bcb_page_size_reduzido",
+                endpoint=endpoint,
+                page_size=page_size,
+                hint="Olinda instavel com paginas grandes; reduzindo",
+            )
+            continue
 
         records = data.get("value", [])
         if not records:
@@ -117,10 +165,10 @@ async def fetch_credito_rural(
             total_so_far=len(all_records),
         )
 
-        if len(records) < PAGE_SIZE:
+        if len(records) < page_size:
             break
 
-        skip += PAGE_SIZE
+        skip += page_size
 
     logger.info(
         "bcb_fetch_credito_raw",
@@ -134,8 +182,8 @@ async def fetch_credito_rural(
     filtered = all_records
 
     if safra_sicor:
-        ano_emissao = safra_sicor.split("/")[0]
-        filtered = [r for r in filtered if str(r.get("AnoEmissao", "")) == ano_emissao]
+        ano_inicio = int(safra_sicor.split("/")[0])
+        filtered = [r for r in filtered if _pertence_a_safra(r, ano_inicio)]
 
     if cd_uf:
         filtered = [

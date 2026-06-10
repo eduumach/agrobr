@@ -37,6 +37,10 @@ COLUNAS_MAP: dict[str, str] = {
     "VlInvestimento": "valor",
     "AreaInvestimento": "area_financiada",
     "QtdInvestimento": "qtd_contratos",
+    "VlInvest": "valor",
+    "QtdInvest": "qtd_contratos",
+    "VlComerc": "valor",
+    "QtdComerc": "qtd_contratos",
     "codIbge": "cd_municipio",
     "cdPrograma": "cd_programa",
     "cdSubPrograma": "cd_sub_programa",
@@ -97,6 +101,20 @@ def parse_credito_rural(
     for col in ("ano_emissao", "mes_emissao", "qtd_contratos"):
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
+
+    if "safra" not in df.columns and "ano_emissao" in df.columns:
+        from agrobr.normalize.dates import INICIO_SAFRA_MES
+
+        ano = df["ano_emissao"]
+        if "mes_emissao" in df.columns:
+            inicio = ano.where(df["mes_emissao"] >= INICIO_SAFRA_MES, ano - 1)
+        else:
+            inicio = ano
+        mask = inicio.notna()
+        df["safra"] = pd.NA
+        df.loc[mask, "safra"] = (
+            inicio[mask].astype(int).astype(str) + "/" + (inicio[mask] + 1).astype(int).astype(str)
+        )
 
     if "produto" in df.columns:
         df["produto"] = df["produto"].str.strip().str.strip('"').str.lower().str.strip()

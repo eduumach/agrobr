@@ -18,10 +18,9 @@
     "bioma",
     "geometry"
   ],
-  "has_multiple_ufs": true,
+  "has_multiple_ufs": false,
   "ufs_expected": [
-    "MT",
-    "PA"
+    "MA"
   ],
   "bioma": "Cerrado",
   "area_km2_min": 0,

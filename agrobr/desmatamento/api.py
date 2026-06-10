@@ -62,6 +62,15 @@ async def prodes(
     df = parser.parse_prodes_csv(csv_bytes, bioma)
     parse_ms = int((time.monotonic() - t1) * 1000)
 
+    if len(df) >= client.MAX_FEATURES_PER_REQUEST:
+        logger.warning(
+            "desmatamento_prodes_truncated",
+            bioma=bioma,
+            records=len(df),
+            limit=client.MAX_FEATURES_PER_REQUEST,
+            hint="Resultado atingiu o teto do WFS; filtre por ano e/ou uf para dados completos",
+        )
+
     if uf is not None:
         uf_upper = uf.strip().upper()
         df = df[df["uf"] == uf_upper].reset_index(drop=True)
@@ -198,6 +207,15 @@ async def deter(
     t1 = time.monotonic()
     df = parser.parse_deter_csv(csv_bytes, bioma)
     parse_ms = int((time.monotonic() - t1) * 1000)
+
+    if len(df) >= client.MAX_FEATURES_PER_REQUEST:
+        logger.warning(
+            "desmatamento_deter_truncated",
+            bioma=bioma,
+            records=len(df),
+            limit=client.MAX_FEATURES_PER_REQUEST,
+            hint="Resultado atingiu o teto do WFS; filtre por uf e/ou periodo para dados completos",
+        )
 
     if classe is not None:
         df = df[df["classe"] == classe].reset_index(drop=True)

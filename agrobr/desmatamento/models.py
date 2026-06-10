@@ -75,7 +75,6 @@ DETER_LAYERS: dict[str, str] = {
 }
 
 PRODES_COLUNAS_WFS = [
-    "uid",
     "state",
     "main_class",
     "class_name",

@@ -15,6 +15,7 @@
     "cd_atividade",
     "cd_modalidade",
     "area_financiada",
+    "safra",
     "finalidade",
     "programa",
     "fonte_recurso",
@@ -44,20 +45,21 @@
     "atividade"
   ],
   "first_row": {
-    "uf": "BA",
+    "safra": "2013/2014",
+    "uf": "RS",
     "produto": "soja",
     "finalidade": "custeio",
-    "programa": "Sem programa especifico",
-    "fonte_recurso": "FNE",
-    "tipo_seguro": "Seguro privado",
+    "programa": "Pronamp",
+    "fonte_recurso": "Poupanca rural livre",
+    "tipo_seguro": "Nao se aplica",
     "modalidade": "Individual",
     "atividade": "Agricola"
   },
   "last_row": {
-    "uf": "RS",
+    "uf": "MG",
     "produto": "soja",
-    "programa": "Pronamp",
-    "fonte_recurso": "Poupanca rural livre",
+    "programa": "Sem programa especifico",
+    "fonte_recurso": "LCA",
     "tipo_seguro": "Nao se aplica",
     "modalidade": "Individual",
     "atividade": "Agricola"

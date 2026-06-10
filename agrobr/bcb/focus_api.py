@@ -31,7 +31,7 @@ _COLUMN_MAP: dict[str, str] = {
 
 @overload
 async def focus(
-    indicador: str = "PIB Agropecuário",
+    indicador: str = "PIB Agropecuária",
     *,
     top: int = 1000,
     as_polars: bool = False,
@@ -41,7 +41,7 @@ async def focus(
 
 @overload
 async def focus(
-    indicador: str = "PIB Agropecuário",
+    indicador: str = "PIB Agropecuária",
     *,
     top: int = 1000,
     as_polars: bool = False,
@@ -50,7 +50,7 @@ async def focus(
 
 
 async def focus(
-    indicador: str = "PIB Agropecuário",
+    indicador: str = "PIB Agropecuária",
     *,
     top: int = 1000,
     as_polars: bool = False,

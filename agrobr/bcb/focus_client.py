@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from functools import partial
 from typing import Any
+from urllib.parse import quote
 
 import httpx
 import structlog
@@ -32,20 +33,18 @@ async def fetch_focus(
 
     logger.info("bcb_focus_request", indicador=indicador, top=top)
 
+    filtro = quote(f"Indicador eq '{safe_indicador}'", safe="'")
+
     async with httpx.AsyncClient(
         timeout=TIMEOUT, headers=UserAgentRotator.get_bot_headers(), follow_redirects=True
     ) as client:
         while True:
-            params: dict[str, str] = {
-                "$format": "json",
-                "$filter": f"Indicador eq '{safe_indicador}'",
-                "$orderby": "Data desc",
-                "$top": str(top),
-                "$skip": str(skip),
-            }
+            page_url = (
+                f"{url}?$format=json&$filter={filtro}&$orderby=Data%20desc&$top={top}&$skip={skip}"
+            )
 
             response = await retry_on_status(
-                partial(client.get, url, params=params),
+                partial(client.get, page_url),
                 source="bcb",
             )
 

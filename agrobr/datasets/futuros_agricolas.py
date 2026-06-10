@@ -15,6 +15,35 @@ logger = structlog.get_logger()
 _PRODUCTS = list(B3_CONTRATOS_AGRO.keys())
 
 
+def _dias_uteis_recentes(n: int = 5) -> list[str]:
+    from datetime import timedelta
+
+    from agrobr.utils.time import utcnow
+
+    dias: list[str] = []
+    dia = utcnow().date()
+    while len(dias) < n:
+        if dia.weekday() < 5:
+            dias.append(dia.isoformat())
+        dia -= timedelta(days=1)
+    return dias
+
+
+async def _fetch_pregao_recente(
+    fetch_fn: Any, **fetch_kwargs: Any
+) -> tuple[pd.DataFrame, MetaInfo]:
+    from agrobr.exceptions import ParseError, SourceUnavailableError
+
+    last_error: Exception | None = None
+    for dia in _dias_uteis_recentes():
+        try:
+            return await fetch_fn(data=dia, return_meta=True, **fetch_kwargs)  # type: ignore[no-any-return]
+        except (SourceUnavailableError, ParseError) as e:
+            logger.debug("b3_pregao_indisponivel", data=dia, error=str(e))
+            last_error = e
+    raise last_error  # type: ignore[misc]
+
+
 async def _fetch_b3(produto: str, **kwargs: Any) -> tuple[pd.DataFrame, MetaInfo | None]:
     from agrobr import b3
 
@@ -24,19 +53,24 @@ async def _fetch_b3(produto: str, **kwargs: Any) -> tuple[pd.DataFrame, MetaInfo
     vencimento: str | None = kwargs.get("vencimento")
 
     if tipo == "historico":
-        inicio: str = kwargs["inicio"]
-        fim: str = kwargs["fim"]
+        if not kwargs.get("inicio") or not kwargs.get("fim"):
+            raise ValueError("tipo='historico' requer inicio e fim (YYYY-MM-DD)")
         result = await b3.historico(
             contrato=contrato or "",
-            inicio=inicio,
-            fim=fim,
+            inicio=kwargs["inicio"],
+            fim=kwargs["fim"],
             vencimento=vencimento,
             return_meta=True,
         )
     elif tipo == "posicoes":
-        result = await b3.posicoes_abertas(data=data, contrato=contrato, return_meta=True)
-    else:
+        if data:
+            result = await b3.posicoes_abertas(data=data, contrato=contrato, return_meta=True)
+        else:
+            result = await _fetch_pregao_recente(b3.posicoes_abertas, contrato=contrato)
+    elif data:
         result = await b3.ajustes(data=data, contrato=contrato, return_meta=True)
+    else:
+        result = await _fetch_pregao_recente(b3.ajustes, contrato=contrato)
 
     return _unpack_result(result)
 

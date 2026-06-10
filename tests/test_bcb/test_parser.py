@@ -76,6 +76,25 @@ class TestParseCreditorRural:
         assert "Valor" not in df.columns
         assert "valor" in df.columns
 
+    def test_safra_derivada_quando_endpoint_nao_retorna(self):
+        rec_jul = _sicor_record()
+        rec_jul.pop("Safra")
+        rec_jul["AnoEmissao"] = 2023
+        rec_jul["MesEmissao"] = 9
+
+        rec_jan = _sicor_record()
+        rec_jan.pop("Safra")
+        rec_jan["AnoEmissao"] = 2024
+        rec_jan["MesEmissao"] = 2
+
+        df = parse_credito_rural([rec_jul, rec_jan])
+
+        assert df["safra"].tolist() == ["2023/2024", "2023/2024"]
+
+    def test_safra_existente_nao_sobrescrita(self):
+        df = parse_credito_rural([_sicor_record(safra="2022/2023")])
+        assert df["safra"].iloc[0] == "2022/2023"
+
     def test_parse_normalizes_produto(self):
         dados = [_sicor_record(produto="SOJA")]
         df = parse_credito_rural(dados)

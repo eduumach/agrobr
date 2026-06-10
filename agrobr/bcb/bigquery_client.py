@@ -82,7 +82,13 @@ FROM `basedosdados.br_bcb_sicor.microdados_operacao`
         conditions.append(f"UPPER(nome_produto) LIKE '%{safe_produto}%'")
 
     if safra_ano:
-        conditions.append(f"ano = {int(safra_ano)}")
+        from agrobr.normalize.dates import INICIO_SAFRA_MES
+
+        inicio = int(safra_ano)
+        conditions.append(
+            f"((ano = {inicio} AND mes >= {INICIO_SAFRA_MES}) "
+            f"OR (ano = {inicio + 1} AND mes < {INICIO_SAFRA_MES}))"
+        )
 
     if uf:
         safe_uf = _sanitize_bq_str(uf.upper(), "uf")

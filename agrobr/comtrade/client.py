@@ -150,6 +150,9 @@ async def fetch_trade_data(
         "flowCode": flow.upper(),
         "cmdCode": ",".join(hs_codes),
         "includeDesc": "True",
+        "partner2Code": "0",
+        "motCode": "0",
+        "customsCode": "C00",
     }
     if partner != 0:
         params_base["partnerCode"] = str(partner)

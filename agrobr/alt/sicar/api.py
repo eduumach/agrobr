@@ -148,7 +148,8 @@ async def imoveis(
 
     if municipio is None and cod_municipio is None:
         try:
-            total = await client.fetch_hits(uf_upper, cql)
+            async with client.make_session() as http:
+                total = await client.fetch_hits(uf_upper, cql, client=http)
             if total > MAX_FEATURES_WARNING:
                 logger.warning(
                     "sicar_large_query",

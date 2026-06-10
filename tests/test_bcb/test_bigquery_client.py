@@ -46,7 +46,8 @@ class TestBuildQuery:
 
     def test_with_safra_ano(self):
         query = _build_query(finalidade="custeio", safra_ano=2023)
-        assert "ano = 2023" in query
+        assert "(ano = 2023 AND mes >= 7)" in query
+        assert "(ano = 2024 AND mes < 7)" in query
 
     def test_with_uf(self):
         query = _build_query(finalidade="custeio", uf="MT")

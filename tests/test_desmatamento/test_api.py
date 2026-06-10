@@ -73,10 +73,10 @@ class TestProdes:
             new_callable=AsyncMock,
             return_value=(csv_bytes, "https://terrabrasilis.dpi.inpe.br/geoserver/prodes.csv"),
         ):
-            df = await api.prodes(bioma="Cerrado", uf="PA")
+            df = await api.prodes(bioma="Cerrado", uf="MT")
 
         assert len(df) >= 1
-        assert (df["uf"] == "PA").all()
+        assert (df["uf"] == "MT").all()
 
     @pytest.mark.asyncio
     async def test_filter_uf_case_insensitive(self):
@@ -87,10 +87,10 @@ class TestProdes:
             new_callable=AsyncMock,
             return_value=(csv_bytes, "https://terrabrasilis.dpi.inpe.br/geoserver/prodes.csv"),
         ):
-            df = await api.prodes(bioma="Cerrado", uf="pa")
+            df = await api.prodes(bioma="Cerrado", uf="mt")
 
         assert len(df) >= 1
-        assert (df["uf"] == "PA").all()
+        assert (df["uf"] == "MT").all()
 
     @pytest.mark.asyncio
     async def test_invalid_uf_raises(self):
@@ -273,10 +273,10 @@ class TestProdesGeo:
                 "https://terrabrasilis.dpi.inpe.br/geoserver/prodes.geojson",
             ),
         ):
-            gdf = await api.prodes_geo(bioma="Cerrado", uf="PA")
+            gdf = await api.prodes_geo(bioma="Cerrado", uf="MA")
 
         assert len(gdf) >= 1
-        assert (gdf["uf"] == "PA").all()
+        assert (gdf["uf"] == "MA").all()
 
     @pytest.mark.asyncio
     async def test_invalid_uf_raises(self):

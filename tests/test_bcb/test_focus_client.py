@@ -15,7 +15,7 @@ from tests.helpers import (
 
 FOCUS_RECORDS = [
     {
-        "Indicador": "PIB Agropecuário",
+        "Indicador": "PIB Agropecuária",
         "Data": "2026-03-21",
         "DataReferencia": "2026",
         "Media": 3.5,
@@ -27,7 +27,7 @@ FOCUS_RECORDS = [
         "baseCalculo": 0,
     },
     {
-        "Indicador": "PIB Agropecuário",
+        "Indicador": "PIB Agropecuária",
         "Data": "2026-03-14",
         "DataReferencia": "2026",
         "Media": 3.45,
@@ -49,7 +49,7 @@ class TestFocusUrlConstruction:
         mock_client.get = AsyncMock(return_value=resp)
 
         with patch("agrobr.bcb.focus_client.httpx.AsyncClient", return_value=mock_client):
-            await focus_client.fetch_focus("PIB Agropecuário")
+            await focus_client.fetch_focus("PIB Agropecuária")
 
         url = mock_client.get.call_args[0][0]
         assert "Expectativas" in url
@@ -64,10 +64,11 @@ class TestFocusUrlConstruction:
         with patch("agrobr.bcb.focus_client.httpx.AsyncClient", return_value=mock_client):
             await focus_client.fetch_focus("IPCA")
 
-        params = mock_client.get.call_args[1]["params"]
-        assert "IPCA" in params["$filter"]
-        assert params["$orderby"] == "Data desc"
-        assert params["$format"] == "json"
+        url = mock_client.get.call_args[0][0]
+        assert "Indicador%20eq%20'IPCA'" in url
+        assert "$orderby=Data%20desc" in url
+        assert "$format=json" in url
+        assert "+" not in url
 
     @pytest.mark.asyncio
     async def test_top_param_passed(self):
@@ -78,8 +79,8 @@ class TestFocusUrlConstruction:
         with patch("agrobr.bcb.focus_client.httpx.AsyncClient", return_value=mock_client):
             await focus_client.fetch_focus("PIB Total", top=50)
 
-        params = mock_client.get.call_args[1]["params"]
-        assert params["$top"] == "50"
+        url = mock_client.get.call_args[0][0]
+        assert "$top=50" in url
 
 
 class TestFocusQuoteEscaping:
@@ -92,8 +93,8 @@ class TestFocusQuoteEscaping:
         with patch("agrobr.bcb.focus_client.httpx.AsyncClient", return_value=mock_client):
             await focus_client.fetch_focus("Indicador's test")
 
-        params = mock_client.get.call_args[1]["params"]
-        assert "Indicador''s test" in params["$filter"]
+        url = mock_client.get.call_args[0][0]
+        assert "Indicador''s%20test" in url
 
 
 class TestFocusPagination:
@@ -102,7 +103,7 @@ class TestFocusPagination:
         page1 = FOCUS_RECORDS
         page2 = [
             {
-                "Indicador": "PIB Agropecuário",
+                "Indicador": "PIB Agropecuária",
                 "Data": "2026-02-28",
                 "DataReferencia": "2026",
                 "Media": 3.35,
@@ -121,13 +122,13 @@ class TestFocusPagination:
         mock_client.get = AsyncMock(side_effect=[resp1, resp2])
 
         with patch("agrobr.bcb.focus_client.httpx.AsyncClient", return_value=mock_client):
-            records, _ = await focus_client.fetch_focus("PIB Agropecuário", top=2)
+            records, _ = await focus_client.fetch_focus("PIB Agropecuária", top=2)
 
         assert len(records) == 3
         assert mock_client.get.call_count == 2
 
-        second_call_params = mock_client.get.call_args_list[1][1]["params"]
-        assert second_call_params["$skip"] == "2"
+        second_call_url = mock_client.get.call_args_list[1][0][0]
+        assert "$skip=2" in second_call_url
 
 
 class TestFocusEmptyResponse:
@@ -138,7 +139,7 @@ class TestFocusEmptyResponse:
         mock_client.get = AsyncMock(return_value=resp)
 
         with patch("agrobr.bcb.focus_client.httpx.AsyncClient", return_value=mock_client):
-            records, _ = await focus_client.fetch_focus("PIB Agropecuário")
+            records, _ = await focus_client.fetch_focus("PIB Agropecuária")
 
         assert records == []
 
@@ -149,7 +150,7 @@ class TestFocusEmptyResponse:
         mock_client.get = AsyncMock(return_value=resp)
 
         with patch("agrobr.bcb.focus_client.httpx.AsyncClient", return_value=mock_client):
-            records, _ = await focus_client.fetch_focus("PIB Agropecuário")
+            records, _ = await focus_client.fetch_focus("PIB Agropecuária")
 
         assert records == []
 
@@ -165,4 +166,4 @@ class TestFocusRetry:
             patch(RETRY_SLEEP, new_callable=AsyncMock),
             pytest.raises(SourceUnavailableError),
         ):
-            await focus_client.fetch_focus("PIB Agropecuário")
+            await focus_client.fetch_focus("PIB Agropecuária")
