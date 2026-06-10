@@ -193,12 +193,10 @@ async def fetch_imoveis_geo(
                 output_format="application/json",
                 property_names=PROPERTY_NAMES_GEO,
             )
-            delay = 2.0 if i >= 5 else None
             content = await fetch_wfs(
                 url,
                 source="sicar",
                 timeout=TIMEOUT,
-                base_delay=delay,
                 client=http,
             )
             pages.append(content)
@@ -209,6 +207,8 @@ async def fetch_imoveis_geo(
                 total_pages=n_pages,
                 size=len(content),
             )
+            if i >= THROTTLE_AFTER_PAGE:
+                await asyncio.sleep(THROTTLE_DELAY)
 
     logger.info("sicar_imoveis_geojson", source="sicar", pages=n_pages, uf=uf)
     return pages, base_url
