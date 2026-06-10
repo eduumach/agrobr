@@ -149,25 +149,27 @@ class TestFetchImoveis:
         assert len(pages) == 2
 
     @pytest.mark.asyncio
-    async def test_progressive_delay_after_page_5(self):
+    async def test_throttle_sleep_after_page_5(self):
         xml_hits = b'<wfs:FeatureCollection numberMatched="70000"/>'
         csv_data = b"cod_imovel,status_imovel\nFOO,AT\n"
-        delays: list[float | None] = []
+        sleeps: list[float] = []
 
-        async def mock_fetch(url, **kwargs):
+        async def mock_fetch(url, **_kwargs):
             if "resultType=hits" in url:
                 return xml_hits
-            delays.append(kwargs.get("base_delay"))
             return csv_data
 
-        with patch.object(client, "fetch_wfs", side_effect=mock_fetch):
+        async def mock_sleep(delay):
+            sleeps.append(delay)
+
+        with (
+            patch.object(client, "fetch_wfs", side_effect=mock_fetch),
+            patch.object(client.asyncio, "sleep", side_effect=mock_sleep),
+        ):
             pages, url = await fetch_imoveis("BA")
 
         assert len(pages) == 7
-        assert delays[0] is None
-        assert delays[4] is None
-        assert delays[5] == 2.0
-        assert delays[6] == 2.0
+        assert sleeps == [client.THROTTLE_DELAY, client.THROTTLE_DELAY]
 
     @pytest.mark.asyncio
     async def test_with_cql_filter_passed_through(self):

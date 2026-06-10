@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import math
 import re
@@ -317,6 +318,7 @@ async def fetch_wfs_paginated(
         [],
         max_features=1,
         cql_filter=cql,
+        bbox=bbox,
         result_type="hits",
     )
     hits_content = await fetch_wfs(hits_url, source=source, timeout=timeout)
@@ -359,12 +361,10 @@ async def fetch_wfs_paginated(
             )
             if i == 0:
                 first_url = url
-            delay = throttle_delay if i >= throttle_after_page else None
             content = await fetch_wfs(
                 url,
                 source=source,
                 timeout=timeout,
-                base_delay=delay,
                 client=http,
             )
             pages.append(content)
@@ -376,6 +376,8 @@ async def fetch_wfs_paginated(
                 total_pages=n_pages,
                 size=len(content),
             )
+            if i >= throttle_after_page:
+                await asyncio.sleep(throttle_delay)
 
     return pages, first_url
 
@@ -393,9 +395,6 @@ async def fetch_arcgis_layer(
     throttle_after_page: int = 5,
     throttle_delay: float = 2.0,
 ) -> tuple[list[bytes], str]:
-    import asyncio
-    import math
-
     service_url = f"{base_url}/{layer_config['service_path']}"
     max_record_count = layer_config["max_record_count"]
     fields = layer_config["fields"]
@@ -433,7 +432,7 @@ async def fetch_arcgis_layer(
                 out_fields=fields,
                 out_sr=4326,
                 f=f,
-                result_record_count=max_record_count,
+                result_record_count=min(max_record_count, total - offset),
                 result_offset=offset,
             )
             if i == 0:

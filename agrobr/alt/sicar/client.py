@@ -11,6 +11,7 @@ enforces ``required_cols``). SECLEVEL=1 kept for the GeoServer cipher set.
 
 from __future__ import annotations
 
+import asyncio
 import math
 import ssl
 from urllib.parse import quote
@@ -36,6 +37,9 @@ from .models import (
 logger = structlog.get_logger()
 
 TIMEOUT = get_timeout(read=180.0)
+
+THROTTLE_AFTER_PAGE = 5
+THROTTLE_DELAY = 2.0
 
 _ssl_ctx = ssl.create_default_context()
 _ssl_ctx.check_hostname = False
@@ -122,12 +126,10 @@ async def fetch_imoveis(uf: str, cql_filter: str | None = None) -> tuple[list[by
                 count=PAGE_SIZE,
                 start_index=start_index,
             )
-            delay = 2.0 if i >= 5 else None
             content = await fetch_wfs(
                 url,
                 source="sicar",
                 timeout=TIMEOUT,
-                base_delay=delay,
                 client=http,
             )
             pages.append(content)
@@ -138,6 +140,8 @@ async def fetch_imoveis(uf: str, cql_filter: str | None = None) -> tuple[list[by
                 total_pages=n_pages,
                 size=len(content),
             )
+            if i >= THROTTLE_AFTER_PAGE:
+                await asyncio.sleep(THROTTLE_DELAY)
 
     return pages, base_url
 

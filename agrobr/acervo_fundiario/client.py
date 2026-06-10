@@ -31,6 +31,12 @@ _SSL_CTX = ssl.create_default_context()
 _SSL_CTX.check_hostname = False
 _SSL_CTX.verify_mode = ssl.CERT_NONE
 
+_SSL_WARNING = (
+    "acervo_fundiario (certificacao.incra.gov.br) usa verify=False: cadeia de "
+    "certificados do INCRA incompleta em truststores comuns. Dado e publico e "
+    "o ZIP e validado por magic bytes + SHA256 apos o download."
+)
+
 _FETCH_LOCKS: dict[str, asyncio.Lock] = {}
 _LOCKS_GUARD = asyncio.Lock()
 
@@ -207,6 +213,9 @@ async def download_and_cache(tema: str, uf: str | None = None, *, use_cache: boo
     meta_path = _meta_path(tema, uf)
     cache_active = use_cache and not _cache_disabled()
 
+    from agrobr.http.rate_limiter import RateLimiter
+
+    warn_once("acervo_fundiario_ssl_verify_off", _SSL_WARNING)
     lock = await _get_lock(_cache_key(tema, uf))
     async with (
         lock,
@@ -221,7 +230,8 @@ async def download_and_cache(tema: str, uf: str | None = None, *, use_cache: boo
         if cache_active:
             cached_meta = _load_meta(meta_path)
             if cached_meta and _validate_cached_zip(zip_path):
-                head_info = await _head(client, url)
+                async with RateLimiter.acquire("acervo_fundiario"):
+                    head_info = await _head(client, url)
                 if head_info["last_modified"] == cached_meta.get("last_modified"):
                     logger.debug(
                         "acervo_fundiario_cache_hit",
@@ -240,10 +250,11 @@ async def download_and_cache(tema: str, uf: str | None = None, *, use_cache: boo
 
         _warn_download_size_once()
         logger.info("acervo_fundiario_download_start", tema=tema, uf=uf, url=url)
-        size_bytes, sha256 = await _stream_download(client, url, zip_path)
+        async with RateLimiter.acquire("acervo_fundiario"):
+            size_bytes, sha256 = await _stream_download(client, url, zip_path)
 
-        if head_info is None:
-            head_info = await _head(client, url)
+            if head_info is None:
+                head_info = await _head(client, url)
 
         _save_meta(
             meta_path,
