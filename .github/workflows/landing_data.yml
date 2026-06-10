@@ -1,0 +1,36 @@
+name: Landing Data
+
+on:
+  schedule:
+    - cron: '30 21 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install agrobr
+        run: pip install -e .
+
+      - name: Atualiza dados da landing
+        run: python scripts/update_landing_data.py
+
+      - name: Commit se houver mudanca
+        run: |
+          git config user.name "agrobr-bot"
+          git config user.email "bot@agrobr.dev"
+          git add index.html
+          git diff --staged --quiet || (git commit -m "chore(landing): atualiza indicadores do ticker [skip ci]" && git push)

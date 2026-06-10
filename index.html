@@ -4,7 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>agrobr — Dados agrícolas brasileiros em uma linha de código</title>
-<meta name="description" content="Infraestrutura Python para dados agrícolas brasileiros. 38 fontes públicas — CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, ANEC, USDA, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento, MapBiomas, B3 Futuros Agro, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedagio, SICAR, ZARC, Agrofit/MAPA (Defensivos), FUNAI, ICMBio, INCRA, IBAMA, MapBiomas Alerta, Lista Suja, ANA/SNIRH, SFB, RNC/CultivarWeb, EMBRAPA Solos, Fundação Rio Verde, Acervo Fundiário/INCRA — uma API, fallback automático, cache DuckDB.">
+<meta name="description" content="Infraestrutura Python para dados agrícolas brasileiros. 38 fontes públicas, uma API unificada com fallback automático, cache DuckDB e contratos versionados.">
+<link rel="canonical" href="https://www.agrobr.dev/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.agrobr.dev/">
+<meta property="og:title" content="agrobr — Dados agrícolas brasileiros em uma linha de código">
+<meta property="og:description" content="38 fontes públicas — CEPEA, CONAB, IBGE, B3, NASA POWER e mais — numa API Python unificada com fallback automático e contratos versionados.">
+<meta property="og:image" content="https://www.agrobr.dev/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -22,6 +30,7 @@
     --accent-gold: #c9a96e;
     --accent-gold-dim: #9a7d4e;
     --accent-green: #5a8a5e;
+    --accent-red: #a05a5a;
     --accent-blue: #4a6a8a;
     --code-bg: #0d0d14;
     --border: #222230;
@@ -41,17 +50,12 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  ::selection {
-    background: var(--accent-gold);
-    color: var(--bg-deep);
-  }
+  ::selection { background: var(--accent-gold); color: var(--bg-deep); }
 
   /* ═══════════════ NAV ═══════════════ */
   nav {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 0; left: 0; right: 0;
     z-index: 100;
     padding: 1.25rem 3rem;
     display: flex;
@@ -75,17 +79,12 @@
     letter-spacing: -0.02em;
   }
 
-  .nav-links {
-    display: flex;
-    gap: 2.5rem;
-    list-style: none;
-  }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
 
   .nav-links a {
     color: var(--text-secondary);
     text-decoration: none;
     font-size: 0.85rem;
-    font-weight: 400;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     transition: color 0.3s;
@@ -152,10 +151,7 @@
     text-shadow: 0 2px 20px rgba(0,0,0,0.7), 0 4px 40px rgba(0,0,0,0.4);
   }
 
-  .hero-title em {
-    font-style: italic;
-    color: var(--accent-gold);
-  }
+  .hero-title em { font-style: italic; color: var(--accent-gold); }
 
   .hero-subtitle {
     font-size: 1.15rem;
@@ -187,42 +183,92 @@
     animation: fadeUp 1s 0.9s forwards;
   }
 
-  .hero-install:hover {
-    border-color: var(--accent-gold-dim);
-    transform: translateY(-2px);
-  }
-
+  .hero-install:hover { border-color: var(--accent-gold-dim); transform: translateY(-2px); }
   .hero-install .pip { color: var(--accent-gold); }
   .hero-install .copy-icon { color: var(--text-muted); font-size: 0.8rem; }
   .hero-install .copied { color: var(--accent-green); }
 
-  .hero-scroll {
-    position: absolute;
-    bottom: 2.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 2;
-    opacity: 0;
-    animation: fadeUp 1s 1.2s forwards;
-  }
-
-  .hero-scroll span {
-    display: block;
-    width: 1px;
-    height: 48px;
-    background: linear-gradient(to bottom, var(--accent-gold-dim), transparent);
-    margin: 0 auto;
-    animation: scrollPulse 2s ease-in-out infinite;
-  }
-
-  @keyframes scrollPulse {
-    0%, 100% { opacity: 0.4; transform: scaleY(1); }
-    50% { opacity: 1; transform: scaleY(1.2); }
-  }
-
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(24px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ═══════════════ TICKER (preços reais) ═══════════════ */
+  .ticker {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    background: rgba(10, 10, 15, 0.72);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(201, 169, 110, 0.18);
+    overflow: hidden;
+    opacity: 0;
+    animation: fadeUp 1s 1.3s forwards;
+  }
+
+  .ticker-track {
+    display: flex;
+    width: max-content;
+    animation: tickerScroll 46s linear infinite;
+  }
+
+  .ticker:hover .ticker-track { animation-play-state: paused; }
+
+  @keyframes tickerScroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  .ticker-set {
+    display: flex;
+    align-items: center;
+    padding: 0.7rem 0;
+  }
+
+  .ticker-item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0 2.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    white-space: nowrap;
+    border-right: 1px solid rgba(201, 169, 110, 0.12);
+  }
+
+  .ticker-item .tk-name { color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.68rem; }
+  .ticker-item .tk-price { color: var(--text-primary); font-weight: 500; }
+  .ticker-item .up { color: #7fae83; }
+  .ticker-item .down { color: #c98a8a; }
+  .ticker-item .tk-stamp { color: var(--accent-gold-dim); font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; }
+
+  /* ═══════════════ STAT STRIP ═══════════════ */
+  .stat-strip {
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-surface);
+  }
+
+  .stat-strip-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.4rem 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 3.5rem;
+    flex-wrap: wrap;
+    font-family: var(--font-mono);
+  }
+
+  .stat-item { display: flex; align-items: baseline; gap: 0.5rem; }
+  .stat-num { font-size: 1.25rem; color: var(--accent-gold); font-weight: 500; }
+  .stat-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 
   /* ═══════════════ SECTIONS ═══════════════ */
@@ -232,10 +278,7 @@
     margin: 0 auto;
   }
 
-  section.hero,
-  section.cta-section {
-    max-width: none;
-  }
+  section.hero, section.cta-section { max-width: none; }
 
   .section-label {
     font-family: var(--font-mono);
@@ -263,15 +306,20 @@
     margin-bottom: 3rem;
   }
 
-  /* ═══════════════ CODE BLOCK ═══════════════ */
+  /* ═══════════════ PROOF ═══════════════ */
+  .proof-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 2rem;
+    align-items: stretch;
+  }
+
   .code-block {
     background: var(--code-bg);
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 1.75rem 2rem;
     overflow-x: auto;
-    margin-top: 3rem;
-    margin-bottom: 2rem;
     position: relative;
   }
 
@@ -303,7 +351,227 @@
   .code-block .var { color: var(--text-primary); }
   .code-block .op { color: #89ddff; }
 
-  /* ═══════════════ DATASETS GRID ═══════════════ */
+  .code-line { opacity: 0; animation: lineIn 0.01s forwards; }
+  .visible .code-line:nth-child(1) { animation-delay: 0.15s; }
+  .visible .code-line:nth-child(2) { animation-delay: 0.45s; }
+  .visible .code-line:nth-child(3) { animation-delay: 0.75s; }
+  .visible .code-line:nth-child(4) { animation-delay: 1.05s; }
+  .visible .code-line:nth-child(5) { animation-delay: 1.5s; }
+  @keyframes lineIn { to { opacity: 1; } }
+
+  .proof-output {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.75rem 2rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .proof-output::before {
+    content: 'OUTPUT · DADO REAL';
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--accent-gold-dim);
+    letter-spacing: 0.15em;
+    margin-bottom: 1rem;
+  }
+
+  .proof-price {
+    font-family: var(--font-display);
+    font-size: 2.6rem;
+    line-height: 1;
+    color: var(--text-primary);
+  }
+
+  .proof-price .currency {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+  }
+
+  .proof-meta {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    letter-spacing: 0.04em;
+  }
+
+  .sparkline { margin: 1.5rem 0 0.75rem; width: 100%; height: auto; }
+
+  .spark-path {
+    fill: none;
+    stroke: var(--accent-gold);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  .visible .spark-path {
+    stroke-dasharray: 600;
+    stroke-dashoffset: 600;
+    animation: drawSpark 2s 0.6s ease-out forwards;
+  }
+
+  @keyframes drawSpark { to { stroke-dashoffset: 0; } }
+
+  .spark-dot { fill: var(--accent-gold); opacity: 0; }
+  .visible .spark-dot { animation: dotIn 0.4s 2.4s forwards; }
+  @keyframes dotIn { to { opacity: 1; } }
+
+  .proof-rows {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+    padding-top: 1rem;
+  }
+
+  .proof-rows div { display: flex; justify-content: space-between; padding: 0.2rem 0; }
+  .proof-rows .v { color: var(--text-primary); }
+
+  /* ═══════════════ PIPELINE (anatomia do fallback) ═══════════════ */
+  .pipeline {
+    margin-top: 3.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2.75rem 2.5rem 2.25rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pipeline::before {
+    content: 'ANATOMIA DE UMA CHAMADA · LOOP REAL DE FALLBACK';
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--accent-gold-dim);
+    letter-spacing: 0.18em;
+    position: absolute;
+    top: 1rem;
+    left: 1.5rem;
+  }
+
+  .pipe-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .pipe-node {
+    flex: 0 0 auto;
+    text-align: center;
+    font-family: var(--font-mono);
+    position: relative;
+  }
+
+  .pipe-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--text-muted);
+    margin: 0 auto 0.6rem;
+    background: var(--bg-deep);
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .pipe-name { font-size: 0.72rem; color: var(--text-secondary); letter-spacing: 0.05em; }
+  .pipe-status { font-size: 0.62rem; height: 1.1rem; margin-top: 0.2rem; letter-spacing: 0.08em; opacity: 0; }
+
+  .pipe-link {
+    flex: 1 1 auto;
+    height: 1px;
+    background: var(--border);
+    position: relative;
+    overflow: visible;
+    min-width: 40px;
+  }
+
+  .pipe-link::after {
+    content: '';
+    position: absolute;
+    top: -1.5px;
+    left: 0;
+    width: 26%;
+    height: 4px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, transparent, var(--accent-gold));
+    opacity: 0;
+  }
+
+  /* loop de 9s: CEPEA falha → NA responde → contrato valida → DataFrame */
+  .pl1 .pipe-dot { animation: nodeFail 9s infinite; }
+  .pl1 .pipe-status { animation: statusFail 9s infinite; color: var(--accent-red); }
+  .lk1::after { animation: pulse1 9s infinite; }
+  .pl2 .pipe-dot { animation: nodeOk2 9s infinite; }
+  .pl2 .pipe-status { animation: statusOk2 9s infinite; color: var(--accent-green); }
+  .lk2::after { animation: pulse2 9s infinite; }
+  .pl3 .pipe-dot { animation: nodeOk3 9s infinite; }
+  .pl3 .pipe-status { animation: statusOk3 9s infinite; color: var(--accent-green); }
+  .lk3::after { animation: pulse3 9s infinite; }
+  .pl4 .pipe-dot { animation: nodeGold 9s infinite; }
+  .pl4 .pipe-status { animation: statusGold 9s infinite; color: var(--accent-gold); }
+
+  @keyframes nodeFail {
+    0%, 8% { border-color: var(--text-muted); box-shadow: none; }
+    12%, 30% { border-color: var(--accent-red); box-shadow: 0 0 14px rgba(160, 90, 90, 0.5); }
+    34%, 100% { border-color: #5a3a3a; box-shadow: none; }
+  }
+  @keyframes statusFail {
+    0%, 10% { opacity: 0; }
+    14%, 32% { opacity: 1; }
+    36%, 100% { opacity: 0.45; }
+  }
+  @keyframes pulse1 {
+    0%, 30% { opacity: 0; left: 0; }
+    36% { opacity: 1; }
+    46% { opacity: 1; left: 74%; }
+    50%, 100% { opacity: 0; left: 74%; }
+  }
+  @keyframes nodeOk2 {
+    0%, 44% { border-color: var(--text-muted); box-shadow: none; }
+    50%, 100% { border-color: var(--accent-green); box-shadow: 0 0 14px rgba(90, 138, 94, 0.45); }
+  }
+  @keyframes statusOk2 {
+    0%, 48% { opacity: 0; }
+    52%, 100% { opacity: 1; }
+  }
+  @keyframes pulse2 {
+    0%, 52% { opacity: 0; left: 0; }
+    56% { opacity: 1; }
+    66% { opacity: 1; left: 74%; }
+    70%, 100% { opacity: 0; left: 74%; }
+  }
+  @keyframes nodeOk3 {
+    0%, 64% { border-color: var(--text-muted); box-shadow: none; }
+    70%, 100% { border-color: var(--accent-green); box-shadow: 0 0 14px rgba(90, 138, 94, 0.45); }
+  }
+  @keyframes statusOk3 {
+    0%, 68% { opacity: 0; }
+    72%, 100% { opacity: 1; }
+  }
+  @keyframes pulse3 {
+    0%, 72% { opacity: 0; left: 0; }
+    76% { opacity: 1; }
+    84% { opacity: 1; left: 74%; }
+    88%, 100% { opacity: 0; left: 74%; }
+  }
+  @keyframes nodeGold {
+    0%, 84% { border-color: var(--text-muted); box-shadow: none; }
+    90%, 100% { border-color: var(--accent-gold); box-shadow: 0 0 18px rgba(201, 169, 110, 0.55); }
+  }
+  @keyframes statusGold {
+    0%, 88% { opacity: 0; }
+    92%, 100% { opacity: 1; }
+  }
+
+  /* ═══════════════ DATASETS ═══════════════ */
   .datasets-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -319,10 +587,7 @@
     transition: border-color 0.3s, transform 0.3s;
   }
 
-  .dataset-card:hover {
-    border-color: var(--accent-gold-dim);
-    transform: translateY(-3px);
-  }
+  .dataset-card:hover { border-color: var(--accent-gold-dim); transform: translateY(-3px); }
 
   .dataset-name {
     font-family: var(--font-mono);
@@ -344,6 +609,20 @@
     color: var(--text-muted);
     letter-spacing: 0.03em;
   }
+
+  .datasets-more { margin-top: 2.5rem; text-align: center; }
+
+  .datasets-more a {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--accent-gold);
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent-gold-dim);
+    padding-bottom: 2px;
+    transition: color 0.3s, border-color 0.3s;
+  }
+
+  .datasets-more a:hover { color: #dbb87a; border-color: #dbb87a; }
 
   /* ═══════════════ FEATURES ═══════════════ */
   .features-grid {
@@ -386,72 +665,76 @@
     font-weight: 300;
   }
 
-  /* ═══════════════ SOURCES ═══════════════ */
-  .sources-row {
+  /* ═══════════════ FONTES: MAPA + TYPE WALL ═══════════════ */
+  .sources-layout {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1.25rem;
-    margin-top: 2rem;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 3rem;
+    align-items: center;
+    margin-top: 1rem;
   }
 
-  .source-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 2rem;
+  .brasil-wrap { position: relative; }
+
+  .brasil-svg { width: 100%; height: auto; display: block; }
+
+  .brasil-svg .dot {
+    fill: #3a3424;
+    opacity: 0.55;
+  }
+
+  .brasil-svg .dot.glow {
+    fill: var(--accent-gold);
+    animation: dotPulse 3.4s ease-in-out infinite;
+  }
+
+  @keyframes dotPulse {
+    0%, 100% { opacity: 0.25; }
+    50% { opacity: 1; }
+  }
+
+  .brasil-caption {
     text-align: center;
-    transition: border-color 0.3s;
-  }
-
-  .source-card:hover { border-color: var(--accent-gold-dim); }
-
-  .source-name {
     font-family: var(--font-mono);
-    font-size: 1rem;
-    font-weight: 500;
-    margin-bottom: 0.4rem;
-  }
-
-  .source-count {
-    font-size: 0.78rem;
-    color: var(--accent-gold-dim);
-    font-family: var(--font-mono);
-    margin-bottom: 0.6rem;
-  }
-
-  .source-detail {
-    font-size: 0.82rem;
-    color: var(--text-secondary);
-    font-weight: 300;
-  }
-
-  .source-badge {
-    display: inline-block;
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    letter-spacing: 0.05em;
-    padding: 0.15rem 0.5rem;
-    border-radius: 4px;
-    margin-top: 0.6rem;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    letter-spacing: 0.16em;
     text-transform: uppercase;
+    margin-top: 1rem;
   }
 
-  .source-badge.nc {
-    color: #d4a843;
-    border: 1px solid #d4a84333;
-    background: #d4a84310;
+  .typewall {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem 1.8rem;
+    align-items: baseline;
   }
 
-  .source-badge.restrito {
-    color: #c45a5a;
-    border: 1px solid #c45a5a33;
-    background: #c45a5a10;
+  .typewall span {
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+    cursor: default;
+    transition: color 0.3s, text-shadow 0.3s;
+    letter-spacing: 0.02em;
   }
 
-  .source-badge.deprecated {
-    color: #888;
-    border: 1px solid #88888833;
-    background: #88888810;
+  .typewall span:hover {
+    color: var(--accent-gold);
+    text-shadow: 0 0 24px rgba(201, 169, 110, 0.45);
+  }
+
+  .typewall .t1 { font-size: 1.3rem; color: var(--text-primary); }
+  .typewall .t2 { font-size: 1rem; }
+  .typewall .t3 { font-size: 0.82rem; color: var(--text-muted); }
+  .typewall .lic { color: #8a6d50; }
+  .typewall .lic:hover { color: #d4a843; }
+
+  .typewall-note {
+    margin-top: 2rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
   }
 
   /* ═══════════════ CTA ═══════════════ */
@@ -492,24 +775,15 @@
     transition: all 0.3s;
   }
 
-  .cta-btn.primary {
-    background: var(--accent-gold);
-    color: var(--bg-deep);
-  }
-  .cta-btn.primary:hover {
-    background: #dbb87a;
-    transform: translateY(-2px);
-  }
+  .cta-btn.primary { background: var(--accent-gold); color: var(--bg-deep); }
+  .cta-btn.primary:hover { background: #dbb87a; transform: translateY(-2px); }
 
   .cta-btn.secondary {
     border: 1px solid var(--border);
     color: var(--text-primary);
     background: var(--bg-card);
   }
-  .cta-btn.secondary:hover {
-    border-color: var(--accent-gold-dim);
-    transform: translateY(-2px);
-  }
+  .cta-btn.secondary:hover { border-color: var(--accent-gold-dim); transform: translateY(-2px); }
 
   /* ═══════════════ FOOTER ═══════════════ */
   footer {
@@ -524,17 +798,11 @@
     color: var(--text-muted);
   }
 
-  footer a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: color 0.3s;
-  }
-
+  footer a { color: var(--text-secondary); text-decoration: none; transition: color 0.3s; }
   footer a:hover { color: var(--accent-gold); }
-
   .footer-links { display: flex; gap: 2rem; }
 
-  /* ═══════════════ REVEAL ANIMATION ═══════════════ */
+  /* ═══════════════ REVEAL ═══════════════ */
   .reveal {
     opacity: 0;
     transform: translateY(32px);
@@ -542,25 +810,46 @@
                 transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ═══════════════ MOTION / RESPONSIVE ═══════════════ */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-bg { animation: none; }
+    .hero-eyebrow, .hero-title, .hero-subtitle, .hero-install, .ticker { animation-duration: 0.01s; animation-delay: 0s; }
+    .ticker-track { animation: none; }
+    .reveal { transition: none; opacity: 1; transform: none; }
+    .code-line { animation-duration: 0.01s; animation-delay: 0s !important; }
+    .visible .spark-path { animation-duration: 0.01s; animation-delay: 0s; }
+    .visible .spark-dot { animation-delay: 0.1s; }
+    .pipe-dot, .pipe-status, .pipe-link::after { animation: none !important; }
+    .pl2 .pipe-dot, .pl3 .pipe-dot { border-color: var(--accent-green); }
+    .pl4 .pipe-dot { border-color: var(--accent-gold); }
+    .pipe-status { opacity: 0.8; }
+    .brasil-svg .dot.glow { animation: none; opacity: 0.85; }
   }
 
-  /* ═══════════════ RESPONSIVE ═══════════════ */
+  @media (max-width: 880px) {
+    .proof-grid { grid-template-columns: 1fr; }
+    .sources-layout { grid-template-columns: 1fr; gap: 2rem; }
+    .brasil-wrap { max-width: 320px; margin: 0 auto; }
+  }
+
   @media (max-width: 768px) {
     nav { padding: 1rem 1.5rem; }
     .nav-links { gap: 1.25rem; }
     .nav-links a { font-size: 0.75rem; }
     section { padding: 4rem 1.5rem; }
-    .sources-row { grid-template-columns: 1fr; }
+    .stat-strip-inner { gap: 1.75rem; padding: 1.2rem 1.5rem; }
     .cta-section { padding: 4rem 1.5rem 6rem; }
     footer { flex-direction: column; gap: 1rem; text-align: center; }
+    .pipe-name { font-size: 0.6rem; }
+    .pipe-status { font-size: 0.55rem; }
   }
 
   @media (max-width: 480px) {
     .nav-links { display: none; }
     .hero-install { font-size: 0.82rem; padding: 0.75rem 1.25rem; }
+    .ticker-item { padding: 0 1.2rem; }
   }
 </style>
 </head>
@@ -590,10 +879,103 @@
       <span class="copy-icon">⎘</span>
     </div>
   </div>
-  <div class="hero-scroll"><span></span></div>
+
+  <!-- TICKER: preços reais buscados pelo próprio agrobr -->
+  <div class="ticker" aria-label="Indicadores CEPEA de 09/06/2026 via agrobr">
+    <div class="ticker-track" id="tickerTrack">
+      <div class="ticker-set">
+        <!-- agrobr:ticker -->
+        <span class="ticker-item"><span class="tk-name">soja</span><span class="tk-price">R$ 130,85</span><span class="up">▲ 0,59%</span></span>
+        <span class="ticker-item"><span class="tk-name">milho</span><span class="tk-price">R$ 64,26</span><span class="down">▼ 0,43%</span></span>
+        <span class="ticker-item"><span class="tk-name">boi gordo</span><span class="tk-price">R$ 353,55</span><span class="up">▲ 0,11%</span></span>
+        <span class="ticker-item"><span class="tk-name">café</span><span class="tk-price">R$ 1,383,57</span><span class="down">▼ 0,83%</span></span>
+        <span class="ticker-item"><span class="tk-name">trigo</span><span class="tk-price">R$ 1,372,24</span><span class="up">▲ 0,02%</span></span>
+        <span class="ticker-item"><span class="tk-name">algodão</span><span class="tk-price">R$ 418,94</span><span class="down">▼ 0,22%</span></span>
+        <span class="ticker-item"><span class="tk-stamp">indicadores CEPEA · 09 jun 2026 · coletados via agrobr</span></span>
+        <!-- /agrobr:ticker -->
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- DATASETS -->
+<!-- STAT STRIP -->
+<div class="stat-strip">
+  <div class="stat-strip-inner">
+    <div class="stat-item"><span class="stat-num">38</span><span class="stat-label">fontes</span></div>
+    <div class="stat-item"><span class="stat-num">35</span><span class="stat-label">datasets</span></div>
+    <div class="stat-item"><span class="stat-num">6.300+</span><span class="stat-label">testes</span></div>
+    <div class="stat-item"><span class="stat-num">92%</span><span class="stat-label">cobertura</span></div>
+    <div class="stat-item"><span class="stat-num">MIT</span><span class="stat-label">license</span></div>
+  </div>
+</div>
+
+<!-- PROOF -->
+<section id="proof">
+  <div class="reveal">
+    <p class="section-label">Prova, não promessa</p>
+    <h2 class="section-title">Isto saiu daqui ontem.</h2>
+    <p class="section-desc">O painel ao lado não é mockup: é o indicador CEPEA da soja buscado pelo próprio agrobr — fallback automático, cache DuckDB, contrato validado.</p>
+  </div>
+
+  <div class="proof-grid reveal">
+    <div class="code-block" data-lang="python">
+<code><span class="code-line"><span class="kw">from</span> <span class="var">agrobr</span> <span class="kw">import</span> <span class="var">datasets</span></span>
+<span class="code-line"> </span>
+<span class="code-line"><span class="var">df</span> <span class="op">=</span> <span class="kw">await</span> <span class="fn">datasets.preco_diario</span>(<span class="str">"soja"</span>)</span>
+<span class="code-line"> </span>
+<!-- agrobr:pregoes --><span class="code-line"><span class="cm"># 86 pregões · CEPEA → Notícias Agrícolas → cache</span></span><!-- /agrobr:pregoes -->
+</code>
+    </div>
+
+    <div class="proof-output">
+      <!-- agrobr:proof -->
+      <div class="proof-price">R$ 130,85 <span class="currency">/ sc 60kg</span></div>
+      <div class="proof-meta">soja · indicador CEPEA/ESALQ · 09 jun 2026</div>
+      <svg class="sparkline" viewBox="0 0 300 84" preserveAspectRatio="none" aria-label="Últimos 30 pregões da soja">
+        <polyline class="spark-path" points="0.0,70.9 10.3,56.2 20.7,44.7 31.0,48.7 41.4,44.0 51.7,48.2 62.1,53.5 72.4,76.0 82.8,70.2 93.1,49.3 103.4,36.9 113.8,18.4 124.1,58.7 134.5,44.0 144.8,33.6 155.2,18.0 165.5,42.0 175.9,34.9 186.2,35.3 196.6,30.0 206.9,38.0 217.2,30.4 227.6,12.0 237.9,26.2 248.3,23.8 258.6,51.3 269.0,28.0 279.3,43.6 289.7,26.9 300.0,12.9"/>
+        <circle class="spark-dot" cx="300.0" cy="12.9" r="3.5"/>
+      </svg>
+      <div class="proof-rows">
+        <div><span>2026-06-03</span><span class="v">130,02</span></div>
+        <div><span>2026-06-05</span><span class="v">129,16</span></div>
+        <div><span>2026-06-08</span><span class="v">130,08</span></div>
+        <div><span>2026-06-09</span><span class="v">130,85</span></div>
+      </div>
+        <!-- /agrobr:proof -->
+    </div>
+  </div>
+
+  <!-- ANATOMIA DO FALLBACK -->
+  <div class="pipeline reveal" aria-label="Animação do fallback em cascata">
+    <div class="pipe-row">
+      <div class="pipe-node pl1">
+        <div class="pipe-dot"></div>
+        <div class="pipe-name">CEPEA</div>
+        <div class="pipe-status">✗ 403 Forbidden</div>
+      </div>
+      <div class="pipe-link lk1"></div>
+      <div class="pipe-node pl2">
+        <div class="pipe-dot"></div>
+        <div class="pipe-name">Not. Agrícolas</div>
+        <div class="pipe-status">✓ 200 OK</div>
+      </div>
+      <div class="pipe-link lk2"></div>
+      <div class="pipe-node pl3">
+        <div class="pipe-dot"></div>
+        <div class="pipe-name">contrato v1.0</div>
+        <div class="pipe-status">✓ schema válido</div>
+      </div>
+      <div class="pipe-link lk3"></div>
+      <div class="pipe-node pl4">
+        <div class="pipe-dot"></div>
+        <div class="pipe-name">DataFrame</div>
+        <div class="pipe-status">◈ entregue</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DATASETS EM DESTAQUE -->
 <section id="datasets">
   <div class="reveal">
     <p class="section-label">Camada Semântica</p>
@@ -608,119 +990,14 @@
       <div class="dataset-sources">CEPEA → NA → cache</div>
     </div>
     <div class="dataset-card">
-      <div class="dataset-name">producao_anual</div>
-      <div class="dataset-desc">Produção consolidada por UF e município</div>
-      <div class="dataset-sources">IBGE PAM → CONAB</div>
-    </div>
-    <div class="dataset-card">
       <div class="dataset-name">estimativa_safra</div>
       <div class="dataset-desc">Estimativas da safra corrente</div>
       <div class="dataset-sources">CONAB → IBGE LSPA</div>
     </div>
     <div class="dataset-card">
-      <div class="dataset-name">balanco</div>
-      <div class="dataset-desc">Oferta e demanda por cultura</div>
-      <div class="dataset-sources">CONAB</div>
-    </div>
-    <div class="dataset-card">
       <div class="dataset-name">credito_rural</div>
       <div class="dataset-desc">Crédito rural por cultura, programa, seguro e modalidade</div>
       <div class="dataset-sources">BCB/SICOR → BigQuery</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">exportacao</div>
-      <div class="dataset-desc">Exportações agrícolas por NCM</div>
-      <div class="dataset-sources">ComexStat → ABIOVE</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">fertilizante</div>
-      <div class="dataset-desc">Entregas de fertilizantes por UF</div>
-      <div class="dataset-sources">ANDA</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">custo_producao</div>
-      <div class="dataset-desc">Custos de produção por hectare</div>
-      <div class="dataset-sources">CONAB</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">pecuaria_municipal</div>
-      <div class="dataset-desc">Rebanhos e produção de origem animal por UF/município</div>
-      <div class="dataset-sources">IBGE PPM</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">abate_trimestral</div>
-      <div class="dataset-desc">Abate de bovinos, suínos e frangos por UF</div>
-      <div class="dataset-sources">IBGE Abate</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">cadastro_rural</div>
-      <div class="dataset-desc">Cadastro Ambiental Rural: imóveis rurais por UF</div>
-      <div class="dataset-sources">SICAR/GeoServer WFS</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">censo_agropecuario</div>
-      <div class="dataset-desc">Censo Agropecuário 1995/2006/2017: rebanho, uso da terra, lavouras, manejo de solo, irrigação</div>
-      <div class="dataset-sources">IBGE Censo Agro</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">censo_agropecuario_legado</div>
-      <div class="dataset-desc">Censo 1995/96 legado: tecnologia, pessoal, máquinas, produção animal, valor, financeiro</div>
-      <div class="dataset-sources">IBGE FTP</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">censo_agropecuario_historico</div>
-      <div class="dataset-desc">Série histórica 1920-2006: 9 temas censitários por UF</div>
-      <div class="dataset-sources">IBGE SIDRA</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">censo_agropecuario_municipal_1985</div>
-      <div class="dataset-desc">Censo 1985 municipal: 53 temas, 22 UFs (OCR de PDFs)</div>
-      <div class="dataset-sources">IBGE PDFs</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">silvicultura</div>
-      <div class="dataset-desc">Produção silvicultural: eucalipto, pinus, carvão vegetal, madeira</div>
-      <div class="dataset-sources">IBGE PEVS</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">extrativismo_vegetal</div>
-      <div class="dataset-desc">Produção extrativista vegetal: açaí, castanha, erva-mate, palmito</div>
-      <div class="dataset-sources">IBGE PEVS</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">leite_industrial</div>
-      <div class="dataset-desc">Aquisição e industrialização trimestral de leite por UF</div>
-      <div class="dataset-sources">IBGE Leite</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">importacao</div>
-      <div class="dataset-desc">Importações agrícolas brasileiras por produto, UF e mês</div>
-      <div class="dataset-sources">ComexStat</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">pib_agro</div>
-      <div class="dataset-desc">PIB agropecuário por setor e trimestre</div>
-      <div class="dataset-sources">IBGE SIDRA</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">progresso_safra</div>
-      <div class="dataset-desc">Progresso semanal de semeadura e colheita</div>
-      <div class="dataset-sources">CONAB</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">serie_historica_safra</div>
-      <div class="dataset-desc">Série histórica de safras — 32 culturas desde 1976</div>
-      <div class="dataset-sources">CONAB</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">preco_atacado</div>
-      <div class="dataset-desc">Preços de atacado hortifrúti em CEASAs</div>
-      <div class="dataset-sources">CONAB CEASA/PROHORT</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">seguro_rural</div>
-      <div class="dataset-desc">Apólices e sinistros do seguro rural</div>
-      <div class="dataset-sources">MAPA PSR</div>
     </div>
     <div class="dataset-card">
       <div class="dataset-name">clima</div>
@@ -729,65 +1006,28 @@
     </div>
     <div class="dataset-card">
       <div class="dataset-name">futuros_agricolas</div>
-      <div class="dataset-desc">Futuros agrícolas B3: ajustes, histórico e posições abertas</div>
+      <div class="dataset-desc">Futuros B3: ajustes, histórico e posições abertas</div>
       <div class="dataset-sources">B3</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">oferta_demanda_global</div>
-      <div class="dataset-desc">Oferta/demanda global de commodities agrícolas (USDA PSD)</div>
-      <div class="dataset-sources">USDA</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">comercio_internacional</div>
-      <div class="dataset-desc">Comércio internacional bilateral por HS code</div>
-      <div class="dataset-sources">UN Comtrade</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">zoneamento_agricola</div>
-      <div class="dataset-desc">Zoneamento de risco climático: janelas de plantio por município</div>
-      <div class="dataset-sources">MAPA/Embrapa (ZARC)</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">condicao_lavouras</div>
-      <div class="dataset-desc">Condição semanal das lavouras do Paraná</div>
-      <div class="dataset-sources">DERAL</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">movimentacao_portuaria</div>
-      <div class="dataset-desc">Movimentação portuária de carga: granel, geral, contêiner</div>
-      <div class="dataset-sources">ANTAQ</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">queimadas</div>
-      <div class="dataset-desc">Focos de calor por satélite em 6 biomas brasileiros</div>
-      <div class="dataset-sources">INPE</div>
-    </div>
-    <div class="dataset-card">
-      <div class="dataset-name">uso_do_solo</div>
-      <div class="dataset-desc">Cobertura e uso da terra anual por UF e município</div>
-      <div class="dataset-sources">MapBiomas</div>
     </div>
     <div class="dataset-card">
       <div class="dataset-name">desmatamento</div>
       <div class="dataset-desc">Desmatamento consolidado PRODES + alertas DETER</div>
       <div class="dataset-sources">INPE TerraBrasilis</div>
     </div>
+    <div class="dataset-card">
+      <div class="dataset-name">exportacao</div>
+      <div class="dataset-desc">Exportações agrícolas por NCM</div>
+      <div class="dataset-sources">ComexStat → ABIOVE</div>
+    </div>
+    <div class="dataset-card">
+      <div class="dataset-name">seguro_rural</div>
+      <div class="dataset-desc">Apólices e sinistros do seguro rural</div>
+      <div class="dataset-sources">MAPA PSR</div>
+    </div>
   </div>
 
-  <div class="code-block reveal" data-lang="python">
-<code><span class="kw">from</span> <span class="var">agrobr</span> <span class="kw">import</span> <span class="var">datasets</span>
-
-<span class="cm"># Uma linha. Fallback automático. Cache DuckDB.</span>
-<span class="var">df</span> <span class="op">=</span> <span class="kw">await</span> <span class="fn">datasets.preco_diario</span>(<span class="str">"soja"</span>)
-
-<span class="var">df</span> <span class="op">=</span> <span class="kw">await</span> <span class="fn">datasets.producao_anual</span>(<span class="str">"soja"</span>, <span class="var">ano</span><span class="op">=</span><span class="var">2023</span>)
-
-<span class="var">df</span> <span class="op">=</span> <span class="kw">await</span> <span class="fn">datasets.estimativa_safra</span>(<span class="str">"soja"</span>, <span class="var">safra</span><span class="op">=</span><span class="str">"2024/25"</span>)
-
-<span class="var">df</span> <span class="op">=</span> <span class="kw">await</span> <span class="fn">datasets.credito_rural</span>(<span class="str">"soja"</span>, <span class="var">safra</span><span class="op">=</span><span class="str">"2024/25"</span>)
-
-<span class="var">df</span> <span class="op">=</span> <span class="kw">await</span> <span class="fn">datasets.exportacao</span>(<span class="str">"soja"</span>, <span class="var">ano</span><span class="op">=</span><span class="var">2024</span>)
-</code>
+  <div class="datasets-more reveal">
+    <a href="https://www.agrobr.dev/docs/">explorar os 35 datasets na documentação →</a>
   </div>
 </section>
 
@@ -844,7 +1084,7 @@
   </div>
 </section>
 
-<!-- SOURCES -->
+<!-- FONTES: BRASIL EM DADOS + TYPE WALL -->
 <section id="sources">
   <div class="reveal">
     <p class="section-label">Fontes de dados</p>
@@ -852,204 +1092,56 @@
     <p class="section-desc">Cada fonte tem seu próprio parser com versionamento, fingerprinting e tratamento de encoding. Você só vê o DataFrame.</p>
   </div>
 
-  <div class="sources-row reveal">
-    <div class="source-card">
-      <div class="source-name">CEPEA/ESALQ</div>
-      <div class="source-count">20 indicadores</div>
-      <div class="source-detail">Soja, milho, boi, café, algodão, trigo, arroz, açúcar, etanol, frango, suíno, leite, laranja</div>
-      <div class="source-badge nc">CC BY-NC</div>
+  <div class="sources-layout reveal">
+    <div class="brasil-wrap">
+      <svg class="brasil-svg" id="brasilSvg" viewBox="0 0 400 400" aria-label="Mapa do Brasil em pontos de dados — malha oficial IBGE">
+        <g id="dotField"></g>
+      </svg>
+      <div class="brasil-caption">o brasil real, em pontos — malha ibge</div>
     </div>
-    <div class="source-card">
-      <div class="source-name">CONAB</div>
-      <div class="source-count">Safras + Balanço + Custos + Série + Progresso + CEASA</div>
-      <div class="source-detail">Estimativas mensais, oferta e demanda, custos, série histórica 2010+, progresso semanal de plantio/colheita, preços atacado hortifrúti (PROHORT)</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">IBGE/SIDRA</div>
-      <div class="source-count">PAM + LSPA + PPM + Abate + PEVS + Leite + PIB + Censo</div>
-      <div class="source-detail">Produção agrícola, estimativas, pecuária, abate, silvicultura, extrativismo vegetal, leite, PIB agro e censo</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">NASA POWER</div>
-      <div class="source-count">7 parâmetros diários</div>
-      <div class="source-detail">Climatologia via satélite: temperatura, precipitação, radiação, umidade, vento</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">BCB/SICOR</div>
-      <div class="source-count">Crédito rural + SGS + PTAX + Focus</div>
-      <div class="source-detail">Financiamentos por cultura/UF, séries temporais (Selic, IPCA, PIB agro), câmbio PTAX e expectativas Focus</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">ComexStat</div>
-      <div class="source-count">Exportações</div>
-      <div class="source-detail">Comércio exterior agrícola por NCM, UF e período</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">ANDA</div>
-      <div class="source-count">Fertilizantes</div>
-      <div class="source-detail">Entregas de fertilizantes por UF e produto</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">ABIOVE</div>
-      <div class="source-count">Complexo soja</div>
-      <div class="source-detail">Exportação mensal de grão, farelo, óleo e milho</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">USDA PSD</div>
-      <div class="source-count">Estimativas globais</div>
-      <div class="source-detail">Produção, oferta e demanda internacional por commodity</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">IMEA</div>
-      <div class="source-count">Mato Grosso</div>
-      <div class="source-detail">Cotações diárias e indicadores de 6 cadeias produtivas</div>
-      <div class="source-badge restrito">Restrito</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">DERAL</div>
-      <div class="source-count">Lavouras PR</div>
-      <div class="source-detail">Condição semanal, progresso de plantio e colheita</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">INMET</div>
-      <div class="source-count">600+ estações</div>
-      <div class="source-detail">Meteorologia por estação (API instável — usar NASA POWER)</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">Not. Agrícolas</div>
-      <div class="source-count">Fallback CEPEA</div>
-      <div class="source-detail">Cotações agrícolas como fonte secundária de preços</div>
-      <div class="source-badge deprecated">Deprecated · Restrito</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">Queimadas/INPE</div>
-      <div class="source-count">Focos de calor</div>
-      <div class="source-detail">6 biomas, 13 satélites, dados diários por município</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">Desmatamento</div>
-      <div class="source-count">PRODES + DETER + Geometria</div>
-      <div class="source-detail">Desmatamento consolidado anual, alertas em tempo real e poligonos GeoDataFrame</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">MapBiomas</div>
-      <div class="source-count">Cobertura da terra</div>
-      <div class="source-detail">Uso e cobertura anual por município (1985-presente)</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">B3 Futuros Agro</div>
-      <div class="source-count">7 contratos</div>
-      <div class="source-detail">Ajustes diarios de boi, milho, cafe, etanol, soja</div>
-      <div class="source-badge nc">Zona cinza</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">UN Comtrade</div>
-      <div class="source-count">Trade mirror</div>
-      <div class="source-detail">Comercio bilateral por HS code, ~200 paises</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">ANTAQ</div>
-      <div class="source-count">Portos · 2010+</div>
-      <div class="source-detail">Movimentacao portuaria de granel, geral e conteiner</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">ANP Diesel</div>
-      <div class="source-count">Precos + Volumes</div>
-      <div class="source-detail">Diesel por UF/municipio — proxy de atividade mecanizada</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">MAPA PSR</div>
-      <div class="source-count">Seguro rural · 2006+</div>
-      <div class="source-detail">Apolices e sinistros — leading indicator de revisao CONAB</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">ANTT Pedagio</div>
-      <div class="source-count">200+ pracas · 2010+</div>
-      <div class="source-detail">Fluxo de veiculos pesados — proxy de escoamento de safra</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">SICAR</div>
-      <div class="source-count">27 UFs · 7.4M+ imoveis + geometria</div>
-      <div class="source-detail">Cadastro Ambiental Rural — compliance EUDR, perfil fundiario, poligonos GeoDataFrame</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">ZARC</div>
-      <div class="source-count">40+ culturas · todos municipios</div>
-      <div class="source-detail">Zoneamento Agricola de Risco Climatico — janelas de plantio por municipio/cultura/solo/ciclo</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">Agrofit/MAPA</div>
-      <div class="source-count">~8K formulados · ~2.8K tecnicos</div>
-      <div class="source-detail">Defensivos agricolas registrados — produtos formulados, autorizacoes de uso e produtos tecnicos (CC-BY)</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">FUNAI</div>
-      <div class="source-count">~740 TIs + geometria</div>
-      <div class="source-detail">Terras indigenas — poligonos WFS GeoDataFrame, filtro uf/fase/bbox</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">ICMBio</div>
-      <div class="source-count">344 UCs federais + geometria</div>
-      <div class="source-detail">Unidades de conservacao — PI/US, filtro uf/grupo/bioma/bbox</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">INCRA</div>
-      <div class="source-count">~426 territorios + geometria</div>
-      <div class="source-detail">Territorios quilombolas — compliance EUDR, filtro uf/fase/bbox</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">Acervo Fundiario</div>
-      <div class="source-count">SIGEF (15 UFs) + SNCI (10 UFs) + assentamentos Brasil + geometria</div>
-      <div class="source-detail">Parcelas certificadas e reforma agraria via shapefile ZIP — filtro uf/bbox</div>
-      <div class="source-badge nc">nc</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">IBAMA</div>
-      <div class="source-count">~89K embargos + geometria</div>
-      <div class="source-detail">Embargos ambientais — paginacao WFS automatica, filtro uf/bbox, PII excluido</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">MapBiomas Alerta</div>
-      <div class="source-count">500K+ alertas + geometria</div>
-      <div class="source-detail">Alertas de desmatamento via GraphQL — filtro data/fonte/bbox/uf, WKT geometry</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">Lista Suja</div>
-      <div class="source-count">Trabalho escravo</div>
-      <div class="source-detail">Cadastro de empregadores flagrados — download XLSX, filtro UF, warning PII</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">ANA/SNIRH</div>
-      <div class="source-count">4 layers + geometria</div>
-      <div class="source-detail">Hidrografia, pivos irrigacao, demanda irrigacao, disponibilidade hidrica (ArcGIS REST)</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">SFB</div>
-      <div class="source-count">3 layers + geometria</div>
-      <div class="source-detail">CNFP florestas publicas, concessoes florestais, IFN conglomerados (ArcGIS REST)</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">RNC/CultivarWeb</div>
-      <div class="source-count">~37K cultivares</div>
-      <div class="source-detail">Registro Nacional de Cultivares — registradas e protegidas (SNPC/MAPA)</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">EMBRAPA Solos</div>
-      <div class="source-count">34K+ perfis + mapa</div>
-      <div class="source-detail">Perfis de solo PronaSolos + mapa pedologico SiBCS via WFS GeoServer</div>
-      <div class="source-badge nc">CC BY-NC</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">F. Rio Verde</div>
-      <div class="source-count">~97 cultivares × 4 epocas</div>
-      <div class="source-detail">Ensaios de cultivares de soja em Lucas do Rio Verde, MT (PDF parsing)</div>
-      <div class="source-badge nc">Zona cinza</div>
-    </div>
-    <div class="source-card">
-      <div class="source-name">ANEC</div>
-      <div class="source-count">19 portos × 6 produtos</div>
-      <div class="source-detail">Embarques semanais de soja, farelo, milho, DDGS, sorgo e trigo (PDF parsing)</div>
-      <div class="source-badge nc">Zona cinza</div>
+
+    <div>
+      <div class="typewall">
+        <span class="t1">CEPEA/ESALQ</span>
+        <span class="t1">CONAB</span>
+        <span class="t1">IBGE/SIDRA</span>
+        <span class="t2">BCB/SICOR</span>
+        <span class="t2">NASA POWER</span>
+        <span class="t2">B3</span>
+        <span class="t2">ComexStat</span>
+        <span class="t2">USDA</span>
+        <span class="t2">SICAR</span>
+        <span class="t2">MapBiomas</span>
+        <span class="t2">INPE Queimadas</span>
+        <span class="t2">TerraBrasilis</span>
+        <span class="t2">ZARC</span>
+        <span class="t2">ANTAQ</span>
+        <span class="t2">UN Comtrade</span>
+        <span class="t3">ANDA</span>
+        <span class="t3">ABIOVE</span>
+        <span class="t3">ANEC</span>
+        <span class="t3 lic">IMEA</span>
+        <span class="t3">DERAL</span>
+        <span class="t3">INMET</span>
+        <span class="t3 lic">Notícias Agrícolas</span>
+        <span class="t3">ANP Diesel</span>
+        <span class="t3">MAPA PSR</span>
+        <span class="t3">ANTT Pedágio</span>
+        <span class="t3">Agrofit/MAPA</span>
+        <span class="t3">FUNAI</span>
+        <span class="t3">ICMBio</span>
+        <span class="t3">INCRA</span>
+        <span class="t3 lic">Acervo Fundiário</span>
+        <span class="t3">IBAMA</span>
+        <span class="t3">MapBiomas Alerta</span>
+        <span class="t3">Lista Suja</span>
+        <span class="t3">ANA/SNIRH</span>
+        <span class="t3">SFB</span>
+        <span class="t3">RNC/CultivarWeb</span>
+        <span class="t3 lic">EMBRAPA Solos</span>
+        <span class="t3 lic">Rio Verde</span>
+      </div>
+      <p class="typewall-note">em âmbar: licença não-comercial ou restrita — detalhes em <a href="https://www.agrobr.dev/docs/" style="color: var(--accent-gold-dim);">docs/licenses</a></p>
     </div>
   </div>
 </section>
@@ -1059,55 +1151,72 @@
   <div class="reveal">
     <p class="section-label">Começar</p>
     <h2 class="section-title">pip install agrobr</h2>
-    <p class="section-desc" style="margin: 0 auto 0;">MIT License (código). 6000+ testes. 38 fontes. 35 datasets. <a href="https://www.agrobr.dev/docs/licenses/" style="color: var(--accent-gold-dim);">Licenças dos dados →</a></p>
+    <p class="section-desc" style="margin: 0 auto 0;">MIT License (código). 6.300+ testes. 38 fontes. 35 datasets.</p>
     <div class="cta-links">
-      <a href="https://www.agrobr.dev/docs/" class="cta-btn primary">Documentação →</a>
-      <a href="https://colab.research.google.com/github/bruno-portfolio/agrobr/blob/main/examples/agrobr_demo.ipynb" class="cta-btn secondary">Abrir no Colab ↗</a>
-      <a href="https://github.com/bruno-portfolio/agrobr" class="cta-btn secondary">GitHub ↗</a>
-      <a href="https://pypi.org/project/agrobr/" class="cta-btn secondary">PyPI ↗</a>
-      <a href="https://www.agrobr.dev/docs/guides/docker/" class="cta-btn secondary">Docker ↗</a>
+      <a class="cta-btn primary" href="https://www.agrobr.dev/docs/">Documentação</a>
+      <a class="cta-btn secondary" href="https://github.com/bruno-portfolio/agrobr" target="_blank">GitHub ↗</a>
+      <a class="cta-btn secondary" href="https://pypi.org/project/agrobr/" target="_blank">PyPI ↗</a>
     </div>
   </div>
 </section>
 
 <!-- FOOTER -->
 <footer>
-  <span>© 2026 Bruno · MIT License (código). Dados sujeitos aos termos de cada fonte — <a href="https://www.agrobr.dev/docs/licenses/">ver licenças</a></span>
+  <span>agrobr — dados agrícolas brasileiros · MIT (código) · dados sujeitos às licenças das fontes</span>
   <div class="footer-links">
+    <a href="https://www.agrobr.dev/docs/">Docs</a>
     <a href="https://github.com/bruno-portfolio/agrobr">GitHub</a>
     <a href="https://pypi.org/project/agrobr/">PyPI</a>
-    <a href="https://www.agrobr.dev/docs/">Docs</a>
   </div>
 </footer>
 
 <script>
-  // Nav scroll
   const nav = document.getElementById('nav');
   window.addEventListener('scroll', () => {
-    nav.classList.toggle('scrolled', window.scrollY > 60);
-  });
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  }, { passive: true });
 
-  // Reveal on scroll
-  const reveals = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => entry.target.classList.add('visible'), i * 100);
-        observer.unobserve(entry.target);
-      }
-    });
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
   }, { threshold: 0.15 });
-  reveals.forEach(el => observer.observe(el));
 
-  // Copy install command
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
   function copyInstall(el) {
     navigator.clipboard.writeText('pip install agrobr').then(() => {
       const icon = el.querySelector('.copy-icon');
       icon.textContent = '✓';
       icon.classList.add('copied');
-      setTimeout(() => { icon.textContent = '⎘'; icon.classList.remove('copied'); }, 2000);
+      setTimeout(() => { icon.textContent = '⎘'; icon.classList.remove('copied'); }, 1600);
     });
   }
+
+  // duplica a fita do ticker para loop contínuo
+  const track = document.getElementById('tickerTrack');
+  track.appendChild(track.querySelector('.ticker-set').cloneNode(true));
+
+  // Brasil real em pontos: grid testado contra a malha oficial do IBGE
+  // (point-in-polygon pré-computado; cada par é um ponto dentro do território)
+  (function buildBrasil() {
+    const BR = "211,367 198,360 210,358 177,349 189,347 196,351 208,349 220,348 232,346 176,339 188,338 200,337 207,340 219,339 231,337 187,329 198,328 210,326 217,330 229,328 241,327 209,317 221,316 228,319 240,318 201,304 208,308 219,307 231,305 238,309 199,295 211,294 218,297 230,296 242,295 249,298 186,288 198,286 210,285 222,283 229,287 240,286 252,284 259,288 271,286 189,274 196,277 208,276 220,274 232,273 239,276 251,275 263,274 270,277 282,276 294,274 306,273 169,262 176,266 188,265 200,263 207,267 219,265 231,264 243,262 250,266 261,265 273,263 280,267 292,265 304,264 316,262 168,253 180,252 187,255 198,254 210,253 217,256 229,255 241,253 253,252 260,255 272,254 284,253 291,256 303,255 315,253 166,244 178,243 190,241 197,245 209,244 221,242 228,246 240,244 252,243 264,241 271,245 282,244 294,242 301,246 313,244 325,243 177,234 189,232 201,231 208,234 219,233 231,232 238,235 250,234 262,232 274,231 281,234 293,233 305,232 312,235 324,234 168,221 175,225 187,223 199,222 211,220 218,224 230,223 242,221 249,225 261,223 273,222 285,220 292,224 303,223 315,221 322,225 148,210 155,213 167,212 179,211 186,214 198,213 210,211 222,210 229,213 240,212 252,211 259,214 271,213 283,211 295,210 302,213 314,212 326,211 333,214 147,201 159,199 166,203 177,202 189,200 196,204 208,202 220,201 232,199 239,203 251,202 263,200 270,204 282,202 294,201 306,199 313,203 324,202 126,190 145,192 157,190 169,189 176,192 188,191 200,190 207,193 219,192 231,190 243,189 250,192 261,191 273,190 280,193 292,192 304,190 316,189 323,192 106,178 113,182 125,181 137,179 144,183 156,181 168,180 180,178 187,182 198,181 210,179 217,183 229,181 241,180 253,178 260,182 272,181 284,179 291,183 303,181 315,180 327,178 334,182 105,169 117,168 124,171 135,170 147,169 154,172 166,171 178,169 190,168 197,171 209,170 221,169 228,172 240,171 252,169 264,168 271,171 282,170 294,169 301,172 313,171 325,169 337,168 344,171 42,159 54,157 61,161 72,160 84,158 103,160 115,159 127,157 134,161 146,160 158,158 165,162 177,160 189,159 201,157 208,161 219,160 231,158 238,162 250,160 262,159 274,157 281,161 293,160 305,158 312,162 324,160 336,159 348,157 355,161 40,150 52,148 64,147 71,150 83,149 95,148 102,151 114,150 126,148 138,147 145,150 156,149 168,148 175,151 187,150 199,148 211,147 218,150 230,149 242,148 249,151 261,150 273,148 285,147 292,150 303,149 315,148 322,151 334,150 346,148 358,147 365,150 32,137 39,141 51,139 63,138 75,136 82,140 93,139 105,137 112,141 124,139 136,138 148,136 155,140 167,139 179,137 186,141 198,139 210,138 222,136 229,140 240,139 252,137 259,141 271,139 283,138 295,136 302,140 314,139 326,137 333,141 345,139 357,138 369,136 30,128 42,127 49,130 61,129 73,127 85,126 92,129 104,128 116,127 123,130 135,129 147,127 159,126 166,129 177,128 189,127 196,130 208,129 220,127 232,126 239,129 251,128 263,127 270,130 282,129 294,127 306,126 313,129 324,128 336,127 343,130 355,129 367,127 41,118 53,116 60,120 72,118 84,117 96,115 103,119 114,118 126,116 133,120 145,118 157,117 169,115 176,119 188,118 200,116 207,120 219,118 231,117 243,115 250,119 261,118 273,116 280,120 292,118 304,117 316,115 323,119 335,118 347,116 354,120 63,106 70,109 82,108 94,106 106,105 113,108 125,107 137,106 144,109 156,108 168,106 180,105 187,108 198,107 210,106 217,109 229,108 241,106 253,105 260,108 272,107 284,106 291,109 303,108 315,106 327,105 334,108 62,97 74,95 81,99 93,97 105,96 117,94 124,98 135,97 147,95 154,99 166,97 178,96 190,94 197,98 209,97 221,95 228,99 240,97 252,96 264,94 271,98 294,95 301,99 313,97 325,96 61,87 72,86 84,85 91,88 103,87 115,85 127,84 134,87 146,86 158,85 165,88 177,87 189,85 201,84 208,87 219,86 231,85 238,88 250,87 262,85 274,84 281,87 64,73 71,77 83,76 95,74 102,78 114,76 126,75 138,73 145,77 156,76 168,74 175,78 187,76 199,75 211,73 218,77 230,76 242,74 249,78 261,76 63,64 75,63 82,66 93,65 105,64 112,67 124,66 136,64 148,63 155,66 167,65 179,64 186,67 198,66 210,64 222,63 229,66 61,55 73,54 116,53 123,57 135,55 147,54 166,56 177,55 189,53 196,57 208,55 220,54 232,52 114,44 126,43 133,46 145,45 219,45 106,31 113,35 125,34 137,32 144,36 217,36";
+    const field = document.getElementById('dotField');
+    const ns = 'http://www.w3.org/2000/svg';
+    const coords = BR.split(' ');
+    for (let i = 0; i < coords.length; i++) {
+      const [x, y] = coords[i].split(',');
+      const dot = document.createElementNS(ns, 'circle');
+      dot.setAttribute('cx', x);
+      dot.setAttribute('cy', y);
+      dot.setAttribute('r', 1.6);
+      dot.setAttribute('class', 'dot');
+      if ((i * 31) % 23 === 0) {
+        dot.setAttribute('class', 'dot glow');
+        dot.style.animationDelay = ((i % 17) * 0.2) + 's';
+        dot.setAttribute('r', 2.1);
+      }
+      field.appendChild(dot);
+    }
+  })();
 </script>
 
 </body>
