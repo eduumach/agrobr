@@ -65,6 +65,7 @@ dependencies = [
     "python-calamine>=0.3.0",
     "xlrd>=2.0.1",
     "sidrapy>=0.1.4",
+    "requests>=2.32.0",
 ]
 
 [project.optional-dependencies]
@@ -169,7 +170,7 @@ ignore_errors = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
-addopts = "-q --tb=short -m 'not benchmark and not slow'"
+addopts = "-q --tb=short -m 'not benchmark and not slow and not integration'"
 filterwarnings = [
     "ignore::DeprecationWarning",
 ]

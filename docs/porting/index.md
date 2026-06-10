@@ -216,7 +216,7 @@ Fallback chain de 5 encodings + detecção automática com chardet
 (threshold > 0.7):
 
 ```
-UTF-8 → ISO-8859-1 → Windows-1252 → UTF-16 → ASCII → chardet → replace
+UTF-8 → Windows-1252 → ISO-8859-1 → UTF-16 → ASCII → chardet → replace
 ```
 
 Funções: `decode_content()`, `detect_encoding()`

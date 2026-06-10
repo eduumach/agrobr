@@ -34,7 +34,7 @@ O agrobr usa fallback chain de 5 encodings + detecção automática
 com `chardet` (threshold > 0.7). Se tudo falha, força UTF-8 com replacement.
 
 ```
-ENCODING_CHAIN = ("utf-8", "iso-8859-1", "windows-1252", "utf-16", "ascii")
+ENCODING_CHAIN = ("utf-8", "windows-1252", "iso-8859-1", "utf-16", "ascii")
 ```
 
 !!! warning "Sem tratamento, nomes quebram"

@@ -129,8 +129,8 @@ Rotação determinística por fonte para parecer tráfego natural.
 Chain de fallback para encoding:
 
 1. UTF-8 (padrão)
-2. ISO-8859-1 (Latin-1, comum em sites BR antigos)
-3. Windows-1252 (CP1252, padrão Excel BR)
+2. Windows-1252 (CP1252, padrão Excel BR — superset do Latin-1, vem antes porque ISO-8859-1 decodifica qualquer byte e mataria o resto da chain)
+3. ISO-8859-1 (Latin-1, comum em sites BR antigos)
 4. UTF-16 (raro)
 5. Detecção automática (chardet)
 6. UTF-8 com replacement (último recurso)

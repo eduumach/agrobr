@@ -6,7 +6,14 @@ from unittest.mock import AsyncMock, patch
 import pandas as pd
 import pytest
 
+from agrobr.rnc import cache as rnc_cache
+
 GOLDEN_DIR = Path(__file__).resolve().parent.parent / "golden_data" / "rnc"
+
+
+@pytest.fixture(autouse=True)
+def _isolated_cache(tmp_path, monkeypatch):
+    monkeypatch.setattr(rnc_cache, "_cache_dir", lambda: tmp_path)
 
 
 def _registradas_bytes():

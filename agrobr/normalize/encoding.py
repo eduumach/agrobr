@@ -9,8 +9,8 @@ logger = structlog.get_logger()
 
 ENCODING_CHAIN: Sequence[str] = (
     "utf-8",
-    "iso-8859-1",
     "windows-1252",
+    "iso-8859-1",
     "utf-16",
     "ascii",
 )
