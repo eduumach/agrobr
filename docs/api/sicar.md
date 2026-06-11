@@ -24,6 +24,7 @@ df = await agrobr.alt.sicar.imoveis("DF")
 | area_min | float | Nao | Area minima em hectares |
 | area_max | float | Nao | Area maxima em hectares |
 | criado_apos | str | Nao | Data minima de criacao (ISO, ex: "2020-01-01") |
+| atualizado_apos | str | Nao | Retorna apenas registros com `data_atualizacao` posterior a esta data (ISO, ex: "2026-06-07" ou "2026-06-07T00:00:00"). Indisponivel para SP, RS, PR, SC, RJ, TO (campo nao existe nesses layers WFS) |
 | return_meta | bool | Nao | Se True, retorna (DataFrame, MetaInfo) |
 
 ### Colunas de retorno
@@ -59,6 +60,11 @@ df = await agrobr.alt.sicar.imoveis("DF", area_min=1000)
 # Cadastros criados apos 2020
 df = await agrobr.alt.sicar.imoveis(
     "GO", criado_apos="2020-01-01"
+)
+
+# Cadastros atualizados apos uma data (util para sincronizar a base incrementalmente)
+df = await agrobr.alt.sicar.imoveis(
+    "MG", atualizado_apos="2026-06-07T00:00:00"
 )
 
 # Com metadados de proveniencia
@@ -145,6 +151,7 @@ gdf = await agrobr.alt.sicar.imoveis_geo("DF")
 | area_min | float | Nao | Area minima em hectares |
 | area_max | float | Nao | Area maxima em hectares |
 | criado_apos | str | Nao | Data minima de criacao (ISO, ex: "2020-01-01") |
+| atualizado_apos | str | Nao | Retorna apenas registros com `data_atualizacao` posterior a esta data (ISO, ex: "2026-06-07" ou "2026-06-07T00:00:00"). Indisponivel para SP, RS, PR, SC, RJ, TO (campo nao existe nesses layers WFS) |
 | return_meta | bool | Nao | Se True, retorna (GeoDataFrame, MetaInfo) |
 
 ### Colunas de retorno
@@ -213,6 +220,7 @@ async for gdf in agrobr.alt.sicar.imoveis_geo_stream("MT"):
 | area_min | float | Nao | Area minima em hectares |
 | area_max | float | Nao | Area maxima em hectares |
 | criado_apos | str | Nao | Data minima de criacao (ISO, ex: "2020-01-01") |
+| atualizado_apos | str | Nao | Retorna apenas registros com `data_atualizacao` posterior a esta data (ISO, ex: "2026-06-07" ou "2026-06-07T00:00:00"). Indisponivel para SP, RS, PR, SC, RJ, TO (campo nao existe nesses layers WFS) |
 
 Cada item gerado e um `GeoDataFrame` com as mesmas colunas de [`imoveis_geo`](#imoveis_geo).
 
@@ -232,6 +240,50 @@ print(total)
 - Cada yield contem ate 50.000 features (5 paginas de 10.000 baixadas em paralelo)
 - Deduplica `cod_imovel` entre batches
 - CRS: EPSG:4326 (WGS84)
+
+## diff_imoveis
+
+Compara dois snapshots de [`imoveis()`](#imoveis) ou [`imoveis_geo()`](#imoveis_geo) (mesma UF/filtros,
+capturados em momentos diferentes) e identifica o que mudou entre eles, usando `cod_imovel` como
+chave. E a forma recomendada de sincronizar a base nas UFs sem `data_atualizacao`
+(SP, RS, PR, SC, RJ, TO — ver `atualizado_apos` em [`imoveis`](#imoveis)).
+
+```python
+import agrobr
+
+anterior = await agrobr.alt.sicar.imoveis("SP")
+# ... dias depois ...
+atual = await agrobr.alt.sicar.imoveis("SP")
+
+mudancas = agrobr.alt.sicar.diff_imoveis(anterior, atual)
+print(mudancas[["cod_imovel", "mudanca", "colunas_alteradas"]])
+```
+
+### Parametros
+
+| Parametro | Tipo | Obrigatorio | Descricao |
+|-----------|------|-------------|-----------|
+| anterior | DataFrame | Sim | Snapshot anterior, com a coluna `cod_imovel` |
+| atual | DataFrame | Sim | Snapshot atual, com a coluna `cod_imovel` |
+
+### Retorno
+
+`DataFrame` (ou `GeoDataFrame`, se a entrada tiver `geometry`) com as colunas de `atual`
+(registros removidos usam os valores de `anterior`), mais:
+
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| mudanca | str | "novo", "alterado" ou "removido" |
+| colunas_alteradas | list[str] | Colunas que mudaram de valor (vazia para "novo"/"removido") |
+
+Registros sem alteracao entre os dois snapshots nao aparecem no resultado. A coluna `geometry`,
+se presente, e ignorada na comparacao (apenas carregada no resultado).
+
+### Notas
+
+- Funcao sincrona e local (sem requests): so compara DataFrames ja carregados em memoria
+- Util tambem para auditar diferencas entre execucoes nas UFs com `data_atualizacao`
+- Levanta `ValueError` se `cod_imovel` nao estiver presente em `anterior` ou `atual`
 
 ## Uso sincrono
 

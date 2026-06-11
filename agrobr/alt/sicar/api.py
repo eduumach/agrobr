@@ -6,6 +6,7 @@ from collections.abc import AsyncGenerator
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 import httpx
+import numpy as np
 import pandas as pd
 import structlog
 
@@ -19,10 +20,12 @@ from .models import (
     MAX_FEATURES_WARNING,
     STATUS_VALIDOS,
     TIPO_VALIDOS,
+    UFS_SEM_DATA_ATUALIZACAO,
     WFS_BASE,
 )
 
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_DATETIME_RE = re.compile(r"^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?$")
 
 if TYPE_CHECKING:
     import geopandas as gpd
@@ -39,6 +42,7 @@ def _build_cql_filter(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    atualizado_apos: str | None = None,
 ) -> str | None:
     parts: list[str] = []
 
@@ -65,7 +69,23 @@ def _build_cql_filter(
             raise ValueError(f"criado_apos invalido (esperado YYYY-MM-DD): {criado_apos!r}")
         parts.append(f"dat_criacao>='{criado_apos}'")
 
+    if atualizado_apos:
+        if not _DATETIME_RE.match(atualizado_apos):
+            raise ValueError(
+                f"atualizado_apos invalido (esperado YYYY-MM-DD ou YYYY-MM-DDTHH:MM:SS): "
+                f"{atualizado_apos!r}"
+            )
+        parts.append(f"data_atualizacao>'{atualizado_apos}'")
+
     return " AND ".join(parts) if parts else None
+
+
+def _check_atualizado_apos_uf(uf: str, atualizado_apos: str | None) -> None:
+    if atualizado_apos and uf in UFS_SEM_DATA_ATUALIZACAO:
+        raise ValueError(
+            f"atualizado_apos nao suportado para UF '{uf}': campo 'data_atualizacao' "
+            f"nao existe neste layer WFS (UFs sem suporte: {sorted(UFS_SEM_DATA_ATUALIZACAO)})"
+        )
 
 
 @overload
@@ -79,6 +99,7 @@ async def imoveis(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    atualizado_apos: str | None = None,
     as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
@@ -95,6 +116,7 @@ async def imoveis(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    atualizado_apos: str | None = None,
     as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
@@ -110,6 +132,7 @@ async def imoveis(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    atualizado_apos: str | None = None,
     as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
@@ -125,6 +148,8 @@ async def imoveis(
 
     if tipo is not None and tipo.upper() not in TIPO_VALIDOS:
         raise ValueError(f"Tipo '{tipo}' invalido. Opcoes: {sorted(TIPO_VALIDOS)}")
+
+    _check_atualizado_apos_uf(uf_upper, atualizado_apos)
 
     logger.info(
         "sicar_imoveis",
@@ -145,6 +170,7 @@ async def imoveis(
         area_min=area_min,
         area_max=area_max,
         criado_apos=criado_apos,
+        atualizado_apos=atualizado_apos,
     )
 
     if municipio is None and cod_municipio is None:
@@ -202,6 +228,7 @@ async def imoveis_geo(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    atualizado_apos: str | None = None,
     max_features: int | None = 5000,
     return_meta: Literal[False] = False,
 ) -> gpd.GeoDataFrame: ...
@@ -218,6 +245,7 @@ async def imoveis_geo(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    atualizado_apos: str | None = None,
     max_features: int | None = 5000,
     return_meta: Literal[True],
 ) -> tuple[gpd.GeoDataFrame, MetaInfo]: ...
@@ -233,6 +261,7 @@ async def imoveis_geo(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    atualizado_apos: str | None = None,
     max_features: int | None = 5000,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
@@ -248,6 +277,8 @@ async def imoveis_geo(
 
     if tipo is not None and tipo.upper() not in TIPO_VALIDOS:
         raise ValueError(f"Tipo '{tipo}' invalido. Opcoes: {sorted(TIPO_VALIDOS)}")
+
+    _check_atualizado_apos_uf(uf_upper, atualizado_apos)
 
     logger.info(
         "sicar_imoveis_geo",
@@ -268,6 +299,7 @@ async def imoveis_geo(
         area_min=area_min,
         area_max=area_max,
         criado_apos=criado_apos,
+        atualizado_apos=atualizado_apos,
     )
 
     if municipio is None and cod_municipio is None:
@@ -329,6 +361,7 @@ async def imoveis_geo_stream(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    atualizado_apos: str | None = None,
 ) -> AsyncGenerator[gpd.GeoDataFrame, None]:
     """Itera sobre os imoveis rurais geoespaciais de uma UF em batches de baixo consumo de memoria.
 
@@ -348,6 +381,8 @@ async def imoveis_geo_stream(
     if tipo is not None and tipo.upper() not in TIPO_VALIDOS:
         raise ValueError(f"Tipo '{tipo}' invalido. Opcoes: {sorted(TIPO_VALIDOS)}")
 
+    _check_atualizado_apos_uf(uf_upper, atualizado_apos)
+
     cql = _build_cql_filter(
         municipio=municipio,
         cod_municipio=cod_municipio,
@@ -356,6 +391,7 @@ async def imoveis_geo_stream(
         area_min=area_min,
         area_max=area_max,
         criado_apos=criado_apos,
+        atualizado_apos=atualizado_apos,
     )
 
     seen_cod_imovel: set[str] = set()
@@ -458,3 +494,66 @@ async def resumo(
         selected_source="sicar_wfs",
     )
     return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
+
+
+def diff_imoveis(anterior: pd.DataFrame, atual: pd.DataFrame) -> pd.DataFrame:
+    """Compara dois snapshots de `imoveis()`/`imoveis_geo()` por `cod_imovel`.
+
+    Detecta registros novos, alterados (qualquer coluna comum mudou de valor) ou
+    removidos entre `anterior` e `atual`. Util para sincronizar a base nas UFs sem
+    `data_atualizacao` (ver `UFS_SEM_DATA_ATUALIZACAO`), onde o WFS nao oferece
+    filtro incremental e a unica forma de detectar mudancas e comparar snapshots
+    completos.
+
+    A coluna `geometry`, se presente, e ignorada na comparacao (apenas carregada
+    no resultado).
+
+    Retorna um DataFrame com as colunas de `atual` (registros removidos usam os
+    valores de `anterior`), mais:
+    - `mudanca`: "novo", "alterado" ou "removido"
+    - `colunas_alteradas`: lista de colunas que mudaram (vazia para novo/removido)
+    """
+    if "cod_imovel" not in anterior.columns or "cod_imovel" not in atual.columns:
+        raise ValueError("Ambos os DataFrames precisam da coluna 'cod_imovel'")
+
+    a = anterior.set_index("cod_imovel")
+    b = atual.set_index("cod_imovel")
+
+    novos_idx = b.index.difference(a.index)
+    removidos_idx = a.index.difference(b.index)
+    comuns_idx = b.index.intersection(a.index)
+
+    cols = [c for c in b.columns if c in a.columns and c != "geometry"]
+    a_comum = a.loc[comuns_idx]
+    b_comum = b.loc[comuns_idx]
+
+    diff_mask = pd.DataFrame(index=comuns_idx)
+    for c in cols:
+        col_a, col_b = a_comum[c], b_comum[c]
+        both_na = col_a.isna() & col_b.isna()
+        neither_na = col_a.notna() & col_b.notna()
+        equal_when_present = (col_a == col_b).where(neither_na, other=False).astype(bool)
+        diff_mask[c] = ~(both_na | equal_when_present)
+
+    changed_mask = diff_mask.any(axis=1) if cols else pd.Series(False, index=comuns_idx)
+    changed_idx = comuns_idx[changed_mask]
+
+    novos = b.loc[novos_idx].reset_index()
+    novos["mudanca"] = "novo"
+    novos["colunas_alteradas"] = [[] for _ in range(len(novos))]
+
+    removidos = a.loc[removidos_idx].reset_index()
+    removidos["mudanca"] = "removido"
+    removidos["colunas_alteradas"] = [[] for _ in range(len(removidos))]
+
+    alterados = b.loc[changed_idx].reset_index()
+    alterados["mudanca"] = "alterado"
+    alt_cols = np.array(diff_mask.columns)
+    alterados["colunas_alteradas"] = [
+        alt_cols[row].tolist() for row in diff_mask.loc[changed_idx].to_numpy()
+    ]
+
+    result = pd.concat([novos, alterados, removidos], ignore_index=True)
+    if not result.empty:
+        result = result.sort_values("cod_imovel").reset_index(drop=True)
+    return result

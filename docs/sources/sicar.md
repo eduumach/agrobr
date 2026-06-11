@@ -42,6 +42,11 @@ com filtros server-side (CQL_FILTER) e paginacao transparente.
 
 ## Notas
 
+- **Atualizacao incremental:** `imoveis()`, `imoveis_geo()` e `imoveis_geo_stream()` aceitam
+  `atualizado_apos` (CQL `data_atualizacao>'...'`, ISO date ou datetime) para buscar apenas
+  registros atualizados depois de uma data. Indisponivel em SP, RS, PR, SC, RJ e TO — o campo
+  `data_atualizacao` nao existe nesses layers WFS estaduais. Para essas UFs, use
+  `diff_imoveis()` para comparar dois snapshots completos e detectar o que mudou
 - **Geometria disponivel:** `imoveis_geo()` retorna `GeoDataFrame` com poligonos MultiPolygon
   (EPSG:4326) via WFS GeoJSON. Requer `pip install agrobr[geo]`. Max 5.000 features por request
 - **Paginacao transparente:** queries grandes sao paginadas automaticamente (10.000 registros por pagina)
