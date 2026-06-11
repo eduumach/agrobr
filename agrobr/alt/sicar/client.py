@@ -42,7 +42,7 @@ TIMEOUT = get_timeout(read=180.0)
 THROTTLE_AFTER_PAGE = 5
 THROTTLE_DELAY = 2.0
 
-GEO_BATCH_SIZE = 5
+GEO_BATCH_SIZE = 1
 
 _ssl_ctx = ssl.create_default_context()
 _ssl_ctx.check_hostname = False
