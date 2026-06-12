@@ -366,22 +366,18 @@ class TestStreamImoveisGeo:
         assert sum(counts) == 15_000
 
     @pytest.mark.asyncio
-    async def test_unbounded_yields_batches_of_geo_batch_size(self):
-        n_pages = client.GEO_BATCH_SIZE * 2 + 2
+    async def test_unbounded_yields_one_page_per_batch(self):
+        n_pages = 4
         mock_fetch, _counts = _geo_paginated_mock(n_pages * PAGE_SIZE, self.GEOJSON)
-        with (
-            patch.object(client, "fetch_wfs", side_effect=mock_fetch),
-            patch.object(client.asyncio, "sleep", new_callable=AsyncMock),
-        ):
+        with patch.object(client, "fetch_wfs", side_effect=mock_fetch):
             batches = [b async for b in stream_imoveis_geo("MT", max_features=None)]
 
         sizes = [len(pages) for pages, _url in batches]
-        assert sizes == [client.GEO_BATCH_SIZE, client.GEO_BATCH_SIZE, 2]
-        assert sum(sizes) == n_pages
+        assert sizes == [1, 1, 1, 1]
 
     @pytest.mark.asyncio
-    async def test_throttle_sleep_within_batch(self):
-        n_pages = client.GEO_BATCH_SIZE + 1
+    async def test_unbounded_throttles_after_page_threshold(self):
+        n_pages = client.THROTTLE_AFTER_PAGE + 2
         mock_fetch, _counts = _geo_paginated_mock(n_pages * PAGE_SIZE, self.GEOJSON)
         sleeps: list[float] = []
 
@@ -395,16 +391,13 @@ class TestStreamImoveisGeo:
             async for _ in stream_imoveis_geo("MT", max_features=None):
                 pass
 
-        assert sleeps == [client.THROTTLE_DELAY]
+        assert sleeps == [client.THROTTLE_DELAY, client.THROTTLE_DELAY]
 
     @pytest.mark.asyncio
-    async def test_fetch_imoveis_geo_aggregates_multiple_batches(self):
-        n_pages = client.GEO_BATCH_SIZE * 2 + 2
+    async def test_fetch_imoveis_geo_aggregates_all_pages(self):
+        n_pages = 4
         mock_fetch, _counts = _geo_paginated_mock(n_pages * PAGE_SIZE, self.GEOJSON)
-        with (
-            patch.object(client, "fetch_wfs", side_effect=mock_fetch),
-            patch.object(client.asyncio, "sleep", new_callable=AsyncMock),
-        ):
+        with patch.object(client, "fetch_wfs", side_effect=mock_fetch):
             pages, url = await fetch_imoveis_geo("MT", max_features=None)
 
         assert len(pages) == n_pages

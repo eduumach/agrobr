@@ -332,9 +332,10 @@ async def imoveis_geo_stream(
 ) -> AsyncGenerator[gpd.GeoDataFrame, None]:
     """Itera sobre os imoveis rurais geoespaciais de uma UF em batches de baixo consumo de memoria.
 
-    Cada yield e um GeoDataFrame parcial com ate GEO_BATCH_SIZE * PAGE_SIZE features.
+    Cada yield e um GeoDataFrame parcial com ate PAGE_SIZE features (uma pagina WFS).
     Ideal para processar volumes grandes (max_features=None implicito) sem acumular
-    tudo em memoria antes de comecar a usar os dados.
+    tudo em memoria antes de comecar a usar os dados. Async-only: sem suporte em
+    agrobr.sync.
     """
     validate_year_uf(uf=uf)
     uf_upper = uf.strip().upper()

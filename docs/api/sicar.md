@@ -229,9 +229,10 @@ print(total)
 ### Notas
 
 - Sem limite de `max_features`: pagina ate esgotar todos os registros da UF
-- Cada yield contem ate 50.000 features (5 paginas de 10.000 baixadas em paralelo)
+- Cada yield contem ate 10.000 features (uma pagina WFS), baixadas sequencialmente com throttle
 - Deduplica `cod_imovel` entre batches
 - CRS: EPSG:4326 (WGS84)
+- Async-only: `agrobr.sync` nao suporta async generators
 
 ## Uso sincrono
 
