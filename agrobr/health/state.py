@@ -27,7 +27,10 @@ def record_check(
     """INSERT a health-check row (pure log, no mutable state)."""
     store = get_store()
     with store._lock:
-        store._get_conn().execute(
+        conn = store._get_conn()
+        if conn is None:
+            return
+        conn.execute(
             "INSERT INTO health_checks (source, status, category, latency_ms, message, checked_at) "
             "VALUES (?, ?, ?, ?, ?, current_timestamp)",
             [source.value, status, category, latency_ms, message],
@@ -38,23 +41,22 @@ def get_consecutive_failures(source: Fonte) -> int:
     """Count failures since the last OK for *source* (via query, not mutable state)."""
     store = get_store()
     with store._lock:
-        result = (
-            store._get_conn()
-            .execute(
-                """
-                SELECT COUNT(*) FROM health_checks
-                WHERE source = ?
-                  AND checked_at > COALESCE(
-                      (SELECT MAX(checked_at) FROM health_checks
-                       WHERE source = ? AND status = 'ok'),
-                      '1970-01-01'
-                  )
-                  AND status != 'ok'
-                """,
-                [source.value, source.value],
-            )
-            .fetchone()
-        )
+        conn = store._get_conn()
+        if conn is None:
+            return 0
+        result = conn.execute(
+            """
+            SELECT COUNT(*) FROM health_checks
+            WHERE source = ?
+              AND checked_at > COALESCE(
+                  (SELECT MAX(checked_at) FROM health_checks
+                   WHERE source = ? AND status = 'ok'),
+                  '1970-01-01'
+              )
+              AND status != 'ok'
+            """,
+            [source.value, source.value],
+        ).fetchone()
     return int(result[0]) if result and result[0] else 0
 
 
@@ -62,14 +64,13 @@ def get_last_success(source: Fonte) -> datetime | None:
     """Return the timestamp of the most recent OK check for *source*."""
     store = get_store()
     with store._lock:
-        result = (
-            store._get_conn()
-            .execute(
-                "SELECT MAX(checked_at) FROM health_checks WHERE source = ? AND status = 'ok'",
-                [source.value],
-            )
-            .fetchone()
-        )
+        conn = store._get_conn()
+        if conn is None:
+            return None
+        result = conn.execute(
+            "SELECT MAX(checked_at) FROM health_checks WHERE source = ? AND status = 'ok'",
+            [source.value],
+        ).fetchone()
     return result[0] if result and result[0] else None
 
 

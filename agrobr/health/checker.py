@@ -165,6 +165,7 @@ async def check_cepea_deep() -> CheckResult:
     from agrobr.cepea import client as cepea_client
     from agrobr.cepea.parsers import fingerprint as fp
     from agrobr.cepea.parsers.detector import get_parser_with_fallback
+    from agrobr.validators.structural import compare_fingerprints
 
     start = time.monotonic()
     details: dict[str, Any] = {}
@@ -192,7 +193,7 @@ async def check_cepea_deep() -> CheckResult:
         baseline_fp = fp.load_baseline_fingerprint(".structures/baseline.json")
 
         if baseline_fp:
-            similarity, diff = fp.compare_fingerprints(current_fp, baseline_fp)
+            similarity, diff = compare_fingerprints(current_fp, baseline_fp)
             details["fingerprint_similarity"] = similarity
             details["fingerprint_diff"] = diff
 

@@ -78,6 +78,12 @@ def _build_registry() -> dict[Fonte, SourceHealthConfig]:
             "tier": "critical",
             "soft_block_codes": (403,),
         },
+        Fonte.CFTC: {
+            "url": f"{URLS[Fonte.CFTC]['disaggregated_futures']}?$limit=1",
+        },
+        Fonte.UNICA: {
+            "url": URLS[Fonte.UNICA]["quinzenal_page"],
+        },
         Fonte.COMEXSTAT: {
             "url": f"{URLS[Fonte.COMEXSTAT]['bulk_csv']}/EXP_{stable_year}.csv",
             "method": "HEAD",
@@ -162,6 +168,7 @@ SOURCE_DATASET_MAP: dict[str, list[str]] = {
     "b3": ["futuros_agricolas"],
     "bcb": ["credito_rural"],
     "cepea": ["preco_diario"],
+    "cftc": ["posicionamento_fundos"],
     "comexstat": ["exportacao", "importacao"],
     "comtrade": ["comercio_internacional"],
     "conab": [
