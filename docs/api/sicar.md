@@ -189,6 +189,51 @@ gdf, meta = await agrobr.alt.sicar.imoveis_geo("DF", return_meta=True)
 - Request unico sem paginacao (volume controlado)
 - CRS: EPSG:4326 (WGS84)
 
+## imoveis_geo_stream
+
+Itera sobre os imoveis com geometria de uma UF em batches, sem acumular tudo em
+memoria antes de comecar a usar os dados. Requer `pip install agrobr[geo]`.
+
+```python
+import agrobr
+
+async for gdf in agrobr.alt.sicar.imoveis_geo_stream("MT"):
+    print(len(gdf))
+```
+
+### Parametros
+
+| Parametro | Tipo | Obrigatorio | Descricao |
+|-----------|------|-------------|-----------|
+| uf | str | Sim | Sigla da UF (ex: "MT", "DF", "BA") |
+| municipio | str | Nao | Filtro parcial de municipio (case-insensitive). Mutuamente exclusivo com `cod_municipio` |
+| cod_municipio | int | Nao | Codigo IBGE do municipio (ex: 5107925). Mutuamente exclusivo com `municipio` |
+| status | str | Nao | AT, PE, SU ou CA |
+| tipo | str | Nao | IRU, AST ou PCT |
+| area_min | float | Nao | Area minima em hectares |
+| area_max | float | Nao | Area maxima em hectares |
+| criado_apos | str | Nao | Data minima de criacao (ISO, ex: "2020-01-01") |
+
+Cada item gerado e um `GeoDataFrame` com as mesmas colunas de [`imoveis_geo`](#imoveis_geo).
+
+### Exemplos
+
+```python
+# Acumula o total de imoveis de Sorriso-MT sem guardar tudo em memoria
+total = 0
+async for gdf in agrobr.alt.sicar.imoveis_geo_stream("MT", municipio="Sorriso"):
+    total += len(gdf)
+print(total)
+```
+
+### Notas
+
+- Sem limite de `max_features`: pagina ate esgotar todos os registros da UF
+- Cada yield contem ate 10.000 features (uma pagina WFS), baixadas sequencialmente com throttle
+- Deduplica `cod_imovel` entre batches
+- CRS: EPSG:4326 (WGS84)
+- Async-only: `agrobr.sync` nao suporta async generators
+
 ## Uso sincrono
 
 ```python

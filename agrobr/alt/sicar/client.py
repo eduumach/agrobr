@@ -14,6 +14,7 @@ from __future__ import annotations
 import asyncio
 import math
 import ssl
+from collections.abc import AsyncGenerator
 from urllib.parse import quote
 
 import httpx
@@ -146,11 +147,17 @@ async def fetch_imoveis(uf: str, cql_filter: str | None = None) -> tuple[list[by
     return pages, base_url
 
 
-async def fetch_imoveis_geo(
+async def stream_imoveis_geo(
     uf: str,
     cql_filter: str | None = None,
     max_features: int | None = MAX_FEATURES_GEO,
-) -> tuple[list[bytes], str]:
+) -> AsyncGenerator[tuple[list[bytes], str], None]:
+    """Yields (pages, source_url) conforme as paginas sao baixadas.
+
+    Quando max_features e None, cada yield corresponde a uma pagina, baixada
+    sequencialmente com o throttle pos-pagina. Isso evita acumular todo o
+    estado bruto em memoria.
+    """
     if max_features is not None and max_features <= PAGE_SIZE:
         url = _build_wfs_url(
             uf,
@@ -162,7 +169,8 @@ async def fetch_imoveis_geo(
         async with make_session() as http:
             content = await fetch_wfs(url, source="sicar", timeout=TIMEOUT, client=http)
         logger.info("sicar_imoveis_geojson", source="sicar", size=len(content), uf=uf)
-        return [content], url
+        yield [content], url
+        return
 
     async with make_session() as http:
         total = await fetch_hits(uf, cql_filter, client=http)
@@ -178,12 +186,12 @@ async def fetch_imoveis_geo(
         )
 
         if limit == 0:
-            return [], base_url
+            yield [], base_url
+            return
 
         n_pages = math.ceil(limit / PAGE_SIZE)
-        pages: list[bytes] = []
 
-        for i in range(n_pages):
+        async def fetch_page(i: int) -> bytes:
             count = min(PAGE_SIZE, limit - i * PAGE_SIZE)
             url = _build_wfs_url(
                 uf,
@@ -199,7 +207,6 @@ async def fetch_imoveis_geo(
                 timeout=TIMEOUT,
                 client=http,
             )
-            pages.append(content)
             logger.debug(
                 "sicar_geo_page",
                 uf=uf,
@@ -209,6 +216,27 @@ async def fetch_imoveis_geo(
             )
             if i >= THROTTLE_AFTER_PAGE:
                 await asyncio.sleep(THROTTLE_DELAY)
+            return content
+
+        if max_features is None:
+            for i in range(n_pages):
+                yield [await fetch_page(i)], base_url
+        else:
+            pages = [await fetch_page(i) for i in range(n_pages)]
+            yield pages, base_url
 
     logger.info("sicar_imoveis_geojson", source="sicar", pages=n_pages, uf=uf)
-    return pages, base_url
+
+
+async def fetch_imoveis_geo(
+    uf: str,
+    cql_filter: str | None = None,
+    max_features: int | None = MAX_FEATURES_GEO,
+) -> tuple[list[bytes], str]:
+    """Acumula todas as paginas em memoria. Use stream_imoveis_geo para baixo consumo."""
+    all_pages: list[bytes] = []
+    source_url = ""
+    async for batch, url in stream_imoveis_geo(uf, cql_filter, max_features):
+        all_pages.extend(batch)
+        source_url = url
+    return all_pages, source_url

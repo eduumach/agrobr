@@ -9,7 +9,13 @@ import pandas as pd
 import pytest
 
 from agrobr.alt.sicar import api
-from agrobr.alt.sicar.api import _build_cql_filter, imoveis, imoveis_geo, resumo
+from agrobr.alt.sicar.api import (
+    _build_cql_filter,
+    imoveis,
+    imoveis_geo,
+    imoveis_geo_stream,
+    resumo,
+)
 from agrobr.alt.sicar.models import COLUNAS_IMOVEIS, COLUNAS_IMOVEIS_GEO
 
 GOLDEN_DIR = Path(__file__).parent.parent / "golden_data" / "sicar"
@@ -760,6 +766,107 @@ class TestImoveisGeoLargeQueryWarning:
 
         assert len(gdf) == 10
         assert "sicar_geo_hit_count_check_failed" in self._warning_events(mock_logger)
+
+
+class TestImoveisGeoStream:
+    gpd = pytest.importorskip("geopandas")
+
+    @pytest.mark.asyncio
+    async def test_invalid_uf_raises(self):
+        with pytest.raises(ValueError, match="UF"):
+            async for _ in imoveis_geo_stream("XX"):
+                pass
+
+    @pytest.mark.asyncio
+    async def test_invalid_status_raises(self):
+        with pytest.raises(ValueError, match="Status"):
+            async for _ in imoveis_geo_stream("DF", status="INVALID"):
+                pass
+
+    @pytest.mark.asyncio
+    async def test_invalid_tipo_raises(self):
+        with pytest.raises(ValueError, match="Tipo"):
+            async for _ in imoveis_geo_stream("DF", tipo="XYZ"):
+                pass
+
+    @pytest.mark.asyncio
+    async def test_municipio_and_cod_municipio_raises(self):
+        with pytest.raises(ValueError, match="municipio.*cod_municipio"):
+            async for _ in imoveis_geo_stream("DF", municipio="Brasilia", cod_municipio=5300108):
+                pass
+
+    @pytest.mark.asyncio
+    async def test_yields_geodataframe_per_batch(self):
+        import geopandas
+
+        geojson = _load_golden_geojson()
+
+        async def fake_stream(*_args, **_kwargs):
+            yield [geojson], "https://test.url"
+
+        with patch.object(api.client, "stream_imoveis_geo", fake_stream):
+            results = [gdf async for gdf in imoveis_geo_stream("DF")]
+
+        assert len(results) == 1
+        assert isinstance(results[0], geopandas.GeoDataFrame)
+        assert len(results[0]) == 10
+        for col in COLUNAS_IMOVEIS_GEO:
+            assert col in results[0].columns
+
+    @pytest.mark.asyncio
+    async def test_dedup_across_batches(self):
+        import json
+
+        features = json.loads(_load_golden_geojson())["features"]
+
+        def page(feats: list[dict]) -> bytes:
+            return json.dumps({"type": "FeatureCollection", "features": feats}).encode()
+
+        async def fake_stream(*_args, **_kwargs):
+            yield [page(features[:6])], "https://test.url"
+            yield [page(features[5:])], "https://test.url"
+
+        with patch.object(api.client, "stream_imoveis_geo", fake_stream):
+            results = [gdf async for gdf in imoveis_geo_stream("DF")]
+
+        assert len(results) == 2
+        assert sum(len(gdf) for gdf in results) == 10
+        all_cods = pd.concat([gdf["cod_imovel"] for gdf in results])
+        assert all_cods.is_unique
+
+    @pytest.mark.asyncio
+    async def test_empty_batch_is_skipped(self):
+        empty = b'{"type":"FeatureCollection","features":[]}'
+        geojson = _load_golden_geojson()
+
+        async def fake_stream(*_args, **_kwargs):
+            yield [empty], "https://test.url"
+            yield [geojson], "https://test.url"
+
+        with patch.object(api.client, "stream_imoveis_geo", fake_stream):
+            results = [gdf async for gdf in imoveis_geo_stream("DF")]
+
+        assert len(results) == 1
+        assert len(results[0]) == 10
+
+    @pytest.mark.asyncio
+    async def test_passes_cql_filter_and_max_features_none(self):
+        geojson = _load_golden_geojson()
+        captured: dict[str, object] = {}
+
+        async def fake_stream(uf, cql_filter=None, *, max_features=None):
+            captured["uf"] = uf
+            captured["cql_filter"] = cql_filter
+            captured["max_features"] = max_features
+            yield [geojson], "https://test.url"
+
+        with patch.object(api.client, "stream_imoveis_geo", fake_stream):
+            async for _ in imoveis_geo_stream("DF", municipio="Brasilia"):
+                pass
+
+        assert captured["uf"] == "DF"
+        assert captured["max_features"] is None
+        assert "municipio ILIKE" in captured["cql_filter"]
 
 
 class TestImoveisNullDataCriacao:

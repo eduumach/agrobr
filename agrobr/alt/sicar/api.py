@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 import time
+from collections.abc import AsyncGenerator
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 import httpx
@@ -316,6 +317,58 @@ async def imoveis_geo(
         return gdf, meta
 
     return gdf
+
+
+async def imoveis_geo_stream(
+    uf: str,
+    *,
+    municipio: str | None = None,
+    cod_municipio: int | None = None,
+    status: str | None = None,
+    tipo: str | None = None,
+    area_min: float | None = None,
+    area_max: float | None = None,
+    criado_apos: str | None = None,
+) -> AsyncGenerator[gpd.GeoDataFrame, None]:
+    """Itera sobre os imoveis rurais geoespaciais de uma UF em batches de baixo consumo de memoria.
+
+    Cada yield e um GeoDataFrame parcial com ate PAGE_SIZE features (uma pagina WFS).
+    Ideal para processar volumes grandes (max_features=None implicito) sem acumular
+    tudo em memoria antes de comecar a usar os dados. Async-only: sem suporte em
+    agrobr.sync.
+    """
+    validate_year_uf(uf=uf)
+    uf_upper = uf.strip().upper()
+
+    if municipio is not None and cod_municipio is not None:
+        raise ValueError("Use 'municipio' ou 'cod_municipio', nao ambos")
+
+    if status is not None and status.upper() not in STATUS_VALIDOS:
+        raise ValueError(f"Status '{status}' invalido. Opcoes: {sorted(STATUS_VALIDOS)}")
+
+    if tipo is not None and tipo.upper() not in TIPO_VALIDOS:
+        raise ValueError(f"Tipo '{tipo}' invalido. Opcoes: {sorted(TIPO_VALIDOS)}")
+
+    cql = _build_cql_filter(
+        municipio=municipio,
+        cod_municipio=cod_municipio,
+        status=status,
+        tipo=tipo,
+        area_min=area_min,
+        area_max=area_max,
+        criado_apos=criado_apos,
+    )
+
+    seen_cod_imovel: set[str] = set()
+    async for batch_pages, _url in client.stream_imoveis_geo(uf_upper, cql, max_features=None):
+        gdf = parser.parse_imoveis_geojson(batch_pages, max_features=None)
+        if gdf.empty:
+            continue
+        if "cod_imovel" in gdf.columns:
+            gdf = gdf[~gdf["cod_imovel"].isin(seen_cod_imovel)]
+            seen_cod_imovel.update(gdf["cod_imovel"].tolist())
+        if not gdf.empty:
+            yield gdf
 
 
 @overload
