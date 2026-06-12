@@ -148,7 +148,7 @@ async def pracas(produto: str) -> list[str]
 
 **Retorno:**
 
-Lista de praças disponíveis.
+Lista de praças disponíveis — vazia para produto válido sem praças mapeadas. Produto desconhecido levanta `ValueError`.
 
 ---
 

@@ -1,236 +1,137 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
-from unittest.mock import patch
 
 import pandas as pd
 import pytest
 
 from agrobr.exceptions import ParseError
-from agrobr.ibama.models import COLUNAS_SAIDA, COLUNAS_SAIDA_GEO, MAX_FEATURES_GEO
-from agrobr.ibama.parser import PARSER_VERSION, parse_embargos_csv
+from agrobr.ibama.models import COLUNAS_SAIDA, COLUNAS_SAIDA_GEO
+from agrobr.ibama.parser import PARSER_VERSION, parse_embargos_csv, parse_embargos_geo
 
-CSV_DIR = Path(__file__).parent.parent / "golden_data" / "ibama" / "embargos_sample"
-GEO_DIR = Path(__file__).parent.parent / "golden_data" / "ibama" / "embargos_geo_sample"
+GOLDEN = Path(__file__).parent.parent / "golden_data" / "ibama" / "termo_embargo_sample.csv"
+
+
+def _golden_bytes() -> bytes:
+    return GOLDEN.read_bytes()
 
 
 class TestParserVersion:
-    def test_version_is_int(self):
-        assert isinstance(PARSER_VERSION, int)
-        assert PARSER_VERSION >= 1
+    def test_version_bumped_para_formato_sifisc(self):
+        assert PARSER_VERSION >= 2
 
 
 class TestParseEmbargosCsv:
-    def test_valid_csv(self):
-        csv_bytes = CSV_DIR.joinpath("response.csv").read_bytes()
-        df = parse_embargos_csv([csv_bytes])
+    def test_golden_valido(self):
+        df = parse_embargos_csv(_golden_bytes())
 
-        assert len(df) == 10
-        for col in COLUNAS_SAIDA:
-            assert col in df.columns, f"Missing column: {col}"
+        assert len(df) == 40
+        assert list(df.columns) == COLUNAS_SAIDA
 
-    def test_golden_data_columns(self):
-        csv_bytes = CSV_DIR.joinpath("response.csv").read_bytes()
-        expected = json.loads(CSV_DIR.joinpath("expected.json").read_text(encoding="utf-8"))
-        df = parse_embargos_csv([csv_bytes])
+    def test_dtypes(self):
+        df = parse_embargos_csv(_golden_bytes())
 
-        for col in expected["columns"]:
-            assert col in df.columns, f"Missing column: {col}"
+        assert pd.api.types.is_datetime64_any_dtype(df["data_embargo"])
+        assert pd.api.types.is_datetime64_any_dtype(df["data_desembargo"])
+        assert pd.api.types.is_float_dtype(df["area_embargada_ha"])
+        assert pd.api.types.is_float_dtype(df["latitude"])
+        assert pd.api.types.is_bool_dtype(df["cancelado"])
 
-    def test_area_is_float(self):
-        csv_bytes = CSV_DIR.joinpath("response.csv").read_bytes()
-        df = parse_embargos_csv([csv_bytes])
+    def test_area_decimal_br_convertida(self):
+        df = parse_embargos_csv(_golden_bytes())
 
-        assert pd.api.types.is_float_dtype(df["area_desmatada_ha"])
+        areas = df["area_embargada_ha"].dropna()
+        assert len(areas) > 0
+        assert (areas >= 0).all()
+        assert (areas < 1_000_000).all()
 
-    def test_uf_is_uppercase(self):
-        csv_bytes = CSV_DIR.joinpath("response.csv").read_bytes()
-        df = parse_embargos_csv([csv_bytes])
+    def test_uf_maiuscula(self):
+        df = parse_embargos_csv(_golden_bytes())
 
-        for val in df["uf"].dropna():
-            if val:
-                assert val == val.upper()
+        ufs = df["uf"].unique()
+        assert all(u == u.upper() for u in ufs if u)
+        assert len(ufs) > 20
 
-    def test_empty_pages_returns_empty_dataframe(self):
-        df = parse_embargos_csv([])
+    def test_cancelados_presentes(self):
+        df = parse_embargos_csv(_golden_bytes())
 
-        assert len(df) == 0
-        for col in COLUNAS_SAIDA:
-            assert col in df.columns
+        assert df["cancelado"].sum() >= 5
 
-    def test_invalid_csv_raises(self):
-        with pytest.raises(ParseError):
-            parse_embargos_csv([b""])
+    def test_filtro_uf(self):
+        df = parse_embargos_csv(_golden_bytes(), uf="PA")
 
-    def test_missing_required_columns_raises(self):
-        csv = b"id,nome,valor\n1,teste,100\n"
-        with pytest.raises(ParseError, match="Colunas obrigatorias ausentes"):
-            parse_embargos_csv([csv])
+        assert len(df) > 0
+        assert (df["uf"] == "PA").all()
 
-    def test_count_matches_golden(self):
-        csv_bytes = CSV_DIR.joinpath("response.csv").read_bytes()
-        expected = json.loads(CSV_DIR.joinpath("expected.json").read_text(encoding="utf-8"))
-        df = parse_embargos_csv([csv_bytes])
+    def test_filtro_bbox(self):
+        df_all = parse_embargos_csv(_golden_bytes())
+        bbox = (-55.0, -10.0, -45.0, 0.0)
+        df = parse_embargos_csv(_golden_bytes(), bbox=bbox)
 
-        assert len(df) == expected["count"]
+        assert len(df) < len(df_all)
+        assert df["longitude"].between(-55.0, -45.0).all()
+        assert df["latitude"].between(-10.0, 0.0).all()
 
-    def test_multi_page_concat(self):
-        csv_bytes = CSV_DIR.joinpath("response.csv").read_bytes()
-        df = parse_embargos_csv([csv_bytes, csv_bytes])
+    def test_layout_drift_raises_parse_error(self):
+        csv_quebrado = b"COLUNA_A;COLUNA_B\n1;2\n"
 
-        assert len(df) == 20
-
-    def test_non_null_columns(self):
-        csv_bytes = CSV_DIR.joinpath("response.csv").read_bytes()
-        expected = json.loads(CSV_DIR.joinpath("expected.json").read_text(encoding="utf-8"))
-        df = parse_embargos_csv([csv_bytes])
-
-        for col in expected["non_null_columns"]:
-            non_null = df[col].notna()
-            non_empty = df[col].astype(str).str.strip() != ""
-            assert (non_null & non_empty).all(), f"Column {col} has nulls/empty"
+        with pytest.raises(ParseError, match="Usecols"):
+            parse_embargos_csv(csv_quebrado)
 
 
-gpd = pytest.importorskip("geopandas")
+class TestParseEmbargosGeo:
+    def test_golden_geo(self):
+        gpd = pytest.importorskip("geopandas")
 
+        gdf = parse_embargos_geo(_golden_bytes())
 
-class TestParseEmbargosGeojson:
-    def _parse(self):
-        from agrobr.ibama.parser import parse_embargos_geojson
-
-        data = GEO_DIR.joinpath("response.geojson").read_bytes()
-        return parse_embargos_geojson(data)
-
-    def test_valid_geojson(self):
-        gdf = self._parse()
-        assert len(gdf) >= 5
-
-    def test_columns_match_schema(self):
-        gdf = self._parse()
-        for col in COLUNAS_SAIDA_GEO:
-            assert col in gdf.columns, f"Missing column: {col}"
-
-    def test_geometry_exists(self):
-        gdf = self._parse()
-        assert "geometry" in gdf.columns
-
-    def test_crs_4326(self):
-        gdf = self._parse()
-        assert gdf.crs.to_epsg() == 4326
-
-    def test_uf_uppercase(self):
-        gdf = self._parse()
-        for val in gdf["uf"].dropna():
-            if val:
-                assert val == val.upper()
-
-    def test_empty_features_returns_empty_geodataframe(self):
-        from agrobr.ibama.parser import parse_embargos_geojson
-
-        data = json.dumps({"type": "FeatureCollection", "features": []}).encode()
-        gdf = parse_embargos_geojson(data)
-
-        assert len(gdf) == 0
         assert isinstance(gdf, gpd.GeoDataFrame)
-        for col in COLUNAS_SAIDA_GEO:
-            assert col in gdf.columns
+        assert len(gdf) == 24
+        assert list(gdf.columns) == COLUNAS_SAIDA_GEO
+        assert gdf.crs is not None
+        assert gdf.geometry.notna().all()
 
-    def test_invalid_json_raises(self):
-        from agrobr.ibama.parser import parse_embargos_geojson
+    def test_geo_filtro_uf_aplicado_antes_do_wkt(self):
+        pytest.importorskip("geopandas")
 
-        with pytest.raises(ParseError):
-            parse_embargos_geojson(b"not json at all {{{")
+        gdf_all = parse_embargos_geo(_golden_bytes())
+        ufs_com_geom = gdf_all["uf"].unique()
+        alvo = ufs_com_geom[0]
 
-    def test_missing_required_columns_raises(self):
-        from agrobr.ibama.parser import parse_embargos_geojson
+        gdf = parse_embargos_geo(_golden_bytes(), uf=alvo)
+        assert len(gdf) >= 1
+        assert (gdf["uf"] == alvo).all()
 
-        data = json.dumps(
-            {
-                "type": "FeatureCollection",
-                "features": [
-                    {
-                        "type": "Feature",
-                        "geometry": {"type": "Point", "coordinates": [-54.0, -3.0]},
-                        "properties": {"id": 1, "nome": "test"},
-                    }
-                ],
-            }
-        ).encode()
-        with pytest.raises(ParseError, match="Colunas obrigatorias ausentes"):
-            parse_embargos_geojson(data)
+    def test_geo_vazio_pos_filtro_retorna_colunas(self):
+        gpd = pytest.importorskip("geopandas")
 
-    def test_geopandas_not_installed(self):
-        from agrobr.ibama.parser import parse_embargos_geojson
+        gdf = parse_embargos_geo(_golden_bytes(), bbox=(0.0, 0.0, 1.0, 1.0))
 
-        with (
-            patch(
-                "agrobr.ibama.parser.check_geopandas",
-                side_effect=ImportError(
-                    "geopandas is required for geo functions. Install with: pip install agrobr[geo]"
-                ),
-            ),
-            pytest.raises(ImportError, match="agrobr\\[geo\\]"),
-        ):
-            parse_embargos_geojson(b"{}")
+        assert isinstance(gdf, gpd.GeoDataFrame)
+        assert len(gdf) == 0
+        assert list(gdf.columns) == COLUNAS_SAIDA_GEO
 
-    def test_truncation_warning(self):
-        from agrobr.ibama.parser import parse_embargos_geojson
+    def test_geo_wkt_invalido_descartado(self):
+        pytest.importorskip("geopandas")
 
-        data = GEO_DIR.joinpath("response.geojson").read_bytes()
-        geojson = json.loads(data)
-        features = geojson["features"]
-        geojson["features"] = features * (MAX_FEATURES_GEO // len(features) + 1)
-        assert len(geojson["features"]) >= MAX_FEATURES_GEO
-        big_data = json.dumps(geojson).encode()
+        raw = _golden_bytes().decode("utf-8")
+        linhas = raw.split("\n")
+        header = linhas[0].split(";")
+        geom_idx = header.index("GEOM_AREA_EMBARGADA")
 
-        with patch("agrobr.utils.geo.logger") as mock_logger:
-            parse_embargos_geojson(big_data)
+        corrompidas = [linhas[0]]
+        trocou = False
+        for linha in linhas[1:]:
+            campos = linha.split(";")
+            if (
+                not trocou
+                and len(campos) > geom_idx
+                and campos[geom_idx].startswith(("POLYGON", "MULTIPOLYGON"))
+            ):
+                campos[geom_idx] = "WKT_QUEBRADO((1 2)"
+                trocou = True
+            corrompidas.append(";".join(campos))
+        assert trocou
 
-        truncation_calls = [
-            c
-            for c in mock_logger.warning.call_args_list
-            if c[0][0] == "ibama_embargos_geo_truncated"
-        ]
-        assert len(truncation_calls) == 1
-
-    def test_null_geometry_warning(self):
-        from agrobr.ibama.parser import parse_embargos_geojson
-
-        data = json.dumps(
-            {
-                "type": "FeatureCollection",
-                "features": [
-                    {
-                        "type": "Feature",
-                        "geometry": None,
-                        "properties": {
-                            "numero_tad": "123",
-                            "data_tad": "2024-01-01",
-                            "sig_uf": "MT",
-                            "qtd_area_desmatada": "10.5",
-                        },
-                    },
-                    {
-                        "type": "Feature",
-                        "geometry": {"type": "Point", "coordinates": [-54.0, -3.0]},
-                        "properties": {
-                            "numero_tad": "456",
-                            "data_tad": "2024-02-01",
-                            "sig_uf": "PA",
-                            "qtd_area_desmatada": "20.0",
-                        },
-                    },
-                ],
-            }
-        ).encode()
-
-        with patch("agrobr.utils.geo.logger") as mock_logger:
-            gdf = parse_embargos_geojson(data)
-
-        assert len(gdf) == 2
-        null_calls = [
-            c for c in mock_logger.warning.call_args_list if c[0][0] == "ibama_null_geometry"
-        ]
-        assert len(null_calls) == 1
-        assert null_calls[0][1]["null_count"] == 1
+        gdf = parse_embargos_geo("\n".join(corrompidas).encode("utf-8"))
+        assert len(gdf) == 23

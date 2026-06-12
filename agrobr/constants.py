@@ -30,6 +30,7 @@ class Fonte(StrEnum):
     B3 = "b3"
     BCB = "bcb"
     CEPEA = "cepea"
+    CFTC = "cftc"
     COMEXSTAT = "comexstat"
     COMTRADE = "comtrade"
     CONAB = "conab"
@@ -53,6 +54,7 @@ class Fonte(StrEnum):
     QUEIMADAS = "queimadas"
     SFB = "sfb"
     SICAR = "sicar"
+    UNICA = "unica"
     USDA = "usda"
     RNC = "rnc"
     RIO_VERDE = "rio_verde"
@@ -106,6 +108,11 @@ URLS = {
         "base": "https://www.cepea.org.br",
         "indicadores": "https://www.cepea.org.br/br/indicador",
     },
+    Fonte.CFTC: {
+        "base": "https://publicreporting.cftc.gov",
+        "disaggregated_futures": "https://publicreporting.cftc.gov/resource/72hh-3qpy.json",
+        "disaggregated_combined": "https://publicreporting.cftc.gov/resource/kh3c-gbw2.json",
+    },
     Fonte.COMEXSTAT: {
         "base": "https://comexstat.mdic.gov.br",
         "bulk_csv": "https://balanca.economia.gov.br/balanca/bd/comexstat-bd/ncm",
@@ -156,7 +163,7 @@ URLS = {
     },
     Fonte.IBAMA: {
         "base": "https://www.ibama.gov.br",
-        "geoserver": "https://siscom.ibama.gov.br/geoserver/wfs",
+        "sifisc_embargo_zip": "https://dadosabertos.ibama.gov.br/dados/SIFISC/termo_embargo/termo_embargo/termo_embargo_csv.zip",
         "dados_abertos": "https://dadosabertos.ibama.gov.br",
     },
     Fonte.ICMBIO: {
@@ -171,10 +178,16 @@ URLS = {
         "base": "https://apitempo.inmet.gov.br",
         "estacoes": "https://apitempo.inmet.gov.br/estacoes",
         "dados": "https://apitempo.inmet.gov.br/estacao",
+        "dadoshistoricos": "https://portal.inmet.gov.br/uploads/dadoshistoricos",
     },
     Fonte.NASA_POWER: {
         "base": "https://power.larc.nasa.gov",
         "daily": "https://power.larc.nasa.gov/api/temporal/daily/point",
+    },
+    Fonte.UNICA: {
+        "base": "https://unicadata.com.br",
+        "quinzenal_page": "https://unicadata.com.br/listagem.php?idMn=63",
+        "historico_xls": "https://unicadata.com.br/xlsHPM.php",
     },
     Fonte.USDA: {
         "base": "https://apps.fas.usda.gov/OpenData/api",
@@ -364,6 +377,7 @@ class HTTPSettings(BaseSettings):
     rate_limit_antt_pedagio: float = 2.0
     rate_limit_bcb: float = 1.0
     rate_limit_cepea: float = 5.0
+    rate_limit_cftc: float = 2.0
     rate_limit_comexstat: float = 2.0
     rate_limit_comtrade: float = 2.0
     rate_limit_conab: float = 3.0
@@ -385,8 +399,10 @@ class HTTPSettings(BaseSettings):
     rate_limit_queimadas: float = 1.0
     rate_limit_sfb: float = 2.0
     rate_limit_sicar: float = 2.0
+    rate_limit_unica: float = 3.0
     rate_limit_usda: float = 1.0
     rate_limit_b3: float = 1.0
+    rate_limit_b3_arquivos: float = 5.0
     rate_limit_embrapa_solos: float = 2.0
     rate_limit_rnc: float = 3.0
     rate_limit_rio_verde: float = 3.0

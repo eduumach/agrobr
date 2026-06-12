@@ -1,50 +1,29 @@
 from agrobr.constants import URLS, Fonte
 
-WFS_BASE: str = URLS[Fonte.IBAMA]["geoserver"]
-WFS_VERSION = "2.0.0"
-LAYER = "vw_brasil_adm_embargo_a"
-NAMESPACE = "publica"
-GEOM_COLUMN = "geom"
+ZIP_URL: str = URLS[Fonte.IBAMA]["sifisc_embargo_zip"]
 
-PAGE_SIZE = 10_000
-MAX_FEATURES_GEO = 5_000
+MIN_CSV_BYTES = 10_000_000
 
-PROPERTY_NAMES = [
-    "numero_tad",
-    "data_tad",
-    "sig_uf",
-    "nom_municipio",
-    "qtd_area_desmatada",
-    "des_infracao",
-    "legislacao",
-    "status_tad",
-    "sit_embarga_poligono",
-    "respeita_embargo",
-]
-
-PROPERTY_NAMES_GEO = [GEOM_COLUMN] + PROPERTY_NAMES
-
-RENAME_MAP: dict[str, str] = {
-    "data_tad": "data_embargo",
-    "sig_uf": "uf",
-    "nom_municipio": "municipio",
-    "qtd_area_desmatada": "area_desmatada_ha",
-    "des_infracao": "infracao",
-    "status_tad": "status",
-    "sit_embarga_poligono": "situacao_poligono",
+CSV_COLUMN_MAP: dict[str, str] = {
+    "SEQ_TAD": "seq_tad",
+    "NUM_TAD": "numero_tad",
+    "DAT_EMBARGO": "data_embargo",
+    "NUM_PROCESSO": "num_processo",
+    "DES_TAD": "descricao",
+    "COD_MUNICIPIO": "codigo_municipio",
+    "MUNICIPIO": "municipio",
+    "UF": "uf",
+    "NUM_LATITUDE_TAD": "latitude",
+    "NUM_LONGITUDE_TAD": "longitude",
+    "QTD_AREA_EMBARGADA": "area_embargada_ha",
+    "NOME_IMOVEL": "nome_imovel",
+    "DES_STATUS_FORMULARIO": "status",
+    "SIT_CANCELADO": "cancelado",
+    "DAT_DESEMBARGO": "data_desembargo",
 }
 
-COLUNAS_SAIDA = [
-    "numero_tad",
-    "data_embargo",
-    "uf",
-    "municipio",
-    "area_desmatada_ha",
-    "infracao",
-    "legislacao",
-    "status",
-    "situacao_poligono",
-    "respeita_embargo",
-]
+GEOM_COLUMN_CSV = "GEOM_AREA_EMBARGADA"
 
-COLUNAS_SAIDA_GEO = COLUNAS_SAIDA + ["geometry"]
+COLUNAS_SAIDA: list[str] = list(CSV_COLUMN_MAP.values())
+
+COLUNAS_SAIDA_GEO: list[str] = [*COLUNAS_SAIDA, "geometry"]

@@ -123,7 +123,7 @@ async def estacao(
 
     meta = build_source_meta(
         "inmet",
-        f"{client.BASE_URL}/estacao/dados/{codigo}/{inicio}/{fim}",
+        f"{client.BASE_URL}/estacao/{inicio}/{fim}/{codigo}",
         "httpx",
         fetch_ms,
         parse_ms,
@@ -163,3 +163,39 @@ async def clima_uf(
         parser.PARSER_VERSION,
     )
     return finalize_result(df_mensal, meta, as_polars=as_polars, return_meta=return_meta)
+
+
+async def historico(
+    codigo: str,
+    ano: int,
+    agregacao: str = "horario",
+    as_polars: bool = False,
+    return_meta: bool = False,
+    **kwargs: Any,  # noqa: ARG001
+) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
+    """Dados horários de um ano inteiro via dadoshistoricos (sem token).
+
+    Baixa o ZIP anual público do portal (~100 MB, cache de 1 ano por processo)
+    e extrai a estação pedida — alternativa ao apitempo, que exige token para
+    dados observacionais. Mesmo schema de saída de `estacao()`.
+    """
+    t0 = time.monotonic()
+    raw, source_url = await client.fetch_historico_estacao(codigo, ano)
+    fetch_ms = int((time.monotonic() - t0) * 1000)
+
+    t1 = time.monotonic()
+    df = parser.parse_historico_csv(raw, codigo)
+    if agregacao == "diario":
+        df = parser.agregar_diario(df)
+    parse_ms = int((time.monotonic() - t1) * 1000)
+
+    meta = build_source_meta(
+        "inmet",
+        source_url,
+        "httpx+zip+csv",
+        fetch_ms,
+        parse_ms,
+        df,
+        parser.PARSER_VERSION,
+    )
+    return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)

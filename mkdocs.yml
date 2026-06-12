@@ -93,6 +93,7 @@ nav:
     - oferta_demanda_global: contracts/oferta_demanda_global.md
     - pecuaria_municipal: contracts/pecuaria_municipal.md
     - pib_agro: contracts/pib_agro.md
+    - posicionamento_fundos: contracts/posicionamento_fundos.md
     - preco_atacado: contracts/preco_atacado.md
     - preco_diario: contracts/preco_diario.md
     - producao_anual: contracts/producao_anual.md
@@ -134,6 +135,8 @@ nav:
     - RNC/CultivarWeb: api/rnc.md
     - EMBRAPA Solos: api/embrapa_solos.md
     - Fundação Rio Verde: api/rio_verde.md
+    - CFTC COT: api/cftc.md
+    - UNICA: api/unica.md
   - Fontes:
     - Visão Geral: sources/index.md
     - CEPEA: sources/cepea.md
@@ -176,6 +179,8 @@ nav:
     - EMBRAPA Solos: sources/embrapa_solos.md
     - Fundação Rio Verde: sources/rio_verde.md
     - ANEC: sources/anec.md
+    - CFTC COT: sources/cftc.md
+    - UNICA: sources/unica.md
   - Licenças dos Dados: licenses.md
   - Portabilidade:
     - Visão Geral: porting/index.md

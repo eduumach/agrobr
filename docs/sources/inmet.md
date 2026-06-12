@@ -11,10 +11,17 @@ Configure a variável de ambiente `AGROBR_INMET_TOKEN` antes de usar:
 export AGROBR_INMET_TOKEN="seu-token-aqui"
 ```
 
-Sem o token, requisições de dados observacionais levantam `SourceUnavailableError` (HTTP 403).
+Sem o token, requisições de dados observacionais levantam `SourceUnavailableError`
+com instrução (a API responde HTTP 204 vazio quando não autenticada). Token inválido
+levanta `SourceUnavailableError` ("Token INMET inválido").
 A listagem de estações (`/estacoes/T`, `/estacoes/M`) funciona sem token.
 
-Para obter o token, consulte o portal INMET: https://portal.inmet.gov.br
+Para obter o token, consulte o portal INMET (https://portal.inmet.gov.br) — sem fluxo
+self-service; alternativa formal: pedido via Fala.BR/LAI (falabr.cgu.gov.br).
+
+**Sem token**: `inmet.historico(codigo, ano)` cobre anos fechados (2000+) via os
+ZIPs anuais públicos do dadoshistoricos, com o mesmo schema de `estacao()` —
+nenhuma autenticação necessária.
 
 ## API
 
@@ -56,12 +63,15 @@ print(meta.source)  # "inmet"
 ## Notas tecnicas
 
 - **Token obrigatório**: Dados observacionais exigem `AGROBR_INMET_TOKEN`.
-  Sem token, o client levanta `SourceUnavailableError` (HTTP 403).
+  Sem token a API responde HTTP 204 vazio; o client converte em
+  `SourceUnavailableError` com instrução. O token entra no path da requisição
+  (esquema `/token/...` da API) e nunca aparece em logs ou mensagens de erro.
 - O client envia User-Agent de navegador (Chrome 120) em todas as
-  requisicoes. A API INMET bloqueia com 403 requisicoes sem User-Agent.
+  requisicoes. A API INMET derruba conexoes sem User-Agent de navegador.
 - A API divide automaticamente periodos longos em chunks de 365 dias.
 - Concorrencia limitada a 5 estacoes simultaneas por UF.
-- Endpoint de dados: `/estacao/{codigo}/{inicio}/{fim}` (atualizado fev/2026).
+- Endpoint de dados: `/estacao/{inicio}/{fim}/{codigo}` — com token,
+  `/token/estacao/{inicio}/{fim}/{codigo}/{token}` (atualizado jun/2026).
 - Para dados climaticos sem token, [NASA POWER](nasa_power.md) é uma
   alternativa funcional (`from agrobr import nasa_power`).
 

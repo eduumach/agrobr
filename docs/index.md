@@ -9,7 +9,7 @@
 
 ## O que é o agrobr?
 
-Infraestrutura Python para dados agrícolas brasileiros com **camada semântica** sobre 38 fontes públicas.
+Infraestrutura Python para dados agrícolas brasileiros com **camada semântica** sobre 40 fontes públicas.
 
 **v1.0.5** — 6000+ testes | 92% cobertura | golden tests com fixtures por fonte | retry centralizado em todos os clients HTTP
 
@@ -161,7 +161,7 @@ df = nasa_power.clima_uf('MT', ano=2025)
 
 ## Features
 
-- **38 fontes públicas** — CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, ANEC, USDA, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento, MapBiomas, B3 Futuros Agro, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedagio, SICAR, ZARC, Agrofit/MAPA (Defensivos), FUNAI, ICMBio, INCRA, IBAMA, MapBiomas Alerta, Lista Suja, ANA/SNIRH, SFB, RNC/CultivarWeb, EMBRAPA Solos, Fundação Rio Verde, Acervo Fundiário/INCRA
+- **40 fontes públicas** — CEPEA, CONAB, IBGE, NASA POWER, BCB/SICOR, ComexStat, ANDA, ABIOVE, ANEC, USDA, IMEA, DERAL, INMET, Notícias Agrícolas, Queimadas/INPE, Desmatamento, MapBiomas, B3 Futuros Agro, UN Comtrade, ANTAQ, ANP Diesel, MAPA PSR, ANTT Pedagio, SICAR, ZARC, Agrofit/MAPA (Defensivos), FUNAI, ICMBio, INCRA, IBAMA, MapBiomas Alerta, Lista Suja, ANA/SNIRH, SFB, RNC/CultivarWeb, EMBRAPA Solos, Fundação Rio Verde, Acervo Fundiário/INCRA, CFTC COT, UNICA
 - **Golden tests** — fixtures de referência por fonte (dados reais ou sintéticos documentados)
 - **Resiliência HTTP** — `retry_on_status()`/`retry_async()` centralizado, Retry-After, 429 handling
 - **Camada semântica** — datasets com fallback automático entre fontes

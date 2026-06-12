@@ -10,6 +10,7 @@ import pytest
 
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.queimadas import client
+from agrobr.utils.io import extract_csv_from_zip
 from tests.helpers import make_mock_response
 
 
@@ -24,7 +25,7 @@ class TestExtractCsvFromZip:
     def test_extracts_csv(self):
         csv_data = b"lat,lon\n-15.0,-47.0"
         zip_bytes = _make_zip_with_csv(csv_data)
-        result = client._extract_csv_from_zip(zip_bytes)
+        result = extract_csv_from_zip(zip_bytes, source="queimadas", url="test")
         assert result == csv_data
 
     def test_extracts_first_csv_from_multi(self):
@@ -33,15 +34,15 @@ class TestExtractCsvFromZip:
             zf.writestr("readme.txt", "info")
             zf.writestr("data.csv", "lat,lon\n1,2")
             zf.writestr("extra.csv", "x,y\n3,4")
-        result = client._extract_csv_from_zip(buf.getvalue())
+        result = extract_csv_from_zip(buf.getvalue(), source="queimadas", url="test")
         assert result == b"lat,lon\n1,2"
 
     def test_no_csv_raises(self):
         buf = io.BytesIO()
         with zipfile.ZipFile(buf, "w") as zf:
             zf.writestr("readme.txt", "no csv here")
-        with pytest.raises(SourceUnavailableError, match="ZIP nao contem"):
-            client._extract_csv_from_zip(buf.getvalue())
+        with pytest.raises(SourceUnavailableError, match="não contém arquivo CSV"):
+            extract_csv_from_zip(buf.getvalue(), source="queimadas", url="test")
 
 
 class TestFetchFocosMensal:

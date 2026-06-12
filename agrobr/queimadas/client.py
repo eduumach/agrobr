@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-import io
-import zipfile
-
 import httpx
 import structlog
 
@@ -11,6 +8,7 @@ from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.retry import retry_on_status
 from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
+from agrobr.utils.io import extract_csv_from_zip
 
 logger = structlog.get_logger()
 
@@ -18,7 +16,7 @@ BASE_URL = URLS[Fonte.QUEIMADAS]["dados_abertos"]
 
 ANUAL_URL = f"{BASE_URL}/anual/Brasil_todos_sats"
 
-TIMEOUT = get_timeout(read=60.0)
+TIMEOUT = get_timeout(read=120.0)
 
 
 async def _try_fetch(client: httpx.AsyncClient, url: str) -> bytes | None:
@@ -41,18 +39,6 @@ async def _try_fetch(client: httpx.AsyncClient, url: str) -> bytes | None:
         )
         return None
     return content
-
-
-def _extract_csv_from_zip(data: bytes) -> bytes:
-    with zipfile.ZipFile(io.BytesIO(data)) as zf:
-        csv_names = [n for n in zf.namelist() if n.lower().endswith(".csv")]
-        if not csv_names:
-            raise SourceUnavailableError(
-                source="queimadas",
-                url="(zip)",
-                last_error="ZIP nao contem arquivo CSV",
-            )
-        return zf.read(csv_names[0])
 
 
 async def fetch_focos_diario(data: str) -> tuple[bytes, str]:
@@ -84,14 +70,14 @@ async def fetch_focos_mensal(ano: int, mes: int) -> tuple[bytes, str]:
         logger.debug("queimadas_csv_404_trying_zip", periodo=periodo)
         content = await _try_fetch(c, zip_url)
         if content is not None:
-            csv_bytes = _extract_csv_from_zip(content)
+            csv_bytes = extract_csv_from_zip(content, source="queimadas", url=zip_url)
             logger.info("queimadas_zip_found", source="queimadas", size=len(csv_bytes))
             return csv_bytes, zip_url
 
         logger.debug("queimadas_zip_404_trying_anual", ano=ano)
         content = await _try_fetch(c, anual_url)
         if content is not None:
-            csv_bytes = _extract_csv_from_zip(content)
+            csv_bytes = extract_csv_from_zip(content, source="queimadas", url=anual_url)
             logger.info(
                 "queimadas_anual_found",
                 source="queimadas",

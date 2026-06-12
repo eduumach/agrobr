@@ -21,7 +21,7 @@
   </a>
 </p>
 
-Infraestrutura Python para dados agrícolas brasileiros com camada semântica sobre **38 fontes públicas** — preços de mercado, produção e safras, comércio exterior, crédito rural, clima, monitoramento ambiental, cadastros territoriais e regulatório.
+Infraestrutura Python para dados agrícolas brasileiros com camada semântica sobre **40 fontes públicas** — preços de mercado, produção e safras, comércio exterior, crédito rural, clima, monitoramento ambiental, cadastros territoriais e regulatório.
 
 **v1.0.5** — 6000+ testes, 92% de cobertura, golden tests com fixtures de referência por fonte, retry centralizado em todos os clients HTTP.
 
@@ -95,13 +95,14 @@ print(await cepea.pracas('soja'))   # praças de comercialização por produto
 | Fonte | Função carro-chefe | Doc |
 |-------|--------------------|-----|
 | **B3** futuros agro | `b3.ajustes(data="13/02/2025")`, `b3.posicoes_abertas(data=...)`, `b3.historico(contrato="boi", inicio=..., fim=...)` | [docs/sources/b3.md](docs/sources/b3.md) |
+| **CFTC COT** posicionamento de fundos (Chicago/NY) | `cftc.cot("soja", start="2026-05-01")` | [docs/sources/cftc.md](docs/sources/cftc.md) |
 | **IMEA** Mato Grosso | `imea.cotacoes("soja", safra="24/25")` | [docs/sources/imea.md](docs/sources/imea.md) |
 | **CONAB CEASA** | `conab.ceasa_precos(produto="tomate", ceasa="SAO PAULO")` | [docs/sources/conab_ceasa.md](docs/sources/conab_ceasa.md) |
 | **ANP Diesel** | `alt.anp_diesel.precos_diesel(uf="MT")`, `alt.anp_diesel.vendas_diesel(uf="MT")` | [docs/sources/anp_diesel.md](docs/sources/anp_diesel.md) |
 
 ### Produção e safras
 
-CONAB (safras, balanço, custo, série histórica, progresso), IBGE (PAM, LSPA, PPM, Abate, PEVS, Leite, PIB, Censo Agro), DERAL, USDA PSD, ABIOVE, ANEC, Rio Verde.
+CONAB (safras, balanço, custo, série histórica, progresso), IBGE (PAM, LSPA, PPM, Abate, PEVS, Leite, PIB, Censo Agro), DERAL, USDA PSD, ABIOVE, ANEC, UNICA, Rio Verde.
 
 ```python
 from agrobr import conab, ibge
@@ -135,6 +136,7 @@ df = await ibge.censo_agro_municipal_1985('bovinos', uf='SP')
 | **USDA PSD** internacional | `usda.psd('soja', country='BR', market_year=2024)` (requer `AGROBR_USDA_API_KEY`) | [docs/sources/usda.md](docs/sources/usda.md) |
 | **ABIOVE** complexo soja | `abiove.exportacao(ano=2024, produto='grao')` | [docs/sources/abiove.md](docs/sources/abiove.md) |
 | **ANEC** embarques semanais | `anec.embarques(ano=2024)`, `anec.destinos(ano=2024)` | [docs/sources/anec.md](docs/sources/anec.md) |
+| **UNICA** moagem Centro-Sul | `unica.moagem_quinzenal('cana')`, `unica.safra_resumo()`, `unica.producao_historica('acucar')` | [docs/sources/unica.md](docs/sources/unica.md) |
 | **Rio Verde** ensaios cultivares MT | `rio_verde.ensaio_soja(safra='2023/24')` | [docs/sources/rio_verde.md](docs/sources/rio_verde.md) |
 
 ### Comércio e logística
@@ -330,7 +332,7 @@ print(meta.selected_source, meta.attempted_sources, meta.contract_version)
 print(datasets.list_datasets())
 ```
 
-35 datasets disponíveis. Veja a [lista completa](#datasets-disponíveis) abaixo.
+36 datasets disponíveis. Veja a [lista completa](#datasets-disponíveis) abaixo.
 
 ## Reprodutibilidade — snapshots e modo determinístico
 
@@ -439,6 +441,7 @@ agrobr snapshot use 2025-Q4   # valida o snapshot e mostra como ativa-lo no codi
 | `movimentacao_portuaria` | Movimentação portuária de carga (granel, geral, contêiner) | ANTAQ |
 | `oferta_demanda_global` | Oferta/demanda global de commodities | USDA PSD |
 | `pecuaria_municipal` | Pecuária municipal (rebanhos e produção animal) | IBGE PPM |
+| `posicionamento_fundos` | Posicionamento semanal de traders nos futuros agro de Chicago/NY (COT) | CFTC |
 | `pib_agro` | PIB Agropecuária por setor e trimestre | IBGE SIDRA |
 | `preco_atacado` | Preços de atacado hortifrúti em CEASAs | CONAB CEASA/PROHORT |
 | `preco_diario` | Preços diários spot | CEPEA → cache |
@@ -488,17 +491,19 @@ Disponibilidade monitorada automaticamente. Use `agrobr health` para verificar l
 | ANA/SNIRH | Hidrografia, pivôs irrigação, demanda irrigação, disponibilidade hídrica (ArcGIS REST) | ✅ | Funcional |
 | SFB | Florestas públicas (CNFP), concessões florestais, IFN conglomerados (ArcGIS REST) | ✅ | Funcional |
 | FUNAI | Terras indígenas (WFS geoserver.funai.gov.br) — ~740 TIs, filtros uf/fase/bbox | ✅ | Funcional |
-| IBAMA | Embargos ambientais (WFS siscom.ibama.gov.br) — ~89K features, filtro uf/bbox | ✅ | Funcional |
+| IBAMA | Embargos ambientais (dump CSV SIFISC + geometrias WKT) — ~114K registros, filtro uf/bbox | ✅ | Funcional |
 | ICMBio | Unidades de conservação federais (WFS geoservicos.inde.gov.br) — 344 UCs | ✅ | Funcional |
 | INCRA | Territórios quilombolas (WFS cmr.funai.gov.br) — ~426 territórios | ✅ | Funcional |
 | Acervo Fundiário/INCRA | Parcelas certificadas SIGEF (15 UFs) + SNCI (10 UFs) + assentamentos Brasil — shapefile ZIP | ✅ | Funcional |
 | RNC/CultivarWeb | Cultivares registradas (~37K) e protegidas (~5K) — MAPA/SNPC | ✅ | Funcional |
 | EMBRAPA Solos | Perfis de solo PronaSolos (34K+) + mapa pedológico SiBCS (2,8K polígonos) | ✅ | Funcional |
 | Fundação Rio Verde | Ensaios cultivares soja MT — ~97 cultivares × 4 épocas (PDF) | ✅ | Funcional |
+| CFTC COT | Posicionamento semanal de traders — managed money, produtores, swaps (12 contratos agro, 2006+) | ✅ | Funcional |
+| UNICA | Moagem Centro-Sul, produção açúcar/etanol, mix e ATR (PDF quinzenal + XLSX histórico) | ✅ | Funcional |
 
 > ¹ Golden test com dados sintéticos — `needs_real_data` para validação com API real.
 >
-> Várias fontes têm licença restritiva ou zona cinzenta — CEPEA `nc`, IMEA `restrito`, Acervo Fundiário `nc`, B3/ABIOVE/ANDA/ANEC/Notícias Agrícolas `zona_cinza`. Emitem `warnings.warn` na primeira chamada. Veja [docs/licenses.md](docs/licenses.md) para a tabela completa.
+> Várias fontes têm licença restritiva ou zona cinzenta — CEPEA `nc`, IMEA `restrito`, Acervo Fundiário `nc`, B3/ABIOVE/ANDA/ANEC/UNICA/Notícias Agrícolas `zona_cinza`. Emitem `warnings.warn` na primeira chamada. Veja [docs/licenses.md](docs/licenses.md) para a tabela completa.
 
 ## Contratos & Schemas
 
@@ -595,7 +600,7 @@ Veja o [guia completo de pipelines](https://www.agrobr.dev/docs/advanced/pipelin
 
 - [Guia Rápido](https://www.agrobr.dev/docs/quickstart/)
 - [Datasets](https://www.agrobr.dev/docs/contracts/) — Contratos e garantias
-- [Fontes](https://www.agrobr.dev/docs/sources/) — 38 fontes documentadas
+- [Fontes](https://www.agrobr.dev/docs/sources/) — 40 fontes documentadas
 - [API Reference](https://www.agrobr.dev/docs/api/cepea/)
 - [Resiliência](https://www.agrobr.dev/docs/advanced/resilience/)
 - [Portabilidade](https://www.agrobr.dev/docs/porting/) — Guia para portar o agrobr para R, Julia ou outras linguagens

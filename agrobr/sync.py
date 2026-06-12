@@ -100,6 +100,7 @@ _modules: dict[str, _SyncModule | None] = {
     "b3": None,
     "bcb": None,
     "cepea": None,
+    "cftc": None,
     "comexstat": None,
     "comtrade": None,
     "conab": None,
@@ -125,6 +126,7 @@ _modules: dict[str, _SyncModule | None] = {
     "rnc": None,
     "sfb": None,
     "sicar": None,
+    "unica": None,
     "usda": None,
     "zarc": None,
 }

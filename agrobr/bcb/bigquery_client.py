@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import os
 import re
 from typing import Any
 
@@ -114,9 +115,23 @@ def _query_bigquery_sync(
     try:
         import basedosdados as bd
 
+        billing_project = os.getenv("AGROBR_BQ_BILLING_PROJECT") or getattr(
+            bd.config, "billing_project_id", None
+        )
+        if not billing_project:
+            raise SourceUnavailableError(
+                source="bcb_bigquery",
+                url="https://basedosdados.org/dataset/br-bcb-sicor",
+                last_error=(
+                    "BigQuery requer projeto GCP para billing. Defina "
+                    "AGROBR_BQ_BILLING_PROJECT=<project-id> ou configure o basedosdados "
+                    "(billing_project_id em ~/.basedosdados/config.toml)"
+                ),
+            )
+
         logger.info("bcb_bigquery_query", query_length=len(query))
 
-        df = bd.read_sql(query, billing_project_id=bd.config.billing_project_id)
+        df = bd.read_sql(query, billing_project_id=billing_project)
 
         if df is None or df.empty:
             return []

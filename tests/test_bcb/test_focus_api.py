@@ -149,3 +149,19 @@ class TestFocusEmptyRecords:
         assert isinstance(df, pd.DataFrame)
         assert len(df) == 0
         assert "indicador" in df.columns
+
+
+class TestFocusParamsRepassados:
+    @pytest.mark.asyncio
+    async def test_data_inicial_e_max_registros_repassados_ao_client(self):
+        with patch.object(
+            focus_api.focus_client,
+            "fetch_focus",
+            new_callable=AsyncMock,
+            return_value=([], FOCUS_SAMPLE_URL),
+        ) as mock_fetch:
+            await focus_api.focus("IPCA", data_inicial="2026-01-01", max_registros=100)
+
+        kwargs = mock_fetch.call_args.kwargs
+        assert kwargs["data_inicial"] == "2026-01-01"
+        assert kwargs["max_registros"] == 100

@@ -12,6 +12,7 @@ from agrobr.bcb.bigquery_client import (
     BQ_TABLE,
     _build_query,
     _check_basedosdados,
+    _query_bigquery_sync,
     fetch_credito_rural_bigquery,
     is_bigquery_available,
 )
@@ -30,6 +31,44 @@ class TestCheckBasedosdados:
         mock_bd = MagicMock()
         with patch.dict("sys.modules", {"basedosdados": mock_bd}):
             _check_basedosdados()
+
+
+class TestBillingProject:
+    def test_sem_billing_raise_com_hint(self, monkeypatch):
+        monkeypatch.delenv("AGROBR_BQ_BILLING_PROJECT", raising=False)
+        mock_bd = MagicMock()
+        mock_bd.config.billing_project_id = None
+
+        with (
+            patch.dict("sys.modules", {"basedosdados": mock_bd}),
+            pytest.raises(SourceUnavailableError, match="AGROBR_BQ_BILLING_PROJECT"),
+        ):
+            _query_bigquery_sync("SELECT 1")
+
+        mock_bd.read_sql.assert_not_called()
+
+    def test_env_var_define_billing(self, monkeypatch):
+        monkeypatch.setenv("AGROBR_BQ_BILLING_PROJECT", "proj-env")
+        mock_bd = MagicMock()
+        mock_bd.config.billing_project_id = None
+        mock_bd.read_sql.return_value = pd.DataFrame()
+
+        with patch.dict("sys.modules", {"basedosdados": mock_bd}):
+            result = _query_bigquery_sync("SELECT 1")
+
+        assert result == []
+        assert mock_bd.read_sql.call_args.kwargs["billing_project_id"] == "proj-env"
+
+    def test_config_billing_usado_sem_env(self, monkeypatch):
+        monkeypatch.delenv("AGROBR_BQ_BILLING_PROJECT", raising=False)
+        mock_bd = MagicMock()
+        mock_bd.config.billing_project_id = "proj-config"
+        mock_bd.read_sql.return_value = pd.DataFrame()
+
+        with patch.dict("sys.modules", {"basedosdados": mock_bd}):
+            _query_bigquery_sync("SELECT 1")
+
+        assert mock_bd.read_sql.call_args.kwargs["billing_project_id"] == "proj-config"
 
 
 class TestBuildQuery:

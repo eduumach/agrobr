@@ -361,6 +361,10 @@ async def produtos() -> list[str]:
 
 
 async def pracas(produto: str) -> list[str]:
+    if produto.lower() not in constants.CEPEA_PRODUTOS:
+        raise ValueError(
+            f"Produto inválido: '{produto}'. Opções: {sorted(constants.CEPEA_PRODUTOS)}"
+        )
     pracas_map = {
         "soja": ["paranagua", "parana", "rio_grande_do_sul"],
         "milho": ["campinas", "parana"],

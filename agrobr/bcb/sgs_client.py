@@ -47,6 +47,7 @@ async def fetch_sgs(
         response = await retry_on_status(
             lambda: client.get(url, params=params),
             source="bcb",
+            max_attempts=2,
         )
 
         response.raise_for_status()

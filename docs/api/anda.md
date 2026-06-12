@@ -34,7 +34,7 @@ async def entregas(
 
 | Parametro | Tipo | Descricao |
 |-----------|------|-----------|
-| `ano` | `int` | Ano de referencia (2010+) |
+| `ano` | `int` | Ano de referencia. Ano indisponivel no site levanta `SourceUnavailableError` listando os anos disponiveis |
 | `uf` | `str \| None` | Filtrar por UF. None retorna todos |
 | `produto` | `str` | Tipo de fertilizante. Default: `"total"` |
 | `agregacao` | `str` | `"detalhado"` (por UF/mes) ou `"mensal"` (soma por mes) |

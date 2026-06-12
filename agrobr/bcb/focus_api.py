@@ -34,6 +34,8 @@ async def focus(
     indicador: str = "PIB Agropecuária",
     *,
     top: int = 1000,
+    data_inicial: str | None = None,
+    max_registros: int | None = None,
     as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
@@ -44,6 +46,8 @@ async def focus(
     indicador: str = "PIB Agropecuária",
     *,
     top: int = 1000,
+    data_inicial: str | None = None,
+    max_registros: int | None = None,
     as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
@@ -53,12 +57,19 @@ async def focus(
     indicador: str = "PIB Agropecuária",
     *,
     top: int = 1000,
+    data_inicial: str | None = None,
+    max_registros: int | None = None,
     as_polars: bool = False,
     return_meta: bool = False,
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
     t0 = time.monotonic()
 
-    records, source_url = await focus_client.fetch_focus(indicador, top=top)
+    records, source_url = await focus_client.fetch_focus(
+        indicador,
+        top=top,
+        data_inicial=data_inicial,
+        max_registros=max_registros,
+    )
 
     fetch_ms = int((time.monotonic() - t0) * 1000)
 

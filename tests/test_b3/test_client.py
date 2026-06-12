@@ -130,8 +130,38 @@ class TestFetchPosicoesAbertas:
         ):
             await client.fetch_posicoes_abertas("2025-12-19")
 
+    @pytest.mark.asyncio
+    async def test_usa_rate_source_b3_arquivos(self):
+        token_response = MagicMock()
+        token_response.status_code = 200
+        token_response.json.return_value = {"token": "abc123"}
+        token_response.raise_for_status = MagicMock()
+
+        csv_response = MagicMock()
+        csv_response.status_code = 200
+        csv_response.content = b"x" * 200
+        csv_response.raise_for_status = MagicMock()
+
+        with patch(
+            "agrobr.b3.client.retry_on_status",
+            new_callable=AsyncMock,
+            side_effect=[token_response, csv_response],
+        ) as mock_retry:
+            await client.fetch_posicoes_abertas("2025-12-19")
+
+        sources = [call.kwargs["source"] for call in mock_retry.call_args_list]
+        assert sources == ["b3_arquivos", "b3_arquivos"]
+
     def test_base_url_arquivos_is_correct(self):
         assert "arquivos.b3.com.br" in client.BASE_URL_ARQUIVOS
+
+    def test_rate_limit_b3_arquivos_configurado(self, monkeypatch):
+        from agrobr.constants import HTTPSettings
+        from agrobr.http.rate_limiter import RateLimiter
+
+        assert HTTPSettings.model_fields["rate_limit_b3_arquivos"].default == 5.0
+        monkeypatch.setenv("AGROBR_HTTP_RATE_LIMIT_B3_ARQUIVOS", "8.0")
+        assert RateLimiter._get_delay("b3_arquivos") == 8.0
 
 
 class TestFetchAjustesZip:
@@ -173,7 +203,7 @@ class TestFetchAjustesZip:
     async def test_too_small_raises_source_unavailable(self):
         mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_response.content = b"\x00" * 10
+        mock_response.content = b"\x00" * 300
         mock_response.raise_for_status = MagicMock()
 
         with (
@@ -185,6 +215,23 @@ class TestFetchAjustesZip:
             pytest.raises(SourceUnavailableError, match="ZIP too small"),
         ):
             await client.fetch_ajustes_zip("03/03/2026")
+
+    @pytest.mark.asyncio
+    async def test_zip_vazio_indica_pregao_nao_publicado(self):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.content = b"\x00" * 22
+        mock_response.raise_for_status = MagicMock()
+
+        with (
+            patch(
+                "agrobr.b3.client.retry_on_status",
+                new_callable=AsyncMock,
+                return_value=mock_response,
+            ),
+            pytest.raises(SourceUnavailableError, match="ainda não publicado"),
+        ):
+            await client.fetch_ajustes_zip("12/06/2026")
 
     @pytest.mark.asyncio
     async def test_date_format(self):

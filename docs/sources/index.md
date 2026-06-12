@@ -1,6 +1,6 @@
 # Fontes de Dados
 
-O agrobr integra dados de 38 fontes de dados agricolas.
+O agrobr integra dados de 40 fontes de dados agricolas.
 Todas as fontes suportam `return_meta=True` para rastreabilidade completa.
 
 ## Visao Geral
@@ -19,7 +19,7 @@ Todas as fontes suportam `return_meta=True` para rastreabilidade completa.
 | [USDA PSD](usda.md) | Oferta/demanda internacional | Mensal | Commodities globais |
 | [IMEA](imea.md) | Cotacoes e indicadores MT | Diaria | Mato Grosso |
 | [DERAL](deral.md) | Condicao lavouras PR | Semanal | Parana |
-| [INMET](inmet.md) | Meteorologia | Diaria | 600+ estacoes (API fora do ar) |
+| [INMET](inmet.md) | Meteorologia | Diaria | 600+ estacoes (dados exigem token) |
 | [Notícias Agrícolas](noticias_agricolas.md) | Cotações (fallback CEPEA) | Diária | Commodities |
 | [Queimadas/INPE](queimadas.md) | Focos de calor | Diária | 6 biomas, 13 satélites |
 | [Desmatamento PRODES/DETER](desmatamento.md) | Desmatamento + alertas | Anual/Diária | Amazônia, Cerrado, Pantanal |
@@ -37,7 +37,7 @@ Todas as fontes suportam `return_meta=True` para rastreabilidade completa.
 | [ICMBio UCs Federais](icmbio.md) | Unidades de conservacao federais (WFS geo) | Continua | 344 UCs federais |
 | [INCRA Quilombolas](incra.md) | Territorios quilombolas (WFS geo) | Continua | ~426 territorios |
 | [Acervo Fundiario/INCRA](acervo_fundiario.md) | Parcelas certificadas + assentamentos (shapefile ZIP) | Continua | SIGEF (15 UFs) + SNCI (10 UFs) + assentamentos Brasil |
-| [IBAMA Embargos](ibama.md) | Embargos ambientais (WFS geo) | Continua | ~89K embargos, paginado |
+| [IBAMA Embargos](ibama.md) | Embargos ambientais (CSV SIFISC + WKT) | Mensal | ~114K embargos |
 | [MapBiomas Alerta](mapbiomas_alerta.md) | Alertas de desmatamento (GraphQL) | Semanal | Nacional |
 | [Lista Suja](lista_suja.md) | Cadastro de trabalho escravo (XLSX) | Semestral | Nacional |
 | [ANA/SNIRH](ana.md) | Hidrografia, irrigacao, disponibilidade hidrica (ArcGIS REST) | Variavel | Nacional |
@@ -45,6 +45,8 @@ Todas as fontes suportam `return_meta=True` para rastreabilidade completa.
 | [RNC/CultivarWeb](rnc.md) | Cultivares registradas/protegidas | Contínua | ~37K registradas, ~5K protegidas |
 | [EMBRAPA Solos](embrapa_solos.md) | Perfis de solo e mapa pedológico | Contínua | 34K perfis, 2.8K polígonos |
 | [Fundação Rio Verde](rio_verde.md) | Ensaios cultivares soja MT | Anual | ~97 cultivares x 4 épocas |
+| [CFTC COT](cftc.md) | Posicionamento de fundos em futuros agro | Semanal | 12 contratos Chicago/NY, 2006+ |
+| [UNICA](unica.md) | Moagem e producao acucar/etanol Centro-Sul | Quinzenal | Safra corrente + historico 1980-2021 |
 
 ## Proveniencia e Rastreabilidade
 

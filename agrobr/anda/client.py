@@ -6,6 +6,7 @@ import httpx
 import structlog
 
 from agrobr.constants import MIN_HTML_SIZE, MIN_ZIP_SIZE, URLS, Fonte
+from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.retry import retry_on_status
 from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
@@ -34,8 +35,6 @@ async def _get_with_retry(url: str) -> httpx.Response:
 
 
 async def fetch_estatisticas_page() -> str:
-    from agrobr.exceptions import SourceUnavailableError
-
     logger.debug("anda_fetch_page", url=ESTATISTICAS_URL)
     logger.info("anda_fetch_page", source="anda")
     response = await _get_with_retry(ESTATISTICAS_URL)
@@ -54,8 +53,6 @@ async def fetch_estatisticas_page() -> str:
 
 
 async def download_file(url: str) -> bytes:
-    from agrobr.exceptions import SourceUnavailableError
-
     logger.debug("anda_download", url=url)
     logger.info("anda_download", source="anda")
     response = await _get_with_retry(url)
@@ -99,18 +96,17 @@ async def fetch_entregas_pdf(ano: int) -> tuple[bytes, int]:
     target = priority[0] if priority else (candidates[0] if candidates else None)
 
     if not target:
-        all_years = sorted(
-            {m.group(0) for link in links for m in re.finditer(r"20\d{2}", link["text"]) if m},
+        anos_disponiveis = sorted(
+            {m.group(0) for link in links for m in re.finditer(r"20\d{2}", link["text"])},
             reverse=True,
         )
-        if all_years:
-            fallback_ano = int(all_years[0])
-            logger.warning("anda_ano_fallback", requested=ano, fallback=fallback_ano)
-            return await fetch_entregas_pdf(fallback_ano)
-
-        raise FileNotFoundError(
-            f"PDF de entregas ANDA para {ano} não encontrado. "
-            f"Links disponíveis: {[link['text'] for link in links[:10]]}"
+        raise SourceUnavailableError(
+            source="anda",
+            url=ESTATISTICAS_URL,
+            last_error=(
+                f"PDF de entregas ANDA para {ano} não encontrado. "
+                f"Anos disponíveis no site: {anos_disponiveis or 'nenhum'}"
+            ),
         )
 
     ano_real = ano

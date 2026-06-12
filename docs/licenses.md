@@ -24,6 +24,7 @@
 | **ANEC** | Sem termos públicos localizados; sem contato formal | Verificar com a associação | `zona_cinza` | [anec.com.br](https://anec.com.br) |
 | **USDA PSD** | U.S. Public Domain | Sim (governo EUA) | `livre` | [Ag Data Commons](https://data.nal.usda.gov/dataset/usda-foreign-agricultural-service-production-supply-and-distribution-database) |
 | **UN Comtrade** | Dados publicos ONU | Sim (dados publicos) | `livre` | [Comtrade](https://comtradeplus.un.org) |
+| **CFTC COT** | U.S. Public Domain | Sim (governo EUA) | `livre` | [CFTC Public Reporting](https://publicreporting.cftc.gov) |
 | **IMEA** | Restritivo: redistribuição proibida sem autorização escrita | Não | `restrito` | [Termo de Uso](https://imea.com.br/imea-site/termo-de-uso.html) |
 | **DERAL** | Dados públicos governo estadual PR | Sim (dados públicos) | `livre` | [SEAB/PR](https://www.agricultura.pr.gov.br) |
 | **INMET** | Dados públicos governo federal | Sim (dados públicos, token requerido) | `livre` | [INMET](https://portal.inmet.gov.br) |
@@ -53,6 +54,7 @@
 | **EMBRAPA Solos** | CC BY-NC 3.0 BR | Requer autorizacao da EMBRAPA | `nc` | [GeoInfo](https://geoinfo.dados.embrapa.br) |
 | **Acervo Fundiario/INCRA** | Vedado uso comercial (portal) | Nao | `nc` | [INCRA Certificacao](https://certificacao.incra.gov.br) |
 | **Fundacao Rio Verde** | Sem termos publicos | Verificar com a fundacao | `zona_cinza` | [fundacaorioverde.com.br](https://fundacaorioverde.com.br) |
+| **UNICA** | Sem termos publicos; todos os direitos reservados no rodape | Verificar com a UNICA | `zona_cinza` | [unicadata.com.br](https://unicadata.com.br) |
 
 ### Legenda de Classificação
 
@@ -146,6 +148,20 @@
 - **Recomendação:** Dados de interesse público (preços de alimentos). Uso
   educacional/pesquisa. Consultar CONAB para redistribuição comercial.
 
+### UNICA
+
+- **Classificação:** `zona_cinza`
+- **Situação:** Associação setorial (União da Indústria de Cana-de-Açúcar e
+  Bioenergia) que publica estatísticas de moagem e produção via unicadata.com.br
+  e relatórios quinzenais de divulgação. Sem página de termos de uso para dados
+  localizada; rodapé do portal indica "todos os direitos reservados".
+- **Dados utilizados:** Relatório quinzenal de acompanhamento de safra do
+  Centro-Sul (PDF público) e histórico anual de produção por estado
+  (export XLSX do portal, safras 1980/1981–2020/2021).
+- **Decisão no agrobr:** Módulo emite `UserWarning` na primeira chamada por
+  sessão. Uso educacional/pesquisa; redistribuição comercial deve ser
+  verificada com a UNICA.
+
 ### Fontes Governamentais Brasileiras
 
 CONAB (incluindo Progresso de Safra), IBGE, BCB, ComexStat, DERAL, INMET, INPE (Queimadas, PRODES/DETER), ANP, ANTT, SICAR (Serviço Florestal Brasileiro), IBAMA, ANA/SNIRH, SFB e Lista Suja (Ministério do Trabalho) são órgãos públicos brasileiros.
@@ -178,3 +194,14 @@ verificar se CC0 foi aplicado explicitamente.
 - **Dados utilizados:** Comércio bilateral por HS code (valores FOB/CIF, peso,
   quantidade) via REST API v1. Trade mirror compara declarações de exportação
   do reporter vs importação do parceiro.
+
+### CFTC COT
+
+- **Classificação:** `livre`
+- **Situação:** Dados do governo americano (Commodity Futures Trading
+  Commission) em domínio público nos EUA (17 U.S.C. 105), publicados via
+  API Socrata aberta sem autenticação.
+- **Dados utilizados:** Relatório semanal Commitments of Traders (COT),
+  formato Disaggregated, para contratos agropecuários de CBOT/CME/ICE
+  (posições de managed money, producer/merchant, swap dealers e other
+  reportables).

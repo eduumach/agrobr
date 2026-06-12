@@ -3,271 +3,106 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
+import pandas as pd
 import pytest
 
 from agrobr.ibama import api
 
-CSV_DIR = Path(__file__).parent.parent / "golden_data" / "ibama" / "embargos_sample"
-GEO_DIR = Path(__file__).parent.parent / "golden_data" / "ibama" / "embargos_geo_sample"
+GOLDEN = Path(__file__).parent.parent / "golden_data" / "ibama" / "termo_embargo_sample.csv"
+ZIP_URL = "https://dadosabertos.ibama.gov.br/dados/SIFISC/termo_embargo/termo_embargo/termo_embargo_csv.zip"
 
 
-def _csv_bytes() -> bytes:
-    return CSV_DIR.joinpath("response.csv").read_bytes()
-
-
-def _geojson_bytes() -> bytes:
-    return GEO_DIR.joinpath("response.geojson").read_bytes()
+def _patch_fetch():
+    return patch(
+        "agrobr.ibama.api.client.fetch_embargos_zip",
+        new_callable=AsyncMock,
+        return_value=(GOLDEN.read_bytes(), ZIP_URL),
+    )
 
 
 class TestEmbargos:
     @pytest.mark.asyncio
-    async def test_returns_dataframe(self):
-        csv_bytes = _csv_bytes()
-        with patch.object(
-            api.client,
-            "fetch_embargos",
-            new_callable=AsyncMock,
-            return_value=([csv_bytes], "https://siscom.ibama.gov.br/geoserver/wfs"),
-        ):
+    async def test_retorna_dataframe(self):
+        with _patch_fetch():
             df = await api.embargos()
 
-        assert len(df) == 10
-        assert "numero_tad" in df.columns
-        assert "uf" in df.columns
-        assert "data_embargo" in df.columns
+        assert isinstance(df, pd.DataFrame)
+        assert len(df) == 40
+        assert "seq_tad" in df.columns
+        assert "area_embargada_ha" in df.columns
+
+    @pytest.mark.asyncio
+    async def test_filtro_uf(self):
+        with _patch_fetch():
+            df = await api.embargos(uf="MT")
+
+        assert len(df) > 0
+        assert (df["uf"] == "MT").all()
+
+    @pytest.mark.asyncio
+    async def test_uf_invalida_raises(self):
+        with pytest.raises(ValueError):
+            await api.embargos(uf="XX")
+
+    @pytest.mark.asyncio
+    async def test_seq_tad_vazio_preservado(self):
+        with _patch_fetch():
+            df = await api.embargos()
+
+        assert df["seq_tad"].isna().sum() == 26
+        assert df.loc[df["seq_tad"].isna(), "numero_tad"].notna().all()
 
     @pytest.mark.asyncio
     async def test_return_meta(self):
-        csv_bytes = _csv_bytes()
-        with patch.object(
-            api.client,
-            "fetch_embargos",
-            new_callable=AsyncMock,
-            return_value=([csv_bytes], "https://siscom.ibama.gov.br/geoserver/wfs"),
-        ):
+        with _patch_fetch():
             df, meta = await api.embargos(return_meta=True)
 
         assert meta.source == "ibama"
-        assert meta.source_method == "httpx+wfs+csv"
+        assert meta.source_method == "httpx+zip+csv"
+        assert meta.selected_source == "ibama_sifisc"
         assert meta.records_count == len(df)
-        assert meta.parser_version == 1
-        assert meta.fetch_timestamp is not None
-        assert "ibama_geoserver" in meta.attempted_sources
 
     @pytest.mark.asyncio
     async def test_as_polars(self):
         pl = pytest.importorskip("polars")
-        csv_bytes = _csv_bytes()
-        with patch.object(
-            api.client,
-            "fetch_embargos",
-            new_callable=AsyncMock,
-            return_value=([csv_bytes], "https://siscom.ibama.gov.br/geoserver/wfs"),
-        ):
+
+        with _patch_fetch():
             result = await api.embargos(as_polars=True)
 
         assert isinstance(result, pl.DataFrame)
 
-    @pytest.mark.asyncio
-    async def test_uf_filter_passthrough(self):
-        csv_bytes = _csv_bytes()
-        with patch.object(
-            api.client,
-            "fetch_embargos",
-            new_callable=AsyncMock,
-            return_value=([csv_bytes], "https://siscom.ibama.gov.br/geoserver/wfs"),
-        ) as mock_fetch:
-            await api.embargos(uf="MT")
-
-        call_kwargs = mock_fetch.call_args[1]
-        assert call_kwargs["uf"] == "MT"
-
-    @pytest.mark.asyncio
-    async def test_invalid_uf_raises(self):
-        with pytest.raises(ValueError, match="UF invalida"):
-            await api.embargos(uf="INVALID")
-
-    @pytest.mark.asyncio
-    async def test_dedup_by_numero_tad(self):
-        csv_bytes = _csv_bytes()
-        with patch.object(
-            api.client,
-            "fetch_embargos",
-            new_callable=AsyncMock,
-            return_value=([csv_bytes, csv_bytes], "https://siscom.ibama.gov.br/geoserver/wfs"),
-        ):
-            df = await api.embargos()
-
-        assert len(df) == 10
-
-    @pytest.mark.asyncio
-    async def test_empty_result(self):
-        with patch.object(
-            api.client,
-            "fetch_embargos",
-            new_callable=AsyncMock,
-            return_value=([], "https://siscom.ibama.gov.br/geoserver/wfs"),
-        ):
-            df = await api.embargos()
-
-        assert len(df) == 0
-
 
 class TestEmbargosGeo:
-    @pytest.fixture(autouse=True)
-    def _skip_no_geopandas(self):
-        pytest.importorskip("geopandas")
-
     @pytest.mark.asyncio
-    async def test_returns_geodataframe(self):
-        import geopandas as local_gpd
+    async def test_retorna_geodataframe(self):
+        gpd = pytest.importorskip("geopandas")
 
-        geojson_bytes = _geojson_bytes()
-        with patch.object(
-            api.client,
-            "fetch_embargos_geo",
-            new_callable=AsyncMock,
-            return_value=(geojson_bytes, "https://siscom.ibama.gov.br/geoserver/wfs"),
-        ):
+        with _patch_fetch():
             gdf = await api.embargos_geo()
 
-        assert isinstance(gdf, local_gpd.GeoDataFrame)
-        assert len(gdf) >= 5
+        assert isinstance(gdf, gpd.GeoDataFrame)
+        assert len(gdf) == 24
         assert "geometry" in gdf.columns
 
     @pytest.mark.asyncio
-    async def test_return_meta(self):
-        geojson_bytes = _geojson_bytes()
-        with patch.object(
-            api.client,
-            "fetch_embargos_geo",
-            new_callable=AsyncMock,
-            return_value=(geojson_bytes, "https://siscom.ibama.gov.br/geoserver/wfs"),
-        ):
+    async def test_geo_return_meta(self):
+        pytest.importorskip("geopandas")
+
+        with _patch_fetch():
             gdf, meta = await api.embargos_geo(return_meta=True)
 
         assert meta.source == "ibama"
-        assert meta.source_method == "httpx+wfs+geojson"
-        assert meta.records_count == len(gdf)
-        assert "ibama_geoserver_geo" in meta.attempted_sources
+        assert meta.source_method == "httpx+zip+csv+wkt"
+        assert meta.selected_source == "ibama_sifisc"
 
     @pytest.mark.asyncio
-    async def test_bbox_passthrough(self):
-        geojson_bytes = _geojson_bytes()
-        with patch.object(
-            api.client,
-            "fetch_embargos_geo",
-            new_callable=AsyncMock,
-            return_value=(geojson_bytes, "https://siscom.ibama.gov.br/geoserver/wfs"),
-        ) as mock_fetch:
-            await api.embargos_geo(bbox=(-60.0, -15.0, -50.0, -10.0))
+    async def test_geo_filtro_uf(self):
+        pytest.importorskip("geopandas")
 
-        call_kwargs = mock_fetch.call_args[1]
-        assert call_kwargs["bbox"] == (-60.0, -15.0, -50.0, -10.0)
+        with _patch_fetch():
+            gdf_all = await api.embargos_geo()
+            alvo = gdf_all["uf"].iloc[0]
+            gdf = await api.embargos_geo(uf=alvo)
 
-    @pytest.mark.asyncio
-    async def test_client_receives_only_bbox(self):
-        geojson_bytes = _geojson_bytes()
-        with patch.object(
-            api.client,
-            "fetch_embargos_geo",
-            new_callable=AsyncMock,
-            return_value=(geojson_bytes, "https://siscom.ibama.gov.br/geoserver/wfs"),
-        ) as mock_fetch:
-            await api.embargos_geo(uf="BA", bbox=(-60.0, -15.0, -50.0, -10.0))
-
-        call_kwargs = mock_fetch.call_args[1]
-        assert "uf" not in call_kwargs
-        assert call_kwargs["bbox"] == (-60.0, -15.0, -50.0, -10.0)
-
-    @pytest.mark.asyncio
-    async def test_post_filter_by_uf(self):
-        geojson_bytes = _geojson_bytes()
-        with patch.object(
-            api.client,
-            "fetch_embargos_geo",
-            new_callable=AsyncMock,
-            return_value=(geojson_bytes, "https://siscom.ibama.gov.br/geoserver/wfs"),
-        ):
-            gdf = await api.embargos_geo(uf="BA")
-
-        assert len(gdf) == 2
-        assert (gdf["uf"] == "BA").all()
-
-    @pytest.mark.asyncio
-    async def test_post_filter_single_match(self):
-        geojson_bytes = _geojson_bytes()
-        with patch.object(
-            api.client,
-            "fetch_embargos_geo",
-            new_callable=AsyncMock,
-            return_value=(geojson_bytes, "https://siscom.ibama.gov.br/geoserver/wfs"),
-        ):
-            gdf = await api.embargos_geo(uf="MT")
-
-        assert len(gdf) == 1
-        assert (gdf["uf"] == "MT").all()
-
-    @pytest.mark.asyncio
-    async def test_post_filter_no_match_returns_empty(self):
-        import geopandas as local_gpd
-
-        geojson_bytes = _geojson_bytes()
-        with patch.object(
-            api.client,
-            "fetch_embargos_geo",
-            new_callable=AsyncMock,
-            return_value=(geojson_bytes, "https://siscom.ibama.gov.br/geoserver/wfs"),
-        ):
-            gdf = await api.embargos_geo(uf="AC")
-
-        assert len(gdf) == 0
-        assert isinstance(gdf, local_gpd.GeoDataFrame)
-
-    @pytest.mark.asyncio
-    async def test_post_filter_meta_reflects_filtered_count(self):
-        geojson_bytes = _geojson_bytes()
-        with patch.object(
-            api.client,
-            "fetch_embargos_geo",
-            new_callable=AsyncMock,
-            return_value=(geojson_bytes, "https://siscom.ibama.gov.br/geoserver/wfs"),
-        ):
-            gdf, meta = await api.embargos_geo(uf="BA", return_meta=True)
-
-        assert len(gdf) == 2
-        assert meta.records_count == 2
-
-    @pytest.mark.asyncio
-    async def test_geometry_preserved(self):
-        geojson_bytes = _geojson_bytes()
-        with patch.object(
-            api.client,
-            "fetch_embargos_geo",
-            new_callable=AsyncMock,
-            return_value=(geojson_bytes, "https://siscom.ibama.gov.br/geoserver/wfs"),
-        ):
-            gdf = await api.embargos_geo()
-
-        assert "geometry" in gdf.columns
-
-    @pytest.mark.asyncio
-    async def test_invalid_uf_raises(self):
-        with pytest.raises(ValueError, match="UF invalida"):
-            await api.embargos_geo(uf="123")
-
-    @pytest.mark.asyncio
-    async def test_empty_result(self):
-        import geopandas as local_gpd
-
-        empty_geojson = b'{"type": "FeatureCollection", "features": []}'
-        with patch.object(
-            api.client,
-            "fetch_embargos_geo",
-            new_callable=AsyncMock,
-            return_value=(empty_geojson, "https://siscom.ibama.gov.br/geoserver/wfs"),
-        ):
-            gdf = await api.embargos_geo()
-
-        assert len(gdf) == 0
-        assert isinstance(gdf, local_gpd.GeoDataFrame)
+        assert len(gdf) >= 1
+        assert (gdf["uf"] == alvo).all()

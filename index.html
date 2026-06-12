@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>agrobr — Dados agrícolas brasileiros em uma linha de código</title>
-<meta name="description" content="Infraestrutura Python para dados agrícolas brasileiros. 38 fontes públicas, uma API unificada com fallback automático, cache DuckDB e contratos versionados.">
+<meta name="description" content="Infraestrutura Python para dados agrícolas brasileiros. 40 fontes públicas, uma API unificada com fallback automático, cache DuckDB e contratos versionados.">
 <link rel="canonical" href="https://www.agrobr.dev/">
 <link rel="alternate" hreflang="pt-BR" href="https://www.agrobr.dev/">
 <link rel="alternate" hreflang="en" href="https://www.agrobr.dev/en/">
@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.agrobr.dev/">
 <meta property="og:title" content="agrobr — Dados agrícolas brasileiros em uma linha de código">
-<meta property="og:description" content="38 fontes públicas — CEPEA, CONAB, IBGE, B3, NASA POWER e mais — numa API Python unificada com fallback automático e contratos versionados.">
+<meta property="og:description" content="40 fontes públicas — CEPEA, CONAB, IBGE, B3, NASA POWER e mais — numa API Python unificada com fallback automático e contratos versionados.">
 <meta property="og:image" content="https://www.agrobr.dev/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
@@ -877,7 +877,7 @@
   <div class="hero-content">
     <p class="hero-eyebrow">Python · Open Source · PyPI</p>
     <h1 class="hero-title">Dados agrícolas brasileiros em <em>uma linha</em> de código</h1>
-    <p class="hero-subtitle"><span class="hero-sources">CEPEA, CONAB, IBGE, NASA POWER, USDA, B3</span> e mais 32 fontes — 38 origens, uma API unificada com fallback automático, cache inteligente e contratos versionados.</p>
+    <p class="hero-subtitle"><span class="hero-sources">CEPEA, CONAB, IBGE, NASA POWER, USDA, B3</span> e mais 34 fontes — 40 origens, uma API unificada com fallback automático, cache inteligente e contratos versionados.</p>
     <div class="hero-install" onclick="copyInstall(this)" title="Copiar">
       <span><span class="pip">$</span> pip install agrobr</span>
       <span class="copy-icon">⎘</span>
@@ -905,9 +905,9 @@
 <!-- STAT STRIP -->
 <div class="stat-strip">
   <div class="stat-strip-inner">
-    <div class="stat-item"><span class="stat-num">38</span><span class="stat-label">fontes</span></div>
-    <div class="stat-item"><span class="stat-num">35</span><span class="stat-label">datasets</span></div>
-    <div class="stat-item"><span class="stat-num">6.300+</span><span class="stat-label">testes</span></div>
+    <div class="stat-item"><span class="stat-num">40</span><span class="stat-label">fontes</span></div>
+    <div class="stat-item"><span class="stat-num">36</span><span class="stat-label">datasets</span></div>
+    <div class="stat-item"><span class="stat-num">6.500+</span><span class="stat-label">testes</span></div>
     <div class="stat-item"><span class="stat-num">92%</span><span class="stat-label">cobertura</span></div>
     <div class="stat-item"><span class="stat-num">MIT</span><span class="stat-label">license</span></div>
   </div>
@@ -1031,7 +1031,7 @@
   </div>
 
   <div class="datasets-more reveal">
-    <a href="https://www.agrobr.dev/docs/">explorar os 35 datasets na documentação →</a>
+    <a href="https://www.agrobr.dev/docs/">explorar os 36 datasets na documentação →</a>
   </div>
 </section>
 
@@ -1092,7 +1092,7 @@
 <section id="sources">
   <div class="reveal">
     <p class="section-label">Fontes de dados</p>
-    <h2 class="section-title">38 origens. Uma API.</h2>
+    <h2 class="section-title">40 origens. Uma API.</h2>
     <p class="section-desc">Cada fonte tem seu próprio parser com versionamento, fingerprinting e tratamento de encoding. Você só vê o DataFrame.</p>
   </div>
 
@@ -1121,9 +1121,11 @@
         <span class="t2">ZARC</span>
         <span class="t2">ANTAQ</span>
         <span class="t2">UN Comtrade</span>
+        <span class="t2">CFTC</span>
         <span class="t3">ANDA</span>
         <span class="t3">ABIOVE</span>
         <span class="t3">ANEC</span>
+        <span class="t3">UNICA</span>
         <span class="t3 lic">IMEA</span>
         <span class="t3">DERAL</span>
         <span class="t3">INMET</span>
@@ -1155,7 +1157,7 @@
   <div class="reveal">
     <p class="section-label">Começar</p>
     <h2 class="section-title">pip install agrobr</h2>
-    <p class="section-desc" style="margin: 0 auto 0;">MIT License (código). 6.300+ testes. 38 fontes. 35 datasets.</p>
+    <p class="section-desc" style="margin: 0 auto 0;">MIT License (código). 6.500+ testes. 40 fontes. 36 datasets.</p>
     <div class="cta-links">
       <a class="cta-btn primary" href="https://www.agrobr.dev/docs/">Documentação</a>
       <a class="cta-btn secondary" href="https://github.com/bruno-portfolio/agrobr" target="_blank">GitHub ↗</a>

@@ -43,11 +43,12 @@ async def fetch_ajustes_zip(data: str) -> tuple[bytes, str]:
         content = response.content
 
         if len(content) < MIN_ZIP_SIZE:
-            raise SourceUnavailableError(
-                source="b3",
-                url=url,
-                last_error=f"ZIP too small ({len(content)} bytes)",
+            last_error = (
+                f"ZIP vazio ({len(content)} bytes) — pregão de {data} ainda não publicado"
+                if len(content) <= 100
+                else f"ZIP too small ({len(content)} bytes)"
             )
+            raise SourceUnavailableError(source="b3", url=url, last_error=last_error)
 
         logger.info("b3_zip_fetch_ok", source="b3", size=len(content))
         return content, url
@@ -64,7 +65,7 @@ async def fetch_posicoes_abertas(data: str) -> tuple[bytes, str]:
         logger.debug("b3_oi_token_request", url=token_url)
         token_resp = await retry_on_status(
             lambda: http.get(token_url),
-            source="b3",
+            source="b3_arquivos",
         )
 
         if token_resp.status_code in (400, 404):
@@ -84,7 +85,7 @@ async def fetch_posicoes_abertas(data: str) -> tuple[bytes, str]:
         logger.debug("b3_oi_download", url=BASE_URL_ARQUIVOS)
         csv_resp = await retry_on_status(
             lambda: http.get(download_url),
-            source="b3",
+            source="b3_arquivos",
         )
 
         if csv_resp.status_code in (400, 404):

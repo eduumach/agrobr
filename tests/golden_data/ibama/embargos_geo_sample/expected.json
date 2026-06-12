@@ -1,6 +1,0 @@
-{
-    "count_min": 5,
-    "columns": ["numero_tad", "data_embargo", "uf", "municipio", "area_desmatada_ha", "infracao", "legislacao", "status", "situacao_poligono", "respeita_embargo", "geometry"],
-    "crs_epsg": 4326,
-    "non_null_columns": ["numero_tad", "data_embargo", "uf", "municipio", "status"]
-}
