@@ -2,11 +2,12 @@ name: Landing Data
 
 on:
   schedule:
-    - cron: '30 21 * * 1'
+    - cron: '30 21 * * 1-5'
   workflow_dispatch:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   update:
@@ -31,8 +32,10 @@ jobs:
         run: python scripts/update_landing_data.py
 
       - name: Commit se houver mudanca
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "agrobr-bot"
           git config user.email "bot@agrobr.dev"
-          git add index.html
-          git diff --staged --quiet || (git commit -m "chore(landing): atualiza indicadores do ticker [skip ci]" && git push)
+          git add index.html en/index.html
+          git diff --staged --quiet || (git commit -m "chore(landing): atualiza indicadores do ticker [skip ci]" && git pull --rebase origin main && git push && gh workflow run docs.yml --ref main)

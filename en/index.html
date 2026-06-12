@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>agrobr — Dados agrícolas brasileiros em uma linha de código</title>
-<meta name="description" content="Infraestrutura Python para dados agrícolas brasileiros. 38 fontes públicas, uma API unificada com fallback automático, cache DuckDB e contratos versionados.">
-<link rel="canonical" href="https://www.agrobr.dev/">
+<title>agrobr — Brazilian agricultural data in one line of code</title>
+<meta name="description" content="Python infrastructure for Brazilian agricultural data. 38 public sources, one unified API with automatic fallback, DuckDB cache and versioned contracts.">
+<link rel="canonical" href="https://www.agrobr.dev/en/">
 <link rel="alternate" hreflang="pt-BR" href="https://www.agrobr.dev/">
 <link rel="alternate" hreflang="en" href="https://www.agrobr.dev/en/">
 <link rel="alternate" hreflang="x-default" href="https://www.agrobr.dev/">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://www.agrobr.dev/">
-<meta property="og:title" content="agrobr — Dados agrícolas brasileiros em uma linha de código">
-<meta property="og:description" content="38 fontes públicas — CEPEA, CONAB, IBGE, B3, NASA POWER e mais — numa API Python unificada com fallback automático e contratos versionados.">
+<meta property="og:url" content="https://www.agrobr.dev/en/">
+<meta property="og:title" content="agrobr — Brazilian agricultural data in one line of code">
+<meta property="og:description" content="38 public sources — CEPEA, CONAB, IBGE, B3, NASA POWER and more — in one unified Python API with automatic fallback and versioned contracts.">
 <meta property="og:image" content="https://www.agrobr.dev/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
@@ -374,7 +374,7 @@
   }
 
   .proof-output::before {
-    content: 'OUTPUT · DADO REAL';
+    content: 'OUTPUT · REAL DATA';
     font-family: var(--font-mono);
     font-size: 0.65rem;
     color: var(--accent-gold-dim);
@@ -449,7 +449,7 @@
   }
 
   .pipeline::before {
-    content: 'ANATOMIA DE UMA CHAMADA · LOOP REAL DE FALLBACK';
+    content: 'ANATOMY OF ONE CALL · REAL FALLBACK LOOP';
     font-family: var(--font-mono);
     font-size: 0.62rem;
     color: var(--accent-gold-dim);
@@ -866,7 +866,7 @@
     <li><a href="#features">Features</a></li>
     <li><a href="#sources">Fontes</a></li>
     <li><a href="https://www.agrobr.dev/docs/">Docs</a></li>
-    <li><a href="https://www.agrobr.dev/en/">EN</a></li>
+    <li><a href="https://www.agrobr.dev/">PT</a></li>
     <li><a href="https://github.com/bruno-portfolio/agrobr" target="_blank">GitHub</a></li>
   </ul>
 </nav>
@@ -876,8 +876,8 @@
   <div class="hero-bg"></div>
   <div class="hero-content">
     <p class="hero-eyebrow">Python · Open Source · PyPI</p>
-    <h1 class="hero-title">Dados agrícolas brasileiros em <em>uma linha</em> de código</h1>
-    <p class="hero-subtitle"><span class="hero-sources">CEPEA, CONAB, IBGE, NASA POWER, USDA, B3</span> e mais 32 fontes — 38 origens, uma API unificada com fallback automático, cache inteligente e contratos versionados.</p>
+    <h1 class="hero-title">Brazilian agricultural data in <em>one line</em> of code</h1>
+    <p class="hero-subtitle"><span class="hero-sources">CEPEA, CONAB, IBGE, NASA POWER, USDA, B3</span> and 32 more — 38 sources behind one unified API with automatic fallback, smart caching and versioned contracts.</p>
     <div class="hero-install" onclick="copyInstall(this)" title="Copiar">
       <span><span class="pip">$</span> pip install agrobr</span>
       <span class="copy-icon">⎘</span>
@@ -885,17 +885,17 @@
   </div>
 
   <!-- TICKER: preços reais buscados pelo próprio agrobr -->
-  <div class="ticker" aria-label="Indicadores CEPEA de 09/06/2026 via agrobr">
+  <div class="ticker" aria-label="CEPEA indicators via agrobr">
     <div class="ticker-track" id="tickerTrack">
       <div class="ticker-set">
         <!-- agrobr:ticker -->
-        <span class="ticker-item"><span class="tk-name">soja</span><span class="tk-price">R$ 131,78</span><span class="down">▼ 0,34%</span></span>
-        <span class="ticker-item"><span class="tk-name">milho</span><span class="tk-price">R$ 64,03</span><span class="down">▼ 0,09%</span></span>
-        <span class="ticker-item"><span class="tk-name">boi gordo</span><span class="tk-price">R$ 353,80</span><span class="up">▲ 0,18%</span></span>
-        <span class="ticker-item"><span class="tk-name">café</span><span class="tk-price">R$ 1.412,22</span><span class="up">▲ 1,01%</span></span>
-        <span class="ticker-item"><span class="tk-name">trigo</span><span class="tk-price">R$ 1.377,98</span><span class="up">▲ 0,22%</span></span>
-        <span class="ticker-item"><span class="tk-name">algodão</span><span class="tk-price">R$ 413,21</span><span class="down">▼ 0,98%</span></span>
-        <span class="ticker-item"><span class="tk-stamp">indicadores CEPEA · 11 jun 2026 · coletados via agrobr</span></span>
+        <span class="ticker-item"><span class="tk-name">soybean</span><span class="tk-price">R$ 131.78</span><span class="down">▼ 0.34%</span></span>
+        <span class="ticker-item"><span class="tk-name">corn</span><span class="tk-price">R$ 64.03</span><span class="down">▼ 0.09%</span></span>
+        <span class="ticker-item"><span class="tk-name">live cattle</span><span class="tk-price">R$ 353.80</span><span class="up">▲ 0.18%</span></span>
+        <span class="ticker-item"><span class="tk-name">coffee</span><span class="tk-price">R$ 1,412.22</span><span class="up">▲ 1.01%</span></span>
+        <span class="ticker-item"><span class="tk-name">wheat</span><span class="tk-price">R$ 1,377.98</span><span class="up">▲ 0.22%</span></span>
+        <span class="ticker-item"><span class="tk-name">cotton</span><span class="tk-price">R$ 413.21</span><span class="down">▼ 0.98%</span></span>
+        <span class="ticker-item"><span class="tk-stamp">CEPEA indicators · Jun 11, 2026 · fetched via agrobr</span></span>
         <!-- /agrobr:ticker -->
       </div>
     </div>
@@ -905,10 +905,10 @@
 <!-- STAT STRIP -->
 <div class="stat-strip">
   <div class="stat-strip-inner">
-    <div class="stat-item"><span class="stat-num">38</span><span class="stat-label">fontes</span></div>
+    <div class="stat-item"><span class="stat-num">38</span><span class="stat-label">sources</span></div>
     <div class="stat-item"><span class="stat-num">35</span><span class="stat-label">datasets</span></div>
-    <div class="stat-item"><span class="stat-num">6.300+</span><span class="stat-label">testes</span></div>
-    <div class="stat-item"><span class="stat-num">92%</span><span class="stat-label">cobertura</span></div>
+    <div class="stat-item"><span class="stat-num">6.300+</span><span class="stat-label">tests</span></div>
+    <div class="stat-item"><span class="stat-num">92%</span><span class="stat-label">coverage</span></div>
     <div class="stat-item"><span class="stat-num">MIT</span><span class="stat-label">license</span></div>
   </div>
 </div>
@@ -916,9 +916,9 @@
 <!-- PROOF -->
 <section id="proof">
   <div class="reveal">
-    <p class="section-label">Prova, não promessa</p>
-    <h2 class="section-title">Ninguém digitou este número.</h2>
-    <p class="section-desc">O painel ao lado não é mockup: o CEPEA divulga, o agrobr busca, a página atualiza — todo pregão, com fallback automático, cache DuckDB e contrato validado.</p>
+    <p class="section-label">Proof, not promise</p>
+    <h2 class="section-title">Nobody typed this number.</h2>
+    <p class="section-desc">The panel beside this text is not a mockup: CEPEA publishes, agrobr fetches, this page updates — every trading day, with automatic fallback, DuckDB cache and a validated contract.</p>
   </div>
 
   <div class="proof-grid reveal">
@@ -927,30 +927,30 @@
 <span class="code-line"> </span>
 <span class="code-line"><span class="var">df</span> <span class="op">=</span> <span class="kw">await</span> <span class="fn">datasets.preco_diario</span>(<span class="str">"soja"</span>)</span>
 <span class="code-line"> </span>
-<!-- agrobr:pregoes --><span class="code-line"><span class="cm"># 10 pregões · CEPEA → Notícias Agrícolas → cache</span></span><!-- /agrobr:pregoes -->
+<!-- agrobr:pregoes --><span class="code-line"><span class="cm"># 10 trading days · CEPEA → Notícias Agrícolas → cache</span></span><!-- /agrobr:pregoes -->
 </code>
     </div>
 
     <div class="proof-output">
       <!-- agrobr:proof -->
-      <div class="proof-price">R$ 131,78 <span class="currency">/ sc 60kg</span></div>
-      <div class="proof-meta">soja · indicador CEPEA/ESALQ · 11 jun 2026</div>
-      <svg class="sparkline" viewBox="0 0 300 84" preserveAspectRatio="none" aria-label="Últimos 10 pregões da soja">
+      <div class="proof-price">R$ 131.78 <span class="currency">/ 60kg bag</span></div>
+      <div class="proof-meta">soybean · CEPEA/ESALQ indicator · Jun 11, 2026</div>
+      <svg class="sparkline" viewBox="0 0 300 84" preserveAspectRatio="none" aria-label="Last 10 soybean trading days">
         <polyline class="spark-path" points="0.0,36.4 33.3,50.7 66.7,48.3 100.0,76.0 133.3,52.5 166.7,68.3 200.0,51.4 233.3,37.3 266.7,12.0 300.0,20.3"/>
         <circle class="spark-dot" cx="300.0" cy="20.3" r="3.5"/>
       </svg>
       <div class="proof-rows">
-        <div><span>2026-06-08</span><span class="v">130,08</span></div>
-        <div><span>2026-06-09</span><span class="v">130,85</span></div>
-        <div><span>2026-06-10</span><span class="v">132,23</span></div>
-        <div><span>2026-06-11</span><span class="v">131,78</span></div>
+        <div><span>2026-06-08</span><span class="v">130.08</span></div>
+        <div><span>2026-06-09</span><span class="v">130.85</span></div>
+        <div><span>2026-06-10</span><span class="v">132.23</span></div>
+        <div><span>2026-06-11</span><span class="v">131.78</span></div>
       </div>
         <!-- /agrobr:proof -->
     </div>
   </div>
 
   <!-- ANATOMIA DO FALLBACK -->
-  <div class="pipeline reveal" aria-label="Animação do fallback em cascata">
+  <div class="pipeline reveal" aria-label="Cascading fallback animation">
     <div class="pipe-row">
       <div class="pipe-node pl1">
         <div class="pipe-dot"></div>
@@ -966,14 +966,14 @@
       <div class="pipe-link lk2"></div>
       <div class="pipe-node pl3">
         <div class="pipe-dot"></div>
-        <div class="pipe-name">contrato v1.0</div>
-        <div class="pipe-status">✓ schema válido</div>
+        <div class="pipe-name">contract v1.0</div>
+        <div class="pipe-status">✓ valid schema</div>
       </div>
       <div class="pipe-link lk3"></div>
       <div class="pipe-node pl4">
         <div class="pipe-dot"></div>
         <div class="pipe-name">DataFrame</div>
-        <div class="pipe-status">◈ entregue</div>
+        <div class="pipe-status">◈ delivered</div>
       </div>
     </div>
   </div>
@@ -982,107 +982,107 @@
 <!-- DATASETS EM DESTAQUE -->
 <section id="datasets">
   <div class="reveal">
-    <p class="section-label">Camada Semântica</p>
-    <h2 class="section-title">Peça o que quer.<br>A fonte é detalhe interno.</h2>
-    <p class="section-desc">Datasets abstraem múltiplas fontes com fallback automático. Quando CEPEA retorna 403, o agrobr busca Notícias Agrícolas. Quando o servidor cai, serve do cache.</p>
+    <p class="section-label">Semantic Layer</p>
+    <h2 class="section-title">Ask for the data.<br>The source is an internal detail.</h2>
+    <p class="section-desc">Datasets abstract multiple sources with automatic fallback. When CEPEA returns a 403, agrobr fetches Notícias Agrícolas. When the server goes down, it serves from cache.</p>
   </div>
 
   <div class="datasets-grid reveal">
     <div class="dataset-card">
       <div class="dataset-name">preco_diario</div>
-      <div class="dataset-desc">Preços spot de 20 commodities agrícolas</div>
+      <div class="dataset-desc">Spot prices for 20 agricultural commodities</div>
       <div class="dataset-sources">CEPEA → NA → cache</div>
     </div>
     <div class="dataset-card">
       <div class="dataset-name">estimativa_safra</div>
-      <div class="dataset-desc">Estimativas da safra corrente</div>
+      <div class="dataset-desc">Current crop season estimates</div>
       <div class="dataset-sources">CONAB → IBGE LSPA</div>
     </div>
     <div class="dataset-card">
       <div class="dataset-name">credito_rural</div>
-      <div class="dataset-desc">Crédito rural por cultura, programa, seguro e modalidade</div>
+      <div class="dataset-desc">Rural credit by crop, program, insurance and modality</div>
       <div class="dataset-sources">BCB/SICOR → BigQuery</div>
     </div>
     <div class="dataset-card">
       <div class="dataset-name">clima</div>
-      <div class="dataset-desc">Dados climáticos mensais por UF ou diários por estação</div>
+      <div class="dataset-desc">Monthly climate by state or daily by station</div>
       <div class="dataset-sources">INMET → NASA POWER</div>
     </div>
     <div class="dataset-card">
       <div class="dataset-name">futuros_agricolas</div>
-      <div class="dataset-desc">Futuros B3: ajustes, histórico e posições abertas</div>
+      <div class="dataset-desc">B3 futures: settlements, history and open interest</div>
       <div class="dataset-sources">B3</div>
     </div>
     <div class="dataset-card">
       <div class="dataset-name">desmatamento</div>
-      <div class="dataset-desc">Desmatamento consolidado PRODES + alertas DETER</div>
+      <div class="dataset-desc">Consolidated PRODES deforestation + DETER alerts</div>
       <div class="dataset-sources">INPE TerraBrasilis</div>
     </div>
     <div class="dataset-card">
       <div class="dataset-name">exportacao</div>
-      <div class="dataset-desc">Exportações agrícolas por NCM</div>
+      <div class="dataset-desc">Agricultural exports by NCM code</div>
       <div class="dataset-sources">ComexStat → ABIOVE</div>
     </div>
     <div class="dataset-card">
       <div class="dataset-name">seguro_rural</div>
-      <div class="dataset-desc">Apólices e sinistros do seguro rural</div>
+      <div class="dataset-desc">Rural insurance policies and claims</div>
       <div class="dataset-sources">MAPA PSR</div>
     </div>
   </div>
 
   <div class="datasets-more reveal">
-    <a href="https://www.agrobr.dev/docs/">explorar os 35 datasets na documentação →</a>
+    <a href="https://www.agrobr.dev/docs/">explore all 35 datasets in the docs →</a>
   </div>
 </section>
 
 <!-- FEATURES -->
 <section id="features">
   <div class="reveal">
-    <p class="section-label">Infraestrutura</p>
-    <h2 class="section-title">Construído para produção,<br>não para demo.</h2>
+    <p class="section-label">Infrastructure</p>
+    <h2 class="section-title">Built for production,<br>not for demos.</h2>
   </div>
 
   <div class="features-grid reveal">
     <div class="feature-item">
       <div class="feature-icon">⟳</div>
       <div class="feature-text">
-        <h3>Fallback em Cascata</h3>
-        <p>Fonte primária falha → tenta secundária → serve do cache. Transparente.</p>
+        <h3>Cascading Fallback</h3>
+        <p>Primary source fails → tries the secondary → serves from cache. Transparent.</p>
       </div>
     </div>
     <div class="feature-item">
       <div class="feature-icon">⛁</div>
       <div class="feature-text">
         <h3>Cache DuckDB</h3>
-        <p>Cache local para CEPEA indicadores (smart TTL, expira 18h). Snapshots opcionais para reprodutibilidade.</p>
+        <p>Local cache for CEPEA indicators (smart TTL, expires 6pm). Optional snapshots for reproducibility.</p>
       </div>
     </div>
     <div class="feature-item">
       <div class="feature-icon">◈</div>
       <div class="feature-text">
-        <h3>Contratos Versionados</h3>
-        <p>Schema garantido por dataset. Breaking changes só em major. Semver.</p>
+        <h3>Versioned Contracts</h3>
+        <p>Guaranteed schema per dataset. Breaking changes only on majors. Semver.</p>
       </div>
     </div>
     <div class="feature-item">
       <div class="feature-icon">↯</div>
       <div class="feature-text">
         <h3>Async-first</h3>
-        <p>httpx nativo com sync wrapper. Funciona em Jupyter, FastAPI e Airflow.</p>
+        <p>Native httpx with a sync wrapper. Works in Jupyter, FastAPI and Airflow.</p>
       </div>
     </div>
     <div class="feature-item">
       <div class="feature-icon">✓</div>
       <div class="feature-text">
-        <h3>Validação Pydantic v2</h3>
-        <p>Modelos tipados. Sanity checks estatísticos. Fingerprinting de layout.</p>
+        <h3>Pydantic v2 Validation</h3>
+        <p>Typed models. Statistical sanity checks. Layout fingerprinting.</p>
       </div>
     </div>
     <div class="feature-item">
       <div class="feature-icon">◎</div>
       <div class="feature-text">
-        <h3>Modo Determinístico</h3>
-        <p>Reprodutibilidade total via contextvars. Para papers e auditorias.</p>
+        <h3>Deterministic Mode</h3>
+        <p>Full reproducibility via contextvars. For papers and audits.</p>
       </div>
     </div>
   </div>
@@ -1091,17 +1091,17 @@
 <!-- FONTES: BRASIL EM DADOS + TYPE WALL -->
 <section id="sources">
   <div class="reveal">
-    <p class="section-label">Fontes de dados</p>
-    <h2 class="section-title">38 origens. Uma API.</h2>
-    <p class="section-desc">Cada fonte tem seu próprio parser com versionamento, fingerprinting e tratamento de encoding. Você só vê o DataFrame.</p>
+    <p class="section-label">Data sources</p>
+    <h2 class="section-title">38 origins. One API.</h2>
+    <p class="section-desc">Every source has its own parser with versioning, fingerprinting and encoding handling. All you see is the DataFrame.</p>
   </div>
 
   <div class="sources-layout reveal">
     <div class="brasil-wrap">
-      <svg class="brasil-svg" id="brasilSvg" viewBox="0 0 400 400" aria-label="Mapa do Brasil em pontos de dados — malha oficial IBGE">
+      <svg class="brasil-svg" id="brasilSvg" viewBox="0 0 400 400" aria-label="Map of Brazil as data dots — official IBGE mesh">
         <g id="dotField"></g>
       </svg>
-      <div class="brasil-caption">o brasil real, em pontos — malha ibge</div>
+      <div class="brasil-caption">the real brazil, in dots — official ibge mesh</div>
     </div>
 
     <div>
@@ -1145,7 +1145,7 @@
         <span class="t3 lic">EMBRAPA Solos</span>
         <span class="t3 lic">Rio Verde</span>
       </div>
-      <p class="typewall-note">em âmbar: licença não-comercial ou restrita — detalhes em <a href="https://www.agrobr.dev/docs/" style="color: var(--accent-gold-dim);">docs/licenses</a></p>
+      <p class="typewall-note">in amber: non-commercial or restricted license — details at <a href="https://www.agrobr.dev/docs/" style="color: var(--accent-gold-dim);">docs/licenses</a></p>
     </div>
   </div>
 </section>
@@ -1153,11 +1153,11 @@
 <!-- CTA -->
 <section class="cta-section">
   <div class="reveal">
-    <p class="section-label">Começar</p>
+    <p class="section-label">Get started</p>
     <h2 class="section-title">pip install agrobr</h2>
-    <p class="section-desc" style="margin: 0 auto 0;">MIT License (código). 6.300+ testes. 38 fontes. 35 datasets.</p>
+    <p class="section-desc" style="margin: 0 auto 0;">MIT License (code). 6,300+ tests. 38 sources. 35 datasets.</p>
     <div class="cta-links">
-      <a class="cta-btn primary" href="https://www.agrobr.dev/docs/">Documentação</a>
+      <a class="cta-btn primary" href="https://www.agrobr.dev/docs/">Documentation</a>
       <a class="cta-btn secondary" href="https://github.com/bruno-portfolio/agrobr" target="_blank">GitHub ↗</a>
       <a class="cta-btn secondary" href="https://pypi.org/project/agrobr/" target="_blank">PyPI ↗</a>
     </div>
@@ -1166,7 +1166,7 @@
 
 <!-- FOOTER -->
 <footer>
-  <span>agrobr — dados agrícolas brasileiros · MIT (código) · dados sujeitos às licenças das fontes</span>
+  <span>agrobr — Brazilian agricultural data · MIT (code) · data subject to source licenses</span>
   <div class="footer-links">
     <a href="https://www.agrobr.dev/docs/">Docs</a>
     <a href="https://github.com/bruno-portfolio/agrobr">GitHub</a>
