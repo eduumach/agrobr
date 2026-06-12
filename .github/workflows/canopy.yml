@@ -15,6 +15,6 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.CANOPY_PAT }}
-      - uses: bruno-portfolio/canopy-code@d24f1e76af3afd0a02ac91b21d718941545a124b
+      - uses: bruno-portfolio/canopy-code@main
         with:
           token: ${{ secrets.CANOPY_PAT }}
