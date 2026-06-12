@@ -13,7 +13,6 @@ from agrobr.alt.antt_pedagio.client import (
     _match_trafego_resource,
     download_csv,
     fetch_pracas,
-    fetch_trafego,
     fetch_trafego_anos,
 )
 from agrobr.exceptions import SourceUnavailableError
@@ -135,41 +134,6 @@ class TestDownloadCsv:
                 mock_retry.return_value = mock_response
                 with pytest.raises(httpx.HTTPStatusError):
                     await download_csv("https://example.com/test.csv")
-
-
-class TestFetchTrafego:
-    @pytest.mark.asyncio
-    async def test_fetch_trafego_success(self):
-        resources = [
-            {
-                "id": "abc",
-                "name": "2023.csv",
-                "url": "https://example.com/2023.csv",
-                "format": "CSV",
-            },
-        ]
-        content = b"concessionaria;praca;mes_ano\nTest;Test;01/01/2023"
-
-        with patch(
-            "agrobr.alt.antt_pedagio.client._get_ckan_resources", new_callable=AsyncMock
-        ) as mock_ckan:
-            mock_ckan.return_value = resources
-            with patch(
-                "agrobr.alt.antt_pedagio.client.download_csv", new_callable=AsyncMock
-            ) as mock_dl:
-                mock_dl.return_value = content
-                result = await fetch_trafego(2023)
-
-        assert result == content
-
-    @pytest.mark.asyncio
-    async def test_fetch_trafego_not_found(self):
-        with patch(
-            "agrobr.alt.antt_pedagio.client._get_ckan_resources", new_callable=AsyncMock
-        ) as mock_ckan:
-            mock_ckan.return_value = []
-            with pytest.raises(ValueError, match="nao encontrado"):
-                await fetch_trafego(2023)
 
 
 class TestFetchTrafegoAnos:

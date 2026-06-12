@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
-from pydantic import BaseModel, Field, field_validator
-
 from agrobr.normalize.regions import UFS_VALIDAS as UFS_VALIDAS
 
 DATASET_ID = "baefdc68-9bad-4204-83e8-f2888b79ab48"
@@ -27,8 +23,6 @@ CSV_RESOURCES: dict[str, dict[str, str]] = {
         "filename": "dados_abertos_psr_2025csv.csv",
     },
 }
-
-PERIODOS_VALIDOS = frozenset(CSV_RESOURCES.keys())
 
 COLUNAS_PII = frozenset({"NM_SEGURADO", "NR_DOCUMENTO_SEGURADO"})
 
@@ -123,17 +117,6 @@ COLUNAS_APOLICES = [
     "seguradora",
 ]
 
-CLASSIFICACOES_VALIDAS = frozenset(
-    {
-        "AGRICOLA",
-        "PECUARIO",
-        "AQUICOLA",
-        "FLORESTAL",
-        "PENHOR RURAL",
-        "BENFEITORIAS",
-    }
-)
-
 ANO_INICIO_PSR = 2006
 
 
@@ -172,52 +155,3 @@ def get_csv_url(periodo: str) -> str:
         resource_id=info["resource_id"],
         filename=info["filename"],
     )
-
-
-class ApoliceSeguroRural(BaseModel):
-    nr_apolice: str = ""
-    ano_apolice: int
-    uf: str = Field("", max_length=2)
-    municipio: str = ""
-    cd_ibge: str = ""
-    cultura: str = ""
-    classificacao: str = ""
-    area_total: float | None = None
-    valor_premio: float | None = None
-    valor_subvencao: float | None = None
-    valor_limite_garantia: float | None = None
-    valor_indenizacao: float | None = None
-    evento: str = ""
-    produtividade_estimada: float | None = None
-    produtividade_segurada: float | None = None
-    nivel_cobertura: float | None = None
-    taxa: float | None = None
-    seguradora: str = ""
-
-    @field_validator(
-        "area_total",
-        "valor_premio",
-        "valor_subvencao",
-        "valor_limite_garantia",
-        "valor_indenizacao",
-        "produtividade_estimada",
-        "produtividade_segurada",
-        "nivel_cobertura",
-        "taxa",
-        mode="before",
-    )
-    @classmethod
-    def convert_numeric(cls, v: Any) -> float | None:
-        if v is None or v == "" or v == "-":
-            return None
-        try:
-            return float(v)
-        except (ValueError, TypeError):
-            return None
-
-    @field_validator("ano_apolice", mode="before")
-    @classmethod
-    def convert_ano(cls, v: Any) -> int:
-        if v is None or v == "":
-            raise ValueError("ano_apolice is required")
-        return int(float(v))

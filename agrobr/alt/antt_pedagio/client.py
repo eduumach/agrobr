@@ -148,17 +148,6 @@ async def download_csv(url: str) -> bytes:
         return content
 
 
-async def fetch_trafego(ano: int) -> bytes:
-    resources = await _get_ckan_resources(DATASET_TRAFEGO_SLUG)
-    url = _match_trafego_resource(resources, ano)
-    if not url:
-        raise ValueError(
-            f"Recurso de trafego nao encontrado para ano {ano}. "
-            f"Resources disponiveis: {[r['name'] for r in resources]}"
-        )
-    return await download_csv(url)
-
-
 async def fetch_trafego_anos(anos: list[int]) -> list[tuple[int, bytes]]:
     resources = await _get_ckan_resources(DATASET_TRAFEGO_SLUG)
     results: list[tuple[int, bytes]] = []

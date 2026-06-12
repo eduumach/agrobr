@@ -152,6 +152,13 @@ def compare_fingerprints(
 
     final_score = sum(scores[k] * weights[k] for k in weights)
 
+    logger.debug(
+        "fingerprint_comparison",
+        scores=scores,
+        final_score=final_score,
+        has_changes=bool(details),
+    )
+
     return final_score, details
 
 

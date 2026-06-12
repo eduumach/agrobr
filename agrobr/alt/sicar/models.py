@@ -50,19 +50,8 @@ COLUNAS_IMOVEIS = [
 ]
 
 STATUS_VALIDOS = frozenset({"AT", "PE", "SU", "CA"})
-STATUS_LABELS = {
-    "AT": "Ativo",
-    "PE": "Pendente",
-    "SU": "Suspenso",
-    "CA": "Cancelado",
-}
 
 TIPO_VALIDOS = frozenset({"IRU", "AST", "PCT"})
-TIPO_LABELS = {
-    "IRU": "Rural",
-    "AST": "Assentamento",
-    "PCT": "Terra Indigena",
-}
 
 MAX_FEATURES_GEO = 5_000
 

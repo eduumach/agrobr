@@ -63,12 +63,7 @@ def _detect_header_row(
     return 0
 
 
-def parse_precos(
-    content: bytes,
-    produto: str | None = None,
-    uf: str | None = None,
-    municipio: str | None = None,
-) -> pd.DataFrame:
+def _read_precos_xlsx(content: bytes) -> pd.DataFrame:
     header_row = _detect_header_row(
         content,
         markers=["PRODUTO", "DATA INICIAL"],
@@ -91,26 +86,41 @@ def parse_precos(
             reason="XLSX de precos vazio",
         )
 
-    df = _normalize_columns(df)
+    return _normalize_columns(df)
 
-    col_produto = _find_column(df, ["PRODUTO"])
-    col_uf = _find_column(df, ["ESTADO - SIGLA", "ESTADO"])
-    col_municipio = _find_column(df, ["MUNICÍPIO", "MUNICIPIO"])
-    col_data_ini = _find_column(df, ["DATA INICIAL"])
-    col_data_fim = _find_column(df, ["DATA FINAL"])
-    col_preco_venda = _find_column(df, ["PREÇO MÉDIO REVENDA", "PRECO MEDIO REVENDA"])
-    col_preco_compra = _find_column(df, ["PREÇO MÉDIO DISTRIBUIÇÃO", "PRECO MEDIO DISTRIBUICAO"])
-    col_n_postos = _find_column(
-        df, ["NÚMERO DE POSTOS PESQUISADOS", "NUMERO DE POSTOS PESQUISADOS"]
-    )
 
-    if col_produto is None:
+def _locate_precos_columns(df: pd.DataFrame) -> dict[str, str | None]:
+    cols = {
+        "produto": _find_column(df, ["PRODUTO"]),
+        "uf": _find_column(df, ["ESTADO - SIGLA", "ESTADO"]),
+        "municipio": _find_column(df, ["MUNICÍPIO", "MUNICIPIO"]),
+        "data_ini": _find_column(df, ["DATA INICIAL"]),
+        "data_fim": _find_column(df, ["DATA FINAL"]),
+        "preco_venda": _find_column(df, ["PREÇO MÉDIO REVENDA", "PRECO MEDIO REVENDA"]),
+        "preco_compra": _find_column(df, ["PREÇO MÉDIO DISTRIBUIÇÃO", "PRECO MEDIO DISTRIBUICAO"]),
+        "n_postos": _find_column(
+            df, ["NÚMERO DE POSTOS PESQUISADOS", "NUMERO DE POSTOS PESQUISADOS"]
+        ),
+    }
+
+    if cols["produto"] is None:
         raise ParseError(
             source="anp_diesel",
             parser_version=PARSER_VERSION,
             reason=f"Coluna PRODUTO nao encontrada. Colunas: {list(df.columns)}",
         )
 
+    return cols
+
+
+def _filter_precos(
+    df: pd.DataFrame,
+    cols: dict[str, str | None],
+    produto: str | None,
+    uf: str | None,
+    municipio: str | None,
+) -> pd.DataFrame:
+    col_produto = cols["produto"]
     diesel_mask = df[col_produto].str.strip().str.upper().str.contains("DIESEL", na=False)
     df = df[diesel_mask].copy()
 
@@ -122,78 +132,68 @@ def parse_precos(
         )
 
     if produto:
-        produto_upper = produto.upper()
         produto_norm = (
             df[col_produto].str.strip().str.upper().str.replace(r"^[OÓ]LEO\s+", "", regex=True)
         )
-        produto_mask = produto_norm == produto_upper
-        df = df[produto_mask]
+        df = df[produto_norm == produto.upper()]
 
-    if uf and col_uf:
+    if uf and cols["uf"]:
         from agrobr.normalize.regions import normalizar_uf
 
         df["_uf_norm"] = (
-            df[col_uf]
+            df[cols["uf"]]
             .str.strip()
             .apply(lambda v: normalizar_uf(v) if pd.notna(v) and v.strip() else "")
         )
-        uf_mask = df["_uf_norm"] == uf.upper()
-        df = df[uf_mask]
+        df = df[df["_uf_norm"] == uf.upper()]
         df = df.drop(columns=["_uf_norm"])
 
-    if municipio and col_municipio:
+    if municipio and cols["municipio"]:
         municipio_mask = (
-            df[col_municipio].str.strip().str.upper().str.contains(municipio.upper(), na=False)
+            df[cols["municipio"]].str.strip().str.upper().str.contains(municipio.upper(), na=False)
         )
         df = df[municipio_mask]
 
+    return df
+
+
+def _serie_uf_normalizada(serie: pd.Series) -> pd.Series:
+    from agrobr.normalize.regions import normalizar_uf
+
+    return serie.str.strip().apply(
+        lambda v: normalizar_uf(v) or "" if pd.notna(v) and v.strip() else ""
+    )
+
+
+def _build_precos_result(df: pd.DataFrame, cols: dict[str, str | None]) -> pd.DataFrame:
     result: dict[str, Any] = {}
 
-    if col_data_ini:
-        result["data"] = pd.to_datetime(
-            df[col_data_ini], errors="coerce", format="mixed", dayfirst=True
-        )
-    elif col_data_fim:
-        result["data"] = pd.to_datetime(
-            df[col_data_fim], errors="coerce", format="mixed", dayfirst=True
-        )
-    else:
+    date_col = cols["data_ini"] or cols["data_fim"]
+    if not date_col:
         raise ParseError(
             source="anp_diesel",
             parser_version=PARSER_VERSION,
             reason="Coluna de data nao encontrada",
         )
+    result["data"] = pd.to_datetime(df[date_col], errors="coerce", format="mixed", dayfirst=True)
 
-    if col_uf:
-        from agrobr.normalize.regions import normalizar_uf
-
-        result["uf"] = (
-            df[col_uf]
-            .str.strip()
-            .apply(lambda v: normalizar_uf(v) or "" if pd.notna(v) and v.strip() else "")
-        )
-    else:
-        result["uf"] = ""
-    result["municipio"] = df[col_municipio].str.strip() if col_municipio else ""
+    result["uf"] = _serie_uf_normalizada(df[cols["uf"]]) if cols["uf"] else ""
+    result["municipio"] = df[cols["municipio"]].str.strip() if cols["municipio"] else ""
     result["produto"] = (
-        df[col_produto].str.strip().str.upper().str.replace(r"^[OÓ]LEO\s+", "", regex=True)
+        df[cols["produto"]].str.strip().str.upper().str.replace(r"^[OÓ]LEO\s+", "", regex=True)
     )
 
-    if col_preco_venda:
-        result["preco_venda"] = pd.to_numeric(
-            df[col_preco_venda].str.replace(",", "."), errors="coerce"
-        )
+    for campo in ("preco_venda", "preco_compra"):
+        if cols[campo]:
+            result[campo] = pd.to_numeric(df[cols[campo]].str.replace(",", "."), errors="coerce")
 
-    if col_preco_compra:
-        result["preco_compra"] = pd.to_numeric(
-            df[col_preco_compra].str.replace(",", "."), errors="coerce"
-        )
+    if cols["n_postos"]:
+        result["n_postos"] = pd.to_numeric(df[cols["n_postos"]], errors="coerce").astype("Int64")
 
-    if col_n_postos:
-        result["n_postos"] = pd.to_numeric(df[col_n_postos], errors="coerce").astype("Int64")
+    return pd.DataFrame(result)
 
-    out = pd.DataFrame(result)
 
+def _finalize_precos(out: pd.DataFrame) -> pd.DataFrame:
     out = out.dropna(subset=["data"])
 
     if "preco_venda" in out.columns and "preco_compra" in out.columns:
@@ -208,7 +208,20 @@ def parse_precos(
     if "n_postos" not in out.columns:
         out["n_postos"] = pd.array([pd.NA] * len(out), dtype="Int64")
 
-    out = out.sort_values("data").reset_index(drop=True)
+    return out.sort_values("data").reset_index(drop=True)
+
+
+def parse_precos(
+    content: bytes,
+    produto: str | None = None,
+    uf: str | None = None,
+    municipio: str | None = None,
+) -> pd.DataFrame:
+    df = _read_precos_xlsx(content)
+    cols = _locate_precos_columns(df)
+    df = _filter_precos(df, cols, produto=produto, uf=uf, municipio=municipio)
+    out = _build_precos_result(df, cols)
+    out = _finalize_precos(out)
 
     logger.debug(
         "anp_diesel_parse_precos_ok",

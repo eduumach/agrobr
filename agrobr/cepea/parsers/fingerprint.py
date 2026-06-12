@@ -3,7 +3,6 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
-from typing import Any
 
 import structlog
 from bs4 import BeautifulSoup
@@ -11,6 +10,7 @@ from bs4 import BeautifulSoup
 from agrobr.constants import Fonte
 from agrobr.models import Fingerprint
 from agrobr.utils.time import utcnow
+from agrobr.validators.structural import compare_fingerprints as compare_fingerprints
 
 logger = structlog.get_logger()
 
@@ -93,97 +93,6 @@ def extract_fingerprint(
         table_headers=table_headers,
         element_counts=element_counts,
     )
-
-
-def compare_fingerprints(
-    current: Fingerprint,
-    reference: Fingerprint,
-) -> tuple[float, dict[str, Any]]:
-    scores: dict[str, float] = {}
-    details: dict[str, Any] = {}
-
-    scores["structure"] = 1.0 if current.structure_hash == reference.structure_hash else 0.0
-    if scores["structure"] == 0:
-        details["structure_changed"] = {
-            "current": current.structure_hash,
-            "reference": reference.structure_hash,
-        }
-
-    if reference.table_classes:
-        matches = sum(1 for tc in current.table_classes if tc in reference.table_classes)
-        scores["table_classes"] = matches / len(reference.table_classes)
-        if scores["table_classes"] < 1.0:
-            details["table_classes_diff"] = {
-                "missing": [
-                    tc for tc in reference.table_classes if tc not in current.table_classes
-                ],
-                "new": [tc for tc in current.table_classes if tc not in reference.table_classes],
-            }
-    else:
-        scores["table_classes"] = 1.0
-
-    if reference.key_ids:
-        matches = sum(1 for kid in reference.key_ids if kid in current.key_ids)
-        scores["key_ids"] = matches / len(reference.key_ids)
-        if scores["key_ids"] < 1.0:
-            details["key_ids_diff"] = {
-                "missing": [kid for kid in reference.key_ids if kid not in current.key_ids],
-                "new": [kid for kid in current.key_ids if kid not in reference.key_ids],
-            }
-    else:
-        scores["key_ids"] = 1.0
-
-    if reference.table_headers:
-        header_score = 0.0
-        for ref_headers in reference.table_headers:
-            for cur_headers in current.table_headers:
-                ref_set = set(ref_headers)
-                cur_set = set(cur_headers)
-                if ref_set or cur_set:
-                    jaccard = len(ref_set & cur_set) / len(ref_set | cur_set)
-                    header_score = max(header_score, jaccard)
-        scores["table_headers"] = header_score
-        if scores["table_headers"] < 0.9:
-            details["table_headers_diff"] = {
-                "reference": reference.table_headers,
-                "current": current.table_headers,
-            }
-    else:
-        scores["table_headers"] = 1.0
-
-    count_diffs: dict[str, dict[str, int]] = {}
-    for key in reference.element_counts:
-        ref_count = reference.element_counts.get(key, 0)
-        cur_count = current.element_counts.get(key, 0)
-        if ref_count > 0:
-            diff_ratio = abs(cur_count - ref_count) / ref_count
-            if diff_ratio > 0.5:
-                count_diffs[key] = {"reference": ref_count, "current": cur_count}
-
-    if count_diffs:
-        scores["element_counts"] = max(0, 1 - len(count_diffs) * 0.2)
-        details["element_counts_diff"] = count_diffs
-    else:
-        scores["element_counts"] = 1.0
-
-    weights = {
-        "structure": 0.25,
-        "table_classes": 0.20,
-        "key_ids": 0.15,
-        "table_headers": 0.30,
-        "element_counts": 0.10,
-    }
-
-    final_score = sum(scores[k] * weights[k] for k in weights)
-
-    logger.debug(
-        "fingerprint_comparison",
-        scores=scores,
-        final_score=final_score,
-        has_changes=bool(details),
-    )
-
-    return final_score, details
 
 
 def save_baseline_fingerprint(fingerprint: Fingerprint, path: str) -> None:

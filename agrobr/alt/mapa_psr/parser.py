@@ -26,19 +26,7 @@ def _normalize_column_name(col: str) -> str:
     return col.strip()
 
 
-def parse_apolices(
-    content: bytes,
-    cultura: str | None = None,
-    uf: str | None = None,
-    ano: int | None = None,
-    municipio: str | None = None,
-) -> pd.DataFrame:
-    from agrobr.alt.mapa_psr.models import (
-        COLUNAS_CSV,
-        COLUNAS_DROP,
-        COLUNAS_FLOAT,
-    )
-
+def _read_apolices_csv(content: bytes) -> pd.DataFrame:
     encoding = detect_encoding_chain(content)
     try:
         text = content.decode(encoding)
@@ -73,13 +61,24 @@ def parse_apolices(
             reason="CSV vazio",
         )
 
-    df.columns = [_normalize_column_name(c) for c in df.columns]
+    return df
 
+
+def _drop_ignored_columns(df: pd.DataFrame) -> pd.DataFrame:
+    from agrobr.alt.mapa_psr.models import COLUNAS_DROP
+
+    df.columns = [_normalize_column_name(c) for c in df.columns]
     upper_cols = {c.upper(): c for c in df.columns}
     drop_cols = [upper_cols[d.upper()] for d in COLUNAS_DROP if d.upper() in upper_cols]
     if drop_cols:
         df = df.drop(columns=drop_cols)
+    return df
 
+
+def _build_rename_map(df: pd.DataFrame) -> dict[str, str]:
+    from agrobr.alt.mapa_psr.models import COLUNAS_CSV
+
+    upper_cols = {c.upper(): c for c in df.columns}
     rename_map: dict[str, str] = {}
     for csv_col, df_col in COLUNAS_CSV.items():
         if csv_col in df.columns:
@@ -88,8 +87,14 @@ def parse_apolices(
             upper = csv_col.upper()
             if upper in upper_cols and upper_cols[upper] in df.columns:
                 rename_map[upper_cols[upper]] = df_col
+    return rename_map
 
-    df = df.rename(columns=rename_map)
+
+def _normalize_apolices_columns(df: pd.DataFrame) -> pd.DataFrame:
+    from agrobr.alt.mapa_psr.models import COLUNAS_CSV
+
+    df = _drop_ignored_columns(df)
+    df = df.rename(columns=_build_rename_map(df))
 
     present_cols = [c for c in COLUNAS_CSV.values() if c in df.columns]
     if not present_cols:
@@ -107,6 +112,30 @@ def parse_apolices(
             reason=f"Colunas criticas faltando: {missing_critical}",
         )
 
+    return df
+
+
+def _normalize_apolices_strings(df: pd.DataFrame) -> pd.DataFrame:
+    for col in ("uf", "municipio", "cultura", "classificacao"):
+        if col in df.columns:
+            df[col] = df[col].str.strip().str.upper()
+
+    for col in ("cd_ibge", "nr_apolice"):
+        if col in df.columns:
+            df[col] = df[col].fillna("").str.strip()
+
+    if "evento" in df.columns:
+        df["evento"] = df["evento"].fillna("").str.strip().str.lower()
+
+    if "seguradora" in df.columns:
+        df["seguradora"] = df["seguradora"].str.strip()
+
+    return df
+
+
+def _convert_apolices_types(df: pd.DataFrame) -> pd.DataFrame:
+    from agrobr.alt.mapa_psr.models import COLUNAS_FLOAT
+
     if "ano_apolice" in df.columns:
         df["ano_apolice"] = pd.to_numeric(df["ano_apolice"], errors="coerce")
         df = df.dropna(subset=["ano_apolice"]).copy()
@@ -116,30 +145,16 @@ def parse_apolices(
         if col in df.columns:
             df[col] = df[col].apply(parse_numeric_br)
 
-    if "uf" in df.columns:
-        df["uf"] = df["uf"].str.strip().str.upper()
+    return _normalize_apolices_strings(df)
 
-    if "municipio" in df.columns:
-        df["municipio"] = df["municipio"].str.strip().str.upper()
 
-    if "cultura" in df.columns:
-        df["cultura"] = df["cultura"].str.strip().str.upper()
-
-    if "classificacao" in df.columns:
-        df["classificacao"] = df["classificacao"].str.strip().str.upper()
-
-    if "evento" in df.columns:
-        df["evento"] = df["evento"].fillna("").str.strip().str.lower()
-
-    if "seguradora" in df.columns:
-        df["seguradora"] = df["seguradora"].str.strip()
-
-    if "cd_ibge" in df.columns:
-        df["cd_ibge"] = df["cd_ibge"].fillna("").str.strip()
-
-    if "nr_apolice" in df.columns:
-        df["nr_apolice"] = df["nr_apolice"].fillna("").str.strip()
-
+def _filter_apolices(
+    df: pd.DataFrame,
+    cultura: str | None,
+    uf: str | None,
+    ano: int | None,
+    municipio: str | None,
+) -> pd.DataFrame:
     if uf:
         df = df[df["uf"] == uf.upper()]
 
@@ -159,7 +174,22 @@ def parse_apolices(
         mask = df["municipio"].str.contains(municipio.upper(), na=False)
         df = df[mask]
 
+    return df
+
+
+def parse_apolices(
+    content: bytes,
+    cultura: str | None = None,
+    uf: str | None = None,
+    ano: int | None = None,
+    municipio: str | None = None,
+) -> pd.DataFrame:
     from agrobr.alt.mapa_psr.models import COLUNAS_APOLICES
+
+    df = _read_apolices_csv(content)
+    df = _normalize_apolices_columns(df)
+    df = _convert_apolices_types(df)
+    df = _filter_apolices(df, cultura=cultura, uf=uf, ano=ano, municipio=municipio)
 
     final_cols = [c for c in COLUNAS_APOLICES if c in df.columns]
     df = df[final_cols]

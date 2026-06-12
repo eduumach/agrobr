@@ -12,7 +12,6 @@ DATASET_TRAFEGO_SLUG = "volume-trafego-praca-pedagio"
 DATASET_PRACAS_SLUG = "praca-de-pedagio"
 
 ANO_INICIO = 2010
-ANO_FIM_V1 = 2023
 ANO_INICIO_V2 = 2024
 
 CATEGORIA_MAP: dict[str, tuple[int, str]] = {
@@ -60,16 +59,6 @@ COLUNAS_FLUXO = [
     "municipio",
 ]
 
-COLUNAS_V1 = [
-    "concessionaria",
-    "praca",
-    "mes_ano",
-    "categoria",
-    "tipo_cobranca",
-    "sentido",
-    "quantidade",
-]
-
 COLUNAS_V2 = [
     "concessionaria",
     "praca",
@@ -78,18 +67,6 @@ COLUNAS_V2 = [
     "tipo_cobranca",
     "sentido",
     "quantidade",
-]
-
-COLUNAS_PRACAS = [
-    "concessionaria",
-    "praca_de_pedagio",
-    "rodovia",
-    "uf",
-    "km_m",
-    "municipio",
-    "lat",
-    "lon",
-    "situacao",
 ]
 
 
@@ -110,15 +87,5 @@ def _resolve_anos(
     return [current - 1, current]
 
 
-def schema_version(ano: int) -> int:
-    if ano >= ANO_INICIO_V2:
-        return 2
-    return 1
-
-
 def build_ckan_package_url(slug: str) -> str:
     return f"{CKAN_API}/package_show?id={slug}"
-
-
-def build_ckan_resource_url(resource_id: str) -> str:
-    return f"{CKAN_BASE}/dataset/file/{resource_id}"
