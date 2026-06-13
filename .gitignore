@@ -24,9 +24,6 @@ dist/
 coverage*.json
 htmlcov/
 
-# Claude Code
-.claude/
-
 # Runtime & temporary
 *.duckdb
 tmp_*/
