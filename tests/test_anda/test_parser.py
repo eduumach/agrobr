@@ -365,6 +365,9 @@ class TestMakeRecord:
     def test_none_volume_dropped(self):
         assert _make_record(2024, 1, "MT", "total", None) is None
 
+    def test_nan_volume_dropped(self):
+        assert _make_record(2024, 1, "MT", "total", float("nan")) is None
+
     def test_product_normalized(self):
         rec = _make_record(2024, 1, "MT", "uréia", 100.0)
         assert rec is not None

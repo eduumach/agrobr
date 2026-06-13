@@ -149,7 +149,7 @@ def _make_record(
     produto: str,
     vol: float | None,
 ) -> dict[str, Any] | None:
-    if vol is None or vol <= 0:
+    if vol is None or not vol > 0:
         return None
     return {
         "ano": ano,
