@@ -19,6 +19,10 @@ _UF_PATTERNS = re.compile(r"^(UF|Estado|Unidade\s*da\s*Federa)", re.IGNORECASE)
 _MES_PATTERNS = re.compile(r"^(M[eê]s|Per[ií]odo|Month)", re.IGNORECASE)
 _VOLUME_PATTERNS = re.compile(r"(tonelada|volume|ton\.|entrega|quantidade|total)", re.IGNORECASE)
 
+_MIN_CELL_LINES_TO_EXPAND = 5
+_MIN_UFS_FOR_LAYOUT = 3
+_SECTION_TITLE_MIN_LEN = 30
+
 
 def _check_pdfplumber() -> Any:
     try:
@@ -70,20 +74,25 @@ def extract_tables_from_pdf(pdf_bytes: bytes) -> list[list[list[str | None]]]:
     return tables
 
 
+def _clean_cells(table: list[list[str | None]]) -> list[list[str]]:
+    return [[str(c).strip() if c else "" for c in row] for row in table]
+
+
+def _max_cell_lines(rows: list[list[str]]) -> int:
+    return max((cell.count("\n") + 1 for row in rows for cell in row), default=0)
+
+
 def _expand_newline_cells(table: list[list[str | None]]) -> list[list[str]]:
-    if not table or len(table) < 2:
-        return [[str(c).strip() if c else "" for c in row] for row in table]
+    """Desmembra células multi-linha quando o pdfplumber colapsa várias linhas numa só.
 
-    clean = [[str(c).strip() if c else "" for c in row] for row in table]
+    Só expande quando alguma célula acumula >= _MIN_CELL_LINES_TO_EXPAND quebras de
+    linha (sinal do colapso); tabelas normais passam intactas.
+    """
+    clean = _clean_cells(table)
+    if len(clean) < 2:
+        return clean
 
-    max_lines = 0
-    for row in clean:
-        for cell in row:
-            n = cell.count("\n") + 1
-            if n > max_lines:
-                max_lines = n
-
-    if max_lines < 5:
+    if _max_cell_lines(clean) < _MIN_CELL_LINES_TO_EXPAND:
         return clean
 
     expanded: list[list[str]] = []
@@ -118,10 +127,10 @@ def parse_entregas_table(
     uf_in_rows = sum(1 for v in first_col_values if _is_uf(v))
     uf_in_cols = sum(1 for v in header[1:] if _is_uf(v))
 
-    if uf_in_rows >= 3:
+    if uf_in_rows >= _MIN_UFS_FOR_LAYOUT:
         records = _parse_uf_rows(clean_table, ano, produto)
 
-    if not records and uf_in_cols >= 3:
+    if not records and uf_in_cols >= _MIN_UFS_FOR_LAYOUT:
         records = _parse_uf_cols(clean_table, ano, produto)
 
     if not records:
@@ -131,6 +140,24 @@ def parse_entregas_table(
         records = _parse_indicadores(clean_table, ano, produto)
 
     return records
+
+
+def _make_record(
+    ano: int,
+    mes: int,
+    uf: str,
+    produto: str,
+    vol: float | None,
+) -> dict[str, Any] | None:
+    if vol is None or vol <= 0:
+        return None
+    return {
+        "ano": ano,
+        "mes": mes,
+        "uf": uf,
+        "produto_fertilizante": normalize_fertilizante(produto),
+        "volume_ton": vol,
+    }
 
 
 def _parse_uf_rows(
@@ -160,17 +187,9 @@ def _parse_uf_rows(
         for col_idx, mes in month_cols.items():
             if col_idx >= len(row):
                 continue
-            vol = safe_float(row[col_idx])
-            if vol is not None and vol > 0:
-                records.append(
-                    {
-                        "ano": ano,
-                        "mes": mes,
-                        "uf": uf_candidate,
-                        "produto_fertilizante": normalize_fertilizante(produto),
-                        "volume_ton": vol,
-                    }
-                )
+            rec = _make_record(ano, mes, uf_candidate, produto, safe_float(row[col_idx]))
+            if rec is not None:
+                records.append(rec)
 
     return records
 
@@ -201,17 +220,9 @@ def _parse_uf_cols(
         for col_idx, uf in uf_cols.items():
             if col_idx >= len(row):
                 continue
-            vol = safe_float(row[col_idx])
-            if vol is not None and vol > 0:
-                records.append(
-                    {
-                        "ano": ano,
-                        "mes": mes,
-                        "uf": uf,
-                        "produto_fertilizante": normalize_fertilizante(produto),
-                        "volume_ton": vol,
-                    }
-                )
+            rec = _make_record(ano, mes, uf, produto, safe_float(row[col_idx]))
+            if rec is not None:
+                records.append(rec)
 
     return records
 
@@ -239,11 +250,13 @@ def _parse_generic(
     if uf_col is None or vol_col is None:
         return records
 
+    max_col = max(c for c in (uf_col, mes_col, vol_col) if c is not None)
+
     for row in table[1:]:
-        if len(row) <= max(c for c in [uf_col, mes_col, vol_col] if c is not None):
+        if len(row) <= max_col:
             continue
 
-        uf_val = row[uf_col].strip().upper() if uf_col is not None else ""
+        uf_val = row[uf_col].strip().upper()
         if not _is_uf(uf_val):
             continue
 
@@ -252,18 +265,27 @@ def _parse_generic(
             detected = _detect_month(row[mes_col])
             mes_val = detected if detected is not None else 0
 
-        vol = safe_float(row[vol_col]) if vol_col is not None else None
-        if vol is not None and vol > 0:
-            record: dict[str, Any] = {
-                "ano": ano,
-                "mes": mes_val,
-                "uf": uf_val,
-                "produto_fertilizante": normalize_fertilizante(produto),
-                "volume_ton": vol,
-            }
-            records.append(record)
+        rec = _make_record(ano, mes_val, uf_val, produto, safe_float(row[vol_col]))
+        if rec is not None:
+            records.append(rec)
 
     return records
+
+
+def _find_year_anchor(table: list[list[str]], ano_str: str) -> tuple[int, int] | None:
+    for i, row in enumerate(table):
+        for j, cell in enumerate(row):
+            if cell.strip() == ano_str:
+                return i, j
+    return None
+
+
+def _find_month_col(rows: list[list[str]]) -> int | None:
+    for row in rows:
+        for j, cell in enumerate(row):
+            if _detect_month(cell) is not None:
+                return j
+    return None
 
 
 def _parse_indicadores(
@@ -272,42 +294,27 @@ def _parse_indicadores(
     produto: str,
 ) -> list[dict[str, Any]]:
     records: list[dict[str, Any]] = []
-
     ano_str = str(ano)
-    header_row_idx = None
-    ano_col_idx = None
 
-    for i, row in enumerate(table):
-        for j, cell in enumerate(row):
-            if cell.strip() == ano_str:
-                header_row_idx = i
-                ano_col_idx = j
-                break
-        if ano_col_idx is not None:
-            break
-
-    if header_row_idx is None or ano_col_idx is None:
+    anchor = _find_year_anchor(table, ano_str)
+    if anchor is None:
         return records
+    header_row_idx, ano_col_idx = anchor
 
-    mes_col_idx = None
-    for row in table[header_row_idx + 1 :]:
-        for j, cell in enumerate(row):
-            if _detect_month(cell) is not None:
-                mes_col_idx = j
-                break
-        if mes_col_idx is not None:
-            break
-
+    data_rows = table[header_row_idx + 1 :]
+    mes_col_idx = _find_month_col(data_rows)
     if mes_col_idx is None:
         return records
 
-    for row in table[header_row_idx + 1 :]:
-        if len(row) <= max(mes_col_idx, ano_col_idx):
+    max_col = max(mes_col_idx, ano_col_idx)
+
+    for row in data_rows:
+        if len(row) <= max_col:
             continue
 
         cell_mes = row[mes_col_idx]
 
-        if cell_mes and len(cell_mes.strip()) > 30:
+        if cell_mes and len(cell_mes.strip()) > _SECTION_TITLE_MIN_LEN:
             break
         if row[ano_col_idx].strip() == ano_str and cell_mes.strip() == "":
             break
@@ -316,17 +323,9 @@ def _parse_indicadores(
         if mes is None:
             continue
 
-        vol = safe_float(row[ano_col_idx])
-        if vol is not None and vol > 0:
-            records.append(
-                {
-                    "ano": ano,
-                    "mes": mes,
-                    "uf": "BR",
-                    "produto_fertilizante": normalize_fertilizante(produto),
-                    "volume_ton": vol,
-                }
-            )
+        rec = _make_record(ano, mes, "BR", produto, safe_float(row[ano_col_idx]))
+        if rec is not None:
+            records.append(rec)
 
     return records
 

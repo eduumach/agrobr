@@ -77,13 +77,8 @@ def parse_links_from_html(html: str, pattern: str = r"\.pdf|\.xlsx?") -> list[di
     return links
 
 
-async def fetch_entregas_pdf(ano: int) -> tuple[bytes, int]:
-    html = await fetch_estatisticas_page()
-    links = parse_links_from_html(html, pattern=r"\.pdf")
-
-    ano_str = str(ano)
+def _select_pdf_target(links: list[dict[str, str]], ano_str: str) -> dict[str, str] | None:
     candidates = [link for link in links if ano_str in link["text"]]
-
     if not candidates:
         candidates = [link for link in links if ano_str in link["url"]]
 
@@ -92,8 +87,27 @@ async def fetch_entregas_pdf(ano: int) -> tuple[bytes, int]:
         for link in candidates
         if re.search(r"entrega|fertiliz|indicador", f"{link['text']} {link['url']}", re.IGNORECASE)
     ]
+    return priority[0] if priority else (candidates[0] if candidates else None)
 
-    target = priority[0] if priority else (candidates[0] if candidates else None)
+
+def _extract_ano_real(target: dict[str, str], ano: int) -> int:
+    text_years = re.findall(r"20\d{2}", target["text"])
+    if text_years:
+        return int(text_years[-1])
+
+    filename = target["url"].split("/")[-1]
+    filename_years = re.findall(r"20\d{2}", filename)
+    if filename_years:
+        return int(filename_years[-1])
+
+    return ano
+
+
+async def fetch_entregas_pdf(ano: int) -> tuple[bytes, int]:
+    html = await fetch_estatisticas_page()
+    links = parse_links_from_html(html, pattern=r"\.pdf")
+
+    target = _select_pdf_target(links, str(ano))
 
     if not target:
         anos_disponiveis = sorted(
@@ -109,15 +123,7 @@ async def fetch_entregas_pdf(ano: int) -> tuple[bytes, int]:
             ),
         )
 
-    ano_real = ano
-    text_years = re.findall(r"20\d{2}", target["text"])
-    if text_years:
-        ano_real = int(text_years[-1])
-    else:
-        filename = target["url"].split("/")[-1]
-        filename_years = re.findall(r"20\d{2}", filename)
-        if filename_years:
-            ano_real = int(filename_years[-1])
+    ano_real = _extract_ano_real(target, ano)
 
     logger.debug("anda_pdf_found_detail", url=target["url"])
     logger.info("anda_pdf_found", source="anda", ano=ano, ano_real=ano_real, text=target["text"])
