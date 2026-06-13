@@ -123,3 +123,51 @@ class TestParseEmpregadores:
 
         for col in df.columns:
             assert col in COLUNAS_SAIDA, f"Unexpected column: {col}"
+
+
+def _make_pdf_from_tables(tables: list):
+    pages = []
+    for t in tables:
+        page = MagicMock()
+        page.extract_table.return_value = t
+        pages.append(page)
+    pdf = MagicMock()
+    pdf.pages = pages
+    pdf.close = MagicMock()
+    return pdf
+
+
+def _parse_with_pdf(pdf):
+    with patch("agrobr.lista_suja.parser._check_pdfplumber") as mock_check:
+        mock_plumber = MagicMock()
+        mock_plumber.open.return_value = pdf
+        mock_check.return_value = mock_plumber
+        return parse_empregadores(_mock_pdf_data())
+
+
+class TestParseEmpregadoresEdgeCases:
+    def test_no_header_returns_empty(self):
+        df = _parse_with_pdf(_make_pdf_from_tables([[["foo", "bar"], ["1", "2"]]]))
+        assert len(df) == 0
+        assert list(df.columns) == COLUNAS_SAIDA
+
+    def test_row_with_wrong_column_count_skipped(self):
+        df = _parse_with_pdf(_make_pdf_from_tables([[_HEADER, _ROWS[0], ["x", "y"]]]))
+        assert len(df) == 1
+
+    def test_multipage_aggregates_rows(self):
+        df = _parse_with_pdf(_make_pdf_from_tables([[_HEADER, _ROWS[0]], [_ROWS[1]]]))
+        assert len(df) == 2
+
+    def test_empty_first_cell_skipped(self):
+        empty_row = [""] + ["x"] * 9
+        df = _parse_with_pdf(_make_pdf_from_tables([[_HEADER, empty_row, _ROWS[0]]]))
+        assert len(df) == 1
+
+    def test_corrupt_pdf_raises(self):
+        with patch("agrobr.lista_suja.parser._check_pdfplumber") as mock_check:
+            mock_plumber = MagicMock()
+            mock_plumber.open.side_effect = Exception("corrupt")
+            mock_check.return_value = mock_plumber
+            with pytest.raises(ParseError):
+                parse_empregadores(_mock_pdf_data())
