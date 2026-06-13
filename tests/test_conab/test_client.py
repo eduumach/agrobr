@@ -52,17 +52,6 @@ class TestConabListLevantamentos:
         assert result[0]["levantamento"] >= result[1]["levantamento"]
 
 
-class TestConabFetchLatest:
-    @pytest.mark.asyncio
-    async def test_no_levantamentos_raises(self):
-        with (
-            patch("agrobr.conab.client.list_levantamentos", new_callable=AsyncMock) as mock_list,
-            pytest.raises(SourceUnavailableError, match="No levantamentos found"),
-        ):
-            mock_list.return_value = []
-            await client.fetch_latest_safra_xlsx()
-
-
 class TestConabFetchSafra:
     @pytest.mark.asyncio
     async def test_safra_not_found_raises(self):

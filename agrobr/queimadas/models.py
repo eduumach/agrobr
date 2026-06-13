@@ -4,24 +4,6 @@ from agrobr.normalize.regions import BIOMAS as BIOMAS  # noqa: F401
 from agrobr.normalize.regions import BIOMAS_VALIDOS as BIOMAS_VALIDOS  # noqa: F401
 from agrobr.normalize.regions import normalizar_bioma as normalizar_bioma  # noqa: F401
 
-SATELITES = {
-    "AQUA_M-T",
-    "AQUA_M-M",
-    "TERRA_M-T",
-    "TERRA_M-M",
-    "NOAA-20",
-    "NOAA-21",
-    "GOES-16",
-    "GOES-19",
-    "METOP-B",
-    "METOP-C",
-    "MSG-03",
-    "NPP-375",
-    "NPP-375D",
-}
-
-SATELITE_REFERENCIA = "AQUA_M-T"
-
 COLUNAS_CSV = [
     "id",
     "lat",

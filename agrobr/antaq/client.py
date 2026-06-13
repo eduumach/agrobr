@@ -79,11 +79,6 @@ def _extract_txt_from_zip(zip_bytes: bytes, filename: str) -> str:
         return f.read().decode("utf-8-sig")
 
 
-def list_zip_contents(zip_bytes: bytes) -> list[str]:
-    with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
-        return zf.namelist()
-
-
 async def fetch_ano_zip(ano: int) -> bytes:
     url = f"{BULK_TXT_BASE}/{ano}.zip"
     return await _download_zip(url)

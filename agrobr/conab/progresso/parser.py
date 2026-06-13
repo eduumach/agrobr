@@ -20,8 +20,6 @@ logger = structlog.get_logger()
 
 PARSER_VERSION = 1
 
-SHEET_NAME = "Progresso de safra"
-
 
 def _parse_pct(val: object) -> float | None:
     has_pct = isinstance(val, str) and "%" in val

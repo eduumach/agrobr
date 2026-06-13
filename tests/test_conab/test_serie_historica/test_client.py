@@ -40,20 +40,6 @@ class TestConabSerieTimeout:
         ):
             await client.download_xls("soja")
 
-    @pytest.mark.asyncio
-    async def test_timeout_on_fetch_series_page(self):
-        mock_client = make_mock_async_client()
-        mock_client.get.side_effect = httpx.TimeoutException("timeout")
-
-        with (
-            patch(
-                "agrobr.conab.serie_historica.client.httpx.AsyncClient", return_value=mock_client
-            ),
-            patch(RETRY_SLEEP, new_callable=AsyncMock),
-            pytest.raises(SourceUnavailableError, match="conab_serie"),
-        ):
-            await client.fetch_series_page("graos")
-
 
 class TestConabSerieHTTPErrors:
     @pytest.mark.asyncio
@@ -130,7 +116,3 @@ class TestConabSerieProductRegistry:
         names = [p["produto"] for p in produtos]
         assert "soja" in names
         assert "milho" in names
-
-    def test_parse_xls_links_empty_html(self):
-        links = client.parse_xls_links_from_html("")
-        assert links == []

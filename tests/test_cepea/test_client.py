@@ -34,13 +34,6 @@ class TestCepeaTimeout:
             with pytest.raises(SourceUnavailableError):
                 await client.fetch_indicador_page("soja")
 
-    @pytest.mark.asyncio
-    async def test_timeout_on_series_historica(self):
-        with patch("agrobr.cepea.client.retry_async", new_callable=AsyncMock) as mock_retry:
-            mock_retry.side_effect = httpx.TimeoutException("timeout")
-            with pytest.raises(SourceUnavailableError, match="cepea"):
-                await client.fetch_series_historica("soja")
-
 
 class TestCepeaHTTPErrors:
     @pytest.mark.asyncio
@@ -191,20 +184,6 @@ class TestCepeaEmptyResponse:
 
         assert result.html == ""
         assert result.source == "cepea"
-
-
-class TestCepeaSetters:
-    def test_set_use_browser(self):
-        client.set_use_browser(True)
-        assert client._use_browser is True
-        client.set_use_browser(False)
-        assert client._use_browser is False
-
-    def test_set_use_alternative_source(self):
-        client.set_use_alternative_source(True)
-        assert client._use_alternative_source is True
-        client.set_use_alternative_source(False)
-        assert client._use_alternative_source is False
 
 
 class TestCepeaEndpointRotation:

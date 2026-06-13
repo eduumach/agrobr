@@ -11,41 +11,6 @@ CATEGORIES_BY_YEAR: dict[int, str] = {
     2026: "cmke9w2wu8873b4txfa547lki",
 }
 
-PORTOS_ANEC: frozenset[str] = frozenset(
-    {
-        "SANTOS",
-        "PARANAGUÁ",
-        "SÃO FRANCISCO DO SUL",
-        "VITÓRIA",
-        "ITACOATIARA",
-        "SÃO LUIS/ITAQUI",
-        "RIO GRANDE",
-        "SANTARÉM",
-        "BARCARENA",
-        "ARATU/COTEGIPE",
-        "IMBITUBA",
-        "ILHÉUS",
-        "TMIB/SERGIPE",
-        "ANTONINA",
-        "SANTANA",
-        "BELÉM",
-        "RIO DE JANEIRO",
-        "SALVADOR (ENSEADA)",
-        "BARRA DOS COQUEIROS",
-    }
-)
-
-PRODUTOS_ANEC: frozenset[str] = frozenset(
-    {
-        "soybean",
-        "soybean_meal",
-        "maize",
-        "ddgs",
-        "sorghum",
-        "wheat",
-    }
-)
-
 PERIODO_LAST_WEEK = "last_week"
 PERIODO_CURRENT_WEEK = "current_week"
 TIPO_EFETIVADO = "efetivado"

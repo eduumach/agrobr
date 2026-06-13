@@ -7,12 +7,7 @@ import pandas as pd
 import pytest
 
 from agrobr.conab.ceasa.models import COLUNAS_SAIDA
-from agrobr.conab.ceasa.parser import (
-    PARSER_VERSION,
-    parse_lista_ceasas,
-    parse_lista_produtos,
-    parse_precos,
-)
+from agrobr.conab.ceasa.parser import PARSER_VERSION, parse_precos
 from agrobr.exceptions import ParseError
 
 GOLDEN_DIR = Path(__file__).parent.parent / "golden_data" / "conab_ceasa" / "precos_sample"
@@ -142,35 +137,3 @@ class TestParseEdgeCases:
         }
         df = parse_precos(precos, _ceasas_json())
         assert len(df) == 0
-
-
-class TestParseListaProdutos:
-    def test_returns_sorted_list(self):
-        result = parse_lista_produtos(_precos_json())
-        assert isinstance(result, list)
-        assert result == sorted(result)
-        assert len(result) == 48
-
-    def test_tomate_present(self):
-        result = parse_lista_produtos(_precos_json())
-        assert "TOMATE" in result
-
-
-class TestParseListaCeasas:
-    def test_returns_list_of_dicts(self):
-        result = parse_lista_ceasas(_ceasas_json())
-        assert isinstance(result, list)
-        assert len(result) == 43
-        for item in result:
-            assert "nome" in item
-            assert "uf" in item
-
-    def test_sorted_by_name(self):
-        result = parse_lista_ceasas(_ceasas_json())
-        names = [r["nome"] for r in result]
-        assert names == sorted(names)
-
-    def test_uf_present(self):
-        result = parse_lista_ceasas(_ceasas_json())
-        for item in result:
-            assert len(item["uf"]) == 2

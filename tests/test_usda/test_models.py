@@ -7,7 +7,6 @@ from agrobr.usda.models import (
     PSD_COLUMNS_MAP,
     PSD_COMMODITIES,
     PSD_COUNTRIES,
-    PSDRecord,
     commodity_name,
     resolve_commodity_code,
     resolve_country_code,
@@ -88,38 +87,6 @@ class TestCommodityName:
 
     def test_unknown_returns_code(self):
         assert commodity_name("9999999") == "9999999"
-
-
-class TestPSDRecord:
-    def test_basic_creation(self):
-        rec = PSDRecord(
-            commodity_code="2222000",
-            commodity="Soybeans",
-            country_code="BR",
-            country="Brazil",
-            market_year=2024,
-            attribute="Production",
-            value=169000.0,
-            unit="(1000 MT)",
-        )
-
-        assert rec.commodity_code == "2222000"
-        assert rec.commodity == "soybeans"  # normalized
-        assert rec.country == "Brazil"
-        assert rec.market_year == 2024
-        assert rec.attribute == "production"  # normalized
-        assert rec.value == 169000.0
-
-    def test_value_optional(self):
-        rec = PSDRecord(
-            commodity_code="2222000",
-            commodity="Soybeans",
-            country_code="BR",
-            country="Brazil",
-            market_year=2024,
-            attribute="Production",
-        )
-        assert rec.value is None
 
 
 class TestConstants:

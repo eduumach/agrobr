@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import re
-from typing import Any
 
 import structlog
-from pydantic import BaseModel, Field, field_validator
 
 logger = structlog.get_logger()
 
@@ -89,51 +87,6 @@ def resolve_atividade(cd: str) -> str:
     return _resolve(SICOR_ATIVIDADES, cd, "atividade")
 
 
-class CreditoRural(BaseModel):
-    safra: str = Field(...)
-    ano_emissao: int | None = None
-    mes_emissao: int | None = Field(None, ge=1, le=12)
-    cd_municipio: str | None = Field(None)
-    municipio: str | None = None
-    uf: str | None = Field(None, min_length=2, max_length=2)
-    produto: str = Field(...)
-    finalidade: str = Field(default="custeio")
-    valor: float = Field(..., ge=0)
-    area_financiada: float | None = Field(None, ge=0)
-    qtd_contratos: int | None = Field(None, ge=0)
-    regiao: str | None = None
-    cd_programa: str | None = None
-    programa: str | None = None
-    cd_sub_programa: str | None = None
-    cd_fonte_recurso: str | None = None
-    fonte_recurso: str | None = None
-    cd_tipo_seguro: str | None = None
-    tipo_seguro: str | None = None
-    cd_modalidade: str | None = None
-    modalidade: str | None = None
-    cd_atividade: str | None = None
-    atividade: str | None = None
-
-    @field_validator("uf", mode="before")
-    @classmethod
-    def normalize_uf(cls, v: Any) -> str | None:
-        if v is None:
-            return None
-        if isinstance(v, str):
-            return v.upper().strip()
-        return str(v)
-
-    @field_validator("produto", mode="before")
-    @classmethod
-    def normalize_produto(cls, v: str) -> str:
-        return v.lower().strip()
-
-    @field_validator("finalidade", mode="before")
-    @classmethod
-    def normalize_finalidade(cls, v: str) -> str:
-        return v.lower().strip()
-
-
 SICOR_PRODUTOS: dict[str, str] = {
     "soja": "SOJA",
     "milho": "MILHO",
@@ -147,13 +100,6 @@ SICOR_PRODUTOS: dict[str, str] = {
     "cana": "CANA-DE-ACUCAR",
     "mandioca": "MANDIOCA",
     "sorgo": "SORGO",
-}
-
-SICOR_FINALIDADES: dict[str, str] = {
-    "custeio": "CUSTEIO",
-    "investimento": "INVESTIMENTO",
-    "comercializacao": "COMERCIALIZACAO",
-    "industrializacao": "INDUSTRIALIZACAO",
 }
 
 UF_CODES: dict[str, str] = {

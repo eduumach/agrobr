@@ -57,6 +57,13 @@ class TestCompareFingerprints:
         similarity, diffs = compare_fingerprints(current, reference)
         assert similarity < 1.0
 
+    def test_duplicate_current_table_classes_capped(self):
+        current = _make_fingerprint(table_classes=[["class-a"], ["class-a"], ["class-a"]])
+        reference = _make_fingerprint(table_classes=[["class-a"]])
+        similarity, diffs = compare_fingerprints(current, reference)
+        assert similarity == pytest.approx(1.0)
+        assert "table_classes_diff" not in diffs
+
     def test_missing_key_ids(self):
         current = _make_fingerprint(key_ids=["id-1"])
         reference = _make_fingerprint(key_ids=["id-1", "id-2", "id-3"])

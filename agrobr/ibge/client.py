@@ -41,15 +41,6 @@ VARIAVEIS = {
     "rendimento_lspa": "112",
 }
 
-NIVEIS_TERRITORIAIS = {
-    "brasil": "1",
-    "regiao": "2",
-    "uf": "3",
-    "mesorregiao": "7",
-    "microrregiao": "8",
-    "municipio": "6",
-}
-
 PRODUTOS_PAM = {
     "soja": "40124",
     "milho": "40122",
@@ -121,12 +112,6 @@ TABELAS_ABATE = {
 VARIAVEIS_ABATE = {
     "animais_abatidos": "284",
     "peso_carcacas": "285",
-}
-
-CATEGORIAS_ABATE = {
-    "ref_trimestre": {"12716": "115236"},
-    "tipo_rebanho_bovino": {"18": "992"},
-    "tipo_inspecao": {"12529": "118225"},
 }
 
 ESPECIES_ABATE = ["bovino", "suino", "frango"]

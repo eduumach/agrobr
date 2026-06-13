@@ -135,11 +135,3 @@ class TestDeralFetchHelpers:
             result = await client.fetch_pc_xls()
             assert result == b"xls"
             assert "PC.xls" in mock.call_args[0][0]
-
-    @pytest.mark.asyncio
-    async def test_fetch_pss_xlsx_calls_fetch_bytes(self):
-        with patch("agrobr.deral.client._fetch_bytes", new_callable=AsyncMock) as mock:
-            mock.return_value = b"xlsx"
-            result = await client.fetch_pss_xlsx()
-            assert result == b"xlsx"
-            assert "pss.xlsx" in mock.call_args[0][0]

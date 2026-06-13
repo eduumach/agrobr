@@ -34,16 +34,6 @@ UF_ESTADO: dict[str, str] = {
     "TOCANTINS": "TO",
 }
 
-CLASSES_DETER = {
-    "DESMATAMENTO_CR",
-    "DESMATAMENTO_VEG",
-    "DEGRADACAO",
-    "MINERACAO",
-    "CICATRIZ_DE_QUEIMADA",
-    "CS_DESORDENADO",
-    "CS_GEOMETRICO",
-}
-
 PRODES_WORKSPACES: dict[str, str] = {
     "Amazônia": "prodes-amazon-nb",
     "Cerrado": "prodes-cerrado-nb",
@@ -144,11 +134,6 @@ COLUNAS_SAIDA_DETER = [
 ]
 
 MAX_FEATURES_GEO = 10_000
-
-DETER_GEOM_COLUMN: dict[str, str] = {
-    "Amazônia": "geom",
-    "Cerrado": "st_multi",
-}
 
 DETER_COLUNAS_WFS_GEO_AMZ = ["geom"] + DETER_COLUNAS_WFS_AMZ
 DETER_COLUNAS_WFS_GEO_CERRADO = ["st_multi"] + DETER_COLUNAS_WFS_CERRADO

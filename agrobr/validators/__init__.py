@@ -10,7 +10,6 @@ from .sanity import (
     validate_safra,
 )
 from .structural import (
-    StructuralMonitor,
     StructuralValidationResult,
     compare_fingerprints,
     load_baseline,
@@ -31,5 +30,4 @@ __all__: list[str] = [
     "compare_fingerprints",
     "load_baseline",
     "save_baseline",
-    "StructuralMonitor",
 ]

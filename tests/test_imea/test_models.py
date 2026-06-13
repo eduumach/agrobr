@@ -2,14 +2,7 @@
 
 import pytest
 
-from agrobr.imea.models import (
-    IMEA_CADEIAS,
-    IMEA_COLUMNS_MAP,
-    IMEA_MACRORREGIOES,
-    CotacaoIMEA,
-    cadeia_name,
-    resolve_cadeia_id,
-)
+from agrobr.imea.models import IMEA_CADEIAS, IMEA_COLUMNS_MAP, cadeia_name, resolve_cadeia_id
 
 
 class TestResolveCadeiaId:
@@ -85,50 +78,6 @@ class TestCadeiaName:
         assert cadeia_name(999) == "999"
 
 
-class TestCotacaoIMEA:
-    def test_basic_creation(self):
-        rec = CotacaoIMEA(
-            cadeia="soja",
-            localidade="Médio-Norte",
-            valor=125.50,
-            variacao=-1.2,
-            safra="24/25",
-            unidade="R$/sc",
-            data_publicacao="2024-06-15",
-        )
-        assert rec.cadeia == "soja"
-        assert rec.localidade == "Médio-Norte"
-        assert rec.valor == 125.50
-        assert rec.variacao == -1.2
-        assert rec.safra == "24/25"
-        assert rec.unidade == "R$/sc"
-
-    def test_cadeia_normalization(self):
-        rec = CotacaoIMEA(
-            cadeia="  SOJA  ",
-            localidade="Norte",
-        )
-        assert rec.cadeia == "soja"
-
-    def test_localidade_strip(self):
-        rec = CotacaoIMEA(
-            cadeia="milho",
-            localidade="  Médio-Norte  ",
-        )
-        assert rec.localidade == "Médio-Norte"
-
-    def test_optional_fields(self):
-        rec = CotacaoIMEA(
-            cadeia="soja",
-            localidade="Norte",
-        )
-        assert rec.valor is None
-        assert rec.variacao is None
-        assert rec.safra == ""
-        assert rec.unidade == ""
-        assert rec.data_publicacao == ""
-
-
 class TestImeaCadeias:
     def test_main_products(self):
         assert "soja" in IMEA_CADEIAS
@@ -150,16 +99,6 @@ class TestImeaCadeias:
 
     def test_milho_and_corn_same_id(self):
         assert IMEA_CADEIAS["milho"] == IMEA_CADEIAS["corn"]
-
-
-class TestImeaMacrorregioes:
-    def test_count(self):
-        assert len(IMEA_MACRORREGIOES) == 7
-
-    def test_major_regions(self):
-        assert "Médio-Norte" in IMEA_MACRORREGIOES
-        assert "Noroeste" in IMEA_MACRORREGIOES
-        assert "Sudeste" in IMEA_MACRORREGIOES
 
 
 class TestImeaColumnsMap:

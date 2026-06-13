@@ -8,13 +8,10 @@ import pytest
 
 from agrobr.bcb.bigquery_client import (
     BQ_COLUMNS_MAP,
-    BQ_DATASET,
-    BQ_TABLE,
     _build_query,
     _check_basedosdados,
     _query_bigquery_sync,
     fetch_credito_rural_bigquery,
-    is_bigquery_available,
 )
 from agrobr.exceptions import SourceUnavailableError
 
@@ -223,24 +220,7 @@ class TestFetchCreditoRuralBigquery:
             await fetch_credito_rural_bigquery(finalidade="custeio")
 
 
-class TestIsBigqueryAvailable:
-    def test_available(self):
-        mock_bd = MagicMock()
-        with patch.dict("sys.modules", {"basedosdados": mock_bd}):
-            assert is_bigquery_available() is True
-
-    def test_not_available(self):
-        with patch.dict("sys.modules", {"basedosdados": None}):
-            assert is_bigquery_available() is False
-
-
 class TestConstants:
-    def test_dataset_name(self):
-        assert BQ_DATASET == "br_bcb_sicor"
-
-    def test_table_name(self):
-        assert BQ_TABLE == "microdados_operacao"
-
     def test_columns_map_has_essential_keys(self):
         assert "sigla_uf" in BQ_COLUMNS_MAP
         assert "nome_produto" in BQ_COLUMNS_MAP

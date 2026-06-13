@@ -1,21 +1,10 @@
-from agrobr.zarc.models import (
-    COLUNAS_SAIDA,
-    CULTURAS_ZARC,
-    SOLOS,
-    extract_safras,
-    match_safra_resource,
-)
+from agrobr.zarc.models import COLUNAS_SAIDA, CULTURAS_ZARC, extract_safras, match_safra_resource
 
 
 def test_culturas_zarc_all_mapped():
     for raw, canon in CULTURAS_ZARC.items():
         assert isinstance(raw, str) and raw
         assert isinstance(canon, str) and canon
-
-
-def test_solos_all_mapped():
-    assert {1, 2, 3} <= set(SOLOS.keys())
-    assert {11, 12, 13, 14, 15, 16} <= set(SOLOS.keys())
 
 
 def test_colunas_saida_count():

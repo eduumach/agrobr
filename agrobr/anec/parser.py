@@ -110,6 +110,10 @@ def _extract_pages_words(pdf_bytes: bytes) -> list[list[dict[str, Any]]]:
     return pages_words
 
 
+def _extract_pages_rows(pdf_bytes: bytes) -> _RowsByPage:
+    return [_group_by_row(words) for words in _extract_pages_words(pdf_bytes)]
+
+
 def _group_by_row(
     words: list[dict[str, Any]], y_tol: float = ROW_Y_TOL
 ) -> list[tuple[float, list[dict[str, Any]]]]:
@@ -174,10 +178,6 @@ def _row_text(row: list[dict[str, Any]]) -> str:
 
 
 _RowsByPage = list[list[tuple[float, list[dict[str, Any]]]]]
-
-
-def _extract_pages_rows(pdf_bytes: bytes) -> _RowsByPage:
-    return [_group_by_row(words) for words in _extract_pages_words(pdf_bytes)]
 
 
 def _find_page_with_header(pages_rows: _RowsByPage, header: str) -> int:
@@ -489,37 +489,6 @@ def _parse_monthly_shipments(words: list[dict[str, Any]]) -> pd.DataFrame:
     df["ano"] = df["ano"].astype("Int64")
     df["mes"] = df["mes"].astype("Int64")
     return df
-
-
-def _detect_monthly_columns(
-    header_row: list[dict[str, Any]],
-) -> list[tuple[str, float]]:
-    out: list[tuple[str, float]] = []
-    i = 0
-    while i < len(header_row):
-        w = header_row[i]
-        txt = w["text"].lower()
-        x_center = (w["x0"] + w.get("x1", w["x0"])) / 2
-
-        if txt in {"soybean", "soybeans"} and i + 1 < len(header_row):
-            next_txt = header_row[i + 1]["text"].lower()
-            if next_txt == "meal":
-                nx = header_row[i + 1]
-                xc = (w["x0"] + nx.get("x1", nx["x0"])) / 2
-                out.append(("soybean_meal", xc))
-                i += 2
-                continue
-            out.append(("soybean", x_center))
-        elif txt == "maize":
-            out.append(("maize", x_center))
-        elif txt == "wheat":
-            out.append(("wheat", x_center))
-        elif txt == "ddgs":
-            out.append(("ddgs", x_center))
-        elif txt == "sorghum":
-            out.append(("sorghum", x_center))
-        i += 1
-    return out
 
 
 _YOY_PRODUCT_TERMS = {

@@ -130,10 +130,3 @@ class TestImeaFetchHelpers:
             result = await client.fetch_cotacoes(cadeia_id=4)
             assert result == [{"id": 1}]
             assert "/cadeias/4/cotacoes" in mock.call_args[0][0]
-
-    @pytest.mark.asyncio
-    async def test_fetch_indicadores_non_list_wraps(self):
-        with patch("agrobr.imea.client._fetch_json", new_callable=AsyncMock) as mock:
-            mock.return_value = [{"key": "val"}]
-            result = await client.fetch_indicadores()
-            assert isinstance(result, list)

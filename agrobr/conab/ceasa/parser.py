@@ -74,22 +74,3 @@ def parse_precos(precos_json: dict[str, Any], ceasas_json: dict[str, Any]) -> pd
         return pd.DataFrame(columns=COLUNAS_SAIDA)
 
     return pd.DataFrame(records, columns=COLUNAS_SAIDA)
-
-
-def parse_lista_produtos(json_data: dict[str, Any]) -> list[str]:
-    produtos = []
-    for row in json_data.get("resultset", []):
-        nome = row[0]
-        if isinstance(nome, str):
-            produto, _ = parse_produto_unidade(nome)
-            produtos.append(produto)
-    return sorted(produtos)
-
-
-def parse_lista_ceasas(json_data: dict[str, Any]) -> list[dict[str, str]]:
-    result = []
-    for row in json_data.get("resultset", []):
-        name = row[1]
-        uf = parse_ceasa_uf(name)
-        result.append({"nome": name, "uf": uf or ""})
-    return sorted(result, key=lambda x: x["nome"])

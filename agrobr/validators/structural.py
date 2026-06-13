@@ -71,6 +71,60 @@ def validate_structure(
     )
 
 
+_SCORE_WEIGHTS = {
+    "structure": 0.25,
+    "table_classes": 0.20,
+    "key_ids": 0.15,
+    "table_headers": 0.30,
+    "element_counts": 0.10,
+}
+
+
+def _score_overlap(
+    current: list[Any],
+    reference: list[Any],
+) -> tuple[float, dict[str, list[Any]] | None]:
+    if not reference:
+        return 1.0, None
+    matches = sum(1 for item in reference if item in current)
+    score = matches / len(reference)
+    if score == 1.0:
+        return score, None
+    return score, {
+        "missing": [item for item in reference if item not in current],
+        "new": [item for item in current if item not in reference],
+    }
+
+
+def _score_headers(
+    current: list[list[str]],
+    reference: list[list[str]],
+) -> float:
+    best = 0.0
+    for ref_headers in reference:
+        for cur_headers in current:
+            ref_set = set(ref_headers)
+            cur_set = set(cur_headers)
+            if ref_set or cur_set:
+                jaccard = len(ref_set & cur_set) / len(ref_set | cur_set)
+                best = max(best, jaccard)
+    return best
+
+
+def _score_element_counts(
+    current: dict[str, int],
+    reference: dict[str, int],
+) -> tuple[float, dict[str, dict[str, int]]]:
+    diffs: dict[str, dict[str, int]] = {}
+    for key, ref_count in reference.items():
+        cur_count = current.get(key, 0)
+        if ref_count > 0 and abs(cur_count - ref_count) / ref_count > 0.5:
+            diffs[key] = {"reference": ref_count, "current": cur_count}
+    if diffs:
+        return max(0.0, 1 - len(diffs) * 0.2), diffs
+    return 1.0, diffs
+
+
 def compare_fingerprints(
     current: Fingerprint,
     reference: Fingerprint,
@@ -85,40 +139,18 @@ def compare_fingerprints(
             "reference": reference.structure_hash,
         }
 
-    if reference.table_classes:
-        matches = sum(1 for tc in current.table_classes if tc in reference.table_classes)
-        scores["table_classes"] = matches / len(reference.table_classes)
-        if scores["table_classes"] < 1.0:
-            details["table_classes_diff"] = {
-                "missing": [
-                    tc for tc in reference.table_classes if tc not in current.table_classes
-                ],
-                "new": [tc for tc in current.table_classes if tc not in reference.table_classes],
-            }
-    else:
-        scores["table_classes"] = 1.0
+    scores["table_classes"], tc_diff = _score_overlap(
+        current.table_classes, reference.table_classes
+    )
+    if tc_diff is not None:
+        details["table_classes_diff"] = tc_diff
 
-    if reference.key_ids:
-        matches = sum(1 for kid in reference.key_ids if kid in current.key_ids)
-        scores["key_ids"] = matches / len(reference.key_ids)
-        if scores["key_ids"] < 1.0:
-            details["key_ids_diff"] = {
-                "missing": [kid for kid in reference.key_ids if kid not in current.key_ids],
-                "new": [kid for kid in current.key_ids if kid not in reference.key_ids],
-            }
-    else:
-        scores["key_ids"] = 1.0
+    scores["key_ids"], kid_diff = _score_overlap(current.key_ids, reference.key_ids)
+    if kid_diff is not None:
+        details["key_ids_diff"] = kid_diff
 
     if reference.table_headers:
-        header_score = 0.0
-        for ref_headers in reference.table_headers:
-            for cur_headers in current.table_headers:
-                ref_set = set(ref_headers)
-                cur_set = set(cur_headers)
-                if ref_set or cur_set:
-                    jaccard = len(ref_set & cur_set) / len(ref_set | cur_set)
-                    header_score = max(header_score, jaccard)
-        scores["table_headers"] = header_score
+        scores["table_headers"] = _score_headers(current.table_headers, reference.table_headers)
         if scores["table_headers"] < 0.9:
             details["table_headers_diff"] = {
                 "reference": reference.table_headers,
@@ -127,30 +159,13 @@ def compare_fingerprints(
     else:
         scores["table_headers"] = 1.0
 
-    count_diffs: dict[str, dict[str, int]] = {}
-    for key in reference.element_counts:
-        ref_count = reference.element_counts.get(key, 0)
-        cur_count = current.element_counts.get(key, 0)
-        if ref_count > 0:
-            diff_ratio = abs(cur_count - ref_count) / ref_count
-            if diff_ratio > 0.5:
-                count_diffs[key] = {"reference": ref_count, "current": cur_count}
-
+    scores["element_counts"], count_diffs = _score_element_counts(
+        current.element_counts, reference.element_counts
+    )
     if count_diffs:
-        scores["element_counts"] = max(0, 1 - len(count_diffs) * 0.2)
         details["element_counts_diff"] = count_diffs
-    else:
-        scores["element_counts"] = 1.0
 
-    weights = {
-        "structure": 0.25,
-        "table_classes": 0.20,
-        "key_ids": 0.15,
-        "table_headers": 0.30,
-        "element_counts": 0.10,
-    }
-
-    final_score = sum(scores[k] * weights[k] for k in weights)
+    final_score = sum(scores[k] * _SCORE_WEIGHTS[k] for k in _SCORE_WEIGHTS)
 
     logger.debug(
         "fingerprint_comparison",
@@ -220,31 +235,3 @@ def validate_against_baseline(
         )
 
     return validate_structure(current, baseline)
-
-
-class StructuralMonitor:
-    def __init__(self, baselines_dir: str | Path = ".structures"):
-        self.baselines_dir = Path(baselines_dir)
-        self.history: list[StructuralValidationResult] = []
-
-    async def check(self, source: Fonte) -> StructuralValidationResult:
-        from ..cepea import client as cepea_client
-        from ..cepea.parsers.fingerprint import extract_fingerprint
-
-        fetch_result = await cepea_client.fetch_indicador_page("soja")
-        current = extract_fingerprint(fetch_result.html, source, "soja")
-
-        result = validate_against_baseline(current, self.baselines_dir)
-        self.history.append(result)
-
-        return result
-
-    async def check_all(self) -> list[StructuralValidationResult]:
-        import asyncio
-
-        sources = [Fonte.CEPEA]
-        results = await asyncio.gather(*[self.check(s) for s in sources])
-        return list(results)
-
-    def get_drift_history(self) -> list[StructuralValidationResult]:
-        return [r for r in self.history if not r.passed]

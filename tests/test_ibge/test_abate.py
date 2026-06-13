@@ -53,17 +53,6 @@ class TestEspeciesAbate:
         assert len(client.ESPECIES_ABATE) == 3
 
 
-class TestCategoriasAbate:
-    def test_ref_trimestre(self):
-        assert client.CATEGORIAS_ABATE["ref_trimestre"]["12716"] == "115236"
-
-    def test_tipo_rebanho_bovino(self):
-        assert client.CATEGORIAS_ABATE["tipo_rebanho_bovino"]["18"] == "992"
-
-    def test_tipo_inspecao(self):
-        assert client.CATEGORIAS_ABATE["tipo_inspecao"]["12529"] == "118225"
-
-
 class TestAbateValidation:
     async def test_especie_invalida(self):
         from agrobr.ibge.api import abate

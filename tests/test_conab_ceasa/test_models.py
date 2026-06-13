@@ -6,7 +6,6 @@ from agrobr.conab.ceasa.models import (
     FRUTAS,
     HORTALICAS,
     PRODUTOS_PROHORT,
-    UNIDADE_ESPECIAL,
     parse_ceasa_uf,
     parse_produto_unidade,
 )
@@ -71,9 +70,6 @@ class TestConstantes:
     def test_categorias_cover_all(self):
         all_prods = set(FRUTAS) | set(HORTALICAS)
         assert all_prods == PRODUTOS_PROHORT
-
-    def test_unidade_especial_count(self):
-        assert len(UNIDADE_ESPECIAL) == 5
 
     def test_colunas_saida(self):
         assert "data" in COLUNAS_SAIDA

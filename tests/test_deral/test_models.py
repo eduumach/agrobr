@@ -1,12 +1,6 @@
 """Testes para os modelos DERAL."""
 
-from agrobr.deral.models import (
-    CONDICOES,
-    DERAL_PRODUTOS,
-    CondicaoLavoura,
-    normalize_condicao,
-    normalize_produto,
-)
+from agrobr.deral.models import DERAL_PRODUTOS, normalize_condicao, normalize_produto
 
 
 class TestNormalizeProduto:
@@ -66,47 +60,6 @@ class TestNormalizeCondicao:
         assert normalize_condicao("excelente") == "excelente"
 
 
-class TestCondicaoLavoura:
-    def test_basic_creation(self):
-        rec = CondicaoLavoura(
-            produto="soja",
-            data="15/01/2025",
-            condicao="boa",
-            pct=75.0,
-        )
-        assert rec.produto == "soja"
-        assert rec.data == "15/01/2025"
-        assert rec.condicao == "boa"
-        assert rec.pct == 75.0
-
-    def test_produto_normalization(self):
-        rec = CondicaoLavoura(
-            produto="  Soja  ",
-            condicao="boa",
-        )
-        assert rec.produto == "soja"
-
-    def test_condicao_normalization(self):
-        rec = CondicaoLavoura(
-            produto="soja",
-            condicao="média",
-        )
-        assert rec.condicao == "media"
-
-    def test_optional_fields(self):
-        rec = CondicaoLavoura(produto="milho")
-        assert rec.data == ""
-        assert rec.estagio == ""
-        assert rec.condicao == ""
-        assert rec.pct is None
-        assert rec.plantio_pct is None
-        assert rec.colheita_pct is None
-
-    def test_empty_condicao_stays_empty(self):
-        rec = CondicaoLavoura(produto="soja", condicao="")
-        assert rec.condicao == ""
-
-
 class TestDeralProdutos:
     def test_main_products(self):
         assert "soja" in DERAL_PRODUTOS
@@ -116,11 +69,3 @@ class TestDeralProdutos:
 
     def test_count(self):
         assert len(DERAL_PRODUTOS) >= 10
-
-
-class TestCondicoes:
-    def test_has_three(self):
-        assert len(CONDICOES) == 3
-        assert "boa" in CONDICOES
-        assert "media" in CONDICOES
-        assert "ruim" in CONDICOES

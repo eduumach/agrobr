@@ -194,22 +194,6 @@ async def download_xlsx(url: str) -> BytesIO:
             await browser.close()
 
 
-async def fetch_latest_safra_xlsx() -> tuple[BytesIO, dict[str, Any]]:
-    levantamentos = await list_levantamentos()
-
-    if not levantamentos:
-        raise SourceUnavailableError(
-            source="conab",
-            url=constants.URLS[constants.Fonte.CONAB]["boletim_graos"],
-            last_error="No levantamentos found",
-        )
-
-    latest = levantamentos[0]
-    xlsx = await download_xlsx(latest["url"])
-
-    return xlsx, latest
-
-
 async def fetch_safra_xlsx(
     safra: str | None = None,
     levantamento: int | None = None,

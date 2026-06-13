@@ -10,7 +10,6 @@ from agrobr.anda.models import ANDA_UFS, normalize_fertilizante
 from agrobr.exceptions import ParseError
 from agrobr.normalize.dates import month_to_number
 from agrobr.normalize.numeric import safe_float
-from agrobr.utils.io import read_excel_safe
 
 logger = structlog.get_logger()
 
@@ -370,35 +369,6 @@ def parse_entregas_pdf(
         ufs=sorted(df["uf"].unique().tolist()),
     )
 
-    return df
-
-
-def parse_entregas_excel(
-    excel_bytes: bytes,
-    ano: int,
-    produto: str = "total",
-) -> pd.DataFrame:
-    df_raw = read_excel_safe(
-        excel_bytes,
-        source="anda",
-        parser_version=PARSER_VERSION,
-        label="Excel entregas",
-        header=None,
-    )
-
-    table = df_raw.fillna("").astype(str).values.tolist()
-
-    records = parse_entregas_table(table, ano, produto)
-
-    if not records:
-        raise ParseError(
-            source="anda",
-            parser_version=PARSER_VERSION,
-            reason="Nenhum registro válido extraído do Excel",
-        )
-
-    df = pd.DataFrame(records)
-    df = df.sort_values(["mes", "uf"]).reset_index(drop=True)
     return df
 
 

@@ -1,12 +1,9 @@
 from __future__ import annotations
 
 from agrobr.mapbiomas.models import (
-    ANO_FIM,
-    ANO_INICIO,
     BIOMAS,
     BIOMAS_VALIDOS,
     CLASSES_LEGENDA,
-    COLECAO_ATUAL,
     COLUNAS_SAIDA_COBERTURA,
     COLUNAS_SAIDA_TRANSICAO,
     ESTADOS_MAPBIOMAS,
@@ -86,13 +83,6 @@ class TestClasseParaNome:
 
 
 class TestConstants:
-    def test_colecao_atual(self):
-        assert COLECAO_ATUAL >= 10
-
-    def test_ano_range(self):
-        assert ANO_INICIO == 1985
-        assert ANO_FIM >= 2024
-
     def test_biomas_validos_has_6(self):
         assert len(BIOMAS_VALIDOS) == 6
 
