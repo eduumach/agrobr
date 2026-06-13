@@ -23,6 +23,7 @@ dist/
 .coverage
 coverage*.json
 htmlcov/
+.pytest
 
 # Runtime & temporary
 *.duckdb
