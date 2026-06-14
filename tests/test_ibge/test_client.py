@@ -102,22 +102,6 @@ class TestTabelas:
         assert client.TABELAS["pam_temporarias"] == "1612"
 
 
-class TestNiveisTerritoriais:
-    """Testes dos niveis territoriais."""
-
-    def test_nivel_brasil(self):
-        """Testa codigo do nivel Brasil."""
-        assert client.NIVEIS_TERRITORIAIS["brasil"] == "1"
-
-    def test_nivel_uf(self):
-        """Testa codigo do nivel UF."""
-        assert client.NIVEIS_TERRITORIAIS["uf"] == "3"
-
-    def test_nivel_municipio(self):
-        """Testa codigo do nivel municipio."""
-        assert client.NIVEIS_TERRITORIAIS["municipio"] == "6"
-
-
 class TestUfCodes:
     """Testes das funcoes de codigo de UF."""
 

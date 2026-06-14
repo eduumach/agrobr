@@ -50,19 +50,8 @@ COLUNAS_IMOVEIS = [
 ]
 
 STATUS_VALIDOS = frozenset({"AT", "PE", "SU", "CA"})
-STATUS_LABELS = {
-    "AT": "Ativo",
-    "PE": "Pendente",
-    "SU": "Suspenso",
-    "CA": "Cancelado",
-}
 
 TIPO_VALIDOS = frozenset({"IRU", "AST", "PCT"})
-TIPO_LABELS = {
-    "IRU": "Rural",
-    "AST": "Assentamento",
-    "PCT": "Terra Indigena",
-}
 
 # dat_criacao tem cobertura nacional, mas o campo data_atualizacao nao existe
 # nestes layers estaduais (causa "400 Bad Request" / ServiceException no WFS).

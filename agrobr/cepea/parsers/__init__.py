@@ -6,7 +6,6 @@ from agrobr.cepea.parsers.base import BaseParser
 from agrobr.cepea.parsers.consensus import (
     ConsensusResult,
     ConsensusValidator,
-    ParserDivergence,
     analyze_consensus,
     parse_with_consensus,
     select_best_result,
@@ -30,7 +29,6 @@ __all__ = [
     "save_baseline_fingerprint",
     "ConsensusResult",
     "ConsensusValidator",
-    "ParserDivergence",
     "parse_with_consensus",
     "analyze_consensus",
     "select_best_result",

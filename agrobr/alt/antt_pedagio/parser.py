@@ -56,7 +56,7 @@ def _has_header(text: str) -> bool:
     return "concessionaria" in first_line or "praca" in first_line
 
 
-def parse_trafego_v1(content: bytes) -> pd.DataFrame:
+def _read_trafego_v1_csv(content: bytes) -> pd.DataFrame:
     encoding = detect_encoding_chain(content)
     try:
         text = content.decode(encoding)
@@ -90,7 +90,10 @@ def parse_trafego_v1(content: bytes) -> pd.DataFrame:
         )
 
     df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
+    return df
 
+
+def _derive_trafego_v1_columns(df: pd.DataFrame) -> pd.DataFrame:
     if "mes_ano" in df.columns:
         df["data"] = df["mes_ano"].apply(_parse_date_v1)
     elif "data" not in df.columns:
@@ -109,30 +112,19 @@ def parse_trafego_v1(content: bytes) -> pd.DataFrame:
         df["n_eixos"] = None
         df["tipo_veiculo"] = None
 
-    vol_col = None
-    for candidate in ("quantidade", "volume", "qtd"):
-        if candidate in df.columns:
-            vol_col = candidate
-            break
+    vol_col = _first_present(df, ("quantidade", "volume", "qtd"))
     if vol_col:
         df["volume"] = df[vol_col].apply(parse_numeric_br).fillna(0).astype(int)
     else:
         df["volume"] = 0
 
-    for col in ("concessionaria", "praca", "sentido"):
-        if col in df.columns:
-            df[col] = df[col].str.strip()
+    return df
 
-    group_cols = ["data", "concessionaria", "praca", "sentido", "n_eixos", "tipo_veiculo"]
-    present_group = [c for c in group_cols if c in df.columns]
-    if present_group and "volume" in df.columns:
-        df = df.groupby(present_group, dropna=False)["volume"].sum().reset_index()
 
-    for col in ("concessionaria", "praca", "sentido"):
-        if col not in df.columns:
-            df[col] = None
-
-    df = df.dropna(subset=["data"])
+def parse_trafego_v1(content: bytes) -> pd.DataFrame:
+    df = _read_trafego_v1_csv(content)
+    df = _derive_trafego_v1_columns(df)
+    df = _aggregate_trafego(df)
 
     logger.debug(
         "antt_pedagio_parse_v1_ok",
@@ -142,7 +134,14 @@ def parse_trafego_v1(content: bytes) -> pd.DataFrame:
     return df
 
 
-def parse_trafego_v2(content: bytes) -> pd.DataFrame:
+def _first_present(df: pd.DataFrame, candidates: tuple[str, ...]) -> str | None:
+    for candidate in candidates:
+        if candidate in df.columns:
+            return candidate
+    return None
+
+
+def _read_trafego_v2_csv(content: bytes) -> pd.DataFrame:
     encoding = detect_encoding_chain(content)
     try:
         text = content.decode(encoding)
@@ -153,10 +152,8 @@ def parse_trafego_v2(content: bytes) -> pd.DataFrame:
             reason=f"Erro de encoding ({encoding}): {e}",
         ) from e
 
-    has_hdr = _has_header(text)
-
     try:
-        if has_hdr:
+        if _has_header(text):
             df = pd.read_csv(
                 io.StringIO(text),
                 sep=";",
@@ -189,11 +186,11 @@ def parse_trafego_v2(content: bytes) -> pd.DataFrame:
             reason="CSV V2 vazio",
         )
 
-    date_col = None
-    for candidate in ("mes_ano", "data"):
-        if candidate in df.columns:
-            date_col = candidate
-            break
+    return df
+
+
+def _derive_trafego_v2_columns(df: pd.DataFrame) -> pd.DataFrame:
+    date_col = _first_present(df, ("mes_ano", "data"))
     if date_col:
         df["data"] = df[date_col].apply(_parse_date_v2)
     else:
@@ -203,19 +200,11 @@ def parse_trafego_v2(content: bytes) -> pd.DataFrame:
             reason=f"Coluna de data nao encontrada. Colunas: {list(df.columns)}",
         )
 
-    eixo_col = None
-    for candidate in ("categoria_eixo", "eixo", "n_eixos"):
-        if candidate in df.columns:
-            eixo_col = candidate
-            break
+    eixo_col = _first_present(df, ("categoria_eixo", "eixo", "n_eixos"))
     if eixo_col:
         df["n_eixos"] = pd.to_numeric(df[eixo_col], errors="coerce").astype("Int64")
 
-    tipo_col = None
-    for candidate in ("tipo_de_veiculo", "tipo_veiculo"):
-        if candidate in df.columns:
-            tipo_col = candidate
-            break
+    tipo_col = _first_present(df, ("tipo_de_veiculo", "tipo_veiculo"))
     if tipo_col:
         df["tipo_veiculo"] = df[tipo_col].str.strip()
     elif eixo_col:
@@ -224,16 +213,16 @@ def parse_trafego_v2(content: bytes) -> pd.DataFrame:
         df["n_eixos"] = None
         df["tipo_veiculo"] = None
 
-    vol_col = None
-    for candidate in ("volume_total", "quantidade", "volume", "qtd"):
-        if candidate in df.columns:
-            vol_col = candidate
-            break
+    vol_col = _first_present(df, ("volume_total", "quantidade", "volume", "qtd"))
     if vol_col:
         df["volume"] = df[vol_col].apply(parse_numeric_br).fillna(0).astype(int)
     else:
         df["volume"] = 0
 
+    return df
+
+
+def _aggregate_trafego(df: pd.DataFrame) -> pd.DataFrame:
     for col in ("concessionaria", "praca", "sentido"):
         if col in df.columns:
             df[col] = df[col].str.strip()
@@ -247,7 +236,13 @@ def parse_trafego_v2(content: bytes) -> pd.DataFrame:
         if col not in df.columns:
             df[col] = None
 
-    df = df.dropna(subset=["data"])
+    return df.dropna(subset=["data"])
+
+
+def parse_trafego_v2(content: bytes) -> pd.DataFrame:
+    df = _read_trafego_v2_csv(content)
+    df = _derive_trafego_v2_columns(df)
+    df = _aggregate_trafego(df)
 
     logger.debug(
         "antt_pedagio_parse_v2_ok",
@@ -263,7 +258,7 @@ def parse_trafego(content: bytes, ano: int) -> pd.DataFrame:
     return parse_trafego_v1(content)
 
 
-def parse_pracas(content: bytes) -> pd.DataFrame:
+def _read_pracas_csv(content: bytes) -> pd.DataFrame:
     encoding = detect_encoding_chain(content)
     try:
         text = content.decode(encoding)
@@ -301,6 +296,10 @@ def parse_pracas(content: bytes) -> pd.DataFrame:
             reason="CSV de pracas vazio",
         )
 
+    return df
+
+
+def _normalize_pracas(df: pd.DataFrame) -> pd.DataFrame:
     df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
 
     for col in ("concessionaria", "praca_de_pedagio", "rodovia", "uf", "municipio", "situacao"):
@@ -317,6 +316,13 @@ def parse_pracas(content: bytes) -> pd.DataFrame:
         if col in df.columns:
             df[col] = df[col].apply(parse_numeric_br)
 
+    return df
+
+
+def parse_pracas(content: bytes) -> pd.DataFrame:
+    df = _read_pracas_csv(content)
+    df = _normalize_pracas(df)
+
     logger.debug(
         "antt_pedagio_parse_pracas_ok",
         records=len(df),
@@ -326,46 +332,22 @@ def parse_pracas(content: bytes) -> pd.DataFrame:
     return df
 
 
-def join_fluxo_pracas(
-    df_fluxo: pd.DataFrame,
-    df_pracas: pd.DataFrame,
-) -> pd.DataFrame:
-    if df_pracas.empty or df_fluxo.empty:
-        for col in ("rodovia", "uf", "municipio"):
-            if col not in df_fluxo.columns:
-                df_fluxo[col] = None
-        return df_fluxo
+def _fill_enrich_defaults(df: pd.DataFrame) -> pd.DataFrame:
+    for col in ("rodovia", "uf", "municipio"):
+        if col not in df.columns:
+            df[col] = None
+    return df
 
-    pracas = df_pracas.copy()
 
-    if "concessionaria" in pracas.columns:
-        pracas["_join_conc"] = pracas["concessionaria"].str.strip().str.upper()
-    else:
-        pracas["_join_conc"] = ""
+def _with_join_keys(df: pd.DataFrame, praca_col: str) -> pd.DataFrame:
+    df["_join_conc"] = (
+        df["concessionaria"].str.strip().str.upper() if "concessionaria" in df.columns else ""
+    )
+    df["_join_praca"] = df[praca_col].str.strip().str.upper() if praca_col in df.columns else ""
+    return df
 
-    praca_col = "praca_de_pedagio" if "praca_de_pedagio" in pracas.columns else "praca"
-    if praca_col in pracas.columns:
-        pracas["_join_praca"] = pracas[praca_col].str.strip().str.upper()
-    else:
-        pracas["_join_praca"] = ""
 
-    join_cols = ["_join_conc", "_join_praca"]
-    enrich_cols = ["rodovia", "uf", "municipio"]
-    available = [c for c in enrich_cols if c in pracas.columns]
-    pracas_slim = pracas[join_cols + available].drop_duplicates(subset=join_cols)
-
-    fluxo = df_fluxo.copy()
-    if "concessionaria" in fluxo.columns:
-        fluxo["_join_conc"] = fluxo["concessionaria"].str.strip().str.upper()
-    else:
-        fluxo["_join_conc"] = ""
-    if "praca" in fluxo.columns:
-        fluxo["_join_praca"] = fluxo["praca"].str.strip().str.upper()
-    else:
-        fluxo["_join_praca"] = ""
-
-    merged = fluxo.merge(pracas_slim, on=join_cols, how="left", suffixes=("", "_pracas"))
-
+def _merge_enrichment(merged: pd.DataFrame, enrich_cols: list[str]) -> pd.DataFrame:
     for col in enrich_cols:
         pracas_col = f"{col}_pracas"
         if pracas_col in merged.columns:
@@ -376,7 +358,28 @@ def join_fluxo_pracas(
             merged = merged.drop(columns=[pracas_col])
         elif col not in merged.columns:
             merged[col] = None
+    return merged
 
+
+def join_fluxo_pracas(
+    df_fluxo: pd.DataFrame,
+    df_pracas: pd.DataFrame,
+) -> pd.DataFrame:
+    if df_pracas.empty or df_fluxo.empty:
+        return _fill_enrich_defaults(df_fluxo)
+
+    praca_col = "praca_de_pedagio" if "praca_de_pedagio" in df_pracas.columns else "praca"
+    pracas = _with_join_keys(df_pracas.copy(), praca_col)
+
+    join_cols = ["_join_conc", "_join_praca"]
+    enrich_cols = ["rodovia", "uf", "municipio"]
+    available = [c for c in enrich_cols if c in pracas.columns]
+    pracas_slim = pracas[join_cols + available].drop_duplicates(subset=join_cols)
+
+    fluxo = _with_join_keys(df_fluxo.copy(), "praca")
+
+    merged = fluxo.merge(pracas_slim, on=join_cols, how="left", suffixes=("", "_pracas"))
+    merged = _merge_enrichment(merged, enrich_cols)
     merged = merged.drop(columns=["_join_conc", "_join_praca"], errors="ignore")
 
     final_cols = [c for c in COLUNAS_FLUXO if c in merged.columns]

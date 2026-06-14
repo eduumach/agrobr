@@ -111,7 +111,7 @@ df = bcb.credito_rural("soja", safra="2024/25", programa="Pronamp")
 
 ## Fallback
 
-Quando a API OData do BCB falha, o agrobr usa automaticamente BigQuery (Base dos Dados) como fallback. Requer `pip install agrobr[bigquery]`.
+Quando a API OData do BCB falha, o agrobr usa automaticamente BigQuery (Base dos Dados) como fallback. Requer `pip install agrobr[bigquery]` e um projeto GCP para billing: defina `AGROBR_BQ_BILLING_PROJECT=<project-id>` ou configure `billing_project_id` no basedosdados (`~/.basedosdados/config.toml`).
 
 ## Notas
 

@@ -1,110 +1,96 @@
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, patch
+import io
+import zipfile
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 from agrobr.exceptions import SourceUnavailableError
-from agrobr.ibama.client import (
-    _build_cql,
-    fetch_embargos,
-    fetch_embargos_geo,
-)
+from agrobr.ibama import client
+from agrobr.ibama.models import MIN_CSV_BYTES
 
 
-class TestBuildCql:
-    def test_uf_filter(self):
-        assert _build_cql(uf="MT") == "sig_uf='MT'"
+def _make_zip(files: dict[str, bytes]) -> bytes:
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_STORED) as zf:
+        for name, data in files.items():
+            zf.writestr(name, data)
+    return buf.getvalue()
 
-    def test_none_returns_none(self):
-        assert _build_cql() is None
+
+def _mock_response(content: bytes) -> MagicMock:
+    resp = MagicMock()
+    resp.status_code = 200
+    resp.content = content
+    resp.raise_for_status = MagicMock()
+    return resp
 
 
-class TestFetchEmbargos:
+class TestFetchEmbargosZip:
     @pytest.mark.asyncio
-    async def test_paginated_fetch(self):
-        hits_xml = b'<?xml version="1.0"?><wfs:FeatureCollection numberMatched="15000" numberReturned="0"/>'
-        page_content = b"x" * 100
-
-        call_count = 0
-
-        async def mock_fetch_wfs(url, **_kwargs):
-            nonlocal call_count
-            call_count += 1
-            if "resultType=hits" in url:
-                return hits_xml
-            return page_content
-
-        with patch("agrobr.utils.geo.fetch_wfs", side_effect=mock_fetch_wfs):
-            pages, base_url = await fetch_embargos()
-
-        assert len(pages) == 2
-        assert call_count == 3
-
-    @pytest.mark.asyncio
-    async def test_zero_hits_returns_empty(self):
-        hits_xml = (
-            b'<?xml version="1.0"?><wfs:FeatureCollection numberMatched="0" numberReturned="0"/>'
-        )
+    async def test_extrai_csv_do_zip(self):
+        csv_data = b"x" * (MIN_CSV_BYTES + 10)
+        zip_bytes = _make_zip({"termo_embargo.csv": csv_data})
 
         with patch(
-            "agrobr.utils.geo.fetch_wfs",
+            "agrobr.ibama.client.retry_on_status",
             new_callable=AsyncMock,
-            return_value=hits_xml,
+            return_value=_mock_response(zip_bytes),
         ):
-            pages, url = await fetch_embargos()
+            content, url = await client.fetch_embargos_zip()
 
-        assert pages == []
+        assert content == csv_data
+        assert "dadosabertos.ibama.gov.br" in url
 
     @pytest.mark.asyncio
-    async def test_404_raises(self):
+    async def test_zip_pequeno_raises(self):
         with (
             patch(
-                "agrobr.utils.geo.fetch_wfs",
+                "agrobr.ibama.client.retry_on_status",
                 new_callable=AsyncMock,
-                side_effect=SourceUnavailableError(
-                    source="ibama", url="test", last_error="HTTP 404"
-                ),
+                return_value=_mock_response(b"x" * 10),
             ),
-            pytest.raises(SourceUnavailableError),
+            pytest.raises(SourceUnavailableError, match="too small"),
         ):
-            await fetch_embargos()
-
-
-class TestFetchEmbargosGeo:
-    @pytest.mark.asyncio
-    async def test_output_format_json(self):
-        with patch(
-            "agrobr.ibama.client.fetch_wfs", new_callable=AsyncMock, return_value=b"x" * 100
-        ):
-            _, url = await fetch_embargos_geo()
-
-        assert "outputFormat=application" in url
+            await client.fetch_embargos_zip()
 
     @pytest.mark.asyncio
-    async def test_geom_column_in_url(self):
-        with patch(
-            "agrobr.ibama.client.fetch_wfs", new_callable=AsyncMock, return_value=b"x" * 100
+    async def test_resposta_nao_zip_raises(self):
+        with (
+            patch(
+                "agrobr.ibama.client.retry_on_status",
+                new_callable=AsyncMock,
+                return_value=_mock_response(b"<html>erro</html>" * 100),
+            ),
+            pytest.raises(SourceUnavailableError, match="ZIP válido"),
         ):
-            _, url = await fetch_embargos_geo()
-
-        assert "propertyName=geom," in url
+            await client.fetch_embargos_zip()
 
     @pytest.mark.asyncio
-    async def test_no_cql_in_geo_url(self):
-        with patch(
-            "agrobr.ibama.client.fetch_wfs", new_callable=AsyncMock, return_value=b"x" * 100
-        ):
-            _, url = await fetch_embargos_geo()
+    async def test_zip_sem_csv_raises(self):
+        zip_bytes = _make_zip({"leiame.txt": b"sem csv aqui" * 100})
 
-        assert "CQL_FILTER" not in url
+        with (
+            patch(
+                "agrobr.ibama.client.retry_on_status",
+                new_callable=AsyncMock,
+                return_value=_mock_response(zip_bytes),
+            ),
+            pytest.raises(SourceUnavailableError, match="não contém arquivo CSV"),
+        ):
+            await client.fetch_embargos_zip()
 
     @pytest.mark.asyncio
-    async def test_bbox_only_no_cql(self):
-        with patch(
-            "agrobr.ibama.client.fetch_wfs", new_callable=AsyncMock, return_value=b"x" * 100
-        ):
-            _, url = await fetch_embargos_geo(bbox=(-60.0, -15.0, -50.0, -10.0))
+    async def test_csv_truncado_raises(self):
+        zip_bytes = _make_zip({"termo_embargo.csv": b"SEQ_TAD;UF\n" + b"1;PA\n" * 200})
 
-        assert "BBOX=" in url
-        assert "CQL_FILTER" not in url
+        with (
+            patch(
+                "agrobr.ibama.client.retry_on_status",
+                new_callable=AsyncMock,
+                return_value=_mock_response(zip_bytes),
+            ),
+            pytest.raises(SourceUnavailableError, match="truncamento"),
+        ):
+            await client.fetch_embargos_zip()

@@ -26,6 +26,7 @@ from agrobr.datasets.movimentacao_portuaria import movimentacao_portuaria
 from agrobr.datasets.oferta_demanda_global import oferta_demanda_global
 from agrobr.datasets.pecuaria_municipal import pecuaria_municipal
 from agrobr.datasets.pib_agro import pib_agro
+from agrobr.datasets.posicionamento_fundos import posicionamento_fundos
 from agrobr.datasets.preco_atacado import preco_atacado
 from agrobr.datasets.preco_diario import preco_diario
 from agrobr.datasets.producao_anual import producao_anual
@@ -80,6 +81,7 @@ __all__ = [
     "oferta_demanda_global",
     "pecuaria_municipal",
     "pib_agro",
+    "posicionamento_fundos",
     "preco_atacado",
     "preco_diario",
     "producao_anual",

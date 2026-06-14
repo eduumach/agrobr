@@ -4,11 +4,7 @@ from agrobr.normalize.regions import BIOMAS as BIOMAS  # noqa: F401
 from agrobr.normalize.regions import BIOMAS_VALIDOS as BIOMAS_VALIDOS  # noqa: F401
 from agrobr.normalize.regions import normalizar_bioma as normalizar_bioma  # noqa: F401
 
-COLECAO_ATUAL = 10
-
 ANO_INICIO = 1985
-ANO_FIM = 2024
-
 CLASSES_LEGENDA: dict[int, str] = {
     1: "Floresta",
     3: "Formação Florestal",
@@ -50,24 +46,8 @@ CLASSES_LEGENDA: dict[int, str] = {
     75: "Não definido",
 }
 
-CLASSES_LEVEL_0: dict[str, str] = {
-    "Natural": "Natural",
-    "Antropic": "Antrópico",
-    "Natural/Antropic": "Natural/Antrópico",
-    "Undefined": "Indefinido",
-}
-
-NIVEIS_COLUNA: dict[int, str] = {
-    0: "class_level_0",
-    1: "class_level_1",
-    2: "class_level_2",
-    3: "class_level_3",
-    4: "class_level_4",
-}
-
 SHEET_COBERTURA = "COVERAGE_10"
 SHEET_TRANSICAO = "TRANSITION_10"
-SHEET_LEGENDA = "LEGEND_CODE"
 
 COLUNAS_SAIDA_COBERTURA = [
     "bioma",

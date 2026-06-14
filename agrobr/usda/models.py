@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, field_validator
-
 PSD_COMMODITIES: dict[str, str] = {
     "soja": "2222000",
     "soybeans": "2222000",
@@ -103,29 +101,3 @@ def resolve_country_code(nome: str) -> str:
 
 def commodity_name(code: str) -> str:
     return _COMMODITY_NAMES.get(code, code)
-
-
-class PSDRecord(BaseModel):
-    commodity_code: str
-    commodity: str
-    country_code: str
-    country: str
-    market_year: int
-    attribute: str
-    value: float | None = None
-    unit: str = ""
-
-    @field_validator("commodity", mode="before")
-    @classmethod
-    def normalize_commodity(cls, v: str) -> str:
-        return v.strip().lower()
-
-    @field_validator("country", mode="before")
-    @classmethod
-    def normalize_country(cls, v: str) -> str:
-        return v.strip()
-
-    @field_validator("attribute", mode="before")
-    @classmethod
-    def normalize_attribute(cls, v: str) -> str:
-        return v.strip().lower()

@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import io
 from typing import Any
 
 import pandas as pd
 import structlog
 
 from agrobr.exceptions import ParseError
+from agrobr.normalize.regions import remover_acentos
 
 logger = structlog.get_logger()
 
@@ -88,6 +90,93 @@ def parse_observacoes(dados: list[dict[str, Any]]) -> pd.DataFrame:
         estacoes=df["estacao"].nunique() if "estacao" in df.columns else 0,
     )
 
+    return df
+
+
+HISTORICO_COLUNA_PREFIXOS: dict[str, str] = {
+    "precipitacao total": "precipitacao_mm",
+    "pressao atmosferica ao nivel": "pressao_hpa",
+    "radiacao global": "radiacao_kj_m2",
+    "temperatura do ar": "temperatura",
+    "temperatura do ponto de orvalho": "ponto_orvalho",
+    "temperatura maxima na hora": "temperatura_max",
+    "temperatura minima na hora": "temperatura_min",
+    "umidade relativa do ar": "umidade",
+    "umidade rel. max": "umidade_max",
+    "umidade rel. min": "umidade_min",
+    "vento, direcao": "vento_dir",
+    "vento, rajada": "vento_rajada_ms",
+    "vento, velocidade": "vento_ms",
+}
+
+
+def _mapear_header_historico(header: list[str]) -> dict[str, str]:
+    rename: dict[str, str] = {}
+    for col in header:
+        norm = remover_acentos(col).strip().lower()
+        if norm == "data" or norm.startswith("data ("):
+            rename[col] = "data"
+        elif norm.startswith("hora"):
+            rename[col] = "hora_utc"
+        else:
+            for prefixo, destino in HISTORICO_COLUNA_PREFIXOS.items():
+                if norm.startswith(prefixo):
+                    rename[col] = destino
+                    break
+    return rename
+
+
+def parse_historico_csv(raw: bytes, codigo: str) -> pd.DataFrame:
+    """CSV anual do dadoshistoricos: 8 linhas de metadados, header com nomes
+    longos que variam entre anos (matching por prefixo normalizado), latin-1
+    e vírgula decimal. Saída no mesmo schema de `parse_observacoes`."""
+    texto = raw.decode("latin-1")
+    linhas = texto.splitlines()
+    if len(linhas) < 10:
+        raise ParseError(
+            source="inmet",
+            parser_version=PARSER_VERSION,
+            reason=f"CSV histórico truncado ({len(linhas)} linhas)",
+        )
+
+    meta: dict[str, str] = {}
+    for linha in linhas[:8]:
+        chave, _, valor = linha.partition(";")
+        meta[remover_acentos(chave).strip().rstrip(":").lower()] = valor.strip()
+
+    header = linhas[8].split(";")
+    rename = _mapear_header_historico(header)
+    obrigatorias = {"data", "hora_utc", "precipitacao_mm"}
+    if not obrigatorias.issubset(rename.values()):
+        raise ParseError(
+            source="inmet",
+            parser_version=PARSER_VERSION,
+            reason=f"Header do CSV histórico não reconhecido: {header[:4]}",
+        )
+
+    df = pd.read_csv(io.StringIO("\n".join(linhas[8:])), sep=";", dtype=str)
+    df = df.rename(columns=rename)
+    df = df[[c for c in df.columns if c in rename.values()]]
+
+    df["data"] = pd.to_datetime(
+        df["data"].str.replace("/", "-", regex=False), format="%Y-%m-%d", errors="coerce"
+    )
+    df["hora_utc"] = (
+        df["hora_utc"].str.replace(" UTC", "", regex=False).str.replace(":", "", regex=False)
+    )
+    df["estacao"] = codigo.strip().upper()
+    df["uf"] = meta.get("uf", "")
+
+    for col in COLUNAS_NUMERICAS:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col].str.replace(",", ".", regex=False), errors="coerce")
+            df.loc[df[col] == SENTINEL, col] = pd.NA
+
+    df = df.dropna(subset=["data"])
+    ordem = [c for c in COLUNAS_HORARIAS.values() if c in df.columns]
+    df = df[ordem].sort_values(["data", "hora_utc"]).reset_index(drop=True)
+
+    logger.debug("inmet_historico_parse_ok", estacao=codigo, records=len(df))
     return df
 
 

@@ -26,18 +26,7 @@ def _check_pdfplumber() -> Any:
         ) from None
 
 
-def parse_empregadores(data: bytes) -> pd.DataFrame:
-    pdfplumber = _check_pdfplumber()
-
-    try:
-        pdf = pdfplumber.open(io.BytesIO(data))
-    except Exception as e:
-        raise ParseError(
-            source="lista_suja",
-            parser_version=PARSER_VERSION,
-            reason=f"Erro ao abrir PDF: {e}",
-        ) from e
-
+def _extract_table_rows(pdf: Any) -> tuple[list[str] | None, list[list[str]]]:
     header: list[str] | None = None
     all_rows: list[list[str]] = []
 
@@ -54,11 +43,10 @@ def parse_empregadores(data: bytes) -> pd.DataFrame:
             if header and len(row) == len(header):
                 all_rows.append(row)
 
-    pdf.close()
+    return header, all_rows
 
-    if not header or not all_rows:
-        return pd.DataFrame(columns=COLUNAS_SAIDA)
 
+def _build_dataframe(header: list[str], all_rows: list[list[str]]) -> pd.DataFrame:
     df = pd.DataFrame(all_rows, columns=header)
 
     rename_found = {k: v for k, v in RENAME_MAP.items() if k in df.columns}
@@ -83,7 +71,27 @@ def parse_empregadores(data: bytes) -> pd.DataFrame:
         df["uf"] = df["uf"].fillna("").str.strip().str.upper()
 
     output_cols = [c for c in COLUNAS_SAIDA if c in df.columns]
-    df = df[output_cols].reset_index(drop=True)
+    return df[output_cols].reset_index(drop=True)
 
+
+def parse_empregadores(data: bytes) -> pd.DataFrame:
+    pdfplumber = _check_pdfplumber()
+
+    try:
+        pdf = pdfplumber.open(io.BytesIO(data))
+    except Exception as e:
+        raise ParseError(
+            source="lista_suja",
+            parser_version=PARSER_VERSION,
+            reason=f"Erro ao abrir PDF: {e}",
+        ) from e
+
+    header, all_rows = _extract_table_rows(pdf)
+    pdf.close()
+
+    if not header or not all_rows:
+        return pd.DataFrame(columns=COLUNAS_SAIDA)
+
+    df = _build_dataframe(header, all_rows)
     logger.info("lista_suja_parse_ok", records=len(df))
     return df

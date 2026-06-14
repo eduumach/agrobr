@@ -6,8 +6,6 @@ import pytest
 
 from agrobr.alt.anp_diesel.models import (
     AGREGACOES_VALIDAS,
-    MENSAL_BRASIL_URL,
-    MENSAL_ESTADOS_URL,
     NIVEIS_VALIDOS,
     NIVEL_BRASIL,
     NIVEL_MUNICIPIO,
@@ -19,8 +17,6 @@ from agrobr.alt.anp_diesel.models import (
     SHLP_BASE,
     UFS_VALIDAS,
     VENDAS_DIESEL_CSV_URL,
-    PrecoDiesel,
-    VendaDiesel,
     _resolve_periodo_municipio,
 )
 
@@ -52,10 +48,6 @@ class TestConstantes:
 
     def test_precos_brasil_url_xlsx(self):
         assert PRECOS_BRASIL_URL.endswith(".xlsx")
-
-    def test_mensal_urls_xlsx(self):
-        assert MENSAL_ESTADOS_URL.endswith(".xlsx")
-        assert MENSAL_BRASIL_URL.endswith(".xlsx")
 
     def test_produtos_diesel_contem_s10(self):
         assert "DIESEL S10" in PRODUTOS_DIESEL
@@ -102,108 +94,3 @@ class TestResolvePeriodoMunicipio:
 
     def test_ano_futuro_retorna_none(self):
         assert _resolve_periodo_municipio(2030) is None
-
-
-class TestPrecoDiesel:
-    def test_criacao_basica(self):
-        p = PrecoDiesel(
-            data="2024-01-15",
-            uf="SP",
-            municipio="SAO PAULO",
-            produto="DIESEL S10",
-            preco_venda=6.45,
-            preco_compra=5.80,
-            margem=0.65,
-            n_postos=150,
-        )
-        assert p.preco_venda == 6.45
-        assert p.n_postos == 150
-
-    def test_sentinel_vazio_preco(self):
-        p = PrecoDiesel(
-            data="2024-01-15",
-            produto="DIESEL S10",
-            preco_venda="",
-            preco_compra="-",
-        )
-        assert p.preco_venda is None
-        assert p.preco_compra is None
-
-    def test_sentinel_vazio_n_postos(self):
-        p = PrecoDiesel(
-            data="2024-01-15",
-            produto="DIESEL",
-            n_postos="",
-        )
-        assert p.n_postos is None
-
-    def test_conversao_string_para_float(self):
-        p = PrecoDiesel(
-            data="2024-01-15",
-            produto="DIESEL S10",
-            preco_venda="6.45",
-        )
-        assert p.preco_venda == 6.45
-
-    def test_conversao_n_postos_float_para_int(self):
-        p = PrecoDiesel(
-            data="2024-01-15",
-            produto="DIESEL",
-            n_postos="150.0",
-        )
-        assert p.n_postos == 150
-
-    def test_valor_invalido_retorna_none(self):
-        p = PrecoDiesel(
-            data="2024-01-15",
-            produto="DIESEL",
-            preco_venda="abc",
-            n_postos="xyz",
-        )
-        assert p.preco_venda is None
-        assert p.n_postos is None
-
-
-class TestVendaDiesel:
-    def test_criacao_basica(self):
-        v = VendaDiesel(
-            data="2024-01-01",
-            uf="MT",
-            regiao="CENTRO-OESTE",
-            produto="ÓLEO DIESEL",
-            volume_m3=500000.0,
-        )
-        assert v.volume_m3 == 500000.0
-        assert v.uf == "MT"
-
-    def test_sentinel_vazio_volume(self):
-        v = VendaDiesel(
-            data="2024-01-01",
-            produto="DIESEL",
-            volume_m3="",
-        )
-        assert v.volume_m3 is None
-
-    def test_sentinel_traco_volume(self):
-        v = VendaDiesel(
-            data="2024-01-01",
-            produto="DIESEL",
-            volume_m3="-",
-        )
-        assert v.volume_m3 is None
-
-    def test_conversao_string_volume(self):
-        v = VendaDiesel(
-            data="2024-01-01",
-            produto="DIESEL",
-            volume_m3="123456.78",
-        )
-        assert v.volume_m3 == 123456.78
-
-    def test_valor_invalido_retorna_none(self):
-        v = VendaDiesel(
-            data="2024-01-01",
-            produto="DIESEL",
-            volume_m3="N/A",
-        )
-        assert v.volume_m3 is None

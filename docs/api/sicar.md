@@ -237,9 +237,10 @@ print(total)
 ### Notas
 
 - Sem limite de `max_features`: pagina ate esgotar todos os registros da UF
-- Cada yield contem ate 50.000 features (5 paginas de 10.000 baixadas em paralelo)
+- Cada yield contem ate `GEO_BATCH_SIZE * 10.000` features (`GEO_BATCH_SIZE` paginas de 10.000 baixadas em paralelo via `asyncio.gather`; default `GEO_BATCH_SIZE=1`)
 - Deduplica `cod_imovel` entre batches
 - CRS: EPSG:4326 (WGS84)
+- Async-only: `agrobr.sync` nao suporta async generators
 
 ## diff_imoveis
 

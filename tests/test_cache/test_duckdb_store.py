@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from unittest import mock
 
+import duckdb
 import pytest
 
 from agrobr.cache.duckdb_store import DuckDBStore
@@ -260,6 +261,62 @@ class TestUpsertDedup:
         results = tmp_store.indicadores_query("soja")
         assert len(results) == 1
         assert float(results[0]["valor"]) == 200.0
+
+
+class TestCacheDegradado:
+    def test_connect_falha_degrada_para_no_op(self, tmp_path: Path):
+        settings = CacheSettings(cache_dir=tmp_path, db_name="locked.duckdb")
+        store = DuckDBStore(settings)
+        indicador = {
+            "produto": "soja",
+            "praca": "paranagua",
+            "data": datetime(2024, 6, 15),
+            "valor": 100.0,
+            "unidade": "BRL/sc",
+            "fonte": "cepea",
+        }
+
+        with mock.patch(
+            "agrobr.cache.duckdb_store.duckdb.connect",
+            side_effect=duckdb.IOException("File is already open in another process"),
+        ) as mock_connect:
+            assert store.indicadores_query("soja") == []
+            assert store.indicadores_upsert([indicador]) == 0
+            assert store.indicadores_query("soja") == []
+
+        assert mock_connect.call_count == 1
+        assert store._degraded is True
+        store.close()
+
+    def test_oserror_tambem_degrada(self, tmp_path: Path):
+        settings = CacheSettings(cache_dir=tmp_path, db_name="sem_permissao.duckdb")
+        store = DuckDBStore(settings)
+
+        with mock.patch(
+            "agrobr.cache.duckdb_store.duckdb.connect",
+            side_effect=OSError("permission denied"),
+        ):
+            assert store.indicadores_query("soja") == []
+
+        assert store._degraded is True
+
+    def test_store_saudavel_nao_degrada(self, tmp_store: DuckDBStore):
+        assert tmp_store.indicadores_query("soja") == []
+        assert tmp_store._degraded is False
+
+    def test_falha_no_schema_fecha_conexao_parcial(self, tmp_path: Path):
+        settings = CacheSettings(cache_dir=tmp_path, db_name="schema_quebrado.duckdb")
+        store = DuckDBStore(settings)
+
+        with mock.patch(
+            "agrobr.cache.migrations.migrate",
+            side_effect=duckdb.Error("migration boom"),
+        ):
+            assert store.indicadores_query("soja") == []
+
+        assert store._degraded is True
+        assert store._conn is None
+        assert store.indicadores_query("soja") == []
 
 
 class TestGetStore:

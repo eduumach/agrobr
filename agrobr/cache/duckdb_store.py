@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import threading
 from datetime import datetime
 from typing import Any
@@ -104,13 +105,25 @@ class DuckDBStore:
         self.settings = settings or constants.CacheSettings()
         self.db_path = self.settings.cache_dir / self.settings.db_name
         self._conn: duckdb.DuckDBPyConnection | None = None
+        self._degraded = False
         self._lock = threading.Lock()
 
-    def _get_conn(self) -> duckdb.DuckDBPyConnection:
-        if self._conn is None:
-            self.settings.cache_dir.mkdir(parents=True, exist_ok=True)
-            self._conn = duckdb.connect(str(self.db_path))
-            self._init_schema()
+    def _get_conn(self) -> duckdb.DuckDBPyConnection | None:
+        """Conexão lazy; falha de abertura (lock de outro processo, corrupção,
+        permissão) degrada o cache para no-op permanente no processo — cache é
+        otimização, nunca pode derrubar o fetch."""
+        if self._conn is None and not self._degraded:
+            try:
+                self.settings.cache_dir.mkdir(parents=True, exist_ok=True)
+                self._conn = duckdb.connect(str(self.db_path))
+                self._init_schema()
+            except (duckdb.Error, OSError) as e:
+                if self._conn is not None:
+                    with contextlib.suppress(duckdb.Error):
+                        self._conn.close()
+                    self._conn = None
+                self._degraded = True
+                logger.warning("cache_degraded", db_path=str(self.db_path), error=str(e))
         return self._conn
 
     def _init_schema(self) -> None:
@@ -132,6 +145,8 @@ class DuckDBStore:
     ) -> list[dict[str, Any]]:
         with self._lock:
             conn = self._get_conn()
+            if conn is None:
+                return []
 
             conditions = ["produto = ?"]
             params: list[Any] = [produto.lower()]
@@ -219,6 +234,8 @@ class DuckDBStore:
 
         with self._lock:
             conn = self._get_conn()
+            if conn is None:
+                return 0
             count = 0
             conn.execute(_STAGING_DDL)
 

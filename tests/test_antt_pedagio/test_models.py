@@ -5,20 +5,16 @@ from __future__ import annotations
 from datetime import date
 
 from agrobr.alt.antt_pedagio.models import (
-    ANO_FIM_V1,
     ANO_INICIO,
     ANO_INICIO_V2,
     CATEGORIA_MAP,
     CKAN_BASE,
     COLUNAS_FLUXO,
-    COLUNAS_V1,
     COLUNAS_V2,
     EIXOS_TIPO_MAP,
     UFS_VALIDAS,
     _resolve_anos,
     build_ckan_package_url,
-    build_ckan_resource_url,
-    schema_version,
 )
 
 
@@ -27,7 +23,6 @@ class TestConstants:
         assert ANO_INICIO == 2010
 
     def test_ano_v1_v2_boundary(self):
-        assert ANO_FIM_V1 == 2023
         assert ANO_INICIO_V2 == 2024
 
     def test_ckan_base(self):
@@ -85,20 +80,6 @@ class TestEixosTipoMap:
             assert n in EIXOS_TIPO_MAP, f"Missing eixo: {n}"
 
 
-class TestSchemaVersion:
-    def test_v1_for_2010(self):
-        assert schema_version(2010) == 1
-
-    def test_v1_for_2023(self):
-        assert schema_version(2023) == 1
-
-    def test_v2_for_2024(self):
-        assert schema_version(2024) == 2
-
-    def test_v2_for_2025(self):
-        assert schema_version(2025) == 2
-
-
 class TestResolveAnos:
     def test_single_ano(self):
         assert _resolve_anos(ano=2023) == [2023]
@@ -130,11 +111,6 @@ class TestUrlBuilders:
         assert "package_show" in url
         assert "test-slug" in url
 
-    def test_ckan_resource_url(self):
-        url = build_ckan_resource_url("abc-123")
-        assert "abc-123" in url
-        assert CKAN_BASE in url
-
 
 class TestColunas:
     def test_colunas_fluxo_has_data(self):
@@ -147,9 +123,6 @@ class TestColunas:
         assert "rodovia" in COLUNAS_FLUXO
         assert "uf" in COLUNAS_FLUXO
         assert "municipio" in COLUNAS_FLUXO
-
-    def test_colunas_v1_has_categoria(self):
-        assert "categoria" in COLUNAS_V1
 
     def test_colunas_v2_has_categoria_eixo(self):
         assert "categoria_eixo" in COLUNAS_V2

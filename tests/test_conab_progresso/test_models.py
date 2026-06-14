@@ -6,7 +6,6 @@ from agrobr.conab.progresso.models import (
     CULTURAS_PROGRESSO,
     CULTURAS_VALIDAS,
     ESTADOS_PARA_UF,
-    TIPOS_OPERACAO,
     estado_para_uf,
     normalizar_cultura,
     parse_cultura_header,
@@ -116,9 +115,6 @@ class TestParseOperacaoHeader:
 class TestConstants:
     def test_culturas_validas_count(self) -> None:
         assert len(CULTURAS_VALIDAS) == 7
-
-    def test_tipos_operacao(self) -> None:
-        assert {"Semeadura", "Colheita"} == TIPOS_OPERACAO
 
     def test_estados_count(self) -> None:
         assert len(ESTADOS_PARA_UF) == 27

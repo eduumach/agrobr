@@ -17,7 +17,6 @@ from .models import (
     PENTAHO_BASE,
     QUERY_CEASAS,
     QUERY_PRECOS,
-    QUERY_PRODUTOS,
 )
 
 logger = structlog.get_logger()
@@ -68,7 +67,3 @@ async def fetch_precos() -> tuple[dict[str, Any], str]:
 
 async def fetch_ceasas() -> tuple[dict[str, Any], str]:
     return await _fetch_query(CDA_PROHORT, QUERY_CEASAS)
-
-
-async def fetch_produtos() -> tuple[dict[str, Any], str]:
-    return await _fetch_query(CDA_PROHORT, QUERY_PRODUTOS)

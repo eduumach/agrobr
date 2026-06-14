@@ -6,7 +6,6 @@ from agrobr.bcb.models import (
     SICOR_PROGRAMAS,
     SICOR_TIPOS_SEGURO,
     UF_CODES,
-    CreditoRural,
     normalize_safra_sicor,
     resolve_atividade,
     resolve_fonte_recurso,
@@ -15,96 +14,6 @@ from agrobr.bcb.models import (
     resolve_programa,
     resolve_tipo_seguro,
 )
-
-
-class TestCreditoRural:
-    def test_basic_creation(self):
-        cr = CreditoRural(
-            safra="2023/2024",
-            uf="MT",
-            municipio="SORRISO",
-            cd_municipio="5107248",
-            produto="SOJA",
-            finalidade="custeio",
-            valor=285431200.0,
-            area_financiada=98500.0,
-            qtd_contratos=1240,
-        )
-
-        assert cr.uf == "MT"
-        assert cr.produto == "soja"
-        assert cr.finalidade == "custeio"
-        assert cr.valor == 285431200.0
-        assert cr.area_financiada == 98500.0
-
-    def test_normalization(self):
-        cr = CreditoRural(
-            safra="2023/2024",
-            uf="mt",
-            produto="  SOJA  ",
-            finalidade="  CUSTEIO  ",
-            valor=100.0,
-        )
-
-        assert cr.uf == "MT"
-        assert cr.produto == "soja"
-        assert cr.finalidade == "custeio"
-
-    def test_optional_fields(self):
-        cr = CreditoRural(
-            safra="2023/2024",
-            produto="soja",
-            valor=100.0,
-        )
-
-        assert cr.uf is None
-        assert cr.municipio is None
-        assert cr.cd_municipio is None
-        assert cr.area_financiada is None
-        assert cr.qtd_contratos is None
-
-    def test_expanded_fields(self):
-        cr = CreditoRural(
-            safra="2023/2024",
-            produto="soja",
-            valor=100.0,
-            cd_programa="0050",
-            programa="Pronamp",
-            cd_fonte_recurso="0303",
-            fonte_recurso="Poupanca rural controlados",
-            cd_tipo_seguro="9",
-            tipo_seguro="Nao se aplica",
-            cd_modalidade="01",
-            modalidade="Individual",
-            cd_atividade="1",
-            atividade="Agricola",
-            regiao="SUL",
-        )
-
-        assert cr.cd_programa == "0050"
-        assert cr.programa == "Pronamp"
-        assert cr.cd_fonte_recurso == "0303"
-        assert cr.fonte_recurso == "Poupanca rural controlados"
-        assert cr.cd_tipo_seguro == "9"
-        assert cr.tipo_seguro == "Nao se aplica"
-        assert cr.cd_modalidade == "01"
-        assert cr.modalidade == "Individual"
-        assert cr.cd_atividade == "1"
-        assert cr.atividade == "Agricola"
-        assert cr.regiao == "SUL"
-
-    def test_expanded_fields_default_none(self):
-        cr = CreditoRural(
-            safra="2023/2024",
-            produto="soja",
-            valor=100.0,
-        )
-
-        assert cr.cd_programa is None
-        assert cr.programa is None
-        assert cr.cd_fonte_recurso is None
-        assert cr.fonte_recurso is None
-        assert cr.regiao is None
 
 
 class TestNormalizeSafraSicor:

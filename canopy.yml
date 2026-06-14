@@ -4,31 +4,34 @@ module_depth: 2
 
 layers:
   core:
-    modules: ["cli", "config", "constants", "exceptions", "export", "models", "quality", "sla", "snapshots", "sync"]
+    modules: ["cli", "__main__", "config", "constants", "exceptions", "export", "models", "quality", "sla", "snapshots", "sync"]
     label: Core
   data:
     modules: ["cache", "http", "datasets", "data", "schemas", "contracts"]
     label: Data Layer
   market:
-    modules: ["cepea", "b3", "comexstat", "comtrade", "noticias_agricolas", "bcb"]
+    modules: ["cepea", "b3", "comexstat", "comtrade", "noticias_agricolas", "bcb", "anec", "cftc"]
     label: Market
   production:
-    modules: ["conab", "ibge", "deral", "imea", "usda", "abiove", "anda"]
+    modules: ["conab", "ibge", "deral", "imea", "usda", "abiove", "anda", "unica", "rnc", "rio_verde", "defensivos"]
     label: Production
   geo:
-    modules: ["inmet", "nasa_power", "zarc", "mapbiomas", "desmatamento", "queimadas"]
+    modules: ["inmet", "nasa_power", "zarc", "mapbiomas", "desmatamento", "queimadas", "ana", "embrapa_solos", "sfb", "funai", "ibama", "icmbio", "mapbiomas_alerta", "acervo_fundiario", "incra"]
     label: Geo & Climate
   quality:
-    modules: ["validators", "normalize", "health", "alerts", "benchmark"]
+    modules: ["validators", "normalize", "health", "alerts", "benchmark", "lista_suja"]
     label: Quality
   infra:
     modules: ["utils", "plugins", "alt", "antaq"]
     label: Infrastructure
 
+git:
+  churn_days: 90
+
 thresholds:
-  mi_healthy: 65
-  mi_moderate: 40
-  churn_high: 10
+  score_healthy: 75
+  score_moderate: 50
+  risk_hotspot: 0.4
   min_loc: 100
 
 output:

@@ -1,10 +1,5 @@
 from __future__ import annotations
 
-from datetime import date
-from typing import Any
-
-from pydantic import BaseModel, Field, field_validator
-
 from agrobr.constants import URLS, Fonte
 from agrobr.normalize.regions import UFS_VALIDAS as UFS_VALIDAS
 
@@ -20,10 +15,6 @@ PRECOS_MUNICIPIOS_URLS: dict[str, str] = {
 PRECOS_ESTADOS_URL = f"{SHLP_BASE}/semanal/semanal-estados-desde-2013.xlsx"
 
 PRECOS_BRASIL_URL = f"{SHLP_BASE}/semanal/semanal-brasil-desde-2013.xlsx"
-
-MENSAL_ESTADOS_URL = f"{SHLP_BASE}/mensal/mensal-estados-desde-jan2013.xlsx"
-
-MENSAL_BRASIL_URL = f"{SHLP_BASE}/mensal/mensal-brasil-desde-jan2013.xlsx"
 
 PRODUTOS_DIESEL = frozenset(
     {
@@ -43,28 +34,6 @@ AGREGACAO_SEMANAL = "semanal"
 AGREGACAO_MENSAL = "mensal"
 AGREGACOES_VALIDAS = frozenset({AGREGACAO_SEMANAL, AGREGACAO_MENSAL})
 
-COLUNAS_XLSX_PRECOS: dict[str, str] = {
-    "ESTADO - SIGLA": "uf",
-    "MUNICÍPIO": "municipio",
-    "PRODUTO": "produto",
-    "DATA INICIAL": "data_inicial",
-    "DATA FINAL": "data_final",
-    "PREÇO MÉDIO REVENDA": "preco_venda",
-    "PREÇO MÉDIO DISTRIBUIÇÃO": "preco_compra",
-    "NÚMERO DE POSTOS PESQUISADOS": "n_postos",
-}
-
-COLUNAS_XLSX_PRECOS_ALT: dict[str, str] = {
-    "Estado - Sigla": "uf",
-    "Município": "municipio",
-    "Produto": "produto",
-    "Data Inicial": "data_inicial",
-    "Data Final": "data_final",
-    "Preço Médio Revenda": "preco_venda",
-    "Preço Médio Distribuição": "preco_compra",
-    "Número de Postos Pesquisados": "n_postos",
-}
-
 
 def _resolve_periodo_municipio(ano: int) -> str | None:
     for periodo, _url in PRECOS_MUNICIPIOS_URLS.items():
@@ -77,52 +46,3 @@ def _resolve_periodo_municipio(ano: int) -> str | None:
             if ano == int(partes[0]):
                 return periodo
     return None
-
-
-class PrecoDiesel(BaseModel):
-    data: date
-    uf: str = Field("", max_length=2)
-    municipio: str = ""
-    produto: str
-    preco_venda: float | None = None
-    preco_compra: float | None = None
-    margem: float | None = None
-    n_postos: int | None = None
-
-    @field_validator("preco_venda", "preco_compra", "margem", mode="before")
-    @classmethod
-    def convert_numeric(cls, v: Any) -> float | None:
-        if v is None or v == "" or v == "-":
-            return None
-        try:
-            return float(v)
-        except (ValueError, TypeError):
-            return None
-
-    @field_validator("n_postos", mode="before")
-    @classmethod
-    def convert_int(cls, v: Any) -> int | None:
-        if v is None or v == "" or v == "-":
-            return None
-        try:
-            return int(float(v))
-        except (ValueError, TypeError):
-            return None
-
-
-class VendaDiesel(BaseModel):
-    data: date
-    uf: str = Field("", max_length=2)
-    regiao: str = ""
-    produto: str = ""
-    volume_m3: float | None = None
-
-    @field_validator("volume_m3", mode="before")
-    @classmethod
-    def convert_volume(cls, v: Any) -> float | None:
-        if v is None or v == "" or v == "-":
-            return None
-        try:
-            return float(v)
-        except (ValueError, TypeError):
-            return None

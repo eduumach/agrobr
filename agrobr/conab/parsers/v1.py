@@ -13,10 +13,73 @@ import structlog
 from agrobr import constants
 from agrobr.exceptions import ParseError
 from agrobr.models import Safra
+from agrobr.normalize.dates import anos_para_safra
 from agrobr.normalize.numeric import safe_float
 from agrobr.utils.io import read_excel_safe
 
 logger = structlog.get_logger()
+
+_SECTION_RE = re.compile(r"^\d+\.\s+\S")
+
+
+def _cell_str(row: pd.Series, idx: int) -> str:
+    return str(row.iloc[idx]).strip() if pd.notna(row.iloc[idx]) else ""
+
+
+def _parse_safra_cell(cell: str) -> str | None:
+    if "Safra" in cell or ("/" in cell and "VAR" not in cell.upper()):
+        safra_match = cell.replace("Safra ", "").strip()
+        if "/" in safra_match:
+            parts = safra_match.split("/")
+            if len(parts) != 2:
+                return None
+            ano1 = parts[0].strip()
+            ano2 = parts[1].strip()
+            if len(ano1) == 2:
+                ano1 = "20" + ano1
+            return f"{ano1}/{ano2}"
+        year_str = safra_match.replace(".0", "").strip()
+        if re.match(r"^\d{4}$", year_str):
+            return anos_para_safra(int(year_str))
+        return None
+    year_str = cell.replace(".0", "").strip()
+    if re.match(r"^\d{4}$", year_str):
+        return year_str
+    return None
+
+
+def _build_suprimento(
+    produto: str,
+    safra: str,
+    data: dict[str, Decimal | None],
+) -> dict[str, Any]:
+    est_ini = data.get("estoque_inicial")
+    prod = data.get("producao")
+    imp = data.get("importacao")
+
+    sup = None
+    if est_ini is not None and prod is not None and imp is not None:
+        sup = est_ini + prod + imp
+
+    sem = data.get("sementes_outros")
+    proc = data.get("processamento")
+    consumo = None
+    if sem is not None and proc is not None:
+        consumo = sem + proc
+
+    return {
+        "produto": produto.upper(),
+        "safra": safra,
+        "estoque_inicial": est_ini,
+        "producao": prod,
+        "importacao": imp,
+        "suprimento_total": sup,
+        "consumo": consumo,
+        "exportacao": data.get("exportacao"),
+        "estoque_final": data.get("estoque_final"),
+        "unidade": "mil_ton",
+    }
+
 
 _SUPRIMENTO_HEADER_KEYWORDS: dict[int, str] = {
     3: "ESTOQUE",
@@ -264,7 +327,7 @@ class ConabParserV1:
 
         safra_row = None
         for idx, row in df.iterrows():
-            cell = str(row.iloc[0]).upper() if pd.notna(row.iloc[0]) else ""
+            cell = _cell_str(row, 0).upper()
             if "PRODUTO" in cell or "SAFRA" in cell:
                 safra_row = cast(int, idx) + 1
                 break
@@ -279,9 +342,7 @@ class ConabParserV1:
         safras: list[str] = []
         row_safras = df.iloc[safra_row]
         for col_idx in range(1, len(row_safras)):
-            cell = (
-                str(row_safras.iloc[col_idx]).strip() if pd.notna(row_safras.iloc[col_idx]) else ""
-            )
+            cell = _cell_str(row_safras, col_idx)
             if "/" in cell and len(cell) <= 8:
                 safras.append(cell)
 
@@ -294,20 +355,16 @@ class ConabParserV1:
 
         items: dict[str, dict[str, Decimal | None]] = {s: {} for s in safras}
 
-        import re
-
-        _section_re = re.compile(r"^\d+\.\s+\S")
-
         in_section_1 = False
         for idx in range(safra_row + 1, len(df)):
             row = df.iloc[idx]
-            label = str(row.iloc[0]).strip() if pd.notna(row.iloc[0]) else ""
+            label = _cell_str(row, 0)
             if not label:
                 continue
 
             label_lower = label.lower()
 
-            if _section_re.match(label):
+            if _SECTION_RE.match(label):
                 if label.startswith("1."):
                     in_section_1 = True
                     continue
@@ -331,39 +388,7 @@ class ConabParserV1:
                 if col_idx < len(row):
                     items[safra_str][field_name] = self._parse_decimal(row.iloc[col_idx])
 
-        suprimentos: list[dict[str, Any]] = []
-        for safra_str in safras:
-            data = items[safra_str]
-            est_ini = data.get("estoque_inicial")
-            prod = data.get("producao")
-            imp = data.get("importacao")
-
-            sup = None
-            if est_ini is not None and prod is not None and imp is not None:
-                sup = est_ini + prod + imp
-
-            sem = data.get("sementes_outros")
-            proc = data.get("processamento")
-            consumo = None
-            if sem is not None and proc is not None:
-                consumo = sem + proc
-
-            suprimentos.append(
-                {
-                    "produto": produto.upper(),
-                    "safra": safra_str,
-                    "estoque_inicial": est_ini,
-                    "producao": prod,
-                    "importacao": imp,
-                    "suprimento_total": sup,
-                    "consumo": consumo,
-                    "exportacao": data.get("exportacao"),
-                    "estoque_final": data.get("estoque_final"),
-                    "unidade": "mil_ton",
-                }
-            )
-
-        return suprimentos
+        return [_build_suprimento(produto, safra_str, items[safra_str]) for safra_str in safras]
 
     def parse_brasil_total(
         self,
@@ -419,7 +444,7 @@ class ConabParserV1:
 
     def _find_header_row(self, df: pd.DataFrame) -> int | None:
         for idx, row in df.iterrows():
-            cell0 = str(row.iloc[0]).upper() if pd.notna(row.iloc[0]) else ""
+            cell0 = _cell_str(row, 0).upper()
             if "REGI" in cell0 or "UF" in cell0 or "PRODUTO" in cell0:
                 return cast(int, idx)
         return None
@@ -438,11 +463,7 @@ class ConabParserV1:
         producao_start = None
 
         for col_idx in range(1, len(header_cols)):
-            cell = (
-                str(header_cols.iloc[col_idx]).upper()
-                if pd.notna(header_cols.iloc[col_idx])
-                else ""
-            )
+            cell = _cell_str(header_cols, col_idx).upper()
             if "ÁREA" in cell or "AREA" in cell:
                 area_start = col_idx
             elif "PRODUTIVIDADE" in cell:
@@ -450,38 +471,12 @@ class ConabParserV1:
             elif "PRODUÇÃO" in cell or "PRODUCAO" in cell:
                 producao_start = col_idx
 
-        safras_encontradas = []
+        safras_encontradas: list[str] = []
         for col_idx in range(1, len(safra_row)):
-            cell = str(safra_row.iloc[col_idx]).strip() if pd.notna(safra_row.iloc[col_idx]) else ""
-
-            if "Safra" in cell or ("/" in cell and "VAR" not in cell.upper()):
-                safra_match = cell.replace("Safra ", "").strip()
-                if "/" in safra_match:
-                    parts = safra_match.split("/")
-                    if len(parts) == 2:
-                        ano1 = parts[0].strip()
-                        ano2 = parts[1].strip()
-
-                        if len(ano1) == 2:
-                            ano1 = "20" + ano1
-                        if len(ano2) == 2:
-                            pass
-
-                        safra_full = f"{ano1}/{ano2}"
-                        if safra_full not in safras_encontradas:
-                            safras_encontradas.append(safra_full)
-                else:
-                    year_str = safra_match.replace(".0", "").strip()
-                    if re.match(r"^\d{4}$", year_str):
-                        from agrobr.normalize.dates import anos_para_safra
-
-                        safra_full = anos_para_safra(int(year_str))
-                        if safra_full not in safras_encontradas:
-                            safras_encontradas.append(safra_full)
-            else:
-                year_str = cell.replace(".0", "").strip()
-                if re.match(r"^\d{4}$", year_str) and year_str not in safras_encontradas:
-                    safras_encontradas.append(year_str)
+            cell = _cell_str(safra_row, col_idx)
+            safra_full = _parse_safra_cell(cell)
+            if safra_full is not None and safra_full not in safras_encontradas:
+                safras_encontradas.append(safra_full)
 
         if area_start and prod_start and producao_start and safras_encontradas:
             for i, safra in enumerate(safras_encontradas):
@@ -514,7 +509,7 @@ class ConabParserV1:
 
     def _validate_suprimento_header(self, header: pd.Series) -> None:
         for col_idx, keyword in _SUPRIMENTO_HEADER_KEYWORDS.items():
-            cell = str(header.iloc[col_idx]).upper() if pd.notna(header.iloc[col_idx]) else ""
+            cell = _cell_str(header, col_idx).upper()
             if keyword not in cell:
                 raise ParseError(
                     source="conab",

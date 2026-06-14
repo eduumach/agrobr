@@ -367,7 +367,7 @@ class TestStreamImoveisGeo:
 
     @pytest.mark.asyncio
     async def test_unbounded_yields_batches_of_geo_batch_size(self):
-        n_pages = client.GEO_BATCH_SIZE * 2 + 2
+        n_pages = client.GEO_BATCH_SIZE * 2 + 1
         mock_fetch, _counts = _geo_paginated_mock(n_pages * PAGE_SIZE, self.GEOJSON)
         with (
             patch.object(client, "fetch_wfs", side_effect=mock_fetch),
@@ -375,13 +375,15 @@ class TestStreamImoveisGeo:
         ):
             batches = [b async for b in stream_imoveis_geo("MT", max_features=None)]
 
+        full, rem = divmod(n_pages, client.GEO_BATCH_SIZE)
+        expected = [client.GEO_BATCH_SIZE] * full + ([rem] if rem else [])
         sizes = [len(pages) for pages, _url in batches]
-        assert sizes == [client.GEO_BATCH_SIZE, client.GEO_BATCH_SIZE, 2]
+        assert sizes == expected
         assert sum(sizes) == n_pages
 
     @pytest.mark.asyncio
-    async def test_throttle_sleep_within_batch(self):
-        n_pages = client.GEO_BATCH_SIZE + 1
+    async def test_throttle_sleep_after_page_threshold(self):
+        n_pages = client.THROTTLE_AFTER_PAGE + 2
         mock_fetch, _counts = _geo_paginated_mock(n_pages * PAGE_SIZE, self.GEOJSON)
         sleeps: list[float] = []
 
@@ -395,7 +397,7 @@ class TestStreamImoveisGeo:
             async for _ in stream_imoveis_geo("MT", max_features=None):
                 pass
 
-        assert sleeps == [client.THROTTLE_DELAY]
+        assert sleeps == [client.THROTTLE_DELAY, client.THROTTLE_DELAY]
 
     @pytest.mark.asyncio
     async def test_fetch_imoveis_geo_aggregates_multiple_batches(self):

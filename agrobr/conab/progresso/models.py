@@ -26,8 +26,6 @@ CULTURAS_PROGRESSO: dict[str, str] = {
 
 CULTURAS_VALIDAS = {"Algodão", "Arroz", "Feijão 1ª", "Milho 1ª", "Milho 2ª", "Soja", "Trigo"}
 
-TIPOS_OPERACAO = {"Semeadura", "Colheita"}
-
 ESTADOS_PARA_UF: dict[str, str] = {
     "Acre": "AC",
     "Alagoas": "AL",

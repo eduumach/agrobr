@@ -137,7 +137,3 @@ def parse_ensaio_soja(data: bytes, safra: str) -> pd.DataFrame:
         pdf.close()
 
     return _records_to_df(_extract_records(pages, safra), safra)
-
-
-def parse_ensaio_soja_from_text(pages: list[str], safra: str) -> pd.DataFrame:
-    return _records_to_df(_extract_records(pages, safra), safra)

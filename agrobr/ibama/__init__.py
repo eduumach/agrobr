@@ -1,6 +1,6 @@
 """IBAMA — Embargos ambientais.
-Fonte: siscom.ibama.gov.br (WFS OGC, sem auth).
-Licenca: ODbL (dadosabertos.ibama.gov.br).
+Fonte: dadosabertos.ibama.gov.br (dump CSV do SIFISC com geometrias WKT, sem auth).
+Licenca: ODbL.
 """
 
 from agrobr.ibama.api import embargos, embargos_geo

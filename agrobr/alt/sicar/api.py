@@ -88,6 +88,56 @@ def _check_atualizado_apos_uf(uf: str, atualizado_apos: str | None) -> None:
         )
 
 
+def _validar_filtros_imoveis(
+    uf: str,
+    municipio: str | None,
+    cod_municipio: int | None,
+    status: str | None,
+    tipo: str | None,
+) -> str:
+    validate_year_uf(uf=uf)
+
+    if municipio is not None and cod_municipio is not None:
+        raise ValueError("Use 'municipio' ou 'cod_municipio', nao ambos")
+
+    if status is not None and status.upper() not in STATUS_VALIDOS:
+        raise ValueError(f"Status '{status}' invalido. Opcoes: {sorted(STATUS_VALIDOS)}")
+
+    if tipo is not None and tipo.upper() not in TIPO_VALIDOS:
+        raise ValueError(f"Tipo '{tipo}' invalido. Opcoes: {sorted(TIPO_VALIDOS)}")
+
+    return uf.strip().upper()
+
+
+async def _warn_consulta_grande(uf_upper: str, cql: str | None, max_features: int | None) -> None:
+    try:
+        async with client.make_session() as http:
+            total = await client.fetch_hits(uf_upper, cql, client=http)
+        effective = total if max_features is None else min(total, max_features)
+        if effective > MAX_FEATURES_WARNING:
+            logger.warning(
+                "sicar_geo_large_query",
+                uf=uf_upper,
+                total=total,
+                max_features=max_features,
+                threshold=MAX_FEATURES_WARNING,
+                hint="Considere definir max_features ou filtrar por municipio para reduzir volume",
+            )
+    except (httpx.HTTPError, SourceUnavailableError):
+        logger.warning("sicar_geo_hit_count_check_failed", uf=uf_upper, exc_info=True)
+
+
+def _dedup_imoveis_geo(gdf: Any) -> Any:
+    if gdf.empty or "cod_imovel" not in gdf.columns:
+        return gdf
+    before = len(gdf)
+    gdf = gdf.drop_duplicates(subset=["cod_imovel"], keep="first")
+    gdf = gdf.sort_values("cod_imovel").reset_index(drop=True)
+    if len(gdf) < before:
+        logger.info("sicar_geo_dedup", removed=before - len(gdf), remaining=len(gdf))
+    return gdf
+
+
 @overload
 async def imoveis(
     uf: str,
@@ -137,17 +187,7 @@ async def imoveis(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
-    validate_year_uf(uf=uf)
-    uf_upper = uf.strip().upper()
-
-    if municipio is not None and cod_municipio is not None:
-        raise ValueError("Use 'municipio' ou 'cod_municipio', nao ambos")
-
-    if status is not None and status.upper() not in STATUS_VALIDOS:
-        raise ValueError(f"Status '{status}' invalido. Opcoes: {sorted(STATUS_VALIDOS)}")
-
-    if tipo is not None and tipo.upper() not in TIPO_VALIDOS:
-        raise ValueError(f"Tipo '{tipo}' invalido. Opcoes: {sorted(TIPO_VALIDOS)}")
+    uf_upper = _validar_filtros_imoveis(uf, municipio, cod_municipio, status, tipo)
 
     _check_atualizado_apos_uf(uf_upper, atualizado_apos)
 
@@ -266,17 +306,7 @@ async def imoveis_geo(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> Any:
-    validate_year_uf(uf=uf)
-    uf_upper = uf.strip().upper()
-
-    if municipio is not None and cod_municipio is not None:
-        raise ValueError("Use 'municipio' ou 'cod_municipio', nao ambos")
-
-    if status is not None and status.upper() not in STATUS_VALIDOS:
-        raise ValueError(f"Status '{status}' invalido. Opcoes: {sorted(STATUS_VALIDOS)}")
-
-    if tipo is not None and tipo.upper() not in TIPO_VALIDOS:
-        raise ValueError(f"Tipo '{tipo}' invalido. Opcoes: {sorted(TIPO_VALIDOS)}")
+    uf_upper = _validar_filtros_imoveis(uf, municipio, cod_municipio, status, tipo)
 
     _check_atualizado_apos_uf(uf_upper, atualizado_apos)
 
@@ -303,21 +333,7 @@ async def imoveis_geo(
     )
 
     if municipio is None and cod_municipio is None:
-        try:
-            async with client.make_session() as http:
-                total = await client.fetch_hits(uf_upper, cql, client=http)
-            effective = total if max_features is None else min(total, max_features)
-            if effective > MAX_FEATURES_WARNING:
-                logger.warning(
-                    "sicar_geo_large_query",
-                    uf=uf_upper,
-                    total=total,
-                    max_features=max_features,
-                    threshold=MAX_FEATURES_WARNING,
-                    hint="Considere definir max_features ou filtrar por municipio para reduzir volume",
-                )
-        except (httpx.HTTPError, SourceUnavailableError):
-            logger.warning("sicar_geo_hit_count_check_failed", uf=uf_upper, exc_info=True)
+        await _warn_consulta_grande(uf_upper, cql, max_features)
 
     t0 = time.monotonic()
     pages, source_url = await client.fetch_imoveis_geo(uf_upper, cql, max_features=max_features)
@@ -327,12 +343,7 @@ async def imoveis_geo(
     gdf = parser.parse_imoveis_geojson(pages, max_features=max_features)
     parse_ms = int((time.monotonic() - t1) * 1000)
 
-    if not gdf.empty and "cod_imovel" in gdf.columns:
-        before = len(gdf)
-        gdf = gdf.drop_duplicates(subset=["cod_imovel"], keep="first")
-        gdf = gdf.sort_values("cod_imovel").reset_index(drop=True)
-        if len(gdf) < before:
-            logger.info("sicar_geo_dedup", removed=before - len(gdf), remaining=len(gdf))
+    gdf = _dedup_imoveis_geo(gdf)
 
     if return_meta:
         meta = build_source_meta(
@@ -367,20 +378,10 @@ async def imoveis_geo_stream(
 
     Cada yield e um GeoDataFrame parcial com ate GEO_BATCH_SIZE * PAGE_SIZE features.
     Ideal para processar volumes grandes (max_features=None implicito) sem acumular
-    tudo em memoria antes de comecar a usar os dados.
+    tudo em memoria antes de comecar a usar os dados. Async-only: sem suporte em
+    agrobr.sync.
     """
-    validate_year_uf(uf=uf)
-    uf_upper = uf.strip().upper()
-
-    if municipio is not None and cod_municipio is not None:
-        raise ValueError("Use 'municipio' ou 'cod_municipio', nao ambos")
-
-    if status is not None and status.upper() not in STATUS_VALIDOS:
-        raise ValueError(f"Status '{status}' invalido. Opcoes: {sorted(STATUS_VALIDOS)}")
-
-    if tipo is not None and tipo.upper() not in TIPO_VALIDOS:
-        raise ValueError(f"Tipo '{tipo}' invalido. Opcoes: {sorted(TIPO_VALIDOS)}")
-
+    uf_upper = _validar_filtros_imoveis(uf, municipio, cod_municipio, status, tipo)
     _check_atualizado_apos_uf(uf_upper, atualizado_apos)
 
     cql = _build_cql_filter(

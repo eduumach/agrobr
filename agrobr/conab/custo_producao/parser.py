@@ -232,6 +232,18 @@ def _refine_valor_column(
             return
 
 
+def _cell_float(row: pd.Series, col_map: dict[str, int], key: str) -> float | None:
+    if key not in col_map:
+        return None
+    return safe_float(row.iloc[col_map[key]], strip=("R$", "%"))
+
+
+def _cell_str(row: pd.Series, col_map: dict[str, int], key: str) -> str | None:
+    if key not in col_map or pd.isna(row.iloc[col_map[key]]):
+        return None
+    return str(row.iloc[col_map[key]]).strip()
+
+
 def parse_planilha(
     xlsx: BytesIO,
     cultura: str,
@@ -278,13 +290,12 @@ def parse_planilha(
     for row_idx in range(data_start, len(df_raw)):
         row = df_raw.iloc[row_idx]
 
-        item_name = str(row.iloc[col_map["item"]]) if pd.notna(row.iloc[col_map["item"]]) else ""
-        item_name = item_name.strip()
+        item_name = _cell_str(row, col_map, "item") or ""
 
         if not item_name:
             continue
 
-        valor = safe_float(row.iloc[col_map["valor_ha"]], strip=("R$", "%"))
+        valor = _cell_float(row, col_map, "valor_ha")
 
         if _COE_PATTERN.search(item_name):
             if valor is not None:
@@ -323,19 +334,11 @@ def parse_planilha(
             tecnologia=tecnologia,
             categoria=categoria,
             item=item_name,
-            unidade=str(row.iloc[col_map["unidade"]]).strip()
-            if "unidade" in col_map and pd.notna(row.iloc[col_map["unidade"]])
-            else None,
-            quantidade_ha=safe_float(row.iloc[col_map["quantidade_ha"]], strip=("R$", "%"))
-            if "quantidade_ha" in col_map
-            else None,
-            preco_unitario=safe_float(row.iloc[col_map["preco_unitario"]], strip=("R$", "%"))
-            if "preco_unitario" in col_map
-            else None,
+            unidade=_cell_str(row, col_map, "unidade"),
+            quantidade_ha=_cell_float(row, col_map, "quantidade_ha"),
+            preco_unitario=_cell_float(row, col_map, "preco_unitario"),
             valor_ha=valor,
-            participacao_pct=safe_float(row.iloc[col_map["participacao_pct"]], strip=("R$", "%"))
-            if "participacao_pct" in col_map
-            else None,
+            participacao_pct=_cell_float(row, col_map, "participacao_pct"),
         )
 
         items.append(item)
@@ -347,30 +350,24 @@ def parse_planilha(
             reason=f"Nenhum item de custo extraído da planilha (cultura={cultura}, uf={uf})",
         )
 
+    coe = coe_value
+    if coe is None:
+        coe_categorias = {"insumos", "operacoes", "mao_de_obra"}
+        coe_from_items = sum(item.valor_ha for item in items if item.categoria in coe_categorias)
+        if coe_from_items > 0:
+            coe = coe_from_items
+
     custo_total: CustoTotal | None = None
-    if coe_value is not None:
+    if coe is not None:
         custo_total = CustoTotal(
             cultura=cultura_norm,
             uf=uf.upper(),
             safra=safra,
             tecnologia=tecnologia,
-            coe_ha=coe_value,
+            coe_ha=coe,
             cot_ha=cot_value,
             ct_ha=ct_value,
         )
-    elif items:
-        coe_categorias = {"insumos", "operacoes", "mao_de_obra"}
-        coe_from_items = sum(item.valor_ha for item in items if item.categoria in coe_categorias)
-        if coe_from_items > 0:
-            custo_total = CustoTotal(
-                cultura=cultura_norm,
-                uf=uf.upper(),
-                safra=safra,
-                tecnologia=tecnologia,
-                coe_ha=coe_from_items,
-                cot_ha=cot_value,
-                ct_ha=ct_value,
-            )
 
     logger.info(
         "conab_custo_parsed",

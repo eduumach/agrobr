@@ -23,6 +23,60 @@ from .models import (
 logger = structlog.get_logger()
 
 
+def _montar_fluxo(trafego_data: list[tuple[int, bytes]], pracas_raw: bytes) -> pd.DataFrame:
+    dfs: list[pd.DataFrame] = []
+    for ano_val, content in trafego_data:
+        dfs.append(parser.parse_trafego(content, ano=ano_val))
+
+    df_out = pd.DataFrame(columns=COLUNAS_FLUXO) if not dfs else pd.concat(dfs, ignore_index=True)
+
+    if pracas_raw:
+        try:
+            df_pracas = parser.parse_pracas(pracas_raw)
+            return parser.join_fluxo_pracas(df_out, df_pracas)
+        except (ParseError, KeyError, ValueError):
+            logger.warning("antt_pedagio_join_fallback", reason="parse/join failed")
+
+    for col in ("rodovia", "uf", "municipio"):
+        if col not in df_out.columns:
+            df_out[col] = None
+    return df_out
+
+
+def _filtrar_fluxo(
+    df_out: pd.DataFrame,
+    *,
+    concessionaria: str | None,
+    praca: str | None,
+    rodovia: str | None,
+    uf: str | None,
+    tipo_veiculo: str | None,
+    apenas_pesados: bool,
+) -> pd.DataFrame:
+    filtros = (
+        ("concessionaria", concessionaria, "contains"),
+        ("praca", praca, "contains"),
+        ("rodovia", rodovia, "upper_eq"),
+        ("uf", uf.upper() if uf else None, "eq"),
+        ("tipo_veiculo", tipo_veiculo, "eq"),
+    )
+    for col, valor, modo in filtros:
+        if not valor or col not in df_out.columns:
+            continue
+        if modo == "contains":
+            df_out = df_out[df_out[col].str.contains(valor, case=False, na=False)]
+        elif modo == "upper_eq":
+            df_out = df_out[df_out[col].str.upper() == valor.upper()]
+        else:
+            df_out = df_out[df_out[col] == valor]
+
+    if apenas_pesados:
+        mask = (df_out["n_eixos"] >= 3) & (df_out["tipo_veiculo"] == "Comercial")
+        df_out = df_out[mask]
+
+    return df_out
+
+
 async def fluxo_pedagio(
     ano: int | None = None,
     ano_inicio: int | None = None,
@@ -52,48 +106,16 @@ async def fluxo_pedagio(
     fetch_ms = int((time.monotonic() - t0) * 1000)
 
     t1 = time.monotonic()
-    dfs: list[pd.DataFrame] = []
-    for ano_val, content in trafego_data:
-        df = parser.parse_trafego(content, ano=ano_val)
-        dfs.append(df)
-
-    df_out = pd.DataFrame(columns=COLUNAS_FLUXO) if not dfs else pd.concat(dfs, ignore_index=True)
-
-    if pracas_raw:
-        try:
-            df_pracas = parser.parse_pracas(pracas_raw)
-            df_out = parser.join_fluxo_pracas(df_out, df_pracas)
-        except (ParseError, KeyError, ValueError):
-            logger.warning("antt_pedagio_join_fallback", reason="parse/join failed")
-            for col in ("rodovia", "uf", "municipio"):
-                if col not in df_out.columns:
-                    df_out[col] = None
-    else:
-        for col in ("rodovia", "uf", "municipio"):
-            if col not in df_out.columns:
-                df_out[col] = None
-
-    if concessionaria and "concessionaria" in df_out.columns:
-        mask = df_out["concessionaria"].str.contains(concessionaria, case=False, na=False)
-        df_out = df_out[mask]
-
-    if praca and "praca" in df_out.columns:
-        mask = df_out["praca"].str.contains(praca, case=False, na=False)
-        df_out = df_out[mask]
-
-    if rodovia and "rodovia" in df_out.columns:
-        mask = df_out["rodovia"].str.upper() == rodovia.upper()
-        df_out = df_out[mask]
-
-    if uf and "uf" in df_out.columns:
-        df_out = df_out[df_out["uf"] == uf.upper()]
-
-    if tipo_veiculo and "tipo_veiculo" in df_out.columns:
-        df_out = df_out[df_out["tipo_veiculo"] == tipo_veiculo]
-
-    if apenas_pesados:
-        mask = (df_out["n_eixos"] >= 3) & (df_out["tipo_veiculo"] == "Comercial")
-        df_out = df_out[mask]
+    df_out = _montar_fluxo(trafego_data, pracas_raw)
+    df_out = _filtrar_fluxo(
+        df_out,
+        concessionaria=concessionaria,
+        praca=praca,
+        rodovia=rodovia,
+        uf=uf,
+        tipo_veiculo=tipo_veiculo,
+        apenas_pesados=apenas_pesados,
+    )
 
     final_cols = [c for c in COLUNAS_FLUXO if c in df_out.columns]
     df_out = df_out[final_cols]

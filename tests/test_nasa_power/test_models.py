@@ -1,16 +1,6 @@
 """Testes para os modelos NASA POWER."""
 
-from datetime import date
-
-import pytest
-
-from agrobr.nasa_power.models import (
-    COLUNAS_MAP,
-    PARAMS_AG,
-    SENTINEL,
-    UF_COORDS,
-    ClimaObservacao,
-)
+from agrobr.nasa_power.models import COLUNAS_MAP, PARAMS_AG, UF_COORDS
 
 
 class TestUFCoords:
@@ -52,47 +42,3 @@ class TestColunasMap:
             "vento_ms",
         }
         assert set(COLUNAS_MAP.values()) == expected
-
-
-class TestClimaObservacao:
-    def test_basic(self):
-        obs = ClimaObservacao(
-            data=date(2024, 1, 15),
-            lat=-12.6,
-            lon=-56.1,
-            uf="MT",
-            temp_media=25.3,
-            precip_mm=5.0,
-        )
-        assert obs.data == date(2024, 1, 15)
-        assert obs.temp_media == pytest.approx(25.3)
-        assert obs.uf == "MT"
-
-    def test_sentinel_becomes_none(self):
-        obs = ClimaObservacao(
-            data=date(2024, 1, 15),
-            lat=-12.6,
-            lon=-56.1,
-            temp_media=SENTINEL,
-            precip_mm=SENTINEL,
-        )
-        assert obs.temp_media is None
-        assert obs.precip_mm is None
-
-    def test_none_stays_none(self):
-        obs = ClimaObservacao(
-            data=date(2024, 1, 15),
-            lat=-12.6,
-            lon=-56.1,
-            temp_media=None,
-        )
-        assert obs.temp_media is None
-
-    def test_invalid_string_becomes_none(self):
-        obs = ClimaObservacao(
-            data=date(2024, 1, 15),
-            lat=-12.6,
-            lon=-56.1,
-            temp_media="abc",
-        )
-        assert obs.temp_media is None

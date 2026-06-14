@@ -33,11 +33,14 @@ async def test_pracas_returns_list():
     assert len(result) > 0
 
 
-@pytest.mark.integration
-async def test_pracas_unknown_product():
-    result = await cepea.pracas("unknown_product")
-    assert isinstance(result, list)
-    assert len(result) == 0
+async def test_pracas_unknown_product_raises():
+    with pytest.raises(ValueError, match="Produto inválido"):
+        await cepea.pracas("unknown_product")
+
+
+async def test_pracas_valid_product_without_mapped_pracas():
+    result = await cepea.pracas("algodao")
+    assert result == []
 
 
 def _make_indicador(

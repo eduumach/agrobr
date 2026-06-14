@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from agrobr.desmatamento.models import (
     BIOMAS_VALIDOS,
-    CLASSES_DETER,
     COLUNAS_SAIDA_DETER,
     COLUNAS_SAIDA_DETER_GEO,
     COLUNAS_SAIDA_PRODES,
@@ -82,12 +81,6 @@ class TestEstadoParaUf:
 class TestConstants:
     def test_biomas_validos_has_6(self):
         assert len(BIOMAS_VALIDOS) == 6
-
-    def test_classes_deter_non_empty(self):
-        assert len(CLASSES_DETER) >= 5
-        assert "DESMATAMENTO_CR" in CLASSES_DETER
-        assert "DEGRADACAO" in CLASSES_DETER
-        assert "MINERACAO" in CLASSES_DETER
 
     def test_prodes_workspaces_non_empty(self):
         assert len(PRODES_WORKSPACES) == 6

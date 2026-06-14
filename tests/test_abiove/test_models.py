@@ -1,58 +1,6 @@
 """Testes para os modelos ABIOVE."""
 
-import pytest
-
-from agrobr.abiove.models import (
-    ABIOVE_PRODUTOS,
-    MESES_PT,
-    ExportacaoSoja,
-    normalize_produto,
-)
-
-
-class TestExportacaoSoja:
-    def test_basic_creation(self):
-        rec = ExportacaoSoja(
-            ano=2024,
-            mes=6,
-            produto="grao",
-            volume_ton=5000000.0,
-            receita_usd_mil=2500000.0,
-        )
-
-        assert rec.ano == 2024
-        assert rec.mes == 6
-        assert rec.produto == "grao"
-        assert rec.volume_ton == 5000000.0
-        assert rec.receita_usd_mil == 2500000.0
-
-    def test_produto_normalization_grao(self):
-        rec = ExportacaoSoja(ano=2024, mes=1, produto="Soja em Grão", volume_ton=100.0)
-        assert rec.produto == "grao"
-
-    def test_produto_normalization_farelo(self):
-        rec = ExportacaoSoja(ano=2024, mes=1, produto="Farelo de Soja", volume_ton=100.0)
-        assert rec.produto == "farelo"
-
-    def test_produto_normalization_oleo(self):
-        rec = ExportacaoSoja(ano=2024, mes=1, produto="Óleo de Soja", volume_ton=100.0)
-        assert rec.produto == "oleo"
-
-    def test_validation_mes_invalid_13(self):
-        with pytest.raises(ValueError):
-            ExportacaoSoja(ano=2024, mes=13, produto="grao", volume_ton=100.0)
-
-    def test_validation_mes_zero(self):
-        with pytest.raises(ValueError):
-            ExportacaoSoja(ano=2024, mes=0, produto="grao", volume_ton=100.0)
-
-    def test_validation_volume_negative(self):
-        with pytest.raises(ValueError):
-            ExportacaoSoja(ano=2024, mes=1, produto="grao", volume_ton=-100.0)
-
-    def test_receita_optional(self):
-        rec = ExportacaoSoja(ano=2024, mes=1, produto="grao", volume_ton=100.0)
-        assert rec.receita_usd_mil is None
+from agrobr.abiove.models import ABIOVE_PRODUTOS, MESES_PT, normalize_produto
 
 
 class TestNormalizeProduto:

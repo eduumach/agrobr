@@ -15,11 +15,6 @@ NATUREZA_CARGA = {
     "conteiner": "Carga Conteinerizada",
 }
 
-SENTIDO = {
-    "embarque": "Embarcados",
-    "desembarque": "Desembarcados",
-}
-
 COLUNAS_ATRACACAO = [
     "IDAtracacao",
     "Porto Atracação",

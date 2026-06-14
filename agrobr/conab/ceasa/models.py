@@ -17,7 +17,6 @@ PENTAHO_AUTH = {
 CDA_PROHORT = "/home/PROHORT/precoDia.cda"
 
 QUERY_PRECOS = "MDXProdutoPreco"
-QUERY_PRODUTOS = "MDXproduto"
 QUERY_CEASAS = "MDXceasa"
 
 FRUTAS: list[str] = [
@@ -85,14 +84,6 @@ for _cat, _prods in CATEGORIAS.items():
         PRODUTO_PARA_CATEGORIA[_p] = _cat
 
 PRODUTOS_PROHORT: set[str] = set(PRODUTO_PARA_CATEGORIA.keys())
-
-UNIDADE_ESPECIAL: dict[str, str] = {
-    "ABACAXI": "UN",
-    "COCO VERDE": "UN",
-    "COUVE-FLOR": "UN",
-    "ALFACE": "DZ",
-    "OVOS": "DZ",
-}
 
 COLUNAS_SAIDA: list[str] = [
     "data",

@@ -7,7 +7,6 @@ from agrobr.conab.serie_historica.models import (
     SERIE_HISTORICA_PRODUTOS,
     UFS_BRASIL,
     SafraHistorica,
-    detect_safra_format,
     normalize_produto,
 )
 
@@ -107,23 +106,6 @@ class TestNormalizeProduto:
 
     def test_map_completeness(self):
         assert len(SERIE_HISTORICA_PRODUTOS) >= 20
-
-
-class TestDetectSafraFormat:
-    def test_short_format(self):
-        assert detect_safra_format("2023/24") == "2023/24"
-
-    def test_long_format(self):
-        assert detect_safra_format("2023/2024") == "2023/24"
-
-    def test_year_only(self):
-        assert detect_safra_format("2023") == "2023/24"
-
-    def test_with_prefix(self):
-        assert detect_safra_format("Safra 2023/24") == "2023/24"
-
-    def test_whitespace(self):
-        assert detect_safra_format("  2023/24  ") == "2023/24"
 
 
 class TestConstants:

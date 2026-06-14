@@ -5,13 +5,7 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
-from agrobr.anec.models import (
-    CATEGORIES_BY_YEAR,
-    PORTOS_ANEC,
-    PRODUTOS_ANEC,
-    ANECArticle,
-    normalize_produto,
-)
+from agrobr.anec.models import CATEGORIES_BY_YEAR, ANECArticle, normalize_produto
 
 
 class TestNormalizeProduto:
@@ -100,18 +94,3 @@ class TestWeekYear:
 class TestConstants:
     def test_categories_include_2026(self):
         assert 2026 in CATEGORIES_BY_YEAR
-
-    def test_portos_canonicos_19(self):
-        assert len(PORTOS_ANEC) == 19
-        assert "SANTOS" in PORTOS_ANEC
-        assert "PARANAGUÁ" in PORTOS_ANEC
-
-    def test_produtos_canonicos_6(self):
-        assert {
-            "soybean",
-            "soybean_meal",
-            "maize",
-            "ddgs",
-            "sorghum",
-            "wheat",
-        } == PRODUTOS_ANEC

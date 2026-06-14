@@ -8,12 +8,10 @@ import pytest
 
 from agrobr.bcb.bigquery_client import (
     BQ_COLUMNS_MAP,
-    BQ_DATASET,
-    BQ_TABLE,
     _build_query,
     _check_basedosdados,
+    _query_bigquery_sync,
     fetch_credito_rural_bigquery,
-    is_bigquery_available,
 )
 from agrobr.exceptions import SourceUnavailableError
 
@@ -30,6 +28,44 @@ class TestCheckBasedosdados:
         mock_bd = MagicMock()
         with patch.dict("sys.modules", {"basedosdados": mock_bd}):
             _check_basedosdados()
+
+
+class TestBillingProject:
+    def test_sem_billing_raise_com_hint(self, monkeypatch):
+        monkeypatch.delenv("AGROBR_BQ_BILLING_PROJECT", raising=False)
+        mock_bd = MagicMock()
+        mock_bd.config.billing_project_id = None
+
+        with (
+            patch.dict("sys.modules", {"basedosdados": mock_bd}),
+            pytest.raises(SourceUnavailableError, match="AGROBR_BQ_BILLING_PROJECT"),
+        ):
+            _query_bigquery_sync("SELECT 1")
+
+        mock_bd.read_sql.assert_not_called()
+
+    def test_env_var_define_billing(self, monkeypatch):
+        monkeypatch.setenv("AGROBR_BQ_BILLING_PROJECT", "proj-env")
+        mock_bd = MagicMock()
+        mock_bd.config.billing_project_id = None
+        mock_bd.read_sql.return_value = pd.DataFrame()
+
+        with patch.dict("sys.modules", {"basedosdados": mock_bd}):
+            result = _query_bigquery_sync("SELECT 1")
+
+        assert result == []
+        assert mock_bd.read_sql.call_args.kwargs["billing_project_id"] == "proj-env"
+
+    def test_config_billing_usado_sem_env(self, monkeypatch):
+        monkeypatch.delenv("AGROBR_BQ_BILLING_PROJECT", raising=False)
+        mock_bd = MagicMock()
+        mock_bd.config.billing_project_id = "proj-config"
+        mock_bd.read_sql.return_value = pd.DataFrame()
+
+        with patch.dict("sys.modules", {"basedosdados": mock_bd}):
+            _query_bigquery_sync("SELECT 1")
+
+        assert mock_bd.read_sql.call_args.kwargs["billing_project_id"] == "proj-config"
 
 
 class TestBuildQuery:
@@ -184,24 +220,7 @@ class TestFetchCreditoRuralBigquery:
             await fetch_credito_rural_bigquery(finalidade="custeio")
 
 
-class TestIsBigqueryAvailable:
-    def test_available(self):
-        mock_bd = MagicMock()
-        with patch.dict("sys.modules", {"basedosdados": mock_bd}):
-            assert is_bigquery_available() is True
-
-    def test_not_available(self):
-        with patch.dict("sys.modules", {"basedosdados": None}):
-            assert is_bigquery_available() is False
-
-
 class TestConstants:
-    def test_dataset_name(self):
-        assert BQ_DATASET == "br_bcb_sicor"
-
-    def test_table_name(self):
-        assert BQ_TABLE == "microdados_operacao"
-
     def test_columns_map_has_essential_keys(self):
         assert "sigla_uf" in BQ_COLUMNS_MAP
         assert "nome_produto" in BQ_COLUMNS_MAP

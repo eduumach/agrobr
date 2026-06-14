@@ -1,65 +1,53 @@
 from __future__ import annotations
 
+import httpx
 import structlog
 
+from agrobr.constants import MIN_ZIP_SIZE
+from agrobr.exceptions import SourceUnavailableError
+from agrobr.http.retry import retry_on_status
 from agrobr.http.settings import get_timeout
-from agrobr.utils.geo import build_wfs_url, fetch_wfs, fetch_wfs_paginated
+from agrobr.http.user_agents import UserAgentRotator
+from agrobr.utils.io import extract_csv_from_zip
 
-from .models import (
-    LAYER,
-    MAX_FEATURES_GEO,
-    NAMESPACE,
-    PAGE_SIZE,
-    PROPERTY_NAMES,
-    PROPERTY_NAMES_GEO,
-    WFS_BASE,
-    WFS_VERSION,
-)
+from .models import MIN_CSV_BYTES, ZIP_URL
 
 logger = structlog.get_logger()
 
-TIMEOUT = get_timeout(read=180.0)
+TIMEOUT = get_timeout(read=300.0)
 
 
-def _build_cql(uf: str | None = None) -> str | None:
-    if uf is None:
-        return None
-    return f"sig_uf='{uf}'"
+async def fetch_embargos_zip() -> tuple[bytes, str]:
+    """Baixa o dump completo de termos de embargo do SIFISC (~47 MB zipado,
+    ~170 MB de CSV com geometrias WKT) e retorna os bytes do CSV extraído."""
+    async with httpx.AsyncClient(
+        timeout=TIMEOUT, headers=UserAgentRotator.get_bot_headers(), follow_redirects=True
+    ) as http:
+        logger.info("ibama_embargos_request", url=ZIP_URL)
+        response = await retry_on_status(
+            lambda: http.get(ZIP_URL),
+            source="ibama",
+        )
+        response.raise_for_status()
+        content = response.content
 
+    if len(content) < MIN_ZIP_SIZE:
+        raise SourceUnavailableError(
+            source="ibama",
+            url=ZIP_URL,
+            last_error=f"ZIP too small ({len(content)} bytes)",
+        )
 
-async def fetch_embargos(
-    *,
-    uf: str | None = None,
-    bbox: tuple[float, float, float, float] | None = None,
-) -> tuple[list[bytes], str]:
-    return await fetch_wfs_paginated(
-        WFS_BASE,
-        NAMESPACE,
-        LAYER,
-        WFS_VERSION,
-        PROPERTY_NAMES,
-        PAGE_SIZE,
-        source="ibama",
-        timeout=TIMEOUT,
-        cql=_build_cql(uf),
-        bbox=bbox,
-    )
+    csv_bytes = extract_csv_from_zip(content, source="ibama", url=ZIP_URL)
+    if len(csv_bytes) < MIN_CSV_BYTES:
+        raise SourceUnavailableError(
+            source="ibama",
+            url=ZIP_URL,
+            last_error=(
+                f"CSV de embargos com {len(csv_bytes)} bytes "
+                f"(esperado >= {MIN_CSV_BYTES}) — possível truncamento na fonte"
+            ),
+        )
 
-
-async def fetch_embargos_geo(
-    *,
-    bbox: tuple[float, float, float, float] | None = None,
-) -> tuple[bytes, str]:
-    url = build_wfs_url(
-        WFS_BASE,
-        NAMESPACE,
-        LAYER,
-        WFS_VERSION,
-        PROPERTY_NAMES_GEO,
-        max_features=MAX_FEATURES_GEO,
-        output_format="application/json",
-        bbox=bbox,
-    )
-    content = await fetch_wfs(url, source="ibama", timeout=TIMEOUT)
-    logger.info("ibama_embargos_geojson", source="ibama", size=len(content))
-    return content, url
+    logger.info("ibama_embargos_zip_ok", zip_bytes=len(content), csv_bytes=len(csv_bytes))
+    return csv_bytes, ZIP_URL

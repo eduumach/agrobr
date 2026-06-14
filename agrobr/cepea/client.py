@@ -7,7 +7,7 @@ import httpx
 import structlog
 
 from agrobr import constants
-from agrobr.constants import _CEPEA_ENDPOINTS, MIN_HTML_PAGE_SIZE
+from agrobr.constants import _CEPEA_ENDPOINTS
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.rate_limiter import RateLimiter
 from agrobr.http.retry import RetriableStatusError, retry_async, should_retry_status
@@ -28,18 +28,6 @@ _use_alternative_source: bool = True
 
 _circuit_state: dict[str, float] = {}
 _CIRCUIT_RESET_SECONDS: float = 600.0
-
-
-def set_use_browser(enabled: bool) -> None:
-    global _use_browser
-    _use_browser = enabled
-    logger.info("cepea_browser_mode", enabled=enabled)
-
-
-def set_use_alternative_source(enabled: bool) -> None:
-    global _use_alternative_source
-    _use_alternative_source = enabled
-    logger.info("cepea_alternative_source_mode", enabled=enabled)
 
 
 TIMEOUT = get_timeout()
@@ -231,72 +219,4 @@ async def fetch_indicador_page(
         source="cepea",
         url=_get_produto_url(produto, _CEPEA_ENDPOINTS[0]),
         last_error=f"All fetch methods failed. Last error: {last_error}",
-    )
-
-
-async def fetch_series_historica(produto: str, anos: int = 5) -> str:
-    headers = UserAgentRotator.get_headers(source="cepea")
-    last_error: str = ""
-
-    logger.info(
-        "http_request",
-        source="cepea",
-        method="GET",
-        produto=produto,
-        anos=anos,
-    )
-
-    for endpoint in _CEPEA_ENDPOINTS:
-        idx = _endpoint_index(endpoint)
-
-        if _is_circuit_open(endpoint):
-            logger.debug("cepea_series_circuit_open", endpoint_index=idx)
-            continue
-
-        url = f"{endpoint}/br/consultas-ao-banco-de-dados-do-site.aspx"
-
-        async def _fetch(_url: str = url) -> httpx.Response:
-            async with (
-                RateLimiter.acquire(constants.Fonte.CEPEA),
-                httpx.AsyncClient(
-                    timeout=TIMEOUT,
-                    follow_redirects=True,
-                ) as client,
-            ):
-                response = await client.get(_url, headers=headers)
-                response.raise_for_status()
-                return response
-
-        try:
-            response = await retry_async(_fetch)
-        except httpx.HTTPError as e:
-            last_error = str(e)
-            is_cloudflare = "403" in last_error or "cloudflare" in last_error.lower()
-            if is_cloudflare:
-                _open_circuit(endpoint)
-            logger.debug(
-                "cepea_series_endpoint_failed",
-                endpoint_index=idx,
-                error=last_error,
-            )
-            continue
-
-        declared_encoding = response.charset_encoding
-        html, _ = decode_content(
-            response.content,
-            declared_encoding=declared_encoding,
-            source="cepea",
-        )
-
-        if len(html) < MIN_HTML_PAGE_SIZE:
-            last_error = f"Serie historica response too small ({len(html)} bytes)"
-            logger.debug("cepea_series_too_small", endpoint_index=idx, size=len(html))
-            continue
-
-        return html
-
-    raise SourceUnavailableError(
-        source="cepea",
-        url=f"{_CEPEA_ENDPOINTS[0]}/br/consultas-ao-banco-de-dados-do-site.aspx",
-        last_error=last_error or "All endpoints failed for series historica",
     )

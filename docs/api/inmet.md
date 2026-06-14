@@ -4,15 +4,57 @@ O modulo INMET fornece dados meteorologicos de 600+ estacoes do Instituto Nacion
 
 ## Token
 
-Dados observacionais requerem token:
+Dados observacionais via apitempo requerem token:
 
 ```bash
 export AGROBR_INMET_TOKEN=seu_token
 ```
 
-A listagem de estacoes funciona sem token.
+A listagem de estacoes funciona sem token — e `historico()` (abaixo) cobre
+anos fechados sem token algum, via dadoshistoricos do portal.
 
 ## Funcoes
+
+### `historico`
+
+Dados horarios de um ano inteiro de uma estacao, **sem token**, via ZIP anual
+publico do portal (`portal.inmet.gov.br/uploads/dadoshistoricos`).
+
+```python
+async def historico(
+    codigo: str,
+    ano: int,
+    agregacao: str = "horario",
+    as_polars: bool = False,
+    return_meta: bool = False,
+) -> pd.DataFrame
+```
+
+**Parametros:**
+
+| Parametro | Tipo | Descricao |
+|-----------|------|-----------|
+| `codigo` | `str` | Codigo da estacao (ex: `"A701"`) |
+| `ano` | `int` | Ano (2000+) |
+| `agregacao` | `str` | `"horario"` (default) ou `"diario"` |
+
+**Retorno:**
+
+Mesmo schema de `estacao()`: `data`, `hora_utc`, `estacao`, `uf`, `temperatura`,
+`temperatura_max/min`, `umidade(_max/_min)`, `precipitacao_mm`, `pressao_hpa`,
+`vento_ms/dir/rajada_ms`, `radiacao_kj_m2`, `ponto_orvalho`.
+
+**Exemplo:**
+
+```python
+from agrobr import inmet
+
+df = await inmet.historico("A701", 2025)                       # 8.760 horas
+df = await inmet.historico("A001", 2025, agregacao="diario")   # 365 dias
+```
+
+> O ZIP anual tem ~100 MB (todas as estacoes) e fica em cache de processo —
+> a segunda estacao do mesmo ano nao re-baixa nada.
 
 ### `estacoes`
 

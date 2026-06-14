@@ -14,9 +14,7 @@ from agrobr.alt.sicar.models import (
     PROPERTY_NAMES_GEO,
     RENAME_MAP,
     SICAR_GEOM_COLUMN,
-    STATUS_LABELS,
     STATUS_VALIDOS,
-    TIPO_LABELS,
     TIPO_VALIDOS,
     UFS_VALIDAS,
     WFS_BASE,
@@ -129,15 +127,6 @@ class TestStatusValidos:
     def test_is_frozenset(self):
         assert isinstance(STATUS_VALIDOS, frozenset)
 
-    def test_labels_match_status(self):
-        assert set(STATUS_LABELS.keys()) == STATUS_VALIDOS
-
-    def test_labels_values(self):
-        assert STATUS_LABELS["AT"] == "Ativo"
-        assert STATUS_LABELS["PE"] == "Pendente"
-        assert STATUS_LABELS["SU"] == "Suspenso"
-        assert STATUS_LABELS["CA"] == "Cancelado"
-
 
 class TestTipoValidos:
     def test_all_tipos(self):
@@ -145,14 +134,6 @@ class TestTipoValidos:
 
     def test_is_frozenset(self):
         assert isinstance(TIPO_VALIDOS, frozenset)
-
-    def test_labels_match_tipos(self):
-        assert set(TIPO_LABELS.keys()) == TIPO_VALIDOS
-
-    def test_labels_values(self):
-        assert TIPO_LABELS["IRU"] == "Rural"
-        assert TIPO_LABELS["AST"] == "Assentamento"
-        assert TIPO_LABELS["PCT"] == "Terra Indigena"
 
 
 class TestUfsValidas:

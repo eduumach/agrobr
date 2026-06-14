@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import io
+import zipfile
 from typing import Any, Literal
 
 import pandas as pd
 import structlog
 
-from agrobr.exceptions import ParseError
+from agrobr.exceptions import ParseError, SourceUnavailableError
 
 _ExcelEngine = Literal["xlrd", "openpyxl", "odf", "pyxlsb", "calamine"]
 
@@ -141,3 +142,22 @@ def concat_csv_pages(
         return pd.DataFrame(columns=empty_columns)
 
     return pd.concat(dfs, ignore_index=True)
+
+
+def extract_csv_from_zip(data: bytes, *, source: str, url: str) -> bytes:
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as zf:
+            csv_names = [n for n in zf.namelist() if n.lower().endswith(".csv")]
+            if not csv_names:
+                raise SourceUnavailableError(
+                    source=source,
+                    url=url,
+                    last_error="ZIP não contém arquivo CSV",
+                )
+            return zf.read(csv_names[0])
+    except zipfile.BadZipFile as e:
+        raise SourceUnavailableError(
+            source=source,
+            url=url,
+            last_error=f"Resposta não é um ZIP válido: {e}",
+        ) from e

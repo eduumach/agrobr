@@ -229,7 +229,7 @@ class TestFetchEntregasPdf:
             patch(
                 "agrobr.anda.client.fetch_estatisticas_page", new_callable=AsyncMock
             ) as mock_page,
-            pytest.raises(FileNotFoundError, match="não encontrado"),
+            pytest.raises(SourceUnavailableError, match="não encontrado"),
         ):
             mock_page.return_value = "<html><body>no links</body></html>"
             await client.fetch_entregas_pdf(2024)
@@ -301,26 +301,26 @@ class TestFetchEntregasPdf:
         mock_dl.assert_called_once_with("https://anda.org.br/docs/entregas_2024.pdf")
 
     @pytest.mark.asyncio
-    async def test_fallback_to_latest_year_when_requested_not_found(self):
+    async def test_ano_indisponivel_raises_com_anos_disponiveis(self):
         html = (
             "<html><body>"
             '<a href="https://anda.org.br/docs/entregas_2023.pdf">Entregas 2023</a>'
             "</body></html>"
         )
-        pdf_content = b"x" * 600
 
         with (
             patch(
                 "agrobr.anda.client.fetch_estatisticas_page", new_callable=AsyncMock
             ) as mock_page,
             patch("agrobr.anda.client.download_file", new_callable=AsyncMock) as mock_dl,
+            pytest.raises(SourceUnavailableError) as exc_info,
         ):
             mock_page.return_value = html
-            mock_dl.return_value = pdf_content
-            result_bytes, ano_real = await client.fetch_entregas_pdf(2025)
+            await client.fetch_entregas_pdf(2025)
 
-        assert result_bytes == pdf_content
-        assert ano_real == 2023
+        assert "2025 não encontrado" in str(exc_info.value)
+        assert "2023" in str(exc_info.value)
+        mock_dl.assert_not_called()
 
     @pytest.mark.asyncio
     async def test_year_extracted_from_url_when_text_has_no_year(self):

@@ -78,13 +78,6 @@ SERIE_HISTORICA_PRODUTOS: dict[str, str] = {
     "laranja": "laranja",
 }
 
-SERIE_HISTORICA_CATEGORIAS: dict[str, str] = {
-    "graos": "graos",
-    "cafe": "cafe",
-    "cana": "cana",
-    "laranja": "laranja",
-}
-
 UFS_BRASIL = [
     "AC",
     "AL",
@@ -121,25 +114,3 @@ REGIOES_BRASIL = ["NORTE", "NORDESTE", "CENTRO-OESTE", "SUDESTE", "SUL"]
 def normalize_produto(nome: str) -> str:
     lower = nome.lower().strip()
     return SERIE_HISTORICA_PRODUTOS.get(lower, lower.replace(" ", "_"))
-
-
-def detect_safra_format(value: str) -> str:
-    import re
-
-    value = value.strip()
-    value = re.sub(r"(?i)^safra\s*", "", value)
-
-    match = re.match(r"(\d{4})/(\d{4})$", value)
-    if match:
-        return f"{match.group(1)}/{match.group(2)[2:]}"
-
-    match = re.match(r"(\d{4})/(\d{2})$", value)
-    if match:
-        return value
-
-    match = re.match(r"^(\d{4})$", value)
-    if match:
-        year = int(match.group(1))
-        return f"{year}/{str(year + 1)[2:]}"
-
-    return value

@@ -13,6 +13,8 @@ from agrobr.models import Indicador
 
 logger = structlog.get_logger()
 
+PARSER_VERSION = 2
+
 UNIDADES = {
     "soja": "BRL/sc60kg",
     "soja_parana": "BRL/sc60kg",
@@ -225,7 +227,7 @@ def parse_indicador(html: str, produto: str) -> list[Indicador]:
                 unidade=unidade,
                 metodologia="CEPEA/ESALQ via Notícias Agrícolas",
                 meta=meta,
-                parser_version=2,
+                parser_version=PARSER_VERSION,
                 anomalies=["media_semanal"] if is_weekly else [],
             )
 
@@ -235,7 +237,7 @@ def parse_indicador(html: str, produto: str) -> list[Indicador]:
         has_tables = bool(soup.find_all("table"))
         raise ParseError(
             source="noticias_agricolas",
-            parser_version=1,
+            parser_version=PARSER_VERSION,
             reason=(
                 f"No indicators found for '{produto}'. "
                 f"{'Tables found but no data rows matched expected format.' if has_tables else 'No tables found in HTML.'}"

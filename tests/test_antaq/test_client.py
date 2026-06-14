@@ -139,22 +139,6 @@ class TestExtractTxtFromZip:
         assert result.startswith("colA")
 
 
-class TestListZipContents:
-    def test_lists_files(self):
-        zip_bytes = _make_zip(
-            {
-                "2024Atracacao.txt": "a",
-                "2024Carga.txt": "b",
-            }
-        )
-
-        names = client.list_zip_contents(zip_bytes)
-
-        assert "2024Atracacao.txt" in names
-        assert "2024Carga.txt" in names
-        assert len(names) == 2
-
-
 class TestFetchAnoZip:
     @pytest.mark.asyncio
     async def test_builds_correct_url(self):

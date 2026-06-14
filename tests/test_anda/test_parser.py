@@ -5,7 +5,9 @@ import pandas as pd
 from agrobr.anda.parser import (
     PARSER_VERSION,
     _detect_month,
+    _expand_newline_cells,
     _is_uf,
+    _make_record,
     _parse_generic,
     _parse_indicadores,
     _parse_uf_cols,
@@ -342,3 +344,81 @@ class TestParserVersion:
     def test_version(self):
         assert isinstance(PARSER_VERSION, int)
         assert PARSER_VERSION >= 1
+
+
+class TestMakeRecord:
+    def test_positive_volume(self):
+        assert _make_record(2024, 1, "MT", "total", 100.0) == {
+            "ano": 2024,
+            "mes": 1,
+            "uf": "MT",
+            "produto_fertilizante": "total",
+            "volume_ton": 100.0,
+        }
+
+    def test_zero_volume_dropped(self):
+        assert _make_record(2024, 1, "MT", "total", 0.0) is None
+
+    def test_negative_volume_dropped(self):
+        assert _make_record(2024, 1, "MT", "total", -5.0) is None
+
+    def test_none_volume_dropped(self):
+        assert _make_record(2024, 1, "MT", "total", None) is None
+
+    def test_nan_volume_dropped(self):
+        assert _make_record(2024, 1, "MT", "total", float("nan")) is None
+
+    def test_product_normalized(self):
+        rec = _make_record(2024, 1, "MT", "uréia", 100.0)
+        assert rec is not None
+        assert rec["produto_fertilizante"] == "ureia"
+
+
+class TestExpandNewlineCells:
+    def test_clean_table_passthrough(self):
+        table = [["UF", "Jan"], ["MT", "100"], ["SP", "200"]]
+        assert _expand_newline_cells(table) == table
+
+    def test_strips_whitespace(self):
+        table = [["  UF ", "Jan"], [" MT", "100 "]]
+        assert _expand_newline_cells(table) == [["UF", "Jan"], ["MT", "100"]]
+
+    def test_none_cells_become_empty_string(self):
+        assert _expand_newline_cells([["UF", None], [None, "100"]]) == [["UF", ""], ["", "100"]]
+
+    def test_expands_when_cell_has_many_lines(self):
+        table = [["UF", "Valores"], ["MT\nSP\nPR\nGO\nBA", "1\n2\n3\n4\n5"]]
+        assert _expand_newline_cells(table) == [
+            ["UF", "Valores"],
+            ["MT", "1"],
+            ["SP", "2"],
+            ["PR", "3"],
+            ["GO", "4"],
+            ["BA", "5"],
+        ]
+
+    def test_below_threshold_not_expanded(self):
+        table = [["UF", "V"], ["MT\nSP\nPR", "1\n2\n3"]]
+        assert _expand_newline_cells(table) == [["UF", "V"], ["MT\nSP\nPR", "1\n2\n3"]]
+
+    def test_short_table_just_cleaned(self):
+        assert _expand_newline_cells([["UF", "Jan"]]) == [["UF", "Jan"]]
+
+    def test_empty_table(self):
+        assert _expand_newline_cells([]) == []
+
+
+class TestExpandIntegration:
+    def test_multiline_cells_expanded_and_parsed(self):
+        table = [
+            ["UF", "Jan", "Fev"],
+            ["MT\nSP\nPR\nGO\nBA", "1\n2\n3\n4\n5", "10\n20\n30\n40\n50"],
+        ]
+        records = parse_entregas_table(table, 2024)
+
+        assert len(records) == 10  # 5 UFs × 2 meses
+        mt_jan = [r for r in records if r["uf"] == "MT" and r["mes"] == 1]
+        assert len(mt_jan) == 1
+        assert mt_jan[0]["volume_ton"] == 1.0
+        ba_fev = [r for r in records if r["uf"] == "BA" and r["mes"] == 2]
+        assert ba_fev[0]["volume_ton"] == 50.0

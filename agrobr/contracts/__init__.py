@@ -45,19 +45,12 @@ class Column:
             null_count = int(series.isna().sum())
             errors.append(f"Column '{self.name}' has {null_count} null values but nullable=False")
 
-        if self.type == ColumnType.DATE:
+        if self.type in (ColumnType.DATE, ColumnType.DATETIME):
             if not pd.api.types.is_datetime64_any_dtype(series):
                 try:
                     pd.to_datetime(series.dropna())
                 except Exception:
-                    errors.append(f"Column '{self.name}' cannot be converted to date")
-
-        elif self.type == ColumnType.DATETIME:
-            if not pd.api.types.is_datetime64_any_dtype(series):
-                try:
-                    pd.to_datetime(series.dropna())
-                except Exception:
-                    errors.append(f"Column '{self.name}' cannot be converted to datetime")
+                    errors.append(f"Column '{self.name}' cannot be converted to {self.type.value}")
 
         elif self.type == ColumnType.INTEGER:
             if not pd.api.types.is_integer_dtype(series):
@@ -75,27 +68,17 @@ class Column:
             errors.append(f"Column '{self.name}' is not numeric")
 
         non_null = series.dropna()
-        if (
-            self.min_value is not None
-            and pd.api.types.is_numeric_dtype(non_null)
-            and len(non_null) > 0
-            and (non_null < self.min_value).any()
-        ):
-            actual_min = float(non_null.min())
-            errors.append(
-                f"Column '{self.name}' has values below minimum {self.min_value} (got {actual_min})"
-            )
-
-        if (
-            self.max_value is not None
-            and pd.api.types.is_numeric_dtype(non_null)
-            and len(non_null) > 0
-            and (non_null > self.max_value).any()
-        ):
-            actual_max = float(non_null.max())
-            errors.append(
-                f"Column '{self.name}' has values above maximum {self.max_value} (got {actual_max})"
-            )
+        if pd.api.types.is_numeric_dtype(non_null) and len(non_null) > 0:
+            if self.min_value is not None and (non_null < self.min_value).any():
+                actual_min = float(non_null.min())
+                errors.append(
+                    f"Column '{self.name}' has values below minimum {self.min_value} (got {actual_min})"
+                )
+            if self.max_value is not None and (non_null > self.max_value).any():
+                actual_max = float(non_null.max())
+                errors.append(
+                    f"Column '{self.name}' has values above maximum {self.max_value} (got {actual_max})"
+                )
 
         return errors
 

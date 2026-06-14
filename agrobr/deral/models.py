@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, field_validator
-
 DERAL_PRODUTOS: dict[str, str] = {
     "soja": "Soja",
     "milho": "Milho",
@@ -18,16 +16,6 @@ DERAL_PRODUTOS: dict[str, str] = {
     "cevada": "Cevada",
     "canola": "Canola",
 }
-
-CONDICOES = ["boa", "media", "ruim"]
-
-ESTAGIOS = [
-    "germinacao",
-    "vegetativo",
-    "florescimento",
-    "frutificacao",
-    "maturacao",
-]
 
 _PRODUTO_ALIASES: dict[str, str] = {
     "soja": "soja",
@@ -73,25 +61,3 @@ def normalize_produto(nome: str) -> str:
 def normalize_condicao(cond: str) -> str:
     key = cond.strip().lower()
     return _CONDICAO_ALIASES.get(key, key)
-
-
-class CondicaoLavoura(BaseModel):
-    produto: str
-    data: str = ""
-    estagio: str = ""
-    condicao: str = ""
-    pct: float | None = None
-    plantio_pct: float | None = None
-    colheita_pct: float | None = None
-
-    @field_validator("produto", mode="before")
-    @classmethod
-    def normalize_prod(cls, v: str) -> str:
-        return normalize_produto(v)
-
-    @field_validator("condicao", mode="before")
-    @classmethod
-    def normalize_cond(cls, v: str) -> str:
-        if not v:
-            return v
-        return normalize_condicao(v)

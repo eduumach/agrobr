@@ -215,6 +215,12 @@ async def posicoes_abertas(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
+    """Posições em aberto de futuros/opções agro de uma data.
+
+    O arquivo DerivativesOpenPosition só existe no endpoint para o dia
+    corrente, publicado após o fechamento do pregão — datas passadas
+    retornam 404 (verificado live em jun/2026: D-1, D-2 e D-5 úteis = 404).
+    """
     warn_once(
         "b3_posicoes",
         "agrobr.b3: dados da B3 (empresa privada). Posicoes em aberto publicadas "
@@ -293,6 +299,13 @@ async def oi_historico(
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
+    """Itera `posicoes_abertas` pelos dias úteis do período.
+
+    A fonte só publica o arquivo do dia corrente (datas passadas = 404),
+    então períodos retroativos retornam vazio — a série histórica só se
+    acumula executando a coleta diariamente. Para posicionamento semanal
+    histórico em Chicago/NY, use `cftc.cot()` (2006+).
+    """
     logger.info("b3_oi_historico", contrato=contrato, inicio=str(inicio), fim=str(fim))
 
     inicio_dt = datetime.strptime(inicio, "%Y-%m-%d").date() if isinstance(inicio, str) else inicio

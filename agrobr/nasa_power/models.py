@@ -1,10 +1,5 @@
 from __future__ import annotations
 
-from datetime import date
-from typing import Any
-
-from pydantic import BaseModel, Field, field_validator
-
 UF_COORDS: dict[str, tuple[float, float]] = {
     "AC": (-9.0, -70.8),
     "AL": (-9.6, -36.8),
@@ -56,42 +51,3 @@ COLUNAS_MAP: dict[str, str] = {
 }
 
 SENTINEL: float = -999.0
-
-
-class ClimaObservacao(BaseModel):
-    data: date
-    lat: float
-    lon: float
-    uf: str = Field("", max_length=2)
-
-    temp_media: float | None = None
-    temp_max: float | None = None
-    temp_min: float | None = None
-    precip_mm: float | None = None
-    umidade_rel: float | None = None
-    radiacao_mj: float | None = None
-    vento_ms: float | None = None
-
-    model_config = {"populate_by_name": True}
-
-    @field_validator(
-        "temp_media",
-        "temp_max",
-        "temp_min",
-        "precip_mm",
-        "umidade_rel",
-        "radiacao_mj",
-        "vento_ms",
-        mode="before",
-    )
-    @classmethod
-    def convert_sentinel(cls, v: Any) -> float | None:
-        if v is None:
-            return None
-        try:
-            val = float(v)
-        except (ValueError, TypeError):
-            return None
-        if val == SENTINEL:
-            return None
-        return val

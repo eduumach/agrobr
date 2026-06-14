@@ -42,18 +42,6 @@ CULTURAS_ZARC: dict[str, str] = {
     "Melancia": "melancia",
 }
 
-SOLOS: dict[int, str] = {
-    1: "arenoso",
-    2: "medio",
-    3: "argiloso",
-    11: "AD1_24mm",
-    12: "AD2_32mm",
-    13: "AD3_42mm",
-    14: "AD4_55mm",
-    15: "AD5_72mm",
-    16: "AD6_95mm",
-}
-
 DEC_COLS: list[str] = [f"dec{i}" for i in range(1, 37)]
 
 COLUNAS_SAIDA: list[str] = [

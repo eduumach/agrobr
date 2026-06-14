@@ -129,6 +129,21 @@ async def vendas_diesel(
     return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
 
+def _periodos_municipios(inicio: date | None, fim: date | None) -> list[str]:
+    if not inicio and not fim:
+        return list(PRECOS_MUNICIPIOS_URLS.keys())
+
+    ano_inicio = inicio.year if inicio else 2022
+    ano_fim = fim.year if fim else datetime.now().year
+
+    periodos: list[str] = []
+    for ano in range(ano_inicio, ano_fim + 1):
+        p = _resolve_periodo_municipio(ano)
+        if p and p not in periodos:
+            periodos.append(p)
+    return periodos
+
+
 async def _fetch_and_parse_municipios(
     produto: str | None,
     uf: str | None,
@@ -136,25 +151,7 @@ async def _fetch_and_parse_municipios(
     inicio: date | None,
     fim: date | None,
 ) -> pd.DataFrame:
-    periodos_necessarios: list[str] = []
-
-    if inicio and fim:
-        for ano in range(inicio.year, fim.year + 1):
-            p = _resolve_periodo_municipio(ano)
-            if p and p not in periodos_necessarios:
-                periodos_necessarios.append(p)
-    elif inicio:
-        for ano in range(inicio.year, datetime.now().year + 1):
-            p = _resolve_periodo_municipio(ano)
-            if p and p not in periodos_necessarios:
-                periodos_necessarios.append(p)
-    elif fim:
-        for ano in range(2022, fim.year + 1):
-            p = _resolve_periodo_municipio(ano)
-            if p and p not in periodos_necessarios:
-                periodos_necessarios.append(p)
-    else:
-        periodos_necessarios = list(PRECOS_MUNICIPIOS_URLS.keys())
+    periodos_necessarios = _periodos_municipios(inicio, fim)
 
     dfs: list[pd.DataFrame] = []
     for periodo in periodos_necessarios:

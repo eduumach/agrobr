@@ -16,11 +16,6 @@ class CachePolicy(NamedTuple):
 
 
 class TTL(Enum):
-    MINUTES_15 = 15 * 60
-    MINUTES_30 = 30 * 60
-    HOUR_1 = 60 * 60
-    HOURS_4 = 4 * 60 * 60
-    HOURS_12 = 12 * 60 * 60
     HOURS_24 = 24 * 60 * 60
     DAYS_7 = 7 * 24 * 60 * 60
     DAYS_30 = 30 * 24 * 60 * 60
@@ -198,10 +193,6 @@ def _get_smart_expiry_time() -> datetime:
     if now < today_expiry:
         return today_expiry
     return today_expiry + timedelta(days=1)
-
-
-def _get_last_expiry_time() -> datetime:
-    return _get_smart_expiry_time() - timedelta(days=1)
 
 
 def calculate_expiry(source: Fonte | str, endpoint: str | None = None) -> datetime:

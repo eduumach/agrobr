@@ -167,3 +167,66 @@ class TestFocusRetry:
             pytest.raises(SourceUnavailableError),
         ):
             await focus_client.fetch_focus("PIB Agropecuária")
+
+
+class TestFocusDataInicial:
+    @pytest.mark.asyncio
+    async def test_data_inicial_entra_no_filtro_server_side(self):
+        resp = make_mock_response(200, json_data={"value": []})
+        mock_client = make_mock_async_client()
+        mock_client.get = AsyncMock(return_value=resp)
+
+        with patch("agrobr.bcb.focus_client.httpx.AsyncClient", return_value=mock_client):
+            await focus_client.fetch_focus("IPCA", data_inicial="2026-01-01")
+
+        url = mock_client.get.call_args[0][0]
+        assert "Data%20ge%20'2026-01-01'" in url
+
+    @pytest.mark.asyncio
+    async def test_data_inicial_invalida_raises(self):
+        with pytest.raises(ValueError, match="YYYY-MM-DD"):
+            await focus_client.fetch_focus("IPCA", data_inicial="01/01/2026")
+
+    @pytest.mark.asyncio
+    async def test_sem_data_inicial_filtro_so_indicador(self):
+        resp = make_mock_response(200, json_data={"value": []})
+        mock_client = make_mock_async_client()
+        mock_client.get = AsyncMock(return_value=resp)
+
+        with patch("agrobr.bcb.focus_client.httpx.AsyncClient", return_value=mock_client):
+            await focus_client.fetch_focus("IPCA")
+
+        url = mock_client.get.call_args[0][0]
+        assert "Data%20ge" not in url
+
+
+class TestFocusMaxRegistros:
+    @pytest.mark.asyncio
+    async def test_max_registros_interrompe_paginacao(self):
+        resp = make_mock_response(200, json_data={"value": FOCUS_RECORDS})
+        mock_client = make_mock_async_client()
+        mock_client.get = AsyncMock(return_value=resp)
+
+        with patch("agrobr.bcb.focus_client.httpx.AsyncClient", return_value=mock_client):
+            records, _ = await focus_client.fetch_focus("IPCA", top=2, max_registros=2)
+
+        assert len(records) == 2
+        assert mock_client.get.call_count == 1
+
+    @pytest.mark.asyncio
+    async def test_max_registros_invalido_raises(self):
+        with pytest.raises(ValueError, match="max_registros"):
+            await focus_client.fetch_focus("IPCA", max_registros=0)
+
+    @pytest.mark.asyncio
+    async def test_max_registros_trunca_excedente(self):
+        resp1 = make_mock_response(200, json_data={"value": FOCUS_RECORDS})
+        resp2 = make_mock_response(200, json_data={"value": FOCUS_RECORDS})
+        mock_client = make_mock_async_client()
+        mock_client.get = AsyncMock(side_effect=[resp1, resp2])
+
+        with patch("agrobr.bcb.focus_client.httpx.AsyncClient", return_value=mock_client):
+            records, _ = await focus_client.fetch_focus("IPCA", top=2, max_registros=3)
+
+        assert len(records) == 3
+        assert mock_client.get.call_count == 2

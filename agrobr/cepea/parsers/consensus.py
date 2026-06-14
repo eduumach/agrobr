@@ -16,7 +16,6 @@ CONSENSUS_PARSERS: list[type[BaseParser]] = [
     CepeaParserV1,
 ]
 
-DIVERGENCE_THRESHOLD_COUNT = 0.1
 DIVERGENCE_THRESHOLD_VALUE = 0.01
 
 
@@ -28,13 +27,6 @@ class ConsensusResult:
     has_consensus: bool
     divergences: list[dict[str, Any]]
     report: dict[str, Any]
-
-
-@dataclass
-class ParserDivergence:
-    divergence_type: str
-    versions: list[int]
-    details: dict[str, Any]
 
 
 async def parse_with_consensus(

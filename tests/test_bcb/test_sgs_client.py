@@ -122,6 +122,20 @@ class TestSgsRetry:
 
         assert len(sleep_calls) > 0
 
+    @pytest.mark.asyncio
+    async def test_timeout_tenta_no_maximo_2_vezes(self):
+        mock_client = make_mock_async_client()
+        mock_client.get.side_effect = httpx.TimeoutException("read timeout")
+
+        with (
+            patch("agrobr.bcb.sgs_client.httpx.AsyncClient", return_value=mock_client),
+            patch(RETRY_SLEEP, new_callable=AsyncMock),
+            pytest.raises(SourceUnavailableError),
+        ):
+            await sgs_client.fetch_sgs(999999)
+
+        assert mock_client.get.call_count == 2
+
 
 class TestSgsEmptyResponse:
     @pytest.mark.asyncio

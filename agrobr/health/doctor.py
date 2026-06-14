@@ -194,6 +194,13 @@ def _get_cache_stats() -> CacheStats:
 
         by_source: dict[str, dict[str, Any]] = {}
         conn = store._get_conn()
+        if conn is None:
+            return CacheStats(
+                location=str(cache_path),
+                size_bytes=size_bytes,
+                total_records=0,
+                by_source={},
+            )
 
         for fonte in Fonte:
             try:
@@ -240,6 +247,8 @@ def _get_last_collections() -> dict[str, datetime | None]:
     try:
         store = get_store()
         conn = store._get_conn()
+        if conn is None:
+            return collections
 
         for fonte in Fonte:
             try:

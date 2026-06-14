@@ -52,25 +52,23 @@ async def embargos(
     logger.info("ibama_embargos", uf=uf, bbox=bbox)
 
     t0 = time.monotonic()
-    pages, source_url = await client.fetch_embargos(uf=uf, bbox=bbox)
+    csv_bytes, source_url = await client.fetch_embargos_zip()
     fetch_ms = int((time.monotonic() - t0) * 1000)
 
     t1 = time.monotonic()
-    df = parser.parse_embargos_csv(pages)
+    df = parser.parse_embargos_csv(csv_bytes, uf=uf, bbox=bbox)
     parse_ms = int((time.monotonic() - t1) * 1000)
-
-    df = df.drop_duplicates(subset=["numero_tad"]).reset_index(drop=True)
 
     meta = build_source_meta(
         "ibama",
         source_url,
-        "httpx+wfs+csv",
+        "httpx+zip+csv",
         fetch_ms,
         parse_ms,
         df,
         parser.PARSER_VERSION,
-        attempted_sources=["ibama_geoserver"],
-        selected_source="ibama_geoserver",
+        attempted_sources=["ibama_sifisc"],
+        selected_source="ibama_sifisc",
     )
     return finalize_result(df, meta, as_polars=as_polars, return_meta=return_meta)
 
@@ -105,27 +103,24 @@ async def embargos_geo(
     logger.info("ibama_embargos_geo", uf=uf, bbox=bbox)
 
     t0 = time.monotonic()
-    geojson_bytes, source_url = await client.fetch_embargos_geo(bbox=bbox)
+    csv_bytes, source_url = await client.fetch_embargos_zip()
     fetch_ms = int((time.monotonic() - t0) * 1000)
 
     t1 = time.monotonic()
-    gdf = parser.parse_embargos_geojson(geojson_bytes)
+    gdf = parser.parse_embargos_geo(csv_bytes, uf=uf, bbox=bbox)
     parse_ms = int((time.monotonic() - t1) * 1000)
-
-    if uf is not None and not gdf.empty:
-        gdf = gdf[gdf["uf"] == uf].reset_index(drop=True)
 
     if return_meta:
         meta = build_source_meta(
             "ibama",
             source_url,
-            "httpx+wfs+geojson",
+            "httpx+zip+csv+wkt",
             fetch_ms,
             parse_ms,
             gdf,
             parser.PARSER_VERSION,
-            attempted_sources=["ibama_geoserver_geo"],
-            selected_source="ibama_geoserver_geo",
+            attempted_sources=["ibama_sifisc"],
+            selected_source="ibama_sifisc",
         )
         return gdf, meta
 

@@ -4,12 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>agrobr — Dados agrícolas brasileiros em uma linha de código</title>
-<meta name="description" content="Infraestrutura Python para dados agrícolas brasileiros. 38 fontes públicas, uma API unificada com fallback automático, cache DuckDB e contratos versionados.">
+<meta name="description" content="Infraestrutura Python para dados agrícolas brasileiros. 40 fontes públicas, uma API unificada com fallback automático, cache DuckDB e contratos versionados.">
 <link rel="canonical" href="https://www.agrobr.dev/">
+<link rel="alternate" hreflang="pt-BR" href="https://www.agrobr.dev/">
+<link rel="alternate" hreflang="en" href="https://www.agrobr.dev/en/">
+<link rel="alternate" hreflang="x-default" href="https://www.agrobr.dev/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.agrobr.dev/">
 <meta property="og:title" content="agrobr — Dados agrícolas brasileiros em uma linha de código">
-<meta property="og:description" content="38 fontes públicas — CEPEA, CONAB, IBGE, B3, NASA POWER e mais — numa API Python unificada com fallback automático e contratos versionados.">
+<meta property="og:description" content="40 fontes públicas — CEPEA, CONAB, IBGE, B3, NASA POWER e mais — numa API Python unificada com fallback automático e contratos versionados.">
 <meta property="og:image" content="https://www.agrobr.dev/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌾</text></svg>">
@@ -863,6 +866,7 @@
     <li><a href="#features">Features</a></li>
     <li><a href="#sources">Fontes</a></li>
     <li><a href="https://www.agrobr.dev/docs/">Docs</a></li>
+    <li><a href="https://www.agrobr.dev/en/">EN</a></li>
     <li><a href="https://github.com/bruno-portfolio/agrobr" target="_blank">GitHub</a></li>
   </ul>
 </nav>
@@ -873,7 +877,7 @@
   <div class="hero-content">
     <p class="hero-eyebrow">Python · Open Source · PyPI</p>
     <h1 class="hero-title">Dados agrícolas brasileiros em <em>uma linha</em> de código</h1>
-    <p class="hero-subtitle"><span class="hero-sources">CEPEA, CONAB, IBGE, NASA POWER, USDA, B3</span> e mais 32 fontes — 38 origens, uma API unificada com fallback automático, cache inteligente e contratos versionados.</p>
+    <p class="hero-subtitle"><span class="hero-sources">CEPEA, CONAB, IBGE, NASA POWER, USDA, B3</span> e mais 34 fontes — 40 origens, uma API unificada com fallback automático, cache inteligente e contratos versionados.</p>
     <div class="hero-install" onclick="copyInstall(this)" title="Copiar">
       <span><span class="pip">$</span> pip install agrobr</span>
       <span class="copy-icon">⎘</span>
@@ -885,13 +889,13 @@
     <div class="ticker-track" id="tickerTrack">
       <div class="ticker-set">
         <!-- agrobr:ticker -->
-        <span class="ticker-item"><span class="tk-name">soja</span><span class="tk-price">R$ 130,85</span><span class="up">▲ 0,59%</span></span>
-        <span class="ticker-item"><span class="tk-name">milho</span><span class="tk-price">R$ 64,26</span><span class="down">▼ 0,43%</span></span>
-        <span class="ticker-item"><span class="tk-name">boi gordo</span><span class="tk-price">R$ 353,55</span><span class="up">▲ 0,11%</span></span>
-        <span class="ticker-item"><span class="tk-name">café</span><span class="tk-price">R$ 1,383,57</span><span class="down">▼ 0,83%</span></span>
-        <span class="ticker-item"><span class="tk-name">trigo</span><span class="tk-price">R$ 1,372,24</span><span class="up">▲ 0,02%</span></span>
-        <span class="ticker-item"><span class="tk-name">algodão</span><span class="tk-price">R$ 418,94</span><span class="down">▼ 0,22%</span></span>
-        <span class="ticker-item"><span class="tk-stamp">indicadores CEPEA · 09 jun 2026 · coletados via agrobr</span></span>
+        <span class="ticker-item"><span class="tk-name">soja</span><span class="tk-price">R$ 129,85</span><span class="down">▼ 1,46%</span></span>
+        <span class="ticker-item"><span class="tk-name">milho</span><span class="tk-price">R$ 64,21</span><span class="up">▲ 0,28%</span></span>
+        <span class="ticker-item"><span class="tk-name">boi gordo</span><span class="tk-price">R$ 353,40</span><span class="down">▼ 0,11%</span></span>
+        <span class="ticker-item"><span class="tk-name">café</span><span class="tk-price">R$ 1.416,69</span><span class="up">▲ 0,32%</span></span>
+        <span class="ticker-item"><span class="tk-name">trigo</span><span class="tk-price">R$ 1.376,98</span><span class="down">▼ 0,07%</span></span>
+        <span class="ticker-item"><span class="tk-name">algodão</span><span class="tk-price">R$ 416,24</span><span class="up">▲ 0,73%</span></span>
+        <span class="ticker-item"><span class="tk-stamp">indicadores CEPEA · 12 jun 2026 · coletados via agrobr</span></span>
         <!-- /agrobr:ticker -->
       </div>
     </div>
@@ -901,9 +905,9 @@
 <!-- STAT STRIP -->
 <div class="stat-strip">
   <div class="stat-strip-inner">
-    <div class="stat-item"><span class="stat-num">38</span><span class="stat-label">fontes</span></div>
-    <div class="stat-item"><span class="stat-num">35</span><span class="stat-label">datasets</span></div>
-    <div class="stat-item"><span class="stat-num">6.300+</span><span class="stat-label">testes</span></div>
+    <div class="stat-item"><span class="stat-num">40</span><span class="stat-label">fontes</span></div>
+    <div class="stat-item"><span class="stat-num">36</span><span class="stat-label">datasets</span></div>
+    <div class="stat-item"><span class="stat-num">6.500+</span><span class="stat-label">testes</span></div>
     <div class="stat-item"><span class="stat-num">92%</span><span class="stat-label">cobertura</span></div>
     <div class="stat-item"><span class="stat-num">MIT</span><span class="stat-label">license</span></div>
   </div>
@@ -913,8 +917,8 @@
 <section id="proof">
   <div class="reveal">
     <p class="section-label">Prova, não promessa</p>
-    <h2 class="section-title">Isto saiu daqui ontem.</h2>
-    <p class="section-desc">O painel ao lado não é mockup: é o indicador CEPEA da soja buscado pelo próprio agrobr — fallback automático, cache DuckDB, contrato validado.</p>
+    <h2 class="section-title">Ninguém digitou este número.</h2>
+    <p class="section-desc">O painel ao lado não é mockup: o CEPEA divulga, o agrobr busca, a página atualiza — todo pregão, com fallback automático, cache DuckDB e contrato validado.</p>
   </div>
 
   <div class="proof-grid reveal">
@@ -923,23 +927,23 @@
 <span class="code-line"> </span>
 <span class="code-line"><span class="var">df</span> <span class="op">=</span> <span class="kw">await</span> <span class="fn">datasets.preco_diario</span>(<span class="str">"soja"</span>)</span>
 <span class="code-line"> </span>
-<!-- agrobr:pregoes --><span class="code-line"><span class="cm"># 86 pregões · CEPEA → Notícias Agrícolas → cache</span></span><!-- /agrobr:pregoes -->
+<!-- agrobr:pregoes --><span class="code-line"><span class="cm"># 10 pregões · CEPEA → Notícias Agrícolas → cache</span></span><!-- /agrobr:pregoes -->
 </code>
     </div>
 
     <div class="proof-output">
       <!-- agrobr:proof -->
-      <div class="proof-price">R$ 130,85 <span class="currency">/ sc 60kg</span></div>
-      <div class="proof-meta">soja · indicador CEPEA/ESALQ · 09 jun 2026</div>
-      <svg class="sparkline" viewBox="0 0 300 84" preserveAspectRatio="none" aria-label="Últimos 30 pregões da soja">
-        <polyline class="spark-path" points="0.0,70.9 10.3,56.2 20.7,44.7 31.0,48.7 41.4,44.0 51.7,48.2 62.1,53.5 72.4,76.0 82.8,70.2 93.1,49.3 103.4,36.9 113.8,18.4 124.1,58.7 134.5,44.0 144.8,33.6 155.2,18.0 165.5,42.0 175.9,34.9 186.2,35.3 196.6,30.0 206.9,38.0 217.2,30.4 227.6,12.0 237.9,26.2 248.3,23.8 258.6,51.3 269.0,28.0 279.3,43.6 289.7,26.9 300.0,12.9"/>
-        <circle class="spark-dot" cx="300.0" cy="12.9" r="3.5"/>
+      <div class="proof-price">R$ 129,85 <span class="currency">/ sc 60kg</span></div>
+      <div class="proof-meta">soja · indicador CEPEA/ESALQ · 12 jun 2026</div>
+      <svg class="sparkline" viewBox="0 0 300 84" preserveAspectRatio="none" aria-label="Últimos 10 pregões da soja">
+        <polyline class="spark-path" points="0.0,50.7 33.3,48.3 66.7,76.0 100.0,52.5 133.3,68.3 166.7,51.4 200.0,37.3 233.3,12.0 266.7,20.3 300.0,55.6"/>
+        <circle class="spark-dot" cx="300.0" cy="55.6" r="3.5"/>
       </svg>
       <div class="proof-rows">
-        <div><span>2026-06-03</span><span class="v">130,02</span></div>
-        <div><span>2026-06-05</span><span class="v">129,16</span></div>
-        <div><span>2026-06-08</span><span class="v">130,08</span></div>
         <div><span>2026-06-09</span><span class="v">130,85</span></div>
+        <div><span>2026-06-10</span><span class="v">132,23</span></div>
+        <div><span>2026-06-11</span><span class="v">131,78</span></div>
+        <div><span>2026-06-12</span><span class="v">129,85</span></div>
       </div>
         <!-- /agrobr:proof -->
     </div>
@@ -1027,7 +1031,7 @@
   </div>
 
   <div class="datasets-more reveal">
-    <a href="https://www.agrobr.dev/docs/">explorar os 35 datasets na documentação →</a>
+    <a href="https://www.agrobr.dev/docs/">explorar os 36 datasets na documentação →</a>
   </div>
 </section>
 
@@ -1088,7 +1092,7 @@
 <section id="sources">
   <div class="reveal">
     <p class="section-label">Fontes de dados</p>
-    <h2 class="section-title">38 origens. Uma API.</h2>
+    <h2 class="section-title">40 origens. Uma API.</h2>
     <p class="section-desc">Cada fonte tem seu próprio parser com versionamento, fingerprinting e tratamento de encoding. Você só vê o DataFrame.</p>
   </div>
 
@@ -1117,9 +1121,11 @@
         <span class="t2">ZARC</span>
         <span class="t2">ANTAQ</span>
         <span class="t2">UN Comtrade</span>
+        <span class="t2">CFTC</span>
         <span class="t3">ANDA</span>
         <span class="t3">ABIOVE</span>
         <span class="t3">ANEC</span>
+        <span class="t3">UNICA</span>
         <span class="t3 lic">IMEA</span>
         <span class="t3">DERAL</span>
         <span class="t3">INMET</span>
@@ -1151,7 +1157,7 @@
   <div class="reveal">
     <p class="section-label">Começar</p>
     <h2 class="section-title">pip install agrobr</h2>
-    <p class="section-desc" style="margin: 0 auto 0;">MIT License (código). 6.300+ testes. 38 fontes. 35 datasets.</p>
+    <p class="section-desc" style="margin: 0 auto 0;">MIT License (código). 6.500+ testes. 40 fontes. 36 datasets.</p>
     <div class="cta-links">
       <a class="cta-btn primary" href="https://www.agrobr.dev/docs/">Documentação</a>
       <a class="cta-btn secondary" href="https://github.com/bruno-portfolio/agrobr" target="_blank">GitHub ↗</a>

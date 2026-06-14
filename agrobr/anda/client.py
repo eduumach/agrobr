@@ -6,6 +6,7 @@ import httpx
 import structlog
 
 from agrobr.constants import MIN_HTML_SIZE, MIN_ZIP_SIZE, URLS, Fonte
+from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.retry import retry_on_status
 from agrobr.http.settings import get_timeout
 from agrobr.http.user_agents import UserAgentRotator
@@ -34,8 +35,6 @@ async def _get_with_retry(url: str) -> httpx.Response:
 
 
 async def fetch_estatisticas_page() -> str:
-    from agrobr.exceptions import SourceUnavailableError
-
     logger.debug("anda_fetch_page", url=ESTATISTICAS_URL)
     logger.info("anda_fetch_page", source="anda")
     response = await _get_with_retry(ESTATISTICAS_URL)
@@ -54,8 +53,6 @@ async def fetch_estatisticas_page() -> str:
 
 
 async def download_file(url: str) -> bytes:
-    from agrobr.exceptions import SourceUnavailableError
-
     logger.debug("anda_download", url=url)
     logger.info("anda_download", source="anda")
     response = await _get_with_retry(url)
@@ -80,13 +77,8 @@ def parse_links_from_html(html: str, pattern: str = r"\.pdf|\.xlsx?") -> list[di
     return links
 
 
-async def fetch_entregas_pdf(ano: int) -> tuple[bytes, int]:
-    html = await fetch_estatisticas_page()
-    links = parse_links_from_html(html, pattern=r"\.pdf")
-
-    ano_str = str(ano)
+def _select_pdf_target(links: list[dict[str, str]], ano_str: str) -> dict[str, str] | None:
     candidates = [link for link in links if ano_str in link["text"]]
-
     if not candidates:
         candidates = [link for link in links if ano_str in link["url"]]
 
@@ -95,33 +87,43 @@ async def fetch_entregas_pdf(ano: int) -> tuple[bytes, int]:
         for link in candidates
         if re.search(r"entrega|fertiliz|indicador", f"{link['text']} {link['url']}", re.IGNORECASE)
     ]
+    return priority[0] if priority else (candidates[0] if candidates else None)
 
-    target = priority[0] if priority else (candidates[0] if candidates else None)
 
-    if not target:
-        all_years = sorted(
-            {m.group(0) for link in links for m in re.finditer(r"20\d{2}", link["text"]) if m},
-            reverse=True,
-        )
-        if all_years:
-            fallback_ano = int(all_years[0])
-            logger.warning("anda_ano_fallback", requested=ano, fallback=fallback_ano)
-            return await fetch_entregas_pdf(fallback_ano)
-
-        raise FileNotFoundError(
-            f"PDF de entregas ANDA para {ano} não encontrado. "
-            f"Links disponíveis: {[link['text'] for link in links[:10]]}"
-        )
-
-    ano_real = ano
+def _extract_ano_real(target: dict[str, str], ano: int) -> int:
     text_years = re.findall(r"20\d{2}", target["text"])
     if text_years:
-        ano_real = int(text_years[-1])
-    else:
-        filename = target["url"].split("/")[-1]
-        filename_years = re.findall(r"20\d{2}", filename)
-        if filename_years:
-            ano_real = int(filename_years[-1])
+        return int(text_years[-1])
+
+    filename = target["url"].split("/")[-1]
+    filename_years = re.findall(r"20\d{2}", filename)
+    if filename_years:
+        return int(filename_years[-1])
+
+    return ano
+
+
+async def fetch_entregas_pdf(ano: int) -> tuple[bytes, int]:
+    html = await fetch_estatisticas_page()
+    links = parse_links_from_html(html, pattern=r"\.pdf")
+
+    target = _select_pdf_target(links, str(ano))
+
+    if not target:
+        anos_disponiveis = sorted(
+            {m.group(0) for link in links for m in re.finditer(r"20\d{2}", link["text"])},
+            reverse=True,
+        )
+        raise SourceUnavailableError(
+            source="anda",
+            url=ESTATISTICAS_URL,
+            last_error=(
+                f"PDF de entregas ANDA para {ano} não encontrado. "
+                f"Anos disponíveis no site: {anos_disponiveis or 'nenhum'}"
+            ),
+        )
+
+    ano_real = _extract_ano_real(target, ano)
 
     logger.debug("anda_pdf_found_detail", url=target["url"])
     logger.info("anda_pdf_found", source="anda", ano=ano, ano_real=ano_real, text=target["text"])

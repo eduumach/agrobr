@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-from agrobr.cepea.parsers.fingerprint import (
-    compare_fingerprints,
-    extract_fingerprint,
-)
+from agrobr.cepea.parsers.fingerprint import extract_fingerprint
 from agrobr.constants import Fonte
+from agrobr.validators.structural import compare_fingerprints
 
 
 class TestFingerprint:
