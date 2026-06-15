@@ -24,7 +24,7 @@ df = await agrobr.alt.sicar.imoveis("DF")
 | area_min | float | Nao | Area minima em hectares |
 | area_max | float | Nao | Area maxima em hectares |
 | criado_apos | str | Nao | Data minima de criacao (ISO, ex: "2020-01-01") |
-| atualizado_apos | str | Nao | Retorna apenas registros com `data_atualizacao` posterior a esta data (ISO, ex: "2026-06-07" ou "2026-06-07T00:00:00"). Indisponivel para SP, RS, PR, SC, RJ, TO (campo nao existe nesses layers WFS) |
+| atualizado_apos | str | Nao | Filtra server-side por `data_atualizacao` posterior a esta data (ISO, ex: "2026-06-07" ou "2026-06-07T00:00:00"). A coluna `data_atualizacao` nao e retornada pelo WFS (vem vazia no resultado). Indisponivel para SP, RS, PR, SC, RJ, TO (campo nao existe nesses layers WFS) |
 | return_meta | bool | Nao | Se True, retorna (DataFrame, MetaInfo) |
 
 ### Colunas de retorno
@@ -151,7 +151,7 @@ gdf = await agrobr.alt.sicar.imoveis_geo("DF")
 | area_min | float | Nao | Area minima em hectares |
 | area_max | float | Nao | Area maxima em hectares |
 | criado_apos | str | Nao | Data minima de criacao (ISO, ex: "2020-01-01") |
-| atualizado_apos | str | Nao | Retorna apenas registros com `data_atualizacao` posterior a esta data (ISO, ex: "2026-06-07" ou "2026-06-07T00:00:00"). Indisponivel para SP, RS, PR, SC, RJ, TO (campo nao existe nesses layers WFS) |
+| atualizado_apos | str | Nao | Filtra server-side por `data_atualizacao` posterior a esta data (ISO, ex: "2026-06-07" ou "2026-06-07T00:00:00"). A coluna `data_atualizacao` nao e retornada pelo WFS (vem vazia no resultado). Indisponivel para SP, RS, PR, SC, RJ, TO (campo nao existe nesses layers WFS) |
 | return_meta | bool | Nao | Se True, retorna (GeoDataFrame, MetaInfo) |
 
 ### Colunas de retorno
@@ -220,7 +220,7 @@ async for gdf in agrobr.alt.sicar.imoveis_geo_stream("MT"):
 | area_min | float | Nao | Area minima em hectares |
 | area_max | float | Nao | Area maxima em hectares |
 | criado_apos | str | Nao | Data minima de criacao (ISO, ex: "2020-01-01") |
-| atualizado_apos | str | Nao | Retorna apenas registros com `data_atualizacao` posterior a esta data (ISO, ex: "2026-06-07" ou "2026-06-07T00:00:00"). Indisponivel para SP, RS, PR, SC, RJ, TO (campo nao existe nesses layers WFS) |
+| atualizado_apos | str | Nao | Filtra server-side por `data_atualizacao` posterior a esta data (ISO, ex: "2026-06-07" ou "2026-06-07T00:00:00"). A coluna `data_atualizacao` nao e retornada pelo WFS (vem vazia no resultado). Indisponivel para SP, RS, PR, SC, RJ, TO (campo nao existe nesses layers WFS) |
 
 Cada item gerado e um `GeoDataFrame` com as mesmas colunas de [`imoveis_geo`](#imoveis_geo).
 
@@ -237,7 +237,7 @@ print(total)
 ### Notas
 
 - Sem limite de `max_features`: pagina ate esgotar todos os registros da UF
-- Cada yield contem ate `GEO_BATCH_SIZE * 10.000` features (`GEO_BATCH_SIZE` paginas de 10.000 baixadas em paralelo via `asyncio.gather`; default `GEO_BATCH_SIZE=1`)
+- Cada yield contem ate 10.000 features (uma pagina WFS), baixadas sequencialmente com throttle
 - Deduplica `cod_imovel` entre batches
 - CRS: EPSG:4326 (WGS84)
 - Async-only: `agrobr.sync` nao suporta async generators

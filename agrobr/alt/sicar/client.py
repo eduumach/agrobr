@@ -42,8 +42,6 @@ TIMEOUT = get_timeout(read=180.0)
 THROTTLE_AFTER_PAGE = 5
 THROTTLE_DELAY = 2.0
 
-GEO_BATCH_SIZE = 1
-
 _ssl_ctx = ssl.create_default_context()
 _ssl_ctx.check_hostname = False
 _ssl_ctx.verify_mode = ssl.CERT_NONE
@@ -154,10 +152,11 @@ async def stream_imoveis_geo(
     cql_filter: str | None = None,
     max_features: int | None = MAX_FEATURES_GEO,
 ) -> AsyncGenerator[tuple[list[bytes], str], None]:
-    """Yields (batch_pages, source_url) conforme as paginas sao baixadas.
+    """Yields (pages, source_url) conforme as paginas sao baixadas.
 
-    Quando max_features e None, cada yield corresponde a um batch paralelo de
-    GEO_BATCH_SIZE paginas. Isso evita acumular todo o estado bruto em memoria.
+    Quando max_features e None, cada yield corresponde a uma pagina, baixada
+    sequencialmente com o throttle pos-pagina. Isso evita acumular todo o
+    estado bruto em memoria.
     """
     if max_features is not None and max_features <= PAGE_SIZE:
         url = _build_wfs_url(
@@ -220,10 +219,8 @@ async def stream_imoveis_geo(
             return content
 
         if max_features is None:
-            for start in range(0, n_pages, GEO_BATCH_SIZE):
-                batch = range(start, min(start + GEO_BATCH_SIZE, n_pages))
-                pages = list(await asyncio.gather(*(fetch_page(i) for i in batch)))
-                yield pages, base_url
+            for i in range(n_pages):
+                yield [await fetch_page(i)], base_url
         else:
             pages = [await fetch_page(i) for i in range(n_pages)]
             yield pages, base_url
