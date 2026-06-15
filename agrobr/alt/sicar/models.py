@@ -53,6 +53,10 @@ STATUS_VALIDOS = frozenset({"AT", "PE", "SU", "CA"})
 
 TIPO_VALIDOS = frozenset({"IRU", "AST", "PCT"})
 
+# dat_criacao tem cobertura nacional, mas o campo data_atualizacao nao existe
+# nestes layers estaduais (causa "400 Bad Request" / ServiceException no WFS).
+UFS_SEM_DATA_ATUALIZACAO = frozenset({"SP", "RS", "PR", "SC", "RJ", "TO"})
+
 MAX_FEATURES_GEO = 5_000
 
 SICAR_GEOM_COLUMN = "geo_area_imovel"

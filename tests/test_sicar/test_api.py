@@ -59,6 +59,18 @@ class TestBuildCqlFilter:
         result = _build_cql_filter(criado_apos="2020-01-01")
         assert "dat_criacao>='2020-01-01'" in result
 
+    def test_atualizado_apos_date(self):
+        result = _build_cql_filter(atualizado_apos="2026-06-07")
+        assert "data_atualizacao>'2026-06-07'" in result
+
+    def test_atualizado_apos_datetime(self):
+        result = _build_cql_filter(atualizado_apos="2026-06-07T00:00:00")
+        assert "data_atualizacao>'2026-06-07T00:00:00'" in result
+
+    def test_atualizado_apos_invalido(self):
+        with pytest.raises(ValueError, match="atualizado_apos"):
+            _build_cql_filter(atualizado_apos="07/06/2026")
+
     def test_compound_filter(self):
         result = _build_cql_filter(municipio="Sorriso", status="AT", area_min=100.0)
         assert " AND " in result
@@ -124,6 +136,32 @@ class TestImoveis:
 
         cql = mock_fetch.call_args[0][1]
         assert "cod_municipio_ibge=1508159" in cql
+
+    @pytest.mark.asyncio
+    async def test_atualizado_apos_filter(self):
+        with (
+            patch.object(
+                api.client,
+                "fetch_hits",
+                new_callable=AsyncMock,
+                return_value=0,
+            ),
+            patch.object(
+                api.client,
+                "fetch_imoveis",
+                new_callable=AsyncMock,
+                return_value=([], "https://test.url"),
+            ) as mock_fetch,
+        ):
+            await imoveis("MG", atualizado_apos="2026-06-07T00:00:00")
+
+        cql = mock_fetch.call_args[0][1]
+        assert "data_atualizacao>'2026-06-07T00:00:00'" in cql
+
+    @pytest.mark.asyncio
+    async def test_atualizado_apos_unsupported_uf_raises(self):
+        with pytest.raises(ValueError, match="atualizado_apos"):
+            await imoveis("SP", atualizado_apos="2026-06-07")
 
     @pytest.mark.asyncio
     @pytest.mark.skipif(
@@ -587,6 +625,21 @@ class TestImoveisGeo:
         assert "cod_municipio_ibge=1508159" in cql
 
     @pytest.mark.asyncio
+    async def test_atualizado_apos_filter(self):
+        geojson = _load_golden_geojson()
+        mock_fetch = AsyncMock(return_value=([geojson], "https://test.url"))
+        with patch.object(api.client, "fetch_imoveis_geo", mock_fetch):
+            await imoveis_geo("MG", atualizado_apos="2026-06-07T00:00:00")
+
+        cql = call_args_cql(mock_fetch)
+        assert "data_atualizacao>'2026-06-07T00:00:00'" in cql
+
+    @pytest.mark.asyncio
+    async def test_atualizado_apos_unsupported_uf_raises(self):
+        with pytest.raises(ValueError, match="atualizado_apos"):
+            await imoveis_geo("RS", atualizado_apos="2026-06-07")
+
+    @pytest.mark.asyncio
     async def test_dedup_by_cod_imovel(self):
         import json
 
@@ -796,6 +849,12 @@ class TestImoveisGeoStream:
                 pass
 
     @pytest.mark.asyncio
+    async def test_atualizado_apos_unsupported_uf_raises(self):
+        with pytest.raises(ValueError, match="atualizado_apos"):
+            async for _ in imoveis_geo_stream("TO", atualizado_apos="2026-06-07"):
+                pass
+
+    @pytest.mark.asyncio
     async def test_yields_geodataframe_per_batch(self):
         import geopandas
 
@@ -867,6 +926,23 @@ class TestImoveisGeoStream:
         assert captured["uf"] == "DF"
         assert captured["max_features"] is None
         assert "municipio ILIKE" in captured["cql_filter"]
+
+    @pytest.mark.asyncio
+    async def test_passes_atualizado_apos_filter(self):
+        geojson = _load_golden_geojson()
+        captured: dict[str, object] = {}
+
+        async def fake_stream(uf, cql_filter=None, *, max_features=None):
+            captured["uf"] = uf
+            captured["cql_filter"] = cql_filter
+            captured["max_features"] = max_features
+            yield [geojson], "https://test.url"
+
+        with patch.object(api.client, "stream_imoveis_geo", fake_stream):
+            async for _ in imoveis_geo_stream("MG", atualizado_apos="2026-06-07T00:00:00"):
+                pass
+
+        assert "data_atualizacao>'2026-06-07T00:00:00'" in captured["cql_filter"]
 
 
 class TestImoveisNullDataCriacao:

@@ -19,10 +19,12 @@ from .models import (
     MAX_FEATURES_WARNING,
     STATUS_VALIDOS,
     TIPO_VALIDOS,
+    UFS_SEM_DATA_ATUALIZACAO,
     WFS_BASE,
 )
 
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_DATETIME_RE = re.compile(r"^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?)?$")
 
 if TYPE_CHECKING:
     import geopandas as gpd
@@ -39,6 +41,7 @@ def _build_cql_filter(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    atualizado_apos: str | None = None,
 ) -> str | None:
     parts: list[str] = []
 
@@ -65,7 +68,23 @@ def _build_cql_filter(
             raise ValueError(f"criado_apos invalido (esperado YYYY-MM-DD): {criado_apos!r}")
         parts.append(f"dat_criacao>='{criado_apos}'")
 
+    if atualizado_apos:
+        if not _DATETIME_RE.match(atualizado_apos):
+            raise ValueError(
+                f"atualizado_apos invalido (esperado YYYY-MM-DD ou YYYY-MM-DDTHH:MM:SS): "
+                f"{atualizado_apos!r}"
+            )
+        parts.append(f"data_atualizacao>'{atualizado_apos}'")
+
     return " AND ".join(parts) if parts else None
+
+
+def _check_atualizado_apos_uf(uf: str, atualizado_apos: str | None) -> None:
+    if atualizado_apos and uf in UFS_SEM_DATA_ATUALIZACAO:
+        raise ValueError(
+            f"atualizado_apos nao suportado para UF '{uf}': campo 'data_atualizacao' "
+            f"nao existe neste layer WFS (UFs sem suporte: {sorted(UFS_SEM_DATA_ATUALIZACAO)})"
+        )
 
 
 def _validar_filtros_imoveis(
@@ -129,6 +148,7 @@ async def imoveis(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    atualizado_apos: str | None = None,
     as_polars: bool = False,
     return_meta: Literal[False] = False,
 ) -> pd.DataFrame: ...
@@ -145,6 +165,7 @@ async def imoveis(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    atualizado_apos: str | None = None,
     as_polars: bool = False,
     return_meta: Literal[True],
 ) -> tuple[pd.DataFrame, MetaInfo]: ...
@@ -160,11 +181,14 @@ async def imoveis(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    atualizado_apos: str | None = None,
     as_polars: bool = False,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> pd.DataFrame | tuple[pd.DataFrame, MetaInfo]:
     uf_upper = _validar_filtros_imoveis(uf, municipio, cod_municipio, status, tipo)
+
+    _check_atualizado_apos_uf(uf_upper, atualizado_apos)
 
     logger.info(
         "sicar_imoveis",
@@ -185,6 +209,7 @@ async def imoveis(
         area_min=area_min,
         area_max=area_max,
         criado_apos=criado_apos,
+        atualizado_apos=atualizado_apos,
     )
 
     if municipio is None and cod_municipio is None:
@@ -242,6 +267,7 @@ async def imoveis_geo(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    atualizado_apos: str | None = None,
     max_features: int | None = 5000,
     return_meta: Literal[False] = False,
 ) -> gpd.GeoDataFrame: ...
@@ -258,6 +284,7 @@ async def imoveis_geo(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    atualizado_apos: str | None = None,
     max_features: int | None = 5000,
     return_meta: Literal[True],
 ) -> tuple[gpd.GeoDataFrame, MetaInfo]: ...
@@ -273,11 +300,14 @@ async def imoveis_geo(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    atualizado_apos: str | None = None,
     max_features: int | None = 5000,
     return_meta: bool = False,
     **kwargs: Any,  # noqa: ARG001
 ) -> Any:
     uf_upper = _validar_filtros_imoveis(uf, municipio, cod_municipio, status, tipo)
+
+    _check_atualizado_apos_uf(uf_upper, atualizado_apos)
 
     logger.info(
         "sicar_imoveis_geo",
@@ -298,6 +328,7 @@ async def imoveis_geo(
         area_min=area_min,
         area_max=area_max,
         criado_apos=criado_apos,
+        atualizado_apos=atualizado_apos,
     )
 
     if municipio is None and cod_municipio is None:
@@ -340,15 +371,17 @@ async def imoveis_geo_stream(
     area_min: float | None = None,
     area_max: float | None = None,
     criado_apos: str | None = None,
+    atualizado_apos: str | None = None,
 ) -> AsyncGenerator[gpd.GeoDataFrame, None]:
     """Itera sobre os imoveis rurais geoespaciais de uma UF em batches de baixo consumo de memoria.
 
-    Cada yield e um GeoDataFrame parcial com ate PAGE_SIZE features (uma pagina WFS).
+    Cada yield e um GeoDataFrame parcial com ate GEO_BATCH_SIZE * PAGE_SIZE features.
     Ideal para processar volumes grandes (max_features=None implicito) sem acumular
     tudo em memoria antes de comecar a usar os dados. Async-only: sem suporte em
     agrobr.sync.
     """
     uf_upper = _validar_filtros_imoveis(uf, municipio, cod_municipio, status, tipo)
+    _check_atualizado_apos_uf(uf_upper, atualizado_apos)
 
     cql = _build_cql_filter(
         municipio=municipio,
@@ -358,6 +391,7 @@ async def imoveis_geo_stream(
         area_min=area_min,
         area_max=area_max,
         criado_apos=criado_apos,
+        atualizado_apos=atualizado_apos,
     )
 
     seen_cod_imovel: set[str] = set()
