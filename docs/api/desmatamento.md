@@ -207,6 +207,45 @@ alertas_em_reserva = gpd.sjoin(gdf, car[car["tipo"] == "RESERVA_LEGAL"])
 
 ---
 
+## `desmatamento.deter_geo_stream()`
+
+Itera os alertas DETER com geometria em batches, sem acumular tudo em memoria nem
+esbarrar no teto de `maxFeatures` da chamada unica de `deter_geo()`. Pagina a WFS
+via `startIndex`/`count` (WFS 2.0.0). Requer `pip install agrobr[geo]`.
+
+```python
+import agrobr
+
+# Processa todos os alertas da Amazonia sem guardar tudo em memoria
+total = 0
+async for gdf in agrobr.desmatamento.deter_geo_stream(bioma="Amazônia"):
+    total += len(gdf)
+print(total)
+```
+
+### Parametros
+
+| Parametro | Tipo | Obrigatorio | Descricao |
+|-----------|------|-------------|-----------|
+| `bioma` | `str` | Nao | Bioma: "Amazonia", "Cerrado". Default: "Amazonia" |
+| `uf` | `str` | Nao | Filtrar por UF (ex: "PA") |
+| `data_inicio` | `str` | Nao | Data inicial YYYY-MM-DD |
+| `data_fim` | `str` | Nao | Data final YYYY-MM-DD |
+| `classe` | `str` | Nao | Filtrar por classe de alerta (aplicado por batch) |
+| `page_size` | `int` | Nao | Features por pagina WFS. Default: 5000 |
+
+Cada item gerado e um `GeoDataFrame` com as mesmas colunas de [`deter_geo()`](#desmatamentodeter_geo).
+
+### Notas
+
+- Sem teto de `maxFeatures`: pagina ate esgotar todos os registros do recorte
+- Cada yield contem ate `page_size` features (uma pagina WFS), baixadas sequencialmente com throttle
+- Paginas vazias sao ignoradas
+- CRS: EPSG:4326 (WGS84)
+- Async-only: `agrobr.sync` nao suporta async generators
+
+---
+
 ## Uso Sincrono
 
 ```python

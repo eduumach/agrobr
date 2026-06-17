@@ -4,6 +4,7 @@ import asyncio
 import json
 import math
 import re
+from collections.abc import AsyncGenerator
 from typing import Any, Literal, TypedDict
 from urllib.parse import quote, urlencode
 
@@ -295,7 +296,7 @@ def parse_wfs_hits(content: bytes, *, source: str) -> int:
     )
 
 
-async def fetch_wfs_paginated(
+async def stream_wfs_paginated(
     base: str,
     namespace: str,
     layer: str,
@@ -307,9 +308,17 @@ async def fetch_wfs_paginated(
     timeout: httpx.Timeout,
     cql: str | None = None,
     bbox: tuple[float, float, float, float] | None = None,
+    output_format: str = "csv",
     throttle_after_page: int = 5,
     throttle_delay: float = 2.0,
-) -> tuple[list[bytes], str]:
+) -> AsyncGenerator[tuple[bytes, str], None]:
+    """Yields (page_bytes, url) conforme as paginas WFS sao baixadas.
+
+    Conta o total via ``resultType=hits`` e pagina com ``startIndex``/``count``
+    (WFS 2.0.0) ou ``maxFeatures`` (1.x), baixando sequencialmente para nao
+    acumular o estado bruto em memoria. Ideal para volumes grandes; use
+    ``fetch_wfs_paginated`` quando quiser tudo em memoria de uma vez.
+    """
     hits_url = build_wfs_url(
         base,
         namespace,
@@ -326,22 +335,9 @@ async def fetch_wfs_paginated(
     logger.info("wfs_paginated_hits", source=source, layer=layer, total=total)
 
     if total == 0:
-        url = build_wfs_url(
-            base,
-            namespace,
-            layer,
-            version,
-            property_names,
-            max_features=page_size,
-            cql_filter=cql,
-            bbox=bbox,
-        )
-        return [], url
+        return
 
     n_pages = math.ceil(total / page_size)
-    pages: list[bytes] = []
-    first_url = ""
-
     async with httpx.AsyncClient(
         timeout=timeout,
         headers=UserAgentRotator.get_bot_headers(),
@@ -355,19 +351,17 @@ async def fetch_wfs_paginated(
                 version,
                 property_names,
                 max_features=page_size,
+                output_format=output_format,
                 cql_filter=cql,
                 start_index=i * page_size,
                 bbox=bbox,
             )
-            if i == 0:
-                first_url = url
             content = await fetch_wfs(
                 url,
                 source=source,
                 timeout=timeout,
                 client=http,
             )
-            pages.append(content)
             logger.debug(
                 "wfs_paginated_page",
                 source=source,
@@ -376,9 +370,60 @@ async def fetch_wfs_paginated(
                 total_pages=n_pages,
                 size=len(content),
             )
+            yield content, url
             if i >= throttle_after_page:
                 await asyncio.sleep(throttle_delay)
 
+
+async def fetch_wfs_paginated(
+    base: str,
+    namespace: str,
+    layer: str,
+    version: str,
+    property_names: list[str],
+    page_size: int,
+    *,
+    source: str,
+    timeout: httpx.Timeout,
+    cql: str | None = None,
+    bbox: tuple[float, float, float, float] | None = None,
+    output_format: str = "csv",
+    throttle_after_page: int = 5,
+    throttle_delay: float = 2.0,
+) -> tuple[list[bytes], str]:
+    pages: list[bytes] = []
+    first_url = ""
+    async for content, url in stream_wfs_paginated(
+        base,
+        namespace,
+        layer,
+        version,
+        property_names,
+        page_size,
+        source=source,
+        timeout=timeout,
+        cql=cql,
+        bbox=bbox,
+        output_format=output_format,
+        throttle_after_page=throttle_after_page,
+        throttle_delay=throttle_delay,
+    ):
+        if not first_url:
+            first_url = url
+        pages.append(content)
+
+    if not first_url:
+        first_url = build_wfs_url(
+            base,
+            namespace,
+            layer,
+            version,
+            property_names,
+            max_features=page_size,
+            output_format=output_format,
+            cql_filter=cql,
+            bbox=bbox,
+        )
     return pages, first_url
 
 

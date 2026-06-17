@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import AsyncGenerator
 from urllib.parse import quote
 
 import structlog
@@ -8,7 +9,7 @@ import structlog
 from agrobr.constants import URLS, Fonte
 from agrobr.exceptions import SourceUnavailableError
 from agrobr.http.settings import get_timeout
-from agrobr.utils.geo import fetch_wfs
+from agrobr.utils.geo import fetch_wfs, stream_wfs_paginated
 
 from .models import (
     DETER_COLUNAS_WFS_AMZ,
@@ -33,6 +34,10 @@ GEOSERVER_BASE = URLS[Fonte.DESMATAMENTO]["geoserver"]
 TIMEOUT = get_timeout(read=120.0)
 
 MAX_FEATURES_PER_REQUEST = 50000
+
+# Streaming (paginacao WFS 2.0.0 via startIndex/count para baixo consumo de memoria)
+STREAM_WFS_VERSION = "2.0.0"
+STREAM_PAGE_SIZE = 5_000
 
 
 def _build_wfs_url(
@@ -129,15 +134,7 @@ async def fetch_prodes_geo(
     return content, url
 
 
-async def _fetch_deter_raw(
-    bioma: str,
-    uf: str | None = None,
-    data_inicio: str | None = None,
-    data_fim: str | None = None,
-    *,
-    output_format: str = "csv",
-    include_geometry: bool = False,
-) -> tuple[bytes, str]:
+def _resolve_deter_layer(bioma: str) -> tuple[str, str]:
     workspace = DETER_WORKSPACES.get(bioma)
     layer = DETER_LAYERS.get(bioma)
     if not workspace or not layer:
@@ -146,14 +143,14 @@ async def _fetch_deter_raw(
             url="",
             last_error=f"Bioma DETER nao suportado: {bioma}",
         )
+    return workspace, layer
 
-    if include_geometry:
-        cols = DETER_COLUNAS_WFS_GEO_AMZ if bioma == "Amazônia" else DETER_COLUNAS_WFS_GEO_CERRADO
-        max_features = MAX_FEATURES_GEO
-    else:
-        cols = DETER_COLUNAS_WFS_AMZ if bioma == "Amazônia" else DETER_COLUNAS_WFS_CERRADO
-        max_features = MAX_FEATURES_PER_REQUEST
 
+def _build_deter_cql(
+    uf: str | None = None,
+    data_inicio: str | None = None,
+    data_fim: str | None = None,
+) -> str | None:
     filters: list[str] = []
     if uf is not None:
         filters.append(f"uf='{uf}'")
@@ -165,13 +162,67 @@ async def _fetch_deter_raw(
         if not _DATE_RE.match(data_fim):
             raise ValueError(f"data_fim invalida (esperado YYYY-MM-DD): {data_fim!r}")
         filters.append(f"view_date<='{data_fim}'")
+    return " AND ".join(filters) if filters else None
 
-    cql = " AND ".join(filters) if filters else None
+
+async def _fetch_deter_raw(
+    bioma: str,
+    uf: str | None = None,
+    data_inicio: str | None = None,
+    data_fim: str | None = None,
+    *,
+    output_format: str = "csv",
+    include_geometry: bool = False,
+) -> tuple[bytes, str]:
+    workspace, layer = _resolve_deter_layer(bioma)
+
+    if include_geometry:
+        cols = DETER_COLUNAS_WFS_GEO_AMZ if bioma == "Amazônia" else DETER_COLUNAS_WFS_GEO_CERRADO
+        max_features = MAX_FEATURES_GEO
+    else:
+        cols = DETER_COLUNAS_WFS_AMZ if bioma == "Amazônia" else DETER_COLUNAS_WFS_CERRADO
+        max_features = MAX_FEATURES_PER_REQUEST
+
+    cql = _build_deter_cql(uf, data_inicio, data_fim)
     url = _build_wfs_url(
         workspace, layer, cols, cql, max_features=max_features, output_format=output_format
     )
     content = await fetch_wfs(url, source="desmatamento", timeout=TIMEOUT)
     return content, url
+
+
+async def stream_deter_geo(
+    bioma: str,
+    uf: str | None = None,
+    data_inicio: str | None = None,
+    data_fim: str | None = None,
+    *,
+    page_size: int = STREAM_PAGE_SIZE,
+) -> AsyncGenerator[tuple[bytes, str], None]:
+    """Yields (page_bytes, url) de GeoJSON DETER conforme as paginas WFS sao baixadas.
+
+    Pagina via WFS 2.0.0 (startIndex/count) sem acumular o estado bruto em
+    memoria nem esbarrar no teto de ``MAX_FEATURES_GEO``. Async-only.
+    """
+    workspace, layer = _resolve_deter_layer(bioma)
+    cols = DETER_COLUNAS_WFS_GEO_AMZ if bioma == "Amazônia" else DETER_COLUNAS_WFS_GEO_CERRADO
+    cql = _build_deter_cql(uf, data_inicio, data_fim)
+    base = f"{GEOSERVER_BASE}/{workspace}/ows"
+
+    async for content, url in stream_wfs_paginated(
+        base,
+        workspace,
+        layer,
+        STREAM_WFS_VERSION,
+        cols,
+        page_size,
+        source="desmatamento",
+        timeout=TIMEOUT,
+        cql=cql,
+        output_format="application/json",
+    ):
+        logger.debug("desmatamento_deter_geojson_page", bioma=bioma, size=len(content))
+        yield content, url
 
 
 async def fetch_deter(

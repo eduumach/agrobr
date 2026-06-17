@@ -118,6 +118,12 @@ gdf = await agrobr.desmatamento.deter_geo(
     data_inicio="2024-01-01",
     data_fim="2024-06-30",
 )
+
+# Streaming geoespacial: pagina a WFS em batches (uma pagina por yield), sem
+# acumular tudo em memoria nem esbarrar no teto de maxFeatures. Async-only.
+total = 0
+async for gdf_batch in agrobr.desmatamento.deter_geo_stream(bioma="Amazônia"):
+    total += len(gdf_batch)
 ```
 
 ## Limitacoes

@@ -94,7 +94,7 @@ def parse_deter_csv(data: bytes, bioma: str) -> pd.DataFrame:
     return df
 
 
-def parse_deter_geojson(data: bytes, bioma: str) -> Any:
+def parse_deter_geojson(data: bytes, bioma: str, *, allow_empty: bool = False) -> Any:
     gpd = check_geopandas()
 
     try:
@@ -108,6 +108,9 @@ def parse_deter_geojson(data: bytes, bioma: str) -> Any:
 
     features = geojson.get("features", [])
     if not features:
+        if allow_empty:
+            empty = gpd.GeoDataFrame(columns=COLUNAS_SAIDA_DETER_GEO)
+            return empty.set_geometry("geometry")
         raise ParseError(
             source="desmatamento",
             parser_version=PARSER_VERSION,

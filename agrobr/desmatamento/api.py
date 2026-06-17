@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+from collections.abc import AsyncGenerator
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 import pandas as pd
@@ -307,3 +308,46 @@ async def deter_geo(
         return gdf, meta
 
     return gdf
+
+
+async def deter_geo_stream(
+    *,
+    bioma: str = "Amazônia",
+    uf: str | None = None,
+    data_inicio: str | None = None,
+    data_fim: str | None = None,
+    classe: str | None = None,
+    page_size: int = client.STREAM_PAGE_SIZE,
+) -> AsyncGenerator[gpd.GeoDataFrame, None]:
+    """Itera sobre os alertas DETER geoespaciais em batches de baixo consumo de memoria.
+
+    Cada yield e um GeoDataFrame parcial com ate ``page_size`` features (uma pagina
+    WFS). Pagina via WFS 2.0.0, evitando acumular tudo em memoria e o teto de
+    ``MAX_FEATURES_GEO`` da chamada unica em ``deter_geo``. Async-only: sem suporte
+    em agrobr.sync.
+    """
+    bioma = normalizar_bioma(bioma)
+    uf = validate_uf(uf)
+    logger.info(
+        "desmatamento_deter_geo_stream",
+        bioma=bioma,
+        uf=uf,
+        data_inicio=data_inicio,
+        data_fim=data_fim,
+        classe=classe,
+    )
+
+    async for page_bytes, _url in client.stream_deter_geo(
+        bioma,
+        uf=uf,
+        data_inicio=data_inicio,
+        data_fim=data_fim,
+        page_size=page_size,
+    ):
+        gdf = parser.parse_deter_geojson(page_bytes, bioma, allow_empty=True)
+        if gdf.empty:
+            continue
+        if classe is not None:
+            gdf = gdf[gdf["classe"] == classe].reset_index(drop=True)
+        if not gdf.empty:
+            yield gdf

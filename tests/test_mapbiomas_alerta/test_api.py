@@ -166,6 +166,58 @@ class TestAlertasGeo:
         assert isinstance(gdf, local_gpd.GeoDataFrame)
 
 
+class TestAlertasGeoStream:
+    @pytest.fixture(autouse=True)
+    def _skip_no_geopandas(self):
+        pytest.importorskip("geopandas")
+
+    @pytest.fixture(autouse=True)
+    def _mock_token(self):
+        with patch.object(api.client, "_get_token", return_value="test-tok"):
+            yield
+
+    @pytest.mark.asyncio
+    async def test_yields_geodataframes(self):
+        import geopandas as local_gpd
+
+        records = _mock_records()
+
+        async def fake_stream(**_kwargs):
+            yield records, "url"
+
+        with patch.object(api.client, "stream_alertas", side_effect=fake_stream):
+            batches = [gdf async for gdf in api.alertas_geo_stream(token="tok")]
+
+        assert len(batches) == 1
+        assert isinstance(batches[0], local_gpd.GeoDataFrame)
+        assert len(batches[0]) == 5
+
+    @pytest.mark.asyncio
+    async def test_dedups_across_pages(self):
+        records = _mock_records()
+
+        async def fake_stream(**_kwargs):
+            yield records, "url"
+            yield records, "url"  # mesma pagina repetida
+
+        with patch.object(api.client, "stream_alertas", side_effect=fake_stream):
+            batches = [gdf async for gdf in api.alertas_geo_stream(token="tok")]
+
+        # Segunda pagina deduplica integralmente -> apenas um batch.
+        assert len(batches) == 1
+        assert len(batches[0]) == 5
+
+    @pytest.mark.asyncio
+    async def test_skips_empty_pages(self):
+        async def fake_stream(**_kwargs):
+            yield [], "url"
+
+        with patch.object(api.client, "stream_alertas", side_effect=fake_stream):
+            batches = [gdf async for gdf in api.alertas_geo_stream(token="tok")]
+
+        assert batches == []
+
+
 class TestAlertaInfo:
     @pytest.mark.asyncio
     async def test_returns_dict(self):

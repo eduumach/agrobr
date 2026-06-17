@@ -220,6 +220,62 @@ class TestFetchDeterGeo:
             await fetch_deter_geo("bioma_invalido")
 
 
+class TestStreamDeterGeo:
+    HITS = b'<wfs:FeatureCollection numberMatched="2" numberReturned="0"/>'
+    GEOJSON = b'{"type":"FeatureCollection","features":[]}'
+
+    @pytest.mark.asyncio
+    async def test_paginates_and_yields_pages(self):
+        from agrobr.desmatamento.client import stream_deter_geo
+
+        with patch(
+            "agrobr.utils.geo.fetch_wfs",
+            new_callable=AsyncMock,
+            side_effect=[self.HITS, self.GEOJSON],
+        ):
+            batches = [c async for c, _u in stream_deter_geo("Amazônia", page_size=5000)]
+
+        assert batches == [self.GEOJSON]
+
+    @pytest.mark.asyncio
+    async def test_url_uses_wfs_2_pagination_and_json(self):
+        from agrobr.desmatamento.client import stream_deter_geo
+
+        with patch(
+            "agrobr.utils.geo.fetch_wfs",
+            new_callable=AsyncMock,
+            side_effect=[self.HITS, self.GEOJSON],
+        ):
+            urls = [u async for _c, u in stream_deter_geo("Amazônia", page_size=5000)]
+
+        assert "version=2.0.0" in urls[0]
+        assert "startIndex=0" in urls[0]
+        assert "count=5000" in urls[0]
+        assert "outputFormat=application/json" in urls[0]
+
+    @pytest.mark.asyncio
+    async def test_total_zero_yields_nothing(self):
+        from agrobr.desmatamento.client import stream_deter_geo
+
+        hits0 = b'<wfs:FeatureCollection numberMatched="0"/>'
+        with patch(
+            "agrobr.utils.geo.fetch_wfs",
+            new_callable=AsyncMock,
+            return_value=hits0,
+        ):
+            batches = [c async for c, _u in stream_deter_geo("Amazônia")]
+
+        assert batches == []
+
+    @pytest.mark.asyncio
+    async def test_unsupported_bioma(self):
+        from agrobr.desmatamento.client import stream_deter_geo
+
+        with pytest.raises(SourceUnavailableError, match="nao suportado"):
+            async for _ in stream_deter_geo("bioma_invalido"):
+                pass
+
+
 class TestFetchProdesGeo:
     @pytest.mark.asyncio
     async def test_successful_fetch(self):

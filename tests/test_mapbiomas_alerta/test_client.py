@@ -159,6 +159,64 @@ class TestFetchAlertas:
         assert len(records) == 1
 
 
+class TestStreamAlertas:
+    @pytest.mark.asyncio
+    async def test_yields_one_batch_per_page(self):
+        from agrobr.mapbiomas_alerta import client
+
+        page1_data = {
+            "alerts": {
+                "collection": [{"alertCode": i} for i in range(100)],
+                "metadata": {"currentPage": 1, "totalCount": 101, "totalPages": 2},
+            }
+        }
+        page2_data = {
+            "alerts": {
+                "collection": [{"alertCode": 100}],
+                "metadata": {"currentPage": 2, "totalCount": 101, "totalPages": 2},
+            }
+        }
+        resps = []
+        for data in (page1_data, page2_data):
+            r = MagicMock()
+            r.status_code = 200
+            r.json.return_value = {"data": data}
+            r.raise_for_status = MagicMock()
+            resps.append(r)
+
+        with patch(
+            "agrobr.mapbiomas_alerta.client.retry_on_status",
+            new_callable=AsyncMock,
+            side_effect=resps,
+        ):
+            batches = [
+                collection
+                async for collection, _url in client.stream_alertas(token="tok", limit=100)
+            ]
+
+        assert [len(b) for b in batches] == [100, 1]
+
+    @pytest.mark.asyncio
+    async def test_stops_on_empty_collection(self):
+        from agrobr.mapbiomas_alerta import client
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.json.return_value = {
+            "data": {"alerts": {"collection": [], "metadata": {"totalPages": 5}}}
+        }
+        mock_resp.raise_for_status = MagicMock()
+
+        with patch(
+            "agrobr.mapbiomas_alerta.client.retry_on_status",
+            new_callable=AsyncMock,
+            return_value=mock_resp,
+        ):
+            batches = [b async for b in client.stream_alertas(token="tok")]
+
+        assert batches == []
+
+
 class TestFetchAlertDateRange:
     @pytest.mark.asyncio
     async def test_returns_date_range(self):

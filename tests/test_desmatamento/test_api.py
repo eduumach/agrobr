@@ -407,3 +407,47 @@ class TestDeterGeo:
 
         assert "geometry" in gdf.columns
         assert gdf.geometry.is_valid.all()
+
+
+class TestDeterGeoStream:
+    @pytest.mark.asyncio
+    async def test_yields_geodataframes(self):
+        geojson_bytes = _deter_geojson_bytes()
+
+        async def fake_stream(*_args, **_kwargs):
+            yield geojson_bytes, "url"
+
+        with patch.object(api.client, "stream_deter_geo", side_effect=fake_stream):
+            batches = [gdf async for gdf in api.deter_geo_stream(bioma="amazonia")]
+
+        assert len(batches) == 1
+        assert isinstance(batches[0], gpd.GeoDataFrame)
+        assert len(batches[0]) >= 5
+        assert "geometry" in batches[0].columns
+
+    @pytest.mark.asyncio
+    async def test_skips_empty_pages(self):
+        empty = b'{"type":"FeatureCollection","features":[]}'
+
+        async def fake_stream(*_args, **_kwargs):
+            yield empty, "url"
+
+        with patch.object(api.client, "stream_deter_geo", side_effect=fake_stream):
+            batches = [gdf async for gdf in api.deter_geo_stream(bioma="Amazônia")]
+
+        assert batches == []
+
+    @pytest.mark.asyncio
+    async def test_classe_filter_removes_all(self):
+        geojson_bytes = _deter_geojson_bytes()
+
+        async def fake_stream(*_args, **_kwargs):
+            yield geojson_bytes, "url"
+
+        with patch.object(api.client, "stream_deter_geo", side_effect=fake_stream):
+            batches = [
+                gdf
+                async for gdf in api.deter_geo_stream(bioma="Amazônia", classe="CLASSE_INEXISTENTE")
+            ]
+
+        assert batches == []

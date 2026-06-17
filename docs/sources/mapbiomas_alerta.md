@@ -53,6 +53,15 @@ async def main():
         end_date="2024-03-31",
     )
 
+    # Streaming geoespacial: itera em batches (uma pagina GraphQL por yield),
+    # sem acumular todas as geometrias WKT em memoria. Dedup de alert_code
+    # entre batches. Async-only.
+    total = 0
+    async for gdf_batch in mapbiomas_alerta.alertas_geo_stream(
+        start_date="2024-01-01",
+    ):
+        total += len(gdf_batch)
+
     # Com metadados
     df, meta = await mapbiomas_alerta.alertas(return_meta=True)
 

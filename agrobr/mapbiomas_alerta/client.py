@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+from collections.abc import AsyncGenerator
 from typing import Any
 
 import httpx
@@ -76,7 +77,7 @@ async def _graphql_request(
         return await _do(http)
 
 
-async def fetch_alertas(
+async def stream_alertas(
     *,
     token: str,
     start_date: str | None = None,
@@ -85,9 +86,12 @@ async def fetch_alertas(
     bounding_box: list[float] | None = None,
     limit: int = 100,
     max_pages: int = 50,
-) -> tuple[list[dict[str, Any]], str]:
-    records: list[dict[str, Any]] = []
+) -> AsyncGenerator[tuple[list[dict[str, Any]], str], None]:
+    """Yields (collection, url) conforme cada pagina GraphQL e baixada.
 
+    Pagina sequencialmente sem acumular todos os alertas em memoria — ideal para
+    grandes consultas geoespaciais (geometryWkt e pesado).
+    """
     async with httpx.AsyncClient(timeout=TIMEOUT, follow_redirects=True) as http:
         for page_num in range(1, max_pages + 1):
             variables: dict[str, Any] = {"limit": limit, "page": page_num}
@@ -113,7 +117,6 @@ async def fetch_alertas(
             collection = alerts_data.get("collection", [])
             if not collection:
                 break
-            records.extend(collection)
 
             metadata = alerts_data.get("metadata", {})
             total_pages = metadata.get("totalPages", 1)
@@ -123,9 +126,34 @@ async def fetch_alertas(
                 total_pages=total_pages,
                 records=len(collection),
             )
+
+            yield collection, GRAPHQL_URL
+
             if page_num >= total_pages:
                 break
 
+
+async def fetch_alertas(
+    *,
+    token: str,
+    start_date: str | None = None,
+    end_date: str | None = None,
+    sources: list[str] | None = None,
+    bounding_box: list[float] | None = None,
+    limit: int = 100,
+    max_pages: int = 50,
+) -> tuple[list[dict[str, Any]], str]:
+    records: list[dict[str, Any]] = []
+    async for collection, _url in stream_alertas(
+        token=token,
+        start_date=start_date,
+        end_date=end_date,
+        sources=sources,
+        bounding_box=bounding_box,
+        limit=limit,
+        max_pages=max_pages,
+    ):
+        records.extend(collection)
     return records, GRAPHQL_URL
 
 
